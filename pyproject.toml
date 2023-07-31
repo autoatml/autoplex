@@ -29,7 +29,7 @@ dependencies = [
      "typing",
      "Sphinx>=4",
      "sphinx-argparse==0.4.0",
-     "sphinx-pdj-theme==0.2.1",
+     "sphinx-pdj-theme==0.4.0",
 ]
 
 [tool.versioningit.vcs]
