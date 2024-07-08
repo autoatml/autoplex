@@ -26,7 +26,7 @@ jobs:
           auto-update-conda: true
           python-version: ${{ matrix.python-version }}
           environment-file: environment.yml
-          auto-activate-base: false
+          auto-activate-base: true
     - name: Install dependencies
       run: |
         python -m pip cache purge
