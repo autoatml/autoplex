@@ -27,7 +27,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
           environment-file: environment.yml
           auto-activate-base: true
+
     - name: Install dependencies
+      shell: bash -l {0}
       run: |
         python -m pip cache purge
         python -m pip install --upgrade pip
