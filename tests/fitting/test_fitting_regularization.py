@@ -70,7 +70,7 @@ def test_auxiliary_functions(test_dir, memory_jobstore, clean_dir):
 
 
     file = test_dir / "fitting" / "ref_files" / "quip_train.extxyz"
-    atoms: Atoms = read(file, ":")
+    atoms: list[Atoms] = read(file, ":")
 
     # Define the arrays
     array1 = np.array([

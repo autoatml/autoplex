@@ -1214,7 +1214,7 @@ def boltzhist_CUR(
 
 
 def convexhull_CUR(
-    atoms: Atoms,
+    atoms: list[Atoms],
     descriptor: str,
     bolt_frac: float = 0.1,
     bolt_max_num: int = 3000,
