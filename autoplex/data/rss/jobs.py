@@ -16,9 +16,9 @@ if TYPE_CHECKING:
 import ase.io
 import numpy as np
 from ase.data import atomic_numbers, covalent_radii
-from jobflow import Maker, job
+from jobflow import Flow, Maker, Response, job
 
-from autoplex.data.rss.utils import minimize_structures
+from autoplex.data.rss.utils import minimize_structures, split_structure_into_groups
 
 
 @dataclass
@@ -360,7 +360,7 @@ class RandomizedStructure(Maker):
 
 
 @job
-def do_rss(
+def do_rss_single_node(
     mlip_type: str | None = None,
     iteration_index: str | None = None,
     mlip_path: str | None = None,
@@ -379,7 +379,9 @@ def do_rss(
     num_processes_rss: int = 1,
     device: str = "cpu",
     isol_es: dict[int, float] | None = None,
-) -> dict:
+    struct_start_index: int = 0,
+    config_type: str = "traj",
+) -> list[str | None]:
     """
     Perform sandom structure searching (RSS) using a MLIP.
 
@@ -394,37 +396,41 @@ def do_rss(
         Path to the MLIP model.
     structure : list of Structure, mandatory
         List of structures to be relaxed.
-    scalar_pressure_method : str, optional
+    scalar_pressure_method : str
         Method for scalar pressure. Default is 'exp'.
-    scalar_exp_pressure : float, optional
+    scalar_exp_pressure : float
         Scalar exponential pressure. Default is 100.
-    scalar_pressure_exponential_width : float, optional
+    scalar_pressure_exponential_width : float
         Width for scalar pressure exponential. Default is 0.2.
-    scalar_pressure_low : float, optional
+    scalar_pressure_low : float
         Low limit for scalar pressure. Default is 0.
-    scalar_pressure_high : float, optional
+    scalar_pressure_high : float
         High limit for scalar pressure. Default is 50.
-    max_steps : int, optional
+    max_steps : int
         Maximum number of steps for relaxation. Default is 1000.
-    force_tol : float, optional
+    force_tol : float
         Force tolerance for relaxation. Default is 0.01.
-    stress_tol : float, optional
+    stress_tol : float
         Stress tolerance for relaxation. Default is 0.01.
-    Hookean_repul : bool, optional
+    Hookean_repul : bool
         Whether to apply Hookean repulsion. Default is False.
-    hookean_paras : dict, optional
+    hookean_paras : dict
         Parameters for Hookean repulsion as a dictionary of tuples. Default is None.
-    write_traj : bool, optional
+    write_traj : bool
         Whether to write trajectory. Default is True.
-    num_processes_rss: int, optional
+    num_processes_rss: int
         Number of processes used for running RSS.
-    device: str, optional
-        specify device to use cuda or cpu.
+    device: str
+        Specify device to use cuda or cpu.
+    struct_start_index: int
+        Specify the starting index within a list
+    config_type: str
+        Specify the type of configurations generated from RSS
 
     Returns
     -------
-    dict
-        Output dictionary containing the results of the RSS relaxation.
+    list
+        Output list[str] containing paths for the results of the RSS relaxation.
     """
     return minimize_structures(
         mlip_path=mlip_path,
@@ -446,4 +452,123 @@ def do_rss(
         num_processes_rss=num_processes_rss,
         device=device,
         isol_es=isol_es,
+        struct_start_index=struct_start_index,
+        config_type=config_type,
     )
+
+
+@job
+def do_rss_multi_node(
+    mlip_type: str | None = None,
+    iteration_index: str | None = None,
+    mlip_path: str | None = None,
+    structure: list[Structure] | None = None,
+    scalar_pressure_method: str = "exp",
+    scalar_exp_pressure: float = 100,
+    scalar_pressure_exponential_width: float = 0.2,
+    scalar_pressure_low: float = 0,
+    scalar_pressure_high: float = 50,
+    max_steps: int = 1000,
+    force_tol: float = 0.01,
+    stress_tol: float = 0.01,
+    Hookean_repul: bool = False,
+    hookean_paras: dict[tuple[int, int], tuple[float, float]] | None = None,
+    write_traj: bool = True,
+    num_processes_rss: int = 1,
+    device: str = "cpu",
+    isol_es: dict[int, float] | None = None,
+    num_groups: int = 5,
+    config_type: str = "traj",
+) -> list[list | None]:
+    """
+    Perform sandom structure searching (RSS) using a MLIP.
+
+    Parameters
+    ----------
+    mlip_type : str, mandatory
+        Choose one specific MLIP type:
+        'GAP' | 'ACE' | 'NequIP' | 'M3GNet' | 'MACE'.
+    iteration_index : str, mandatory
+        Index for the current iteration.
+    mlip_path : str, mandatory
+        Path to the MLIP model.
+    structure : list of Structure, mandatory
+        List of structures to be relaxed.
+    scalar_pressure_method : str, mandatory
+        Method for scalar pressure. Default is 'exp'.
+    scalar_exp_pressure : float, optional
+        Scalar exponential pressure. Default is 100.
+    scalar_pressure_exponential_width : float, optional
+        Width for scalar pressure exponential. Default is 0.2.
+    scalar_pressure_low : float, optional
+        Low limit for scalar pressure. Default is 0.
+    scalar_pressure_high : float, optional
+        High limit for scalar pressure. Default is 50.
+    max_steps : int, mandatory
+        Maximum number of steps for relaxation. Default is 1000.
+    force_tol : float, mandatory
+        Force tolerance for relaxation. Default is 0.01.
+    stress_tol : float, optional
+        Stress tolerance for relaxation. Default is 0.01.
+    Hookean_repul : bool, optional
+        Whether to apply Hookean repulsion. Default is False.
+    hookean_paras : dict, optional
+        Parameters for Hookean repulsion as a dictionary of tuples. Default is None.
+    write_traj : bool, mandatory
+        Whether to write trajectory. Default is True.
+    num_processes_rss: int, mandatory
+        Number of processes used for running RSS on one node.
+    device: str, mandatory
+        Specify device to use cuda or cpu.
+    num_groups: int, mandatory
+        Number of structure groups, used for assigning tasks across multiple nodes,
+        with each node handling one group.
+    config_type: str
+        Specify the type of configurations generated from RSS
+
+    Returns
+    -------
+    list
+        Output list containing paths for the results of the RSS relaxation.
+    """
+    job_list = []
+
+    if structure is None:
+        raise ValueError("The 'structure' cannot be None!")
+
+    structure_groups = split_structure_into_groups(structure, num_groups)
+
+    rss_info = []
+
+    struct_start_index = 0
+
+    for i in range(num_groups):
+        rss = do_rss_single_node(
+            mlip_type=mlip_type,
+            iteration_index=iteration_index,
+            mlip_path=mlip_path,
+            structure=structure_groups[i],
+            scalar_pressure_method=scalar_pressure_method,
+            scalar_exp_pressure=scalar_exp_pressure,
+            scalar_pressure_exponential_width=scalar_pressure_exponential_width,
+            scalar_pressure_low=scalar_pressure_low,
+            scalar_pressure_high=scalar_pressure_high,
+            max_steps=max_steps,
+            force_tol=force_tol,
+            stress_tol=stress_tol,
+            Hookean_repul=Hookean_repul,
+            hookean_paras=hookean_paras,
+            write_traj=write_traj,
+            num_processes_rss=num_processes_rss,
+            device=device,
+            isol_es=isol_es,
+            struct_start_index=struct_start_index,
+            config_type=config_type,
+        )
+
+        struct_start_index += len(structure_groups[i])
+
+        job_list.append(rss)
+        rss_info.append(rss.output)
+
+    return Response(replace=Flow(job_list), output=rss_info)

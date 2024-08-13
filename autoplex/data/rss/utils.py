@@ -11,7 +11,11 @@ import ase.io
 import matgl
 import numpy as np
 import quippy.potential
-from ase.constraints import FixConstraint, UnitCellFilter, slice2enlist
+from ase.constraints import (
+    FixConstraint,
+    UnitCellFilter,
+    slice2enlist,
+)
 from ase.data import atomic_numbers, chemical_symbols
 from ase.geometry import find_mic
 from ase.optimize.precon import Exp, PreconLBFGS
@@ -35,15 +39,23 @@ class myPotential(quippy.potential.Potential):
             atoms.arrays["forces"] = self.results["forces"].copy()
         if "energy" in self.results:
             atoms.info["energy"] = self.results["energy"].copy()
+        if "stress" in self.results:
+            atoms.info["stress"] = self.results["stress"].copy()
         if "virial" in self.extra_results["config"]:
             atoms.info["virial"] = self.extra_results["config"]["virial"].copy()
-        # if 'stress' in self.results:
-        #     atoms.info['stress'] = self.results['stress'].copy()
         return res
 
 
-def extract_pairstyle(ace_label, ace_json, ace_table):
-    """Extract the pair style and coefficients from ACE potential files for running LAMMPS."""
+def extract_pairstyle(
+    ace_label: str, ace_json: str, ace_table: str
+) -> tuple[dict[str, int], list[str]]:
+    """Extract the pair style and coefficients from ACE potential files for running LAMMPS.
+
+    Args:
+        ace_label (str): Label for the ACE potential.
+        ace_json (str): Path to the JSON file of ACE potential.
+        ace_table (str): Path to the table file containing pairwise coefficients of ACE potential.
+    """
     with open(ace_json) as file:
         data = json.load(file)
 
@@ -308,7 +320,8 @@ def process_rss(
     write_traj,
     device,
     isol_es,
-):
+    config_type,
+) -> str | None:
     """Run RSS on a single thread using MLIPs."""
     if mlip_type == "GAP":
         gap_label = os.path.join(mlip_path, "gap_file.xml")
@@ -384,6 +397,7 @@ def process_rss(
             atom.set_constraint(hks)
 
         atom.calc = pot
+
         if scalar_pressure_method == "exp":
             scalar_pressure_tmp = scalar_exp_pressure * GPa
             if scalar_pressure_exponential_width > 0.0:
@@ -405,10 +419,15 @@ def process_rss(
             traj = []
 
             def build_traj():
-                current_energy = atom.get_potential_energy().copy()
                 atom_copy = atom.copy()
-                atom_copy.info["energy"] = current_energy
-                atom_copy.info["forces"] = atom.get_forces().copy()
+                atom_copy.info["energy"] = atom.atoms.get_potential_energy()
+                # atom_copy.info["energy"] = atom.info["energy"].copy() # Applicable to gap_fit, not others
+                atom_copy.info["enthalpy"] = atom.get_potential_energy().copy()
+                # Note that the UnitCellFilter returns enthalpy using scalar_pressure_tmp!!
+                # virial = atom.info["virial"].copy()
+                # volume = atom.atoms.get_volume().copy()
+                # stress = voigt_6_to_full_3x3_stress(atom.atoms.info["stress"])
+                # atom_copy.info["RSS_applied_pressure"] = -stress.trace() / 3.0 / GPa  # unit: GPa
                 traj.append(atom_copy)
 
             optimizer.attach(build_traj)
@@ -418,8 +437,9 @@ def process_rss(
 
             for traj_at_i, traj_at in enumerate(traj):
                 traj_at.info["RSS_minim_iter"] = traj_at_i
-                traj_at.info["config_type"] = "traj"
+                traj_at.info["config_type"] = config_type
                 traj_at.info["minim_stat"] = minim_stat
+
             if write_traj:
                 traj_file_name = (
                     output_file_name + "_traj_" + str(unique_starting_index) + ".extxyz"
@@ -430,13 +450,9 @@ def process_rss(
 
             local_minima = traj[-1]
 
-            if local_minima.info["config_type"] != "unconverged_minimum":
+            if local_minima.info["config_type"] == "converged_minimum":
                 dir_path = Path.cwd()
-                traj_dir = os.path.join(dir_path, traj_file_name)
-                return {
-                    "traj_path": traj_dir,
-                    "pressure": local_minima.info["RSS_applied_pressure"],
-                }
+                return os.path.join(dir_path, traj_file_name)
             return None
 
         except RuntimeError:
@@ -464,7 +480,9 @@ def minimize_structures(
     num_processes_rss,
     device,
     isol_es,
-):
+    config_type,
+    struct_start_index,
+) -> list[str | None]:
     """Run RSS in parallel."""
     atoms = [AseAtomsAdaptor().get_atoms(structure) for structure in input_structure]
 
@@ -472,7 +490,7 @@ def minimize_structures(
         print("Hookean repulsion is used!")
 
     for i, atom in enumerate(atoms):
-        atom.info["unique_starting_index"] = index + f"{i}"
+        atom.info["unique_starting_index"] = index + f"{i+struct_start_index}"
 
     args = [
         (
@@ -493,6 +511,7 @@ def minimize_structures(
             write_traj,
             device,
             isol_es,
+            config_type,
         )
         for atom in atoms
     ]
@@ -501,3 +520,31 @@ def minimize_structures(
         results = pool.starmap(process_rss, args)
 
     return list(results)
+
+
+def split_structure_into_groups(structures: list, num_groups: int) -> list[list]:
+    """
+    Split a list of structures into several groups, with each group being its own list.
+
+    Parameters
+    ----------
+    structures: list
+        list of structures
+    num_groups: int, mandatory
+        Number of structure groups, used for assigning tasks across multiple nodes,
+        with each node handling one group.
+    """
+    base_size = len(structures) // num_groups
+    remainder = len(structures) % num_groups
+
+    structure_groups = []
+    start_index = 0
+
+    for i in range(num_groups):
+        extra = 1 if i < remainder else 0
+        group_size = base_size + extra
+
+        structure_groups.append(structures[start_index : start_index + group_size])
+        start_index += group_size
+
+    return structure_groups
