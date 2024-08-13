@@ -5,6 +5,7 @@ import json
 import os
 from multiprocessing import Pool
 from pathlib import Path
+from typing import Literal
 
 import ase.io
 import matgl
@@ -80,30 +81,47 @@ def extract_pairstyle(ace_label, ace_json, ace_table):
 
 
 class HookeanRepulsion(FixConstraint):
-    """Constrain atoms softly to minimum separation.
+    """Constrain atoms softly to a minimum separation.
 
-    Useful to avoid early versions of potentials
-    causing crashes due to atoms being too close together.
+    Intended to avoid early iterations of potentials
+    causing crashes due to overlapping atoms.
+
+    It is recommended to calibrate the spring constant for your system
+    dependent on the potential and the atomic species used. It is not guaranteed
+    that the constraint will be either soft enough (e.g. non-exploding in MD) or
+    strong enough (to avoid overlaps) for all spring constants and distances.
     """
 
-    def __init__(self, a1, a2, k, rt=None):
-        """Apply a Hookean restorative force to separate two atoms that are close.
+    def __init__(
+        self,
+        a1: int,
+        a2: int
+        | tuple[float, float, float]
+        | tuple[float, float, float, float]
+        | Literal["cell"],
+        k: float,
+        rt: float | None = None,
+    ) -> None:
+        """Apply a Hookean restorative force repel two atoms that are close.
 
+        Parameters
+        ----------
         a1 : int
-           Index of atom 1
-        a2 : one of three options
-           1) index of atom 2
+           Atom 1 index
+        a2 : can be one of three options
+           1) Atom 2 index
            2) a fixed point in cartesian space to which to tether a1
            3) a plane given as (A, B, C, D) in A x + B y + C z + D = 0.
            4) 'cell' :: selects the unit cell to constrain
         k : float
            Hooke's law (spring) constant to apply when distance
-           exceeds threshold_length. Units of eV A^-2.
+           exceeds threshold_length. Units are eV Å^-2.
         rt : float
-           The threshold length above which there is no force. The
-           length is 1) between two atoms, 2) between atom and point.
-           This argument is not supplied in case 3. Units of A.
+           Threshold length above which no Hookean force is applied.
+           This argument is not supplied in case 3. Units of Å.
 
+        Notes
+        -----
         If a plane is specified, the Hooke's law force is applied if the atom
         is on the normal side of the plane. For instance, the plane with
         (A, B, C, D) = (0, 0, 1, -7) defines a plane in the xy plane with a z
@@ -157,13 +175,21 @@ class HookeanRepulsion(FixConstraint):
         return dct
 
     def adjust_positions(self, atoms, newpositions):
-        """Adjust positions of the atoms to match the constraints."""
+        """Adjust positions to match the constraints.
+
+        Do nothing for this constraint.
+        """
+        return
 
     def adjust_momenta(self, atoms, momenta):
-        """Adjust momenta of the atoms to match the constraints."""
+        """Adjust momenta to match the constraints.
+
+        Do nothing for this constraint.
+        """
+        return
 
     def adjust_forces(self, atoms, forces):
-        """Adjust forces of the atoms to match the constraints."""
+        """Adjust forces on the atoms to match the constraints."""
         positions = atoms.positions
         if self._type == "plane":
             A, B, C, D = self.plane
@@ -203,7 +229,7 @@ class HookeanRepulsion(FixConstraint):
     def adjust_potential_energy(self, atoms):
         """Return the difference to the potential energy due to an active constraint.
 
-        (That is, the quantity returned is to be added to the potential energy.)
+        (the quantity returned is to be added to the potential energy).
         """
         positions = atoms.positions
         if self._type == "plane":
@@ -237,7 +263,7 @@ class HookeanRepulsion(FixConstraint):
     def index_shuffle(self, atoms, ind):
         """Change the indices."""
         if self._type == "two atoms":
-            newa = [-1, -1]  # Signal error
+            newa = [-1, -1]  # Error condition
             for new, old in slice2enlist(ind, len(atoms)):
                 for i, a in enumerate(self.indices):
                     if old == a:
@@ -246,7 +272,7 @@ class HookeanRepulsion(FixConstraint):
                 raise IndexError("Constraint not part of slice")
             self.indices = newa
         elif (self._type == "point") or (self._type == "plane"):
-            newa = -1  # Signal error
+            newa = -1  # Error condition
             for new, old in slice2enlist(ind, len(atoms)):
                 if old == self.index:
                     newa = new
@@ -330,7 +356,7 @@ def process_rss(
     log_file_name = output_file_name + "_" + str(unique_starting_index) + ".log"
     with open(log_file_name, "w") as log_file:
         if Hookean_repul:
-            print("Hookean repulsion is used!")
+            print("Hookean repulsion is used")
             hks = []
             atom_num = atom.get_atomic_numbers()
             for i in range(len(atom_num)):

@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
+    from ase import Atoms
     from emmet.core.math import Matrix3D
 
 import logging
@@ -675,12 +676,12 @@ def Data_preprocessing(
     write("test.extxyz", test_structures, format="extxyz", append=True)
 
     if regularization:
-        atoms = read("train.extxyz", index=":")
+        atoms_reg: list[Atoms] = read("train.extxyz", index=":")
 
         if etup is None:
             etup = [(0.1, 1), (0.001, 0.1), (0.0316, 0.316), (0.0632, 0.632)]
 
-        atom_with_sigma = set_sigma(atoms, etup)
+        atom_with_sigma = set_sigma(atoms_reg, etup)
 
         write("train_with_sigma.extxyz", atom_with_sigma, format="extxyz")
 

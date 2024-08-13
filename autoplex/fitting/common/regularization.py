@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 def set_sigma(
-    atoms,
+    atoms: list[Atoms],
     reg_minmax,
     isolated_atoms_energies: dict | None = None,
     scheme="linear-hull",
@@ -95,7 +95,7 @@ def set_sigma(
 
     if scheme == "linear-hull":
         print("Regularising with linear hull")
-        hull, p = get_convex_hull(atoms, energy_name=energy_name)
+        hull, points = get_convex_hull(atoms, energy_name=energy_name)
         get_e_distance_func = get_e_distance_to_hull
 
     elif scheme == "volume-stoichiometry":
@@ -103,13 +103,13 @@ def set_sigma(
         if isolated_atoms_energies == {}:
             raise ValueError("Need to supply dictionary of isolated energies.")
 
-        p = label_stoichiometry_volume(
+        points = label_stoichiometry_volume(
             atoms, isolated_atoms_energies, energy_name, element_order=element_order
         )  # label atoms with volume and mole fraction
-        hull = calculate_hull_3D(p)  # calculate 3D convex hull
+        hull = calculate_hull_3D(points)  # calculate 3D convex hull
         get_e_distance_func = get_e_distance_to_hull_3D  # type: ignore
 
-    p = {}
+    points = {}
     for group in sorted(
         {  # check if set comprehension is running as supposed to
             at.info.get("gap_rss_group")
@@ -117,18 +117,18 @@ def set_sigma(
             if not at.info.get("gap_rss_nonperiodic")
         }
     ):
-        p[group] = []
+        points[group] = []
 
     for at in atoms:
         try:
             # skip non-periodic configs, volume is meaningless
             if "gap_rss_nonperiodic" in at.info and at.info["gap_rss_nonperiodic"]:
                 continue
-            p[at.info.get("gap_rss_group")].append(at)
+            points[at.info.get("gap_rss_group")].append(at)
         except Exception:
             pass
 
-    for group, atoms_group in p.items():
+    for group, atoms_group in points.items():
         print("group:", group)
 
         for val in atoms_group:
@@ -406,7 +406,7 @@ def label_stoichiometry_volume(
 
     Parameters
     ----------
-    atoms_list: (Atoms)
+    atoms_list: (list[Atoms])
         list of atoms objects
     isolated_atoms_energies: (dict)
         dictionary of isolated atom energies {atomic_number: energy}

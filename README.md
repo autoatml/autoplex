@@ -44,6 +44,12 @@ Pkg.add("DataFrames")
 Pkg.add("CSV")
 ```
 
+Additionally, `buildcell` as a part of `AIRSS` needs to be installed:
+
+```bash
+curl -O https://www.mtg.msm.cam.ac.uk/files/airss-0.9.3.tgz; tar -xf airss-0.9.3.tgz; rm airss-0.9.3.tgz; cd airss; make ; make install ; make neat; cd ..
+```
+
 # Contributing guidelines
 
 Please follow the [contributing guidelines](docs/dev/contributing.md)!

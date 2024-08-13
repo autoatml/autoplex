@@ -49,7 +49,8 @@ def test_set_sigma(test_dir):
                            reg_minmax,
                            scheme='linear-hull',
                            max_energy=0.05,
-                           isolated_atoms_energies=isol_es
+                           isolated_atoms_energies=isol_es,
+                           element_order=[3, 17],
                            )
     assert len(atoms_modi) < len(test_atoms)
 
@@ -57,7 +58,8 @@ def test_set_sigma(test_dir):
     atoms_modi = set_sigma(test_atoms,
                            reg_minmax,
                            scheme='volume-stoichiometry',
-                           isolated_atoms_energies=isol_es
+                           isolated_atoms_energies=isol_es,
+                           element_order=[3, 17],
                            )
     assert True  # TODO: modify this to test actual condition
 
@@ -66,8 +68,6 @@ def test_auxiliary_functions(test_dir, memory_jobstore, clean_dir):
     from ase.io import read
     from ase import Atoms
     import numpy as np
-    import random
-
 
     file = test_dir / "fitting" / "ref_files" / "quip_train.extxyz"
     atoms: list[Atoms] = read(file, ":")
@@ -93,18 +93,16 @@ def test_auxiliary_functions(test_dir, memory_jobstore, clean_dir):
         [8000.0, -0.27567309],
     ])
 
-    array3 = np.array([
-        [0.5, 15.2266087, -3.53839715],
-        [1.0, 8000.0, -0.01928852],
-        [0.5, 17.6913485, -3.53493109],
-        [0.5, 16.2004607, -3.54783422],
-        [0.5, 17.6913485, -3.53521408],
-        [0.5, 16.4281758, -3.54726137],
-        [0.5, 15.2266087, -3.53963152],
-        [0.5, 19.017667, -3.50825935],
-        [0.5, 16.2004607, -3.54783542],
-        [1.0, 8000.0, -0.00014539],
-    ])
+    array3 = np.array([[0.00000000e+00, 8.00000000e+03, -1.45390000e-04],
+                       [5.00000000e-01, 1.76913485e+01, -3.53493109e+00],
+                       [5.00000000e-01, 1.52266087e+01, -3.53839715e+00],
+                       [5.00000000e-01, 1.62004607e+01, -3.54783542e+00],
+                       [5.00000000e-01, 1.62004607e+01, -3.54783422e+00],
+                       [5.00000000e-01, 1.76913485e+01, -3.53521408e+00],
+                       [5.00000000e-01, 1.64281758e+01, -3.54726137e+00],
+                       [5.00000000e-01, 1.90176670e+01, -3.50825935e+00],
+                       [5.00000000e-01, 1.52266087e+01, -3.53963152e+00],
+                       [1.00000000e+00, 8.00000000e+03, -1.92885200e-02]])
 
     lower_half_hull_points, points = get_convex_hull(atoms, energy_name="REF_energy")
 
@@ -117,7 +115,12 @@ def test_auxiliary_functions(test_dir, memory_jobstore, clean_dir):
     assert arrays_allclose(lower_half_hull_points, array1)
     assert arrays_allclose(points, array2)
 
-    label = label_stoichiometry_volume(atoms, {3: -0.28649227, 17: -0.25638457}, "REF_energy")
+    label = label_stoichiometry_volume(
+        atoms_list=atoms,
+        isolated_atoms_energies={3: -0.28649227, 17: -0.25638457},
+        energy_name="REF_energy",
+        element_order=[3, 17],
+    )
     assert arrays_allclose(label, array3)
 
     calc_hull = calculate_hull_ND(points)
