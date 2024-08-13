@@ -29,8 +29,8 @@ from pymatgen.io.vasp.outputs import Vasprun
 
 from autoplex.data.common.utils import (
     ElementCollection,
-    boltzhist_CUR_dualIter,
-    boltzhist_CUR_oneShot,
+    boltzhist_cur_dualIter,
+    boltzhist_cur_oneShot,
     create_soap_descriptor,
     cur_select,
     data_distillation,
@@ -375,7 +375,7 @@ def Sampling(
         List of lists containing trajectory paths. Default is None.
 
     isol_es : dict, optional
-        Dictionary of isolated energy values for species. Required for 'boltzhist_CUR'
+        Dictionary of isolated energy values for species. Required for 'boltzhist_cur'
         selection method. Default is None.
 
     remove_traj_files : bool
@@ -448,7 +448,7 @@ def Sampling(
                 raise ValueError("Please provide the energy of isolated atoms!")
 
             if selection_method == "bcur1s":
-                selected_atoms = boltzhist_CUR_oneShot(
+                selected_atoms = boltzhist_cur_oneShot(
                     atoms=atoms,
                     isol_es=isol_es,
                     bolt_frac=bcur_params["frac_of_bcur"],
@@ -462,7 +462,7 @@ def Sampling(
                     random_seed=random_seed,
                 )
             else:
-                selected_atoms = boltzhist_CUR_dualIter(
+                selected_atoms = boltzhist_cur_dualIter(
                     atoms=atoms,
                     isol_es=isol_es,
                     bolt_frac=bcur_params["frac_of_bcur"],

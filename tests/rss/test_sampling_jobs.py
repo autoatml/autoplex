@@ -7,9 +7,9 @@ from jobflow import run_locally
 from pathlib import Path
 from ase.io import read
 from autoplex.data.common.utils import (cur_select, 
-                                        boltzhist_CUR_oneShot, 
+                                        boltzhist_cur_oneShot, 
                                         ElementCollection, 
-                                        boltzhist_CUR_dualIter)
+                                        boltzhist_cur_dualIter)
 import shutil
 
 
@@ -120,7 +120,7 @@ def test_sampling_bcur1s(test_dir):
                 ' cutoff_transition_width=' + str(soap_paras['cutoff_transition_width']) + \
                 ' average=' + str(soap_paras['average'])
 
-    selected_atoms = boltzhist_CUR_oneShot(atoms=atoms,
+    selected_atoms = boltzhist_cur_oneShot(atoms=atoms,
                                    isol_es={14: -0.81},
                                    bolt_frac=0.3, 
                                    bolt_max_num=3000,
@@ -202,7 +202,7 @@ def test_sampling_bcur2i():
                 ' cutoff_transition_width=' + str(soap_paras['cutoff_transition_width']) + \
                 ' average=' + str(soap_paras['average'])
 
-    selected_atoms = boltzhist_CUR_dualIter(
+    selected_atoms = boltzhist_cur_dualIter(
                     atoms=atoms,
                     isol_es={13: 0.2},
                     bolt_frac=0.8, 

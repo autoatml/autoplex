@@ -1071,7 +1071,7 @@ def boltz(e: float, emin: float, kT: float) -> float:
     return np.exp(-(e - emin) / (kT))
 
 
-def boltzhist_CUR_oneShot(
+def boltzhist_cur_oneShot(
     atoms,
     descriptor,
     isol_es,
@@ -1222,17 +1222,17 @@ def boltzhist_CUR_oneShot(
     return selected_atoms
 
 
-def boltzhist_CUR_dualIter(
+def boltzhist_cur_dualIter(
     atoms,
     descriptor,
     isol_es,
-    bolt_frac,
-    bolt_max_num,
-    cur_num,
-    kernel_exp,
-    kT,
-    energy_label,
-    P,
+    bolt_frac=0.1,
+    bolt_max_num=3000,
+    cur_num=100,
+    kernel_exp=4,
+    kT=0.3,
+    energy_label="energy",
+    P=None,
     random_seed=None,
 ) -> list | None:
     """
@@ -1279,7 +1279,7 @@ def boltzhist_CUR_dualIter(
     minima_indices = [ats[-1].info["unique_starting_index"] for ats in atoms]
     pressure_minima = [pressure[-1] for pressure in P]
 
-    selected_minima = boltzhist_CUR_oneShot(
+    selected_minima = boltzhist_cur_oneShot(
         atoms=atom_minima,
         descriptor=descriptor,
         isol_es=isol_es,
@@ -1305,7 +1305,7 @@ def boltzhist_CUR_dualIter(
     selected_trajs = [atoms[i] for i in selected__indices]
     selected_trajs_pressure = [P[j] for j in selected__indices]
 
-    return boltzhist_CUR_oneShot(
+    return boltzhist_cur_oneShot(
         atoms=selected_trajs,
         descriptor=descriptor,
         isol_es=isol_es,
@@ -1320,7 +1320,7 @@ def boltzhist_CUR_dualIter(
     )
 
 
-def convexhull_CUR(
+def convexhull_cur(
     atoms: list[Atoms],
     descriptor: str,
     bolt_frac: float = 0.1,
@@ -1382,7 +1382,7 @@ def convexhull_CUR(
 
     if isol_es is None:
         raise KeyError(
-            "isol_es (isolated_atom_energies) must be supplied for convexhull_CUR"
+            "isol_es (isolated_atom_energies) must be supplied for convexhull_cur"
         )
 
     if scheme == "linear-hull":
