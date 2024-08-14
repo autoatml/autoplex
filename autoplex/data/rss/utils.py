@@ -106,7 +106,7 @@ class HookeanRepulsion(FixConstraint):
 
     def __init__(
         self,
-        a1: int,
+        a1: int,  # a lot of unclear variable names here
         a2: int
         | tuple[float, float, float]
         | tuple[float, float, float, float]
