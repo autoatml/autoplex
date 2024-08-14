@@ -10,7 +10,7 @@ from autoplex.data.common.jobs import (
     Sampling,
     VASP_collect_data,
 )
-from autoplex.data.rss.jobs import RandomizedStructure, do_rss
+from autoplex.data.rss.jobs import RandomizedStructure, do_rss_multi_node
 from autoplex.fitting.common.flows import MLIPFitMaker
 
 
@@ -190,7 +190,7 @@ def initial_RSS(
 
 @job
 def do_RSS_iterations(
-    input: dict | None = None,
+    input: dict,
     struct_number: int = 10000,
     tag: str = "GeSb2Te4",
     selection_method1: str = "cur",
@@ -232,6 +232,8 @@ def do_RSS_iterations(
     device: str = "cpu",
     stop_criterion: float = 0.01,
     max_iteration_number: int = 9,
+    num_groups: int = 5,
+    config_type: str = "traj",
     **fit_kwargs,
 ):
     """
@@ -240,15 +242,20 @@ def do_RSS_iterations(
     Each iteration involves generating new structures, sampling, running
     VASP calculations, collecting data, preprocessing data, and fitting a new MLIP.
     """
-    if input is None:
-        input = {
-            "test_error": None,
-            "pre_database_dir": None,
-            "mlip_path": None,
-            "isol_es": None,
-            "current_iter": 0,
-            "kt": 0.6,
-        }
+    valid_keys = {
+        "test_error",
+        "pre_database_dir",
+        "mlip_path",
+        "isol_es",
+        "current_iter",
+        "kt",
+    }
+
+    for key in input:
+        if key not in valid_keys:
+            raise ValueError(
+                f"Invalid key '{key}' in input dictionary. Allowed keys are: {valid_keys}"
+            )
 
     test_error = input.get("test_error")
     current_iter = input.get("current_iter")
@@ -277,7 +284,7 @@ def do_RSS_iterations(
             dir=job1.output,
             random_seed=random_seed,
         )
-        job3 = do_rss(
+        job3 = do_rss_multi_node(
             mlip_type=mlip_type,
             iteration_index=f"{current_iter}th",
             mlip_path=input["mlip_path"],
@@ -294,12 +301,14 @@ def do_RSS_iterations(
             write_traj=write_traj,
             num_processes_rss=num_processes_rss,
             device=device,
+            num_groups=num_groups,
+            config_type=config_type,
         )
         job4 = Sampling(
             selection_method=selection_method2,
             num_of_selection=num_of_selection2,
             bcur_params=bcur_params,
-            traj_info=job3.output,
+            traj_path=job3.output,
             random_seed=random_seed,
             isol_es=input["isol_es"],
         )

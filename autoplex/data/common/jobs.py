@@ -29,10 +29,13 @@ from pymatgen.io.vasp.outputs import Vasprun
 
 from autoplex.data.common.utils import (
     ElementCollection,
-    boltzhist_CUR,
+    boltzhist_cur_dualIter,
+    boltzhist_cur_oneShot,
     create_soap_descriptor,
     cur_select,
     data_distillation,
+    flatten,
+    handle_rss_trajectory,
     mc_rattle,
     random_vary_angle,
     scale_cell,
@@ -316,28 +319,33 @@ def generate_randomized_structures(
 
 @job
 def Sampling(
-    selection_method: Literal["cur", "bcur", "random", "uniform"] = "random",
+    selection_method: Literal[
+        "cur", "bcur1s", "bcur2i", "random", "uniform"
+    ] = "random",
     num_of_selection: int = 5,
     bcur_params: dict | None = None,
     dir: str = None,
     structure: list[Structure] = None,
-    traj_info: list[dict[str, str | float]] = None,
+    traj_path: list | None = None,
     isol_es: dict | None = None,
     random_seed: int = None,
+    remove_traj_files: bool = True,
 ):
     """
     Job to sample training configurations from trajectories of MD/RSS.
 
     Parameters
     ----------
-    selection_method : Literal['cur', 'bcur', 'random', 'uniform']
+    selection_method : Literal['cur', 'bcur1s', 'bcur2s', 'random', 'uniform']
        Method for selecting samples. Options include:
         - 'cur': Pure CUR selection.
         - 'bcur': Boltzmann flat histogram in enthalpy, then CUR.
+            - 'bcur1s': Execute bcur one shot (1s)
+            - 'bcur2i': Execute bcur with two iterations (2i)
         - 'random': Random selection.
         - 'uniform': Uniform selection.
 
-    num_of_selection : int, optional
+    num_of_selection : int
         Number of selections to be made. Default is 5.
 
     bcur_params : dict, optional
@@ -363,13 +371,15 @@ def Sampling(
     structure : list[Structure], optional
         List of structures for sampling. Default is None.
 
-    traj_info : list[dict[str, Union[str, float]]], optional
-        List of dictionaries containing trajectory information. Each dictionary should
-        have keys 'traj_path' and 'pressure'. Default is None.
+    traj_path : list[list[str]], optional
+        List of lists containing trajectory paths. Default is None.
 
     isol_es : dict, optional
-        Dictionary of isolated energy values for species. Required for 'boltzhist_CUR'
+        Dictionary of isolated energy values for species. Required for 'boltzhist_cur'
         selection method. Default is None.
+
+    remove_traj_files : bool
+        Remove all trajectory files raised by RSS to save memory
 
     Returns
     -------
@@ -407,21 +417,13 @@ def Sampling(
         atoms = [AseAtomsAdaptor().get_atoms(at) for at in structure]
 
     else:
-        atoms = []
-        pressures = []
-        if traj_info is None:
-            traj_info = []
-        for traj in traj_info:
-            if traj is not None:
-                print("traj:", traj)
-                at = read(traj["traj_path"], index=":")
-                atoms.extend(at)
-                pressure = [traj["pressure"]] * len(at)
-                pressures.extend(pressure)
+        atoms, pressures = handle_rss_trajectory(traj_path, remove_traj_files)
 
-    if selection_method == "cur" or selection_method == "bcur":
-        n_species = ElementCollection(atoms).get_number_of_species()
-        species_Z = ElementCollection(atoms).get_species_Z()
+    if selection_method in {"cur", "bcur1s", "bcur2i"}:
+        n_species = ElementCollection(
+            flatten(atoms, recursive=True)
+        ).get_number_of_species()
+        species_Z = ElementCollection(flatten(atoms, recursive=True)).get_species_Z()
 
         if not isinstance(bcur_params["soap_paras"], dict):
             raise TypeError("soap_paras must be a dictionary")
@@ -439,25 +441,40 @@ def Sampling(
                 random_seed=random_seed,
             )
 
-        elif selection_method == "bcur":
+        elif selection_method in {"bcur1s", "bcur2i"}:
             if isol_es is not None:
                 isol_es = {int(k): v for k, v in isol_es.items()}
             else:
                 raise ValueError("Please provide the energy of isolated atoms!")
 
-            selected_atoms = boltzhist_CUR(
-                atoms=atoms,
-                isol_es=isol_es,
-                bolt_frac=bcur_params["frac_of_bcur"],
-                bolt_max_num=bcur_params["bolt_max_num"],
-                cur_num=num_of_selection,
-                kernel_exp=bcur_params["kernel_exp"],
-                kT=bcur_params["kT"],
-                energy_label=bcur_params["energy_label"],
-                P=pressures,
-                descriptor=descriptor,
-                random_seed=random_seed,
-            )
+            if selection_method == "bcur1s":
+                selected_atoms = boltzhist_cur_oneShot(
+                    atoms=atoms,
+                    isol_es=isol_es,
+                    bolt_frac=bcur_params["frac_of_bcur"],
+                    bolt_max_num=bcur_params["bolt_max_num"],
+                    cur_num=num_of_selection,
+                    kernel_exp=bcur_params["kernel_exp"],
+                    kT=bcur_params["kT"],
+                    energy_label=bcur_params["energy_label"],
+                    P=pressures,
+                    descriptor=descriptor,
+                    random_seed=random_seed,
+                )
+            else:
+                selected_atoms = boltzhist_cur_dualIter(
+                    atoms=atoms,
+                    isol_es=isol_es,
+                    bolt_frac=bcur_params["frac_of_bcur"],
+                    bolt_max_num=bcur_params["bolt_max_num"],
+                    cur_num=num_of_selection,
+                    kernel_exp=bcur_params["kernel_exp"],
+                    kT=bcur_params["kT"],
+                    energy_label=bcur_params["energy_label"],
+                    P=pressures,
+                    descriptor=descriptor,
+                    random_seed=random_seed,
+                )
 
         if selected_atoms is None:
             raise ValueError(

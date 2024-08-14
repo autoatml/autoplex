@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import random
+import shutil
 import warnings
 from multiprocessing import Pool
 from typing import TYPE_CHECKING
@@ -17,6 +18,7 @@ if TYPE_CHECKING:
 import logging
 import os
 from collections.abc import Iterable
+from itertools import chain
 
 import ase.io
 import matplotlib.pyplot as plt
@@ -61,7 +63,9 @@ def flatten(atoms_object: Atoms | Iterable, recursive: bool = False) -> list[Ato
 
     if recursive:
         for element in atoms_object:
-            if isinstance(element, Iterable) and not isinstance(element, Atoms):
+            if isinstance(element, Iterable) and not isinstance(
+                element, (str, bytes, ase.atoms.Atoms, ase.Atoms)
+            ):
                 iteration_list.extend(flatten(element, recursive=True))
             else:
                 iteration_list.append(element)
@@ -1067,7 +1071,7 @@ def boltz(e: float, emin: float, kT: float) -> float:
     return np.exp(-(e - emin) / (kT))
 
 
-def boltzhist_CUR(
+def boltzhist_cur_oneShot(
     atoms,
     descriptor,
     isol_es,
@@ -1085,7 +1089,7 @@ def boltzhist_CUR(
 
     Parameters
     ----------
-    atoms : list of ase.Atoms
+    atoms : list[ase.Atoms] or list[list[ase.Atoms]]
         The atoms from which to select. If this is a list of lists, it is flattened.
     descriptor : str
         The quippy SOAP descriptor string for CUR.
@@ -1103,7 +1107,7 @@ def boltzhist_CUR(
         The product of the Boltzmann constant and the temperature, in eV.
     energy_label : str
         The label for the energy property in the atoms.
-    P : list of float
+    P : list[float] or list[list[float]]
         The pressures at which the atoms have been optimized, in GPa.
     random_seed : int
         The seed for the random number generator.
@@ -1131,39 +1135,44 @@ def boltzhist_CUR(
         logging.info("Pressures not supplied, attempting to use pressure in atoms dict")
 
         try:
-            ps = np.array([at.info["pressure"] for at in fatoms])
+            ps = np.array([at.info["RSS_applied_pressure"] for at in fatoms])
         except RuntimeError:
             print("No pressures, so can't Boltzmann weight")
 
     else:
-        ps = P
+        ps = flatten_list(P)
 
     enthalpies = []
 
-    at_ids = [atom.get_atomic_numbers() for atom in atoms]
+    at_ids = [atom.get_atomic_numbers() for atom in fatoms]
 
     if isol_es is None:
         raise ValueError("isol_es cannot be None!")
 
     if energy_label == "energy":
-        ener_relative = np.array(
-            [
-                (atom.get_potential_energy() - sum([isol_es[j] for j in at_ids[ct]]))
-                / len(atom)
-                for ct, atom in enumerate(fatoms)
-            ]
-        )
+        formation_energies = []
+        for ct, atom in enumerate(fatoms):
+            if "energy" in atom.info:
+                formation_energy = atom.info["energy"] - sum(
+                    [isol_es[j] for j in at_ids[ct]]
+                )
+            else:
+                formation_energy = atom.get_potential_energy() - sum(
+                    [isol_es[j] for j in at_ids[ct]]
+                )
+            formation_energies.append(formation_energy)
+        formation_energies = np.array(formation_energies)
+
     else:
-        ener_relative = np.array(
+        formation_energies = np.array(
             [
-                (atom.info[energy_label] - sum([isol_es[j] for j in at_ids[ct]]))
-                / len(atom)
+                atom.info[energy_label] - sum([isol_es[j] for j in at_ids[ct]])
                 for ct, atom in enumerate(fatoms)
             ]
         )
 
     for i, at in enumerate(fatoms):
-        enthalpy = (ener_relative[i] + at.get_volume() * ps[i] * GPa) / len(at)
+        enthalpy = (formation_energies[i] + at.get_volume() * ps[i] * GPa) / len(at)
         enthalpies.append(enthalpy)
 
     enthalpies = np.array(enthalpies)
@@ -1213,7 +1222,105 @@ def boltzhist_CUR(
     return selected_atoms
 
 
-def convexhull_CUR(
+def boltzhist_cur_dualIter(
+    atoms,
+    descriptor,
+    isol_es,
+    bolt_frac=0.1,
+    bolt_max_num=3000,
+    cur_num=100,
+    kernel_exp=4,
+    kT=0.3,
+    energy_label="energy",
+    P=None,
+    random_seed=None,
+) -> list | None:
+    """
+    Execute sampling with two iterations.
+
+    Each iteration includes a Boltzmann flat histogram in enthalpy followed by a CUR process.
+
+    Parameters
+    ----------
+    atoms : list[list[ase.Atoms]]
+        The atoms from which to select. This is a list of lists.
+    descriptor : str
+        The quippy SOAP descriptor string for CUR.
+    isol_es : dict
+        Dictionary of isolated energy values for species.
+    bolt_frac : float
+        The fraction to control the flat Boltzmann selection number.
+    bolt_max_num : int
+        The maximum number of atoms to select by Boltzmann-weighted flat histogram.
+    cur_num : int
+        The number of atoms to select by CUR.
+    kernel_exp : float
+        The exponent for the dot-product SOAP kernel.
+    kT : float
+        The product of the Boltzmann constant and the temperature, in eV.
+    energy_label : str
+        The label for the energy property in the atoms.
+    P : list[list[float]]
+        The pressures at which the atoms have been optimized, in GPa.
+    random_seed : int
+        The seed for the random number generator.
+
+    Returns
+    -------
+    list of ase.Atoms
+        The selected atoms. These are copies of the atoms in the input list.
+
+    Notes
+    -----
+    This function selects the most diverse atoms based on the chosen algorithm.
+    The algorithm uses a combination of CUR selection and Boltzmann weighting to select the atoms.
+    """
+    atom_minima = [ats[-1] for ats in atoms]
+    minima_indices = [ats[-1].info["unique_starting_index"] for ats in atoms]
+    pressure_minima = [pressure[-1] for pressure in P]
+
+    selected_minima = boltzhist_cur_oneShot(
+        atoms=atom_minima,
+        descriptor=descriptor,
+        isol_es=isol_es,
+        bolt_frac=bolt_frac,
+        bolt_max_num=bolt_max_num,
+        cur_num=cur_num,
+        kernel_exp=kernel_exp,
+        kT=kT,
+        energy_label=energy_label,
+        P=pressure_minima,
+        random_seed=random_seed,
+    )
+
+    if selected_minima is None:
+        raise ValueError(
+            "The structures obtained from the first bcur sampling cannot be None."
+        )
+
+    selected_minima_indices = [
+        at.info["unique_starting_index"] for at in selected_minima
+    ]
+    selected__indices = [minima_indices.index(item) for item in selected_minima_indices]
+    selected_trajs = [atoms[i] for i in selected__indices]
+    selected_trajs_pressure = [P[j] for j in selected__indices]
+
+    return boltzhist_cur_oneShot(
+        atoms=selected_trajs,
+        descriptor=descriptor,
+        isol_es=isol_es,
+        bolt_frac=bolt_frac,
+        bolt_max_num=bolt_max_num,
+        cur_num=cur_num,
+        kernel_exp=kernel_exp,
+        kT=kT,
+        energy_label=energy_label,
+        P=selected_trajs_pressure,
+        random_seed=random_seed,
+    )
+
+
+def convexhull_cur(
     atoms: list[Atoms],
     descriptor: str,
     bolt_frac: float = 0.1,
@@ -1275,18 +1382,21 @@ def convexhull_CUR(
 
     if isol_es is None:
         raise KeyError(
-            "isol_es (isolated_atom_energies) must be supplied for convexhull_CUR"
+            "isol_es (isolated_atom_energies) must be supplied for convexhull_cur"
         )
 
     if scheme == "linear-hull":
-        hull, p = get_convex_hull(atoms, energy_name=energy_label)
+        hull, p = get_convex_hull(fatoms, energy_name=energy_label)
         des = np.array(
-            [get_e_distance_to_hull(hull, at, energy_name=energy_label) for at in atoms]
+            [
+                get_e_distance_to_hull(hull, at, energy_name=energy_label)
+                for at in fatoms
+            ]
         )
 
     elif scheme == "volume-stoichiometry":
         points = label_stoichiometry_volume(
-            atoms,
+            fatoms,
             isolated_atoms_energies=isol_es,
             energy_name=energy_label,
             element_order=element_order,
@@ -1302,7 +1412,7 @@ def convexhull_CUR(
                     energy_name=energy_label,
                     element_order=element_order,
                 )
-                for at in atoms
+                for at in fatoms
             ]
         )
         print("it will be coming soon!")
@@ -1485,3 +1595,66 @@ def create_soap_descriptor(
         + " average="
         + str(soap_paras["average"])
     )
+
+
+def flatten_list(input_list: list | list[list]) -> list:
+    """Flatten a nested list into a single list if necessary."""
+    if (
+        isinstance(input_list, list)
+        and len(input_list) > 0
+        and isinstance(input_list[0], list)
+    ):
+        return list(chain.from_iterable(input_list))
+
+    return input_list
+
+
+def handle_rss_trajectory(
+    traj_path, remove_traj_files
+) -> tuple[list[list], list[list]]:
+    """
+    Handle trajectory and associated information.
+
+    Parameters
+    ----------
+    traj_path: list | None
+        A list of dictionaries containing trajectory information.
+        Each dictionary should have keys 'traj_path' and 'pressure'.
+        If None, an empty list will be used.
+    remove_traj_files: bool
+        Whether to remove the directories containing trajectory files
+        after processing them. Default is False.
+
+    Returns
+    -------
+    tuple:
+        atoms: list
+            A list of ASE Atoms objects read from the trajectory files.
+        pressures: list
+            A list of pressure values corresponding to the atoms.
+    """
+    atoms = []
+    pressures = []
+    traj_path = [] if traj_path is None else flatten_list(traj_path)
+    traj_dirs = []
+
+    if all(i is None for i in traj_path):
+        raise ValueError("No valid trajectory path was obtained!")
+
+    for traj in traj_path:
+        if traj is not None:
+            print("Processing trajectory:", traj)
+            at = ase.io.read(traj, index=":")
+            atoms.append(at)
+            pressure = [i.info["RSS_applied_pressure"] for i in at]
+            pressures.append(pressure)
+            traj_dirs.append(os.path.dirname(traj))
+
+    if remove_traj_files and traj_dirs:
+        traj_dirs = list(set(traj_dirs))
+        for dir_path in traj_dirs:
+            if os.path.exists(dir_path) and os.path.isdir(dir_path):
+                shutil.rmtree(dir_path)
+                os.makedirs(dir_path)
+
+    return atoms, pressures
