@@ -421,13 +421,13 @@ def sampling(
         n_species = ElementCollection(
             flatten(atoms, recursive=True)
         ).get_number_of_species()
-        species_Z = ElementCollection(flatten(atoms, recursive=True)).get_species_Z()
+        species_z = ElementCollection(flatten(atoms, recursive=True)).get_species_Z()
 
         if not isinstance(bcur_params["soap_paras"], dict):
             raise TypeError("soap_paras must be a dictionary")
 
         soap_paras = bcur_params["soap_paras"]
-        descriptor = create_soap_descriptor(soap_paras, n_species, species_Z)
+        descriptor = create_soap_descriptor(soap_paras, n_species, species_z)
 
         if selection_method == "cur":
             selected_atoms = cur_select(
