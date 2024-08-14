@@ -101,17 +101,17 @@ class RandomizedStructure(Maker):
                 num_atom_formula = 0
                 total_varvol_formula = 0
 
-                for ele in elements:
-                    r0[ele] = covalent_radii[atomic_numbers[ele]]
+                for element in elements:
+                    r0[element] = covalent_radii[atomic_numbers[element]]
 
-                    if self._is_metal(ele):
-                        varvol[ele] = 4.5 * np.power(r0[ele], 3)
+                    if self._is_metal(element):
+                        varvol[element] = 4.5 * np.power(r0[element], 3)
                     else:
-                        varvol[ele] = 12.0 * np.power(r0[ele], 3)
+                        varvol[element] = 12.0 * np.power(r0[element], 3)
 
-                    total_varvol_formula += varvol[ele] * elements[ele]
+                    total_varvol_formula += varvol[element] * elements[element]
 
-                    num_atom_formula += elements[ele]
+                    num_atom_formula += elements[element]
 
                 if "VARVOL" not in self.buildcell_options:
                     mean_var = total_varvol_formula / num_atom_formula * len(elements)
@@ -129,7 +129,7 @@ class RandomizedStructure(Maker):
                     )
 
             self._cell_seed(buildcell_parameters, self.tag)
-            bt_file = f"{self.tag}.cell"
+            bt_file = f"{self.tag}.cell"  # unclear variable name
 
         with Pool(processes=self.num_processes) as pool:
             args = [
@@ -171,7 +171,7 @@ class RandomizedStructure(Maker):
 
     def _cell_seed(
         self,
-        buildcell_options,
+        buildcell_options: list[str],
         tag,
     ):
         """
@@ -184,8 +184,8 @@ class RandomizedStructure(Maker):
         contents = []
         contents.extend(["#" + i + "\n" for i in buildcell_options])
 
-        with open(bc_file, "w") as f:
-            f.writelines(contents)
+        with open(bc_file, "w") as file:
+            file.writelines(contents)
 
     def _is_metal(self, element_symbol):
         metals = [
@@ -315,7 +315,7 @@ class RandomizedStructure(Maker):
         minsep = "1.5 "
         for i in range(len(keys)):
             for j in range(i, len(keys)):
-                el1, el2 = keys[i], keys[j]
+                el1, el2 = keys[i], keys[j]  # unclear one-letter variables
                 r1, r2 = r[el1], r[el2]
                 if el1 == el2:
                     result = r1 * 2.0
