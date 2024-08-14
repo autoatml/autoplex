@@ -6,9 +6,9 @@ from jobflow import Flow, Response, job
 
 from autoplex.data.common.flows import DFTStaticMaker
 from autoplex.data.common.jobs import (
-    Data_preprocessing,
-    Sampling,
-    VASP_collect_data,
+    collect_vasp_data,
+    data_preprocessing,
+    sampling,
 )
 from autoplex.data.rss.jobs import RandomizedStructure, do_rss_multi_node
 from autoplex.fitting.common.flows import MLIPFitMaker
@@ -133,7 +133,7 @@ def initial_RSS(
         The value of kT.
     """
     job1 = RandomizedStructure(struct_number=struct_number, tag=tag).make()
-    job2 = Sampling(
+    job2 = sampling(
         selection_method=selection_method,
         num_of_selection=num_of_selection,
         bcur_params=bcur_params,
@@ -148,10 +148,10 @@ def initial_RSS(
         dimer_num=dimer_num,
         custom_set=custom_set,
     ).make(structures=job2.output, config_types=config_types)
-    job4 = VASP_collect_data(
+    job4 = collect_vasp_data(
         vasp_ref_file=vasp_ref_file, rss_group=rss_group, vasp_dirs=job3.output
     )
-    job5 = Data_preprocessing(
+    job5 = data_preprocessing(
         test_ratio=test_ratio,
         regularization=regularization,
         distillation=distillation,
@@ -277,7 +277,7 @@ def do_RSS_iterations(
         bcur_params["kT"] = kt
 
         job1 = RandomizedStructure(struct_number=struct_number, tag=tag).make()
-        job2 = Sampling(
+        job2 = sampling(
             selection_method=selection_method1,
             num_of_selection=num_of_selection1,
             bcur_params=bcur_params,
@@ -304,13 +304,13 @@ def do_RSS_iterations(
             num_groups=num_groups,
             config_type=config_type,
         )
-        job4 = Sampling(
+        job4 = sampling(
             selection_method=selection_method2,
             num_of_selection=num_of_selection2,
             bcur_params=bcur_params,
             traj_path=job3.output,
             random_seed=random_seed,
-            isol_es=input["isol_es"],
+            isolated_atoms_energies=input["isol_es"],
         )
         job5 = DFTStaticMaker(
             e0_spin=e0_spin,
@@ -320,10 +320,10 @@ def do_RSS_iterations(
             dimer_num=dimer_num,
             custom_set=custom_set,
         ).make(structures=job4.output, config_types=config_types)
-        job6 = VASP_collect_data(
+        job6 = collect_vasp_data(
             vasp_ref_file=vasp_ref_file, rss_group=rss_group, vasp_dirs=job5.output
         )
-        job7 = Data_preprocessing(
+        job7 = data_preprocessing(
             test_ratio=test_ratio,
             regularization=regularization,
             distillation=distillation,
