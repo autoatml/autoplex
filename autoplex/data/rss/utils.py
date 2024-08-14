@@ -192,26 +192,34 @@ class HookeanRepulsion(FixConstraint):
             raise NotImplementedError("Bad type: %s" % self._type)
         return dct
 
-    def adjust_positions(self, atoms, newpositions):
+    def adjust_positions(self, atoms: ase.Atoms, newpositions):
         """Adjust positions to match the constraints.
 
         Do nothing for this constraint.
         """
         return
 
-    def adjust_momenta(self, atoms, momenta):
+    def adjust_momenta(self, atoms: ase.Atoms, momenta):
         """Adjust momenta to match the constraints.
 
         Do nothing for this constraint.
         """
         return
 
-    def adjust_forces(self, atoms, forces):
+    def adjust_forces(self, atoms: ase.Atoms, forces):
         """Adjust forces on the atoms to match the constraints."""
         positions = atoms.positions
         if self._type == "plane":
-            A, B, C, D = self.plane
-            x, y, z = positions[self.index]
+            (
+                A,
+                B,
+                C,
+                D,
+            ) = self.plane  # type: ignore
+            # CE: Need more than 3 values to unpack (4 expected)
+            x, y, z = positions[
+                self.index
+            ]  # also unclear variables throughout this function
             d = (A * x + B * y + C * z + D) / np.sqrt(A**2 + B**2 + C**2)
             if d < 0:
                 return
@@ -244,14 +252,22 @@ class HookeanRepulsion(FixConstraint):
             else:
                 forces[self.index] += direction * magnitude
 
-    def adjust_potential_energy(self, atoms):
+    def adjust_potential_energy(self, atoms: ase.Atoms):
         """Return the difference to the potential energy due to an active constraint.
+
+        atoms: ase.Atoms
 
         (the quantity returned is to be added to the potential energy).
         """
         positions = atoms.positions
         if self._type == "plane":
-            A, B, C, D = self.plane
+            (
+                A,
+                B,
+                C,
+                D,
+            ) = self.plane  # type: ignore
+            # CE: Need more than 3 values to unpack (4 expected)
             x, y, z = positions[self.index]
             d = (A * x + B * y + C * z + D) / np.sqrt(A**2 + B**2 + C**2)
             if d > 0:
@@ -278,7 +294,7 @@ class HookeanRepulsion(FixConstraint):
             return self.index
         return None
 
-    def index_shuffle(self, atoms, ind):
+    def index_shuffle(self, atoms: ase.Atoms, ind):
         """Change the indices."""
         if self._type == "two atoms":
             newa = [-1, -1]  # Error condition
@@ -290,14 +306,15 @@ class HookeanRepulsion(FixConstraint):
                 raise IndexError("Constraint not part of slice")
             self.indices = newa
         elif (self._type == "point") or (self._type == "plane"):
-            newa = -1  # Error condition
+            newa_ = -1  # Error condition
+            # CE: Incompatible types in assignment (expression has type "int", variable has type "list[int]")
             for new, old in slice2enlist(ind, len(atoms)):
                 if old == self.index:
-                    newa = new
+                    newa_ = new
                     break
-            if newa == -1:
+            if newa_ == -1:
                 raise IndexError("Constraint not part of slice")
-            self.index = newa
+            self.index = newa_
 
     def __repr__(self):
         """Return a representation of the constraint."""
