@@ -165,8 +165,14 @@ class HookeanRepulsion(FixConstraint):
         self.spring = k
         self.used = False
 
-    def get_removed_dof(self, atoms):
-        """Get number of removed degrees of freedom due to constraint."""
+    def get_removed_dof(self, atoms: ase.Atoms):
+        """
+        Get number of removed degrees of freedom due to constraint.
+
+        Parameters
+        ----------
+        atoms: ase.Atoms
+        """
         return 0
 
     def todict(self):
