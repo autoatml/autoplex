@@ -532,7 +532,34 @@ def minimize_structures(
     config_type,
     struct_start_index,
 ) -> list[str | None]:
-    """Run RSS in parallel."""
+    """
+    Run RSS in parallel.
+
+    Parameters
+    ----------
+    mlip_path
+    index
+    input_structure
+    output_file_name
+    mlip_type
+    scalar_pressure_method
+    scalar_exp_pressure
+    scalar_pressure_exponential_width
+    scalar_pressure_low
+    scalar_pressure_high
+    max_steps
+    force_tol
+    stress_tol
+    Hookean_repul
+    hookean_paras
+    write_traj
+    num_processes_rss
+    device
+    isol_es
+    config_type
+    struct_start_index
+
+    """
     atoms = [AseAtomsAdaptor().get_atoms(structure) for structure in input_structure]
 
     if Hookean_repul:
