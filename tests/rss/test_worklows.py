@@ -154,7 +154,7 @@ def mock_do_RSS_iterations(input: Dict[str, Optional[Any]] = {'test_error': None
                         bcur_params=bcur_params,
                         traj_path=job3.output,
                         random_seed=random_seed,
-                        isol_es=input["isol_es"])
+                        isolated_atoms_energies=input["isol_es"])
         
         job_list = [job2, job3, job4]
 
@@ -233,7 +233,7 @@ def mock_do_RSS_iterations_multi_jobs(input: Dict[str, Optional[Any]] = {'test_e
                         bcur_params=bcur_params,
                         traj_path=job3.output,
                         random_seed=random_seed,
-                        isol_es=input["isol_es"],
+                        isolated_atoms_energies=input["isol_es"],
                         remove_traj_files=remove_traj_files)
         
         job_list = [job2, job3, job4]

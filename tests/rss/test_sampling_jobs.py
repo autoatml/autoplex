@@ -9,7 +9,7 @@ from ase.io import read
 from autoplex.data.common.utils import (cur_select,
                                         boltzhist_cur_one_shot,
                                         ElementCollection,
-                                        boltzhist_cur_dualIter)
+                                        boltzhist_cur_dual_iter)
 import shutil
 
 
@@ -202,7 +202,7 @@ def test_sampling_bcur2i():
                 ' cutoff_transition_width=' + str(soap_paras['cutoff_transition_width']) + \
                 ' average=' + str(soap_paras['average'])
 
-    selected_atoms = boltzhist_cur_dualIter(
+    selected_atoms = boltzhist_cur_dual_iter(
                     atoms_list=atoms,
                     isolated_atoms_energies={13: 0.2},
                     bolt_frac=0.8, 
@@ -250,7 +250,7 @@ def test_sampling_bcur1s_job(test_dir, memory_jobstore):
                                 'energy_label': 'REF_energy'
                     },
                    structure=structures,
-                   isol_es={14: -0.84696938},
+                   isolated_atoms_energies={14: -0.84696938},
                    random_seed=42)
 
     response = run_locally(

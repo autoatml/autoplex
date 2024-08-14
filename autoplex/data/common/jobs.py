@@ -29,8 +29,8 @@ from pymatgen.io.vasp.outputs import Vasprun
 
 from autoplex.data.common.utils import (
     ElementCollection,
-    boltzhist_cur_dualIter,
-    boltzhist_cur_oneShot,
+    boltzhist_cur_dual_iter,
+    boltzhist_cur_one_shot,
     create_soap_descriptor,
     cur_select,
     data_distillation,
@@ -327,7 +327,7 @@ def sampling(
     dir: str = None,
     structure: list[Structure] = None,
     traj_path: list | None = None,
-    isol_es: dict | None = None,
+    isolated_atoms_energies: dict | None = None,
     random_seed: int = None,
     remove_traj_files: bool = True,
 ):
@@ -374,7 +374,7 @@ def sampling(
     traj_path : list[list[str]], optional
         List of lists containing trajectory paths. Default is None.
 
-    isol_es : dict, optional
+    isolated_atoms_energies : dict, optional
         Dictionary of isolated energy values for species. Required for 'boltzhist_cur'
         selection method. Default is None.
 
@@ -412,7 +412,7 @@ def sampling(
         atoms = read(dir, index=":")
 
     elif structure is not None:
-        atoms = [AseAtomsAdaptor().get_atoms(at) for at in structure]
+        atoms = [AseAtomsAdaptor().get_atoms(atom) for atom in structure]
 
     else:
         atoms, pressures = handle_rss_trajectory(traj_path, remove_traj_files)
@@ -440,36 +440,38 @@ def sampling(
             )
 
         elif selection_method in {"bcur1s", "bcur2i"}:
-            if isol_es is not None:
-                isol_es = {int(k): v for k, v in isol_es.items()}
+            if isolated_atoms_energies is not None:
+                isolated_atoms_energies = {
+                    int(k): v for k, v in isolated_atoms_energies.items()
+                }
             else:
                 raise ValueError("Please provide the energy of isolated atoms!")
 
             if selection_method == "bcur1s":
-                selected_atoms = boltzhist_cur_oneShot(
+                selected_atoms = boltzhist_cur_one_shot(
                     atoms=atoms,
-                    isol_es=isol_es,
+                    isolated_atoms_energies=isolated_atoms_energies,
                     bolt_frac=bcur_params["frac_of_bcur"],
                     bolt_max_num=bcur_params["bolt_max_num"],
                     cur_num=num_of_selection,
                     kernel_exp=bcur_params["kernel_exp"],
                     kT=bcur_params["kT"],
                     energy_label=bcur_params["energy_label"],
-                    P=pressures,
+                    pressures=pressures,
                     descriptor=descriptor,
                     random_seed=random_seed,
                 )
             else:
-                selected_atoms = boltzhist_cur_dualIter(
-                    atoms=atoms,
-                    isol_es=isol_es,
+                selected_atoms = boltzhist_cur_dual_iter(
+                    atoms_list=atoms,
+                    isolated_atoms_energies=isolated_atoms_energies,
                     bolt_frac=bcur_params["frac_of_bcur"],
                     bolt_max_num=bcur_params["bolt_max_num"],
                     cur_num=num_of_selection,
-                    kernel_exp=bcur_params["kernel_exp"],
+                    kernel_exponent=bcur_params["kernel_exp"],
                     kT=bcur_params["kT"],
                     energy_label=bcur_params["energy_label"],
-                    P=pressures,
+                    pressures=pressures,
                     descriptor=descriptor,
                     random_seed=random_seed,
                 )
