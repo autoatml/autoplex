@@ -322,7 +322,31 @@ def process_rss(
     isolated_atoms_energies,
     config_type,
 ) -> str | None:
-    """Run RSS on a single thread using MLIPs."""
+    """
+    Run RSS on a single thread using MLIPs.
+
+    Parameters
+    ----------
+    atom
+    mlip_path
+    output_file_name
+    mlip_type
+    scalar_pressure_method
+    scalar_exp_pressure
+    scalar_pressure_exponential_width
+    scalar_pressure_low
+    scalar_pressure_high
+    max_steps
+    force_tol
+    stress_tol
+    hookean_repul
+    hookean_paras
+    write_traj
+    device
+    isolated_atoms_energies
+    config_type
+
+    """
     if mlip_type == "GAP":
         gap_label = os.path.join(mlip_path, "gap_file.xml")
         gap_control = "Potential xml_label=" + extract_gap_label(gap_label)
