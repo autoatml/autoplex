@@ -6,9 +6,9 @@ from autoplex.data.common.jobs import sampling
 from jobflow import run_locally
 from pathlib import Path
 from ase.io import read
-from autoplex.data.common.utils import (cur_select, 
-                                        boltzhist_cur_oneShot, 
-                                        ElementCollection, 
+from autoplex.data.common.utils import (cur_select,
+                                        boltzhist_cur_one_shot,
+                                        ElementCollection,
                                         boltzhist_cur_dualIter)
 import shutil
 
@@ -120,18 +120,18 @@ def test_sampling_bcur1s(test_dir):
                 ' cutoff_transition_width=' + str(soap_paras['cutoff_transition_width']) + \
                 ' average=' + str(soap_paras['average'])
 
-    selected_atoms = boltzhist_cur_oneShot(atoms=atoms,
-                                   isol_es={14: -0.81},
-                                   bolt_frac=0.3, 
-                                   bolt_max_num=3000,
-                                   cur_num=num_of_selection, 
-                                   kernel_exp=4, 
-                                   kT=0.1, 
-                                   energy_label='energy',
-                                   P=None,  
-                                   descriptor=descriptor,
-                                   random_seed=42,                          
-                                   )
+    selected_atoms = boltzhist_cur_one_shot(atoms=atoms,
+                                            isolated_atoms_energies={14: -0.81},
+                                            bolt_frac=0.3,
+                                            bolt_max_num=3000,
+                                            cur_num=num_of_selection,
+                                            kernel_exp=4,
+                                            kT=0.1,
+                                            energy_label='energy',
+                                            pressures=None,
+                                            descriptor=descriptor,
+                                            random_seed=42,
+                                            )
     
     ref_energies = [-32.294567459921545, 
                     -104.74329476438821, 
@@ -203,15 +203,15 @@ def test_sampling_bcur2i():
                 ' average=' + str(soap_paras['average'])
 
     selected_atoms = boltzhist_cur_dualIter(
-                    atoms=atoms,
-                    isol_es={13: 0.2},
+                    atoms_list=atoms,
+                    isolated_atoms_energies={13: 0.2},
                     bolt_frac=0.8, 
                     bolt_max_num=5,
                     cur_num=3, 
-                    kernel_exp=4, 
+                    kernel_exponent=4,
                     kT=0.3, 
                     energy_label='energy',
-                    P=pressures,  
+                    pressures=pressures,
                     descriptor=descriptor,
                     random_seed=42,                          
                 )
