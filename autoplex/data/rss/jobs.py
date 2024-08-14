@@ -146,7 +146,7 @@ class RandomizedStructure(Maker):
 
         return os.path.join(dir_path, self.output_file_name)
 
-    def _update_buildcell_options(self, updates, origin):
+    def _update_buildcell_options(self, updates: dict, origin):
         """
         Update buildcell options based on a dictionary of updates.
 
