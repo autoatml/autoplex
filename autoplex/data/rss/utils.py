@@ -315,11 +315,11 @@ def process_rss(
     max_steps,
     force_tol,
     stress_tol,
-    Hookean_repul,
+    hookean_repul,
     hookean_paras,
     write_traj,
     device,
-    isol_es,
+    isolated_atoms_energies,
     config_type,
 ) -> str | None:
     """Run RSS on a single thread using MLIPs."""
@@ -345,8 +345,10 @@ def process_rss(
 
     elif mlip_type == "NEQUIP":
         nequip_label = os.path.join(mlip_path, "deployed_nequip_model.pth")
-        if isol_es:
-            ele_syms = [chemical_symbols[int(e_num)] for e_num in isol_es]
+        if isolated_atoms_energies:
+            ele_syms = [
+                chemical_symbols[int(e_num)] for e_num in isolated_atoms_energies
+            ]
 
         else:
             raise ValueError("isol_es is empty or not defined!")
@@ -368,7 +370,7 @@ def process_rss(
     unique_starting_index = atom.info["unique_starting_index"]
     log_file_name = output_file_name + "_" + str(unique_starting_index) + ".log"
     with open(log_file_name, "w") as log_file:
-        if Hookean_repul:
+        if hookean_repul:
             print("Hookean repulsion is used")
             hks = []
             atom_num = atom.get_atomic_numbers()

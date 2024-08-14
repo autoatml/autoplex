@@ -471,17 +471,17 @@ def do_rss_multi_node(
     max_steps: int = 1000,
     force_tol: float = 0.01,
     stress_tol: float = 0.01,
-    Hookean_repul: bool = False,
+    hookean_repul: bool = False,
     hookean_paras: dict[tuple[int, int], tuple[float, float]] | None = None,
     write_traj: bool = True,
     num_processes_rss: int = 1,
     device: str = "cpu",
-    isol_es: dict[int, float] | None = None,
+    isolated_atoms_energies: dict[int, float] | None = None,
     num_groups: int = 5,
     config_type: str = "traj",
 ) -> list[list | None]:
     """
-    Perform sandom structure searching (RSS) using a MLIP.
+    Perform multi-node random structure searching (RSS) using a MLIP.
 
     Parameters
     ----------
@@ -510,7 +510,7 @@ def do_rss_multi_node(
         Force tolerance for relaxation. Default is 0.01.
     stress_tol : float, optional
         Stress tolerance for relaxation. Default is 0.01.
-    Hookean_repul : bool, optional
+    hookean_repul : bool, optional
         Whether to apply Hookean repulsion. Default is False.
     hookean_paras : dict, optional
         Parameters for Hookean repulsion as a dictionary of tuples. Default is None.
@@ -556,12 +556,12 @@ def do_rss_multi_node(
             max_steps=max_steps,
             force_tol=force_tol,
             stress_tol=stress_tol,
-            Hookean_repul=Hookean_repul,
+            Hookean_repul=hookean_repul,
             hookean_paras=hookean_paras,
             write_traj=write_traj,
             num_processes_rss=num_processes_rss,
             device=device,
-            isol_es=isol_es,
+            isol_es=isolated_atoms_energies,
             struct_start_index=struct_start_index,
             config_type=config_type,
         )

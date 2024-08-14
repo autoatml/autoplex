@@ -297,7 +297,7 @@ def do_RSS_iterations(
             max_steps=max_steps,
             force_tol=force_tol,
             stress_tol=stress_tol,
-            Hookean_repul=Hookean_repul,
+            hookean_repul=Hookean_repul,
             write_traj=write_traj,
             num_processes_rss=num_processes_rss,
             device=device,
