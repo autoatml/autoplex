@@ -4,7 +4,7 @@ os.environ["OMP_NUM_THREADS"] = "1"
 from jobflow import run_locally, Flow
 from jobflow import Response, job
 from autoplex.data.rss.jobs import RandomizedStructure, do_rss_single_node, do_rss_multi_node
-from autoplex.data.common.jobs import Sampling, VASP_collect_data, Data_preprocessing
+from autoplex.data.common.jobs import sampling, collect_vasp_data, data_preprocessing
 from autoplex.data.common.flows import DFTStaticMaker
 from autoplex.fitting.common.flows import MLIPFitMaker
 from typing import List, Optional, Dict, Any
@@ -41,8 +41,8 @@ def mock_RSS(input_dir: str = None,
              kt: float = None,
              **fit_kwargs,):
     
-    job2 = Sampling(selection_method=selection_method, 
-                    num_of_selection=num_of_selection, 
+    job2 = sampling(selection_method=selection_method,
+                    num_of_selection=num_of_selection,
                     bcur_params=bcur_params,
                     dir=input_dir,
                     random_seed=random_seed)
@@ -53,13 +53,13 @@ def mock_RSS(input_dir: str = None,
                        dimer_num=dimer_num,
                        custom_set=custom_set, 
                        ).make(structures=job2.output)
-    job4 = VASP_collect_data(vasp_ref_file=vasp_ref_file, 
-                             rss_group=rss_group, 
+    job4 = collect_vasp_data(vasp_ref_file=vasp_ref_file,
+                             rss_group=rss_group,
                              vasp_dirs=job3.output)
-    job5 = Data_preprocessing(test_ratio=test_ratio, 
-                              regularization=regularization, 
-                              distillation=distillation, 
-                              f_max=f_max, 
+    job5 = data_preprocessing(test_ratio=test_ratio,
+                              regularization=regularization,
+                              distillation=distillation,
+                              f_max=f_max,
                               vasp_ref_dir=job4.output['vasp_ref_dir'], pre_database_dir=pre_database_dir)
     job6 = MLIPFitMaker(mlip_type=mlip_type, 
                         ref_energy_name=ref_energy_name,
@@ -128,8 +128,8 @@ def mock_do_RSS_iterations(input: Dict[str, Optional[Any]] = {'test_error': None
 
         bcur_params['kT'] = kt
 
-        job2 = Sampling(selection_method=selection_method1, 
-                        num_of_selection=num_of_selection1, 
+        job2 = sampling(selection_method=selection_method1,
+                        num_of_selection=num_of_selection1,
                         bcur_params=bcur_params,
                         dir=input_dir,
                         random_seed=random_seed)
@@ -149,8 +149,8 @@ def mock_do_RSS_iterations(input: Dict[str, Optional[Any]] = {'test_error': None
                       write_traj=write_traj,
                       num_processes_rss=num_processes_rss,
                       device=device)
-        job4 = Sampling(selection_method=selection_method2, 
-                        num_of_selection=num_of_selection2, 
+        job4 = sampling(selection_method=selection_method2,
+                        num_of_selection=num_of_selection2,
                         bcur_params=bcur_params,
                         traj_path=job3.output,
                         random_seed=random_seed,
@@ -206,8 +206,8 @@ def mock_do_RSS_iterations_multi_jobs(input: Dict[str, Optional[Any]] = {'test_e
 
         bcur_params['kT'] = kt
 
-        job2 = Sampling(selection_method=selection_method1, 
-                        num_of_selection=num_of_selection1, 
+        job2 = sampling(selection_method=selection_method1,
+                        num_of_selection=num_of_selection1,
                         bcur_params=bcur_params,
                         dir=input_dir,
                         random_seed=random_seed)
@@ -228,8 +228,8 @@ def mock_do_RSS_iterations_multi_jobs(input: Dict[str, Optional[Any]] = {'test_e
                       num_processes_rss=num_processes_rss,
                       device=device,
                       num_groups=num_groups,)
-        job4 = Sampling(selection_method=selection_method2, 
-                        num_of_selection=num_of_selection2, 
+        job4 = sampling(selection_method=selection_method2,
+                        num_of_selection=num_of_selection2,
                         bcur_params=bcur_params,
                         traj_path=job3.output,
                         random_seed=random_seed,

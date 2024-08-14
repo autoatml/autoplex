@@ -952,23 +952,23 @@ def parallel_calc_descriptor_vec(atom: Atoms, selected_descriptor: str) -> Atoms
 
 
 def cur_select(
-    atoms,
-    selected_descriptor,
-    kernel_exp,
-    select_nums,
-    stochastic=True,
-    random_seed=None,
+    atoms_list: list[Atoms],
+    selected_descriptor: str,
+    kernel_exponent: float,
+    select_nums: int = 100,
+    stochastic: bool = True,
+    random_seed: int | None = None,
 ) -> list[Atoms] | None:
     """
     Perform CUR selection on a set of atoms to get representative SOAP descriptors.
 
     Parameters
     ----------
-    atoms : list of ase.Atoms
+    atoms_list : list of ase.Atoms
         The atoms for which to perform CUR selection.
     selected_descriptor : str
         The quip descriptor string to use for the calculation.
-    kernel_exp : float
+    kernel_exponent : float
         The kernel exponent to use in the calculation.
     select_nums : int
         The number of atoms to select.
@@ -989,57 +989,64 @@ def cur_select(
     if random_seed is not None:
         np.random.seed(random_seed)
 
-    if isinstance(atoms[0], list):
+    if isinstance(atoms_list[0], list):
         print("flattening")
-        fatoms = flatten(atoms, recursive=True)
+        flattened_atoms = flatten(atoms_list, recursive=True)
     else:
-        fatoms = atoms
+        flattened_atoms = atoms_list
 
-    num_workers = min(len(fatoms), os.cpu_count() or 1)
+    num_workers = min(len(flattened_atoms), os.cpu_count() or 1)
 
     with Pool(
         processes=num_workers
     ) as pool:  # TODO: implement argument for number of cores throughout
-        ats = pool.starmap(
+        atoms = pool.starmap(
             parallel_calc_descriptor_vec,
-            [(atom, selected_descriptor) for atom in fatoms],
+            [(atom, selected_descriptor) for atom in flattened_atoms],
         )
 
-    if isinstance(ats, list) & (len(ats) != 0):
-        at_descs = np.array([at.info["descriptor_vec"] for at in ats]).T
-        m = (
-            np.matmul((np.squeeze(at_descs)).T, np.squeeze(at_descs)) ** kernel_exp
-            if kernel_exp > 0.0
-            else at_descs
+    if isinstance(atoms, list) & (len(atoms) != 0):
+        atom_descriptors = np.array([at.info["descriptor_vec"] for at in atoms]).T
+        descriptor_matrix = (
+            np.matmul((np.squeeze(atom_descriptors)).T, np.squeeze(atom_descriptors))
+            ** kernel_exponent
+            if kernel_exponent > 0.0
+            else atom_descriptors
         )
 
-        def descriptor_svd(at_descs, num, do_vectors="vh"):
-            def mv(v):
-                return np.dot(at_descs, v)
+        def descriptor_svd(atom_descriptors, num, do_vectors="vh"):
+            def matrix_vector_dot_product(vector):
+                return np.dot(atom_descriptors, vector)
 
-            def rmv(v):
-                return np.dot(at_descs.T, v)
+            def transpose_matrix_vector_dot_product(vector):
+                return np.dot(atom_descriptors.T, vector)
 
-            A = LinearOperator(at_descs.shape, matvec=mv, rmatvec=rmv, matmat=mv)
-            return svds(A, k=num, return_singular_vectors=do_vectors)
+            descriptor_operator = LinearOperator(
+                atom_descriptors.shape,
+                matvec=matrix_vector_dot_product,
+                rmatvec=transpose_matrix_vector_dot_product,
+                matmat=matrix_vector_dot_product,
+            )
+            return svds(descriptor_operator, k=num, return_singular_vectors=do_vectors)
 
         (_, _, vt) = descriptor_svd(
-            m, min(max(1, int(select_nums / 2)), min(m.shape) - 1)
+            descriptor_matrix,
+            min(max(1, int(select_nums / 2)), min(descriptor_matrix.shape) - 1),
         )
         c_scores = np.sum(vt**2, axis=0) / vt.shape[0]
         if stochastic:
             selected = sorted(
                 np.random.choice(
-                    range(len(ats)), size=select_nums, replace=False, p=c_scores
+                    range(len(atoms)), size=select_nums, replace=False, p=c_scores
                 )
             )
         else:
             selected = sorted(np.argsort(c_scores)[-select_nums:])
 
-        selected_atoms = [ats[i] for i in selected]
+        selected_atoms = [atoms[i] for i in selected]
 
-        for at in selected_atoms:
-            del at.info["descriptor_vec"]
+        for atom in selected_atoms:
+            del atom.info["descriptor_vec"]
 
         return selected_atoms
 
@@ -1209,9 +1216,9 @@ def boltzhist_cur_oneShot(
     # implement CUR
     if cur_num < select_num:
         selected_atoms = cur_select(
-            atoms=selected_bolt_ats,
+            atoms_list=selected_bolt_ats,
             selected_descriptor=descriptor,
-            kernel_exp=kernel_exp,
+            kernel_exponent=kernel_exp,
             select_nums=cur_num,
             stochastic=True,
             random_seed=random_seed,
@@ -1456,9 +1463,9 @@ def convexhull_cur(
     # implement CUR
     if cur_num < select_num:
         selected_atoms = cur_select(
-            atoms=selected_bolt_ats,
+            atoms_list=selected_bolt_ats,
             selected_descriptor=descriptor,
-            kernel_exp=kernel_exp,
+            kernel_exponent=kernel_exp,
             select_nums=cur_num,
             stochastic=True,
         )

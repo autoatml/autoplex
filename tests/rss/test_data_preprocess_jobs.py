@@ -8,15 +8,15 @@ from pathlib import Path
 import numpy as np
 
 def test_vasp_static(test_dir, memory_jobstore):
-    from autoplex.data.common.jobs import Data_preprocessing
+    from autoplex.data.common.jobs import data_preprocessing
     test_files_dir = test_dir / "data/rss.extxyz"
 
-    job = Data_preprocessing(test_ratio=0.1,
+    job = data_preprocessing(test_ratio=0.1,
                              regularization=True,
                              distillation=True,
                              f_max=0.7,
                              vasp_ref_dir=test_files_dir,
-                             pre_database_dir=None,)
+                             pre_database_dir=None, )
 
     response = run_locally(
         job,

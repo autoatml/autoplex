@@ -8,7 +8,7 @@ import shutil
 from pathlib import Path
 
 def test_vasp_static(test_dir, mock_vasp, memory_jobstore):
-    from autoplex.data.common.jobs import VASP_collect_data
+    from autoplex.data.common.jobs import collect_vasp_data
     from autoplex.data.common.flows import DFTStaticMaker
     
     poscar_paths = {
@@ -71,7 +71,7 @@ def test_vasp_static(test_dir, mock_vasp, memory_jobstore):
                     },
                     ).make(structures=test_structures)
     
-    job2 = VASP_collect_data(vasp_dirs=job1.output)
+    job2 = collect_vasp_data(vasp_dirs=job1.output)
     
     response = run_locally(
         Flow([job1,job2]),

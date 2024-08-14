@@ -49,7 +49,7 @@ logging.basicConfig(level=logging.DEBUG, format="[%(levelname)s] %(message)s")
 
 
 @job
-def convert_to_extxyz(job_output, pkl_file, config_type, factor):
+def convert_to_extxyz(job_output, pkl_file, config_type: str, factor: str):
     """
     Convert data and write extxyt file.
 
@@ -69,8 +69,8 @@ def convert_to_extxyz(job_output, pkl_file, config_type, factor):
         traj_obj = pickle.load(file)
     data = to_ase_trajectory(traj_obj=traj_obj)
     data[-1].write("tmp.xyz")
-    file = read("tmp.xyz", index=":")
-    for i in file:
+    atoms: list[Atoms] = read("tmp.xyz", index=":")
+    for i in atoms:
         virial_list = -voigt_6_to_full_3x3_stress(i.get_stress()) * i.get_volume()
         i.info["REF_virial"] = " ".join(map(str, virial_list.flatten()))
         del i.calc.results["stress"]
@@ -80,7 +80,7 @@ def convert_to_extxyz(job_output, pkl_file, config_type, factor):
         del i.calc.results["energy"]
         i.info["config_type"] = config_type
         i.pbc = True
-    write("ref_" + factor + ".extxyz", file, append=True)
+    write("ref_" + factor + ".extxyz", atoms, append=True)
 
     return os.getcwd()
 
@@ -318,7 +318,7 @@ def generate_randomized_structures(
 
 
 @job
-def Sampling(
+def sampling(
     selection_method: Literal[
         "cur", "bcur1s", "bcur2i", "random", "uniform"
     ] = "random",
@@ -404,10 +404,8 @@ def Sampling(
         "energy_label": "energy",
     }
 
-    if bcur_params is not None:
-        default_bcur_params.update(bcur_params)
+    bcur_params = {**default_bcur_params, **(bcur_params or {})}
 
-    bcur_params = default_bcur_params
     pressures = None
 
     if dir is not None:
@@ -433,9 +431,9 @@ def Sampling(
 
         if selection_method == "cur":
             selected_atoms = cur_select(
-                atoms=atoms,
+                atoms_list=atoms,
                 selected_descriptor=descriptor,
-                kernel_exp=bcur_params["kernel_exp"],
+                kernel_exponent=bcur_params["kernel_exp"],
                 select_nums=num_of_selection,
                 stochastic=True,
                 random_seed=random_seed,
@@ -520,7 +518,7 @@ def Sampling(
 
 
 @job
-def VASP_collect_data(
+def collect_vasp_data(
     vasp_ref_file: str = "vasp_ref.extxyz",
     rss_group: str = "RSS",
     vasp_dirs: dict | None = None,
@@ -660,7 +658,7 @@ def safe_strip_hostname(value):
 
 
 @job
-def Data_preprocessing(
+def data_preprocessing(
     vasp_ref_dir: str,
     test_ratio: float = 0.5,
     regularization: bool = False,
