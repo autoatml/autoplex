@@ -96,7 +96,7 @@ class RandomizedStructure(Maker):
                 "VARVOL" not in self.buildcell_options
                 or "MINSEP" not in self.buildcell_options
             ):
-                r0 = {}
+                r0 = {}  # unclear variable
                 varvol = {}
                 num_atom_formula = 0
                 total_varvol_formula = 0
