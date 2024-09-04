@@ -117,6 +117,10 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         List of SOAP delta values that are checked.
     n_sparse_list: list
         List of GAP n_sparse values that are checked.
+    adaptive_supercell_settings: bool
+        prevent too big rattled supercells or too tight phonopy supercell settings.
+    benchmark_kwargs: dict
+        kwargs for the benchmark flows
     """
 
     name: str = "add_data"
@@ -146,6 +150,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
     atomwise_regularization_list: list | None = None
     soap_delta_list: list | None = None
     n_sparse_list: list | None = None
+    adaptive_supercell_settings: bool = True
     benchmark_kwargs: dict = field(default_factory=dict)
 
     def make(
@@ -156,7 +161,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         f_max: float = 40.0,
         pre_xyz_files: list[str] | None = None,
         pre_database_dir: str | None = None,
-        preprocessing_data=False,
+        preprocessing_data: bool = True,
         atomwise_regularization_parameter: float = 0.1,
         f_min: float = 0.01,  # unit: eV Å-1
         atom_wise_regularization: bool = True,
@@ -182,8 +187,10 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
             Maximally allowed force in the data set.
         pre_xyz_files: list[str] or None
             names of the pre-database train xyz file and test xyz file.
-        pre_database_dir:
+        pre_database_dir: str or None
             the pre-database directory.
+        preprocessing_data: bool
+            preprocessing the data.
         atomwise_regularization_parameter: float
             regularization value for the atom-wise force components.
         f_min: float
@@ -227,6 +234,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                     angle_max_attempts=self.angle_max_attempts,
                     angle_percentage_scale=self.angle_percentage_scale,
                     w_angle=self.w_angle,
+                    adaptive_rattled_supercell_settings=self.adaptive_supercell_settings,
                 )
                 flows.append(addDFTrand)
                 fit_input.update({mp_id: addDFTrand.output})
@@ -237,6 +245,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                     self.symprec,
                     self.phonon_displacement_maker,
                     self.min_length,
+                    self.adaptive_supercell_settings,
                 )
                 flows.append(addDFTphon)
                 fit_input.update({mp_id: addDFTphon.output})
@@ -253,7 +262,6 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                 {"IsolatedAtom": {"iso_atoms_dir": [isoatoms.output["dirs"]]}}
             )
 
-        print("pre_database_dir:", pre_database_dir)
         for ml_model in self.ml_models:
             add_data_fit = MLIPFitMaker(
                 mlip_type=ml_model,
@@ -398,6 +406,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         symprec: float,
         phonon_displacement_maker: BaseVaspMaker,
         min_length: float,
+        adaptive_phonopy_supercell_settings: bool = True,
     ):
         """Add DFT phonon runs for reference structures.
 
@@ -416,9 +425,16 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
             Maker used to compute the forces for a supercell.
         min_length: float
              min length of the supercell that will be built
+        adaptive_phonopy_supercell_settings: bool
+            prevent too tight phonopy supercell settings
         """
         additonal_dft_phonon = dft_phonopy_gen_data(
-            structure, displacements, symprec, phonon_displacement_maker, min_length
+            structure,
+            displacements,
+            symprec,
+            phonon_displacement_maker,
+            min_length,
+            adaptive_phonopy_supercell_settings,
         )
 
         return Flow(
@@ -449,6 +465,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         rattle_seed: int = 42,
         rattle_mc_n_iter: int = 10,
         w_angle: list[float] | None = None,
+        adaptive_rattled_supercell_settings: bool = True,
     ):
         """Add DFT phonon runs for randomly displaced structures.
 
@@ -503,6 +520,8 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
             Number of Monte Carlo iterations.
             Larger number of iterations will generate larger displacements.
             Default=10.
+        adaptive_rattled_supercell_settings: bool
+            prevent too big rattled supercells
         """
         additonal_dft_random = dft_random_gen_data(
             structure=structure,
@@ -522,6 +541,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
             angle_percentage_scale=angle_percentage_scale,
             w_angle=w_angle,
             min_distance=min_distance,
+            adaptive_rattled_supercell_settings=adaptive_rattled_supercell_settings,
         )
         return Flow(
             jobs=additonal_dft_random,

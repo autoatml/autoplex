@@ -10,7 +10,41 @@ This tutorial will demonstrate how to use `autoplex` with its default setup and 
 
 ## General workflow
 
-The complete workflow of `autoplex` involves the data generation (including the execution of VASP calculations), the fitting of the  machine-learned interatomic potential (MLIP) and the benchmark to the DFT results.
+The complete workflow of `autoplex` involves the data generation 
+(including the execution of VASP calculations), 
+the fitting of the  machine-learned interatomic potential (MLIP) and the benchmark to the DFT results.
+
+### Before running the workflow
+
+As a first step, you should check if our algorithm can generate supercells that are small enough to be treated with DFT 
+(not too many atoms) and large enough to result into reliable phonon properties.
+To do so, you can use the following function:
+
+```python
+from mp_api.client import MPRester
+from autoplex.data.phonons.utils import check_supercells
+
+
+# first you can download structures from the Materials Project
+mpr = MPRester(api_key='YOUR_MP_API_KEY')
+structure_list = []
+
+mpids = ["mp-149","mp-165","mp-168","mp-16220","mp-571520","mp-971661","mp-971662","mp-999200", "mp-1072544", "mp-1079297", "mp-1095269", "mp-1200830", "mp-1203790"]
+for mpid in mpids:
+    structure = mpr.get_structure_by_material_id(mpid)
+    structure_list.append(structure)
+
+
+# then you can use the check_supercells function
+check_supercells(structure_list, mpids, min_length=18, max_length=25, fallback_min_length=10, min_atoms=100, max_atoms=500, tolerance=0.1)
+```
+
+`check_supercells` will list all structures that should likely be excluded. 
+However, please carefully check yourself as your local memory requirements might be different.
+Remove all structures which you cannot treat computationally 
+(e.g., structures with lattice parameters larger than 25 Angstrom or more than 500 atoms)
+
+## Now start the workflow
 
 Let us start by importing all the necessary modules:
 

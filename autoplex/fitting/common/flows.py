@@ -39,7 +39,7 @@ class MLIPFitMaker(Maker):
     mlip_type: str
         Choose one specific MLIP type:
         'GAP' | 'J-ACE' | 'P-ACE' | 'NEQUIP' | 'M3GNET' | 'MACE'
-    HPO: bool
+    hyper_param_optimization: bool
         Perform hyperparameter optimization using XPOT
         (XPOT: https://pubs.aip.org/aip/jcp/article/159/2/024803/2901815)
     ref_energy_name : str, optional
@@ -52,7 +52,7 @@ class MLIPFitMaker(Maker):
 
     name: str = "MLpotentialFit"
     mlip_type: str = "GAP"
-    HPO: bool = False
+    hyper_param_optimization: bool = False
     ref_energy_name: str = "REF_energy"
     ref_force_name: str = "REF_forces"
     ref_virial_name: str = "REF_virial"
@@ -78,8 +78,8 @@ class MLIPFitMaker(Maker):
         glue_xml: bool = False,  # This is only used for GAP.
         num_processes_fit: int | None = None,
         preprocessing_data: bool = True,
-        database_dir: str = None,
-        device: str = "cpu",
+        database_dir: Path | None = None,
+        device: str = "cuda",
         **fit_kwargs,
     ):
         """
@@ -123,9 +123,16 @@ class MLIPFitMaker(Maker):
         preprocessing_data: bool
             Determine whether to preprocess the data.
             If not, one needs to input the path to the training database.
+        database_dir: Path
+            the database directory.
+        device: str
+            specify device to use cuda or cpu.
         fit_kwargs : dict.
             dict including MLIP fit keyword args.
         """
+        if database_dir is None:
+            database_dir = Path.cwd()
+
         if self.mlip_type not in ["GAP", "J-ACE", "P-ACE", "NEQUIP", "M3GNET", "MACE"]:
             raise ValueError(
                 "Please correct the MLIP name!"
@@ -157,7 +164,7 @@ class MLIPFitMaker(Maker):
                 auto_delta=auto_delta,
                 glue_xml=glue_xml,
                 mlip_type=self.mlip_type,
-                HPO=self.HPO,
+                hyper_param_optimization=self.hyper_param_optimization,
                 ref_energy_name=self.ref_energy_name,
                 ref_force_name=self.ref_force_name,
                 ref_virial_name=self.ref_virial_name,
@@ -168,7 +175,7 @@ class MLIPFitMaker(Maker):
             jobs.append(mlip_fit_job)
 
             return Flow(jobs=jobs, output=mlip_fit_job.output, name=self.name)
-
+        # this will only run if train.extxyz and test.extxyz files are present in the database_dir
         mlip_fit_job = machine_learning_fit(
             database_dir=database_dir,
             isolated_atoms_energies=isolated_atoms_energies,
@@ -176,7 +183,7 @@ class MLIPFitMaker(Maker):
             auto_delta=auto_delta,
             glue_xml=glue_xml,
             mlip_type=self.mlip_type,
-            HPO=self.HPO,
+            hyper_param_optimization=self.hyper_param_optimization,
             ref_energy_name=self.ref_energy_name,
             ref_force_name=self.ref_force_name,
             ref_virial_name=self.ref_virial_name,

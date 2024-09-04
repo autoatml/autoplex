@@ -10,7 +10,7 @@ name = "autoplex"
 description = "Automated machine-learned Potential Landscape explorer"
 readme = "README.md"
 keywords = ["high-throughput", "automated", "mlpotential"]
-license = { text = "BSD 3-Clause" }
+license = { text = "MIT License" }
 authors = [{ name = "Janine George", email = "janine.george@bam.de" }]
 version = "0.2.9"
 classifiers = [
@@ -24,11 +24,11 @@ classifiers = [
 ]
 requires-python = ">=3.9"
 dependencies = [
-     #"pymatgen>=2023.9.10",
-     "atomate2[strict]@git+https://github.com/materialsproject/atomate2.git@50ae3c05daa5d6e2deaeda4c37a4277e7b7ac4f5",
+     "pymatgen>=2024.8.9",
+     "atomate2[strict]@git+https://github.com/QuantumChemist/atomate2.git@adjust_get_supercell_size",
      #"FireWorks>=2.0.3",
      "ase==3.23.0",
-     "matgl==1.1.2",
+     "matgl==1.1.3",
      #"quippy-ase==0.9.14",
      "numpy==1.26.4",
      "mace-torch==0.3.4",
@@ -64,8 +64,8 @@ docs = [
 ]
 
 strict = [
-     #"pymatgen==2023.9.10",
-     "atomate2[strict]@git+https://github.com/materialsproject/atomate2.git@50ae3c05daa5d6e2deaeda4c37a4277e7b7ac4f5",
+     "pymatgen>=2024.8.9",
+     "atomate2[strict]@git+https://github.com/QuantumChemist/atomate2.git@adjust_get_supercell_size",
      #"FireWorks==2.0.3",
      # last known working ASE version: https://gitlab.com/ase/ase@2bab58f4e
      #"ase@git+https://gitlab.com/ase/ase.git@2bab58f4e",

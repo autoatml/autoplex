@@ -20,7 +20,7 @@ GAP_DEFAULTS_FILE_PATH = current_dir / "gap-defaults.json"
 
 @job
 def machine_learning_fit(
-    database_dir: Path,
+    database_dir: str | Path,
     species_list: list,
     isolated_atoms_energies: dict | None = None,
     num_processes_fit: int = 32,
@@ -31,7 +31,7 @@ def machine_learning_fit(
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",
     device: str = "cuda",
-    HPO: bool = False,
+    hyper_param_optimization: bool = False,
     **fit_kwargs,
 ):
     """
@@ -39,7 +39,7 @@ def machine_learning_fit(
 
     Parameters
     ----------
-    database_dir: Path
+    database_dir: str | Path
         the database directory.
     isolated_atoms_energies: dict | None
         Dict of isolated atoms energies.
@@ -52,8 +52,6 @@ def machine_learning_fit(
     mlip_type: str
         Choose one specific MLIP type:
         'GAP' | 'J-ACE' | 'P-ACE' | 'NEQUIP' | 'M3GNET' | 'MACE'
-    regularization: bool
-        For using sigma regularization.
     species_list : list.
             List of element names (str)
     ref_energy_name : str, optional
@@ -62,11 +60,16 @@ def machine_learning_fit(
         Reference force name.
     ref_virial_name : str, optional
         Reference virial name.
-    HPO: bool
+    device: str
+        specify device to use cuda or cpu.
+    hyper_param_optimization: bool
         call hyperparameter optimization (HPO) or not
     fit_kwargs : dict.
             dict including more fit keyword args.
     """
+    if isinstance(database_dir, str):  # data_prep_job.output is returned as string
+        database_dir = Path(database_dir)
+
     train_files = [
         "train.extxyz",
         "train_wo_sigma.extxyz",
@@ -82,10 +85,9 @@ def machine_learning_fit(
 
     if mlip_type == "GAP":
         for train_name, test_name in zip(train_files, test_files):
-            if (
-                Path(Path(database_dir) / train_name).exists()
-                and Path(Path(database_dir) / test_name).exists()
-            ):
+            if (database_dir / train_name).exists() and (
+                database_dir / test_name
+            ).exists():
                 train_test_error = gap_fitting(
                     db_dir=database_dir,
                     species_list=species_list,

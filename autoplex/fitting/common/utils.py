@@ -1088,7 +1088,7 @@ def mace_fitting(
     path_to_default_hyperparameters : str or Path.
         Path to mlip-defaults.json.
     device: str
-        specify device to use cuda or cpu
+        specify device to use cuda or cpu.
     ref_energy_name : str, optional
         Reference energy name.
     ref_force_name : str, optional
@@ -1370,6 +1370,7 @@ def vaspoutput_2_extended_xyz(
     atom_wise_regularization: bool
         for including atom-wise regularization.
     """
+    counter = 0
     if config_types is None:
         config_types = ["bulk"] * len(path_to_vasp_static_calcs)
     if data_types is None:
@@ -1380,30 +1381,40 @@ def vaspoutput_2_extended_xyz(
     ):
         # strip hostname if it exists in the path
         path_without_hostname = Path(strip_hostname(path)).joinpath("vasprun.xml.gz")
-        # read the vasp output
-        file = read(path_without_hostname, index=":")
-        for i in file:
-            virial_list = -voigt_6_to_full_3x3_stress(i.get_stress()) * i.get_volume()
-            i.info["REF_virial"] = " ".join(map(str, virial_list.flatten()))
-            del i.calc.results["stress"]
-            i.arrays["REF_forces"] = i.calc.results["forces"]
-            if atom_wise_regularization and (data_type == "phonon_dir"):
-                atom_forces = np.array(i.arrays["REF_forces"])
-                atom_wise_force = np.array(
-                    [
-                        force if force > f_min else f_min
-                        for force in np.linalg.norm(atom_forces, axis=1)
-                    ]
+        try:
+            # read the vasp output
+            file = read(path_without_hostname, index=":")
+            for i in file:
+                virial_list = (
+                    -voigt_6_to_full_3x3_stress(i.get_stress()) * i.get_volume()
                 )
-                i.arrays["force_atom_sigma"] = regularization * atom_wise_force
-            del i.calc.results["forces"]
-            i.info["REF_energy"] = i.calc.results["free_energy"]
-            del i.calc.results["energy"]
-            del i.calc.results["free_energy"]
-            i.info["config_type"] = config_type
-            i.info["data_type"] = data_type.rstrip("_dir")
-            i.pbc = True
-        write("vasp_ref.extxyz", file, append=True)
+                i.info["REF_virial"] = " ".join(map(str, virial_list.flatten()))
+                del i.calc.results["stress"]
+                i.arrays["REF_forces"] = i.calc.results["forces"]
+                if atom_wise_regularization and (data_type == "phonon_dir"):
+                    atom_forces = np.array(i.arrays["REF_forces"])
+                    atom_wise_force = np.array(
+                        [
+                            force if force > f_min else f_min
+                            for force in np.linalg.norm(atom_forces, axis=1)
+                        ]
+                    )
+                    i.arrays["force_atom_sigma"] = regularization * atom_wise_force
+                del i.calc.results["forces"]
+                i.info["REF_energy"] = i.calc.results["free_energy"]
+                del i.calc.results["energy"]
+                del i.calc.results["free_energy"]
+                i.info["config_type"] = config_type
+                i.info["data_type"] = data_type.rstrip("_dir")
+                i.pbc = True
+            write("vasp_ref.extxyz", file, append=True)
+        except FileNotFoundError:
+            counter += 1
+
+        if counter / len(path_to_vasp_static_calcs) > 0.05:
+            raise ValueError(
+                "An insufficient number of data points collected. Workflow stopped."
+            )
 
 
 def flatten(atoms_object, recursive=False) -> list[str | bytes | Atoms] | list:

@@ -182,26 +182,27 @@ def generate_randomized_structures(
     rattle_seed: int = 42,
     rattle_mc_n_iter: int = 10,
     w_angle: list[float] | None = None,
+    adaptive_rattled_supercell_settings: bool = True,
 ):
     """
     Take in a pymatgen Structure object and generates angle/volume distorted + rattled structures.
 
     Parameters
     ----------
-    structure : Structure.
+    structure: Structure.
         Pymatgen structures object.
     supercell_matrix: Matrix3D.
         Matrix for obtaining the supercell.
-    distort_type : int.
+    distort_type: int.
         0- volume distortion, 1- angle distortion, 2- volume and angle distortion. Default=0.
-    n_structures : int.
+    n_structures: int.
         Total number of distorted structures to be generated.
         Must be provided if distorting volume without specifying a range, or if distorting angles.
         Default=10.
-    volume_scale_factor_range : list[float]
+    volume_scale_factor_range: list[float]
         [min, max] of volume scale factors.
         e.g. [0.90, 1.10] will distort volume +-10%.
-    volume_custom_scale_factors : list[float]
+    volume_custom_scale_factors: list[float]
         Specify explicit scale factors (if range is not specified).
         If None, will default to [0.90, 0.95, 0.98, 0.99, 1.01, 1.02, 1.05, 1.10].
     min_distance: float
@@ -230,6 +231,8 @@ def generate_randomized_structures(
         Number of Monte Carlo iterations.
         Larger number of iterations will generate larger displacements.
         Default=10.
+    adaptive_rattled_supercell_settings: bool
+        prevent too big rattled supercells
 
     Returns
     -------
@@ -238,11 +241,13 @@ def generate_randomized_structures(
     """
     if supercell_matrix is None:
         supercell_matrix = [[2, 0, 0], [0, 2, 0], [0, 0, 2]]
+
     supercell = get_supercell(
         unitcell=get_phonopy_structure(structure),
         supercell_matrix=supercell_matrix,
     )
     structure = get_pmg_structure(supercell)
+
     # distort cells by volume or angle
     if distort_type == 0:
         distorted_cells = scale_cell(

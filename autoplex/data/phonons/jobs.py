@@ -1,45 +1,105 @@
 """Jobs to create training data for ML potentials."""
-# from __future__ import annotations
-#
-# import numpy as np
-# from jobflow import job
-# from pymatgen.core.structure import Structure
-# from pymatgen.io.ase import AseAtomsAdaptor
-#
-#
-# @job(data=[Structure])
-# def generate_randomized_structures(  # old version of the function
-#     structure: Structure,
-#     n_struct: int,
-#     cell_factor_sequence: list[float] | None = None,
-#     std_dev: float = 0.01,
-# ) -> list[Structure]:
-#     """
-#     Take in a pymatgen Structure object and generates randomly displaced structures.
-#
-#     Parameters
-#     ----------
-#     structure : Structure.
-#         Pymatgen structures object.
-#     n_struct : int.
-#         Total number of randomly displaced structures to be generated.
-#     cell_factor_sequence: list[float]
-#         list of factors to resize cell parameters.
-#     std_dev: float
-#         Standard deviation std_dev for normal distribution to draw numbers from to generate the rattled structures.
-#
-#     Returns
-#     -------
-#     Response.output.
-#         Randomly displaced structures.
-#     """
-#     random_rattled = []
-#     if cell_factor_sequence is None:
-#         cell_factor_sequence = [0.975, 1.0, 1.025, 1.05]
-#     for cell_factor in cell_factor_sequence:
-#         ase_structure = AseAtomsAdaptor.get_atoms(structure)
-#         ase_structure.set_cell(ase_structure.get_cell() * cell_factor, scale_atoms=True)
-#         for seed in np.random.permutation(100000)[:n_struct]:
-#             ase_structure.rattle(seed=seed, stdev=std_dev)
-#             random_rattled.append(AseAtomsAdaptor.get_structure(ase_structure))
-#     return random_rattled
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+import numpy as np
+from jobflow import Response, job
+from pymatgen.transformations.advanced_transformations import (
+    CubicSupercellTransformation,
+)
+
+if TYPE_CHECKING:
+    from pymatgen.core.structure import Structure
+
+
+@job
+def reduce_supercell_size(
+    structure: Structure,
+    min_length: float = 18,
+    max_length: float = 22,
+    fallback_min_length: float = 12,
+    min_atoms: int = 100,
+    max_atoms: int = 500,
+    step_size: float = 1,
+):
+    """
+    Reduce phonopy supercell size.
+
+    Parameters
+    ----------
+    structure: Structure
+        pymatgen Structure object.
+    min_length: float
+        min length of the supercell that will be built.
+    max_length: float
+        max length of the supercell that will be built.
+    max_atoms: int
+        maximally allowed number of atoms in the supercell.
+    min_atoms: int
+        minimum number of atoms in the supercell that shall be reached.
+    fallback_min_length: float
+        fallback option for minimum length for exceptional cases.
+    step_size: float
+        step_size which is used to increase the supercell.
+        If allow_orthorhombic and force_90_degrees are both set to True,
+        the chosen step_size will be automatically multiplied by 5 to
+        prevent a too long search for the possible supercell.
+
+    Returns
+    -------
+    list
+        supercell matrix.
+    """
+    for minimum in range(int(min_length), int(fallback_min_length), -1):
+        try:
+            transformation = CubicSupercellTransformation(
+                min_length=minimum,
+                max_length=max_length,
+                min_atoms=min_atoms,
+                max_atoms=max_atoms,
+                step_size=step_size,
+                allow_orthorhombic=True,
+                force_90_degrees=True,
+            )
+            new_structure = transformation.apply_transformation(structure=structure)
+            if min_atoms <= new_structure.num_sites <= max_atoms:
+                return transformation.transformation_matrix.transpose().tolist()
+        except AttributeError:
+            try:
+                transformation = CubicSupercellTransformation(
+                    min_length=minimum,
+                    max_length=max_length,
+                    min_atoms=min_atoms,
+                    max_atoms=max_atoms,
+                    step_size=step_size,
+                    allow_orthorhombic=True,
+                    force_90_degrees=False,
+                )
+                new_structure = transformation.apply_transformation(structure=structure)
+                if min_atoms <= new_structure.num_sites <= max_atoms:
+                    return transformation.transformation_matrix.transpose().tolist()
+            except AttributeError:
+                try:
+                    transformation = CubicSupercellTransformation(
+                        min_length=minimum,
+                        max_length=max_length,
+                        min_atoms=min_atoms,
+                        max_atoms=max_atoms,
+                        step_size=step_size,
+                    )
+                    new_structure = transformation.apply_transformation(
+                        structure=structure
+                    )
+                    if min_atoms <= new_structure.num_sites <= max_atoms:
+                        return transformation.transformation_matrix.transpose().tolist()
+                except AttributeError:
+                    pass
+
+    a, b, c = structure.lattice.abc
+    a_factor = np.max((np.floor(max_length / a), 1))
+    b_factor = np.max((np.floor(max_length / b), 1))
+    c_factor = np.max((np.floor(max_length / c), 1))
+
+    matrix = np.array([[a_factor, 0, 0], [0, b_factor, 0], [0, 0, c_factor]])
+    return Response(output=matrix.transpose().tolist())
