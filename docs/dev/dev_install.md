@@ -7,7 +7,13 @@ git clone https://github.com/JaGeo/autoplex.git
 cd autoplex
 pip install -e .[docs,strict,dev]
 ```
-This will install autoplex will all dependencies for tests, pre-commit and docs building.
+This will install autoplex will all dependencies for tests, pre-commit and docs building. 
+However, note that non-python programs like `buildcell` and `julia` needed for ACE potential fitting will not be installed with above command. One needs to install these 
+seperately.
+
+Alternatively, one can use the `devcontainer` provided to have your developer environment setup automatically in your IDE. It has been tested to work in [VSCode](https://code.visualstudio.com/docs/devcontainers/containers#_quick-start-open-an-existing-folder-in-a-container) and [PyCharm](https://blog.jetbrains.com/pycharm/2023/06/2023-2-eap-4/). 
+Only prerequisite is one has [docker](https://docs.docker.com/get-started/get-docker/) installed on the system as it uses the published docker images to create this developer env. 
+
 
 ## Running unit tests
 

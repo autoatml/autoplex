@@ -28,7 +28,7 @@ about/contributing
 about/license
 ```
 
-![autoplex documentation](_static/autoplex_logo_tmp.png)
+![autoplex documentation](_static/autoplex_logo.png)
 # autoplex documentation
 
 

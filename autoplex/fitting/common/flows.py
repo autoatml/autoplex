@@ -39,7 +39,11 @@ class MLIPFitMaker(Maker):
     mlip_type: str
         Choose one specific MLIP type to be fitted:
         'GAP' | 'J-ACE' | 'P-ACE' | 'NEQUIP' | 'M3GNET' | 'MACE'
+    <<<<<<< HEAD
     hyperpara_opt: bool
+    =======
+    hyper_param_optimization: bool
+    >>>>>>> upstream/main
         Perform hyperparameter optimization using XPOT
         (XPOT: https://pubs.aip.org/aip/jcp/article/159/2/024803/2901815)
     ref_energy_name : str
@@ -78,7 +82,7 @@ class MLIPFitMaker(Maker):
         glue_xml: bool = False,  # This is only used for GAP.
         num_processes_fit: int | None = None,
         apply_data_preprocessing: bool = True,
-        database_dir: str = None,
+        database_dir: str | None = None,
         device: str = "cpu",
         **fit_kwargs,
     ):
@@ -171,6 +175,12 @@ class MLIPFitMaker(Maker):
             jobs.append(mlip_fit_job)
 
             return Flow(jobs=jobs, output=mlip_fit_job.output, name=self.name)
+        # this will only run if train.extxyz and test.extxyz files are present in the database_dir
+
+        if database_dir is None or not os.path.exists(database_dir):
+            raise ValueError(
+                "The specified database directory does not exist or was not provided."
+            )
 
         mlip_fit_job = machine_learning_fit(
             database_dir=database_dir,

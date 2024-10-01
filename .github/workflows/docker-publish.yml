@@ -1,0 +1,48 @@
+name: Build and Push Docker Image
+
+on:
+  workflow_dispatch:
+  release:
+    types: [ created ] # Runs only when a new release is created
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'JaGeo' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+    strategy:
+      matrix:
+        python-version: [ "3.10", "3.11", "3.12" ]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to the GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: lowercase github.repository
+      run: |
+        echo "IMAGE_NAME=`echo ${{github.repository}} | tr '[:upper:]' '[:lower:]'`" >>${GITHUB_ENV}
+
+    # Build Docker image with a custom Python version
+    - name: Build Docker image (Python ${{ matrix.python-version }})
+      run: |
+        docker build \
+        --build-arg PYTHON_VERSION=${{ matrix.python-version }} \
+        -t ghcr.io/${{ env.IMAGE_NAME }}/autoplex:python-${{ matrix.python-version }} .
+   # Push Docker image to GHCR
+    - name: Push Docker image to GHCR (Python ${{ matrix.python-version }})
+      run: |
+        docker push ghcr.io/${{ env.IMAGE_NAME }}/autoplex:python-${{ matrix.python-version }}

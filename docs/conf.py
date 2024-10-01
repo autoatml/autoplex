@@ -151,7 +151,7 @@ autodoc_pydantic_field_show_constraints = False
 # a list of builtin themes.
 #
 html_theme = "sphinx_book_theme"
-html_logo = "_static/autoplex_logo_tmp.png"
+html_logo = "_static/autoplex_logo.png"
 html_theme_options = {
     "repository_provider": "github",
     "repository_url": "https://github.com/JaGeo/autoplex",

@@ -20,6 +20,8 @@ from autoplex.data.phonons.flows import (
     TightDFTStaticMaker,
     TightDFTStaticMakerBigSupercells,
 )
+from autoplex.data.phonons.jobs import reduce_supercell_size
+from autoplex.data.phonons.utils import update_phonon_displacement_maker
 
 
 @job
@@ -36,6 +38,7 @@ def complete_benchmark(  # this function was put here to prevent circular import
     symprec,
     phonon_displacement_maker: BaseVaspMaker,
     dft_references=None,
+    adaptive_phonopy_supercell_settings: bool = True,
     relax_maker_kwargs: dict | None = None,
     static_maker_kwargs: dict | None = None,
     **ml_phonon_maker_kwargs,
@@ -79,6 +82,8 @@ def complete_benchmark(  # this function was put here to prevent circular import
         Maker used to compute the forces for a supercell.
     dft_references:
         a list of DFT reference files containing the PhononBSDOCDoc object. Default None.
+    adaptive_phonopy_supercell_settings: bool
+        prevent too tight phonopy supercell settings.
     relax_maker_kwargs: dict
         Keyword arguments that can be passed to the RelaxMaker.
     static_maker_kwargs: dict
@@ -134,14 +139,16 @@ def complete_benchmark(  # this function was put here to prevent circular import
                 ) or (  # else?
                     add_dft_phonon_struct is False
                 ):
-                    dft_phonons = DFTPhononMaker(
+                    dft_phonons = dft_phonopy_gen_data(
+                        structure=benchmark_structure,
+                        displacements=[0.01],
                         symprec=symprec,
                         phonon_displacement_maker=phonon_displacement_maker,
-                        born_maker=None,
                         min_length=min_length,
-                    ).make(structure=benchmark_structure)
+                        adaptive_phonopy_supercell_settings=adaptive_phonopy_supercell_settings,
+                    )
                     jobs.append(dft_phonons)
-                    dft_references = dft_phonons.output
+                    dft_references = dft_phonons.output["data"]["001"]
 
                 add_data_bm = PhononBenchmarkMaker(name="Benchmark").make(
                     ml_model=ml_model,
@@ -182,7 +189,12 @@ def complete_benchmark(  # this function was put here to prevent circular import
 
 @job(data=["data"])
 def dft_phonopy_gen_data(
-    structure: Structure, displacements, symprec, phonon_displacement_maker, min_length
+    structure: Structure,
+    displacements,
+    symprec,
+    phonon_displacement_maker,
+    min_length,
+    adaptive_phonopy_supercell_settings: bool = True,
 ):
     """
     Job to generate DFT reference database using phonopy to be used for fitting ML potentials.
@@ -190,27 +202,51 @@ def dft_phonopy_gen_data(
     Parameters
     ----------
     structure: Structure
-        pymatgen Structure object
+        pymatgen Structure object.
     phonon_displacement_maker : .BaseVaspMaker or None
         Maker used to compute the forces for a supercell.
     displacements: list[float]
-        list of phonon displacement
+        list of phonon displacement.
     min_length: float
-        min length of the supercell that will be built
+        min length of the supercell that will be built.
     symprec : float
         Symmetry precision to use in the
         reduction of symmetry to find the primitive/conventional cell
         (use_primitive_standard_structure, use_conventional_standard_structure)
-        and to handle all symmetry-related tasks in phonopy
+        and to handle all symmetry-related tasks in phonopy.
+    adaptive_phonopy_supercell_settings: bool
+        prevent too tight phonopy supercell settings.
     """
     jobs = []
     dft_phonons_output = {}
     dft_phonons_dir_output = []
+    supercell_matrix = None
 
     if phonon_displacement_maker is None:
         phonon_displacement_maker = TightDFTStaticMaker(name="dft phonon static")
-    if min_length >= 18:
+    if min_length >= 15:
         phonon_displacement_maker = TightDFTStaticMakerBigSupercells()
+    if adaptive_phonopy_supercell_settings:
+        lattice_avg = sum(structure.lattice.abc) / 3
+        if lattice_avg > 10.5:
+            supercell_matrix_job = reduce_supercell_size(
+                structure=structure,
+                min_length=min_length,
+                max_length=25,
+                fallback_min_length=15,
+                max_atoms=500,
+                min_atoms=300,
+                step_size=1.0,
+            )
+            jobs.append(supercell_matrix_job)
+            supercell_matrix = supercell_matrix_job.output
+            # in case everything fails, and a fitting supercell matrix cannot be found, reduce the
+            # reciprocal k-point density and search for a supercell within the atomate2 phonon wf:
+            if supercell_matrix == [[1, 0, 0], [0, 1, 0], [0, 0, 1]]:
+                supercell_matrix = None
+                phonon_displacement_maker = update_phonon_displacement_maker(
+                    lattice_avg, TightDFTStaticMakerBigSupercells()
+                )
 
     for displacement in displacements:
         dft_phonons = DFTPhononMaker(
@@ -219,7 +255,8 @@ def dft_phonopy_gen_data(
             born_maker=None,
             displacement=displacement,
             min_length=min_length,
-        ).make(structure=structure)
+            max_length=35,
+        ).make(structure=structure, supercell_matrix=supercell_matrix)
         jobs.append(dft_phonons)
         dft_phonons_output[
             f"{displacement}".replace(".", "")  # key must not contain '.'
@@ -249,6 +286,7 @@ def dft_random_gen_data(
     rattle_seed: int = 42,
     rattle_mc_n_iter: int = 10,
     w_angle: list[float] | None = None,
+    adaptive_rattled_supercell_settings: bool = True,
 ):
     """
     Job to generate random structured DFT reference database to be used for fitting ML potentials.
@@ -306,6 +344,8 @@ def dft_random_gen_data(
         Number of Monte Carlo iterations.
         Larger number of iterations will generate larger displacements.
         Default=10.
+    adaptive_rattled_supercell_settings: bool
+        prevent too big rattled supercells
     """
     jobs = []
 
@@ -326,6 +366,7 @@ def dft_random_gen_data(
         angle_percentage_scale=angle_percentage_scale,
         rattle_mc_n_iter=rattle_mc_n_iter,
         w_angle=w_angle,
+        adaptive_rattled_supercell_settings=adaptive_rattled_supercell_settings,
     ).make(
         structure=structure,
         mp_id=mp_id,

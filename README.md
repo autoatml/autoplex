@@ -1,5 +1,7 @@
 [![Testing Linux](https://github.com/JaGeo/autoplex/actions/workflows/python-package.yml/badge.svg)](https://github.com/JaGeo/autoplex/actions/workflows/python-package.yml)
-# autoplex
+
+<img src="docs/_static/autoplex_logo.png" width="66%">
+
 
 `autoplex` is a software for generating and benchmarking machine learning (ML) based interatomic potentials. The aim of `autoplex` is to provide a fully automated solution for creating high-quality ML potentials. The software is interfaced to multiple different ML potential fitting frameworks and to the atomate2 and ase environment for efficient high-throughput computations. The vision of this project is to allow a wide community of researchers to create accurate and reliable ML potentials for materials simulations.
 
@@ -15,11 +17,11 @@ After setting up `atomate2`, make sure to add `VASP_INCAR_UPDATES: {"NPAR": numb
 Set a number that is a divisor of the number of tasks you use for the VASP calculations.
 
 # Installation
-autoplex relies on the atomate2 and ase frameworks.
+`autoplex` relies on the `atomate2` and `ase` frameworks.
 
-Developers installation: Navigate to autoplex and install it by `pip install -e .[docs,strict,dev]`.
+Developers installation: Navigate to `autoplex` and install it by `pip install -e .[docs,strict,dev]`.
 
-Alternatively, the dependencies atomate2 and ase can be installed individually via
+Alternatively, the dependencies `atomate2` and `ase` can be installed individually via
 ```bash
 pip install atomate2[strict]
 
@@ -27,7 +29,7 @@ pip install ase@git+https://gitlab.com/ase/ase.git@aae51d57721847624cea569f3a2d4
 ```
 
 Additionally, to be able to fit and validate `ACEpotentials`, one also needs to install julia as autoplex relies on [ACEpotentials](https://acesuit.github.io/ACEpotentials.jl/dev/gettingstarted/installation/) which support fitting of linear ACE and currently no python package exists for the same.
-Please run following commands to enable ACEpotentials fitting and functionality.
+Please run following commands to enable `ACEpotentials` fitting and functionality.
 
 Install julia
 `curl -fsSL https://install.julialang.org | sh`

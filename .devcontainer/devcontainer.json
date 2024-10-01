@@ -1,0 +1,17 @@
+{
+  "name": "DeveloperEnv",
+  "image": "ghcr.io/jageo/autoplex/autoplex:python-3.10",
+  "hostRequirements": {
+   "cpus": 4,
+   "memory": "16gb",
+   "storage": "32gb"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-azuretools.vscode-docker"]
+    },
+  },
+  "postCreateCommand": "pip cache purge && uv pip install -e .[strict,docs] && uv pip install ase==3.23.0 && pre-commit install",
+}

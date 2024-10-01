@@ -47,6 +47,7 @@ def test_phonon_wf_only_displacements3(mock_vasp, clean_dir):
         store_force_constants=False,
         prefer_90_degrees=False,
         generate_frequencies_eigenvectors_kwargs={"tstep": 100},
+        get_supercell_size_kwargs={"step_size": 0.5}
     ).make(structure)
 
     # run the flow or job and ensure that it finished running successfully

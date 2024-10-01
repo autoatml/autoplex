@@ -14,21 +14,24 @@ that will affect the fit regardless of the chosen MLIP method, and e.g. changes 
 (like the split-up into training and test data). The other type of settings influences the MLIP specific setup 
 like e.g. the choice of hyperparameters.
 
-In case of the general settings, you can pass the MLIP model you want to use with the `ml_models` parameter list 
-and set the basic hyperparameters using the `mlip_hyper` list.
+In case of the general settings, you can pass the MLIP model you want to use with the `ml_models` parameter list.
 You can set the maximum force threshold `f_max` for filtering the data ("distillation") in the MLIP fit preprocess step.
 In principle, the distillation step can be turned off by passing `"distillation": False` in the `fit_kwargs` keyword arguments,
 but it is strongly advised to filter out too high force data points.
-Further parameters can be passed using `fit_kwargs` (or `**{...}`),
+The hyperparameters and further parameters can be passed in the `make` call (see below) or using `fit_kwargs` (or `**{...}`),
 like e.g. you can set the `split_ratio` to split the database up into a training and a test set,
-or adjust the number of processes `num_processes`.
+or adjust the number of processes `num_processes_fit`.
 ```python
 complete_flow = CompleteDFTvsMLBenchmarkWorkflow(
-    ml_models=["GAP", "MACE"], mlip_hyper=[{...}, {...}]).make(..., f_max=40.0,
+    ml_models=["GAP", "MACE"], ...,
+).make(..., 
+    f_max=40.0,
     fit_kwargs={
         "split_ratio": 0.4,
-        "num_processes": 32,
-    })
+        "num_processes_fit": 32,
+    },
+    ...  # put the other hyperparameter commands here as shown below
+)
 ```
 
 The MLIP model specific settings and hyperparameters setup varies from model to model and is demonstrated in the next 
@@ -53,25 +56,32 @@ taken into account for the atom-wise regularization or otherwise be replaced by 
 automatically determine a suitable delta value based on the database's energies.
 ```python
 complete_flow = CompleteDFTvsMLBenchmarkWorkflow(
-    ml_models=["GAP"],
-    mlip_hyper=[{"two_body": True, "three_body": False,"soap": False}], 
-    hyper_para_loop=False, 
+    ml_models=["GAP"], ...,
+    hyper_para_loop=True, 
     atomwise_regularization_list=[0.01, 0.1], 
     soap_delta_list=[0.5, 1.0, 1.5], 
-    n_sparse_list=[1000, 3000, 6000, 9000]).make(..., 
+    n_sparse_list=[1000, 3000, 6000, 9000]
+).make(..., 
+    structure_list=[structure],
+    mp_ids=["mpid"],
+    benchmark_mp_ids=["mpid"],
+    benchmark_structures=[structure],
+    preprocessing_data=True,
     atom_wise_regularization=True, 
     atomwise_regularization_parameter=0.1, 
     f_min=0.01, 
     auto_delta=False,
+    ...,
     **{...,
      "glue_xml": False,
      "regularization": False,
      "separated": False,
-     "general": {"default_sigma": "{0.001 0.05 0.05 0.0}",...},
+     "general": {"default_sigma": "{0.001 0.05 0.05 0.0}", {"two_body": True, "three_body": False,"soap": False},...},
      "twob": {"cutoff": 5.0,...},
      "threeb": {"cutoff": 3.25,...},
      "soap": {"delta": 1.0, "l_max": 12, "n_max": 10,...},
-    })
+    }
+)
 ```
 `autoplex` provides a JSON dict file containing default GAP fit settings in 
 *autoplex/fitting/common/gap-defaults.json*, 
@@ -99,83 +109,107 @@ For fitting and validating ACE potentials, one needs to install **julia** as `au
 
 ```python
 complete_flow = CompleteDFTvsMLBenchmarkWorkflow(
-    ml_models=["J-ACE"],
-    mlip_hyper=[{"order": 3, 
-                "totaldegree": 6, 
-                "cutoff": 2.0, 
-                "solver": "BLR"}]
-).make(...)
+    ml_models=["J-ACE"], ...,
+).make(..., 
+    structure_list=[structure],
+    mp_ids=["mpid"],
+    benchmark_mp_ids=["mpid"],
+    benchmark_structures=[structure],
+    preprocessing_data=True,
+    order=3,
+    totaldegree=6,
+    cutoff=2.0,
+    solver="BLR",
+    ...)
 ```
-The ACE fit hyperparameters can be passed as a dict using `mlip_hyper`.
+The ACE fit hyperparameters can be passed in the `make` call with its distinct commands. 
+Because there is no respective MLPhononMaker in `atomate2` for J-ACE, the functionalities for `autoplex` are limited to
+the data generation and ML fit in this case.
 
 ## Nequip
 
-The Nequip fit procedure can be controlled by fit hyperparameters passed to `mlip_hyper` as a dict.
+The Nequip fit procedure can be controlled by fit hyperparameters in the `make` call.
 
 ```python
 complete_flow = CompleteDFTvsMLBenchmarkWorkflow(
-    ml_models=["Nequip"],
-    mlip_hyper= {"r_max": 4.0,
-                "num_layers": 4,
-                "l_max": 2,
-                "num_features": 32,
-                "num_basis": 8,
-                "invariant_layers": 2,
-                "invariant_neurons": 64,
-                "batch_size": 5,
-                "learning_rate": 0.005,
-                "max_epochs": 10000,
-                "default_dtype": "float32",
-                "device": "cuda",
-            }
-).make(...)
+    ml_models=["Nequip"], ...,
+).make(...,
+    structure_list=[structure],
+    mp_ids=["mpid"],
+    benchmark_mp_ids=["mpid"],
+    benchmark_structures=[structure],
+    preprocessing_data=True,
+    r_max=4.0,
+    num_layers=4,
+    l_max=2,
+    num_features=32,
+    num_basis=8,
+    invariant_layers=2,
+    invariant_neurons=64,
+    batch_size=5,
+    learning_rate=0.005,
+    max_epochs=10000,  
+    default_dtype="float32",
+    device="cuda",
+    ...
+)
 ```
 
 ## M3GNet
 
-In a similar way, the M3GNet fit hyperparameters can be passed as a dict using `mlip_hyper` as well.
+In a similar way, the M3GNet fit hyperparameters can be passed using `make` as well.
 
 ```python
 complete_flow = CompleteDFTvsMLBenchmarkWorkflow(
-    ml_models=["M3GNet"],
-    mlip_hyper = {"exp_name": "training",
-                "results_dir": "m3gnet_results",
-                "cutoff": 5.0,
-                "threebody_cutoff": 4.0,
-                "batch_size": 10,
-                "max_epochs": 1000,
-                "include_stresses": True,
-                "hidden_dim": 128,
-                "num_units": 128,
-                "max_l": 4,
-                "max_n": 4,
-                "device": "cuda",
-                "test_equal_to_val": True,
-            } 
-).make(...)
+    ml_models=["M3GNet"], ...,
+).make(...,
+    structure_list=[structure],
+    mp_ids=["mpid"],
+    benchmark_mp_ids=["mpid"],
+    benchmark_structures=[structure],
+    preprocessing_data=True,
+    cutoff=5.0,
+    threebody_cutoff=4.0,
+    batch_size=10,
+    max_epochs=1000,
+    include_stresses=True,
+    hidden_dim=128,
+    num_units=128,
+    max_l=4,
+    max_n=4,
+    device="cuda",
+    test_equal_to_val=True,
+    ...,
+    )
 ```
 
 ## MACE
 
-Here again, you can pass the MACE fit hyperparameters to `mlip_hyper` as a dict.
+Here again, you can pass the MACE fit hyperparameters to `make`.
 
 ```python
 complete_flow = CompleteDFTvsMLBenchmarkWorkflow(
-    ml_models=["MACE"],
-    mlip_hyper = {"model": "MACE",
-                "config_type_weights": '{"Default":1.0}',
-                "hidden_irreps": "128x0e + 128x1o",
-                "r_max": 5.0,
-                "batch_size": 10,
-                "max_num_epochs": 1500,
-                "start_swa": 1200,
-                "ema_decay": 0.99,
-                "correlation": 3,
-                "loss": "huber",
-                "default_dtype": "float32",
-                "device": "cuda",
-            }
-).make(...)
+    ml_models=["MACE"], ...,
+).make(...,
+    structure_list=[structure],
+    mp_ids=["mpid"],
+    benchmark_mp_ids=["mpid"],
+    benchmark_structures=[structure],
+    preprocessing_data=True,
+    model="MACE",
+    config_type_weights='{"Default":1.0}',
+    hidden_irreps="128x0e + 128x1o",
+    r_max=5.0,
+    batch_size=10,
+    max_num_epochs=1500,
+    start_swa=1200,
+    ema_decay=0.99,
+    correlation=3,
+    loss="huber",
+    default_dtype="float32",
+    device="cuda",
+    ...
+)
 ```
 
 ## Running a MLIP fit only
@@ -226,7 +260,7 @@ fit_input_dict = {
     }
     
     
-mlip_fit = MLIPFitMaker(mlip_type="GAP", mlip_hyper= {...}).make(
+mlip_fit = MLIPFitMaker(mlip_type="GAP", ...,).make(
         species_list=["Li", "Cl"],
         isolated_atoms_energy=[-0.28649227, -0.25638457],
         fit_input=fit_input_dict,
