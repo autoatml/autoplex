@@ -93,13 +93,16 @@ class RandomizedStructure(Maker):
                 )
 
             elements = self._extract_elements(self.tag)  # {"Si":1, "O":2}
-            
-            if "SPECIES" in self.buildcell_option and self.fragment_file is not None:
-                raise ValueError("Cannot use 'SPECIES' and 'fragment' together in buildcell options.\n"
-                                 "Specify your fragment only and use NFORM to control their number.")
 
-            if self.buildcell_option is None or \
-                ("SPECIES" not in self.buildcell_option and self.fragment_file is None):
+            if "SPECIES" in self.buildcell_option and self.fragment_file is not None:
+                raise ValueError(
+                    "Cannot use 'SPECIES' and 'fragment' together in buildcell options.\n"
+                    "Specify your fragment only and use NFORM to control their number."
+                )
+
+            if self.buildcell_option is None or (
+                "SPECIES" not in self.buildcell_option and self.fragment_file is None
+            ):
                 make_species = self._make_species(elements)  # Si%NUM=1,O%NUM=2
                 buildcell_parameters = self._update_buildcell_option(
                     {"SPECIES": make_species}, buildcell_parameters
@@ -151,39 +154,49 @@ class RandomizedStructure(Maker):
                         },
                         buildcell_parameters,
                     )
-                    
+
             if self.fragment_file is not None:
-                
                 self.fragment = ase.io.read(self.fragment_file, index=":")
-                
+
                 if len(self.fragment) == 1:
                     self.fragment = self.fragment[0]
-                    
+
                 if isinstance(self.fragment, Atoms):
                     fragment_ratios = [1 for _ in self.fragment]
-                    if 'fragment_id' not in self.fragment.arrays.keys():
-                        self.fragment.arrays['fragment_id'] = [f'{1}-f' for i in self.fragment]
-                        
+                    if "fragment_id" not in self.fragment.arrays:
+                        self.fragment.arrays["fragment_id"] = [
+                            f"{1}-f" for i in self.fragment
+                        ]
+
                 elif isinstance(self.fragment, list) and self.fragment_ratios is None:
-                    fragment_ratios = [1 for _ in range(sum([len(i) for i in self.fragment]))]
+                    fragment_ratios = [
+                        1 for _ in range(sum([len(i) for i in self.fragment]))
+                    ]
                     write_fragment = self.fragment[0]
-                    for frag in self.fragment[1:]: # merge all separate fragments into one Atoms object
+                    for frag in self.fragment[
+                        1:
+                    ]:  # merge all separate fragments into one Atoms object
                         write_fragment += frag
-                    
-                fragment_parameters = ['%BLOCK POSITIONS_FRAC',]
+
+                fragment_parameters = [
+                    "%BLOCK POSITIONS_FRAC",
+                ]
                 symbols = self.fragment.get_chemical_symbols()
-                for i, val in enumerate(self.fragment.arrays['positions']):
-                    newline = (f"{symbols[i]} {val[0]:.8f} {val[1]:.8f} {val[2]:.8f}"
-                                            f" # {self.fragment.arrays['fragment_id'][i]}"
-                                            f" % NUM={fragment_ratios[i]}")
+                for i, val in enumerate(self.fragment.arrays["positions"]):
+                    newline = (
+                        f"{symbols[i]} {val[0]:.8f} {val[1]:.8f} {val[2]:.8f}"
+                        f" # {self.fragment.arrays['fragment_id'][i]}"
+                        f" % NUM={fragment_ratios[i]}"
+                    )
                     fragment_parameters.append(newline)
-                fragment_parameters.append('%ENDBLOCK POSITIONS_FRAC')
-                
-                buildcell_parameters = fragment_parameters + buildcell_parameters # prepend with structural info
+                fragment_parameters.append("%ENDBLOCK POSITIONS_FRAC")
+
+                buildcell_parameters = (
+                    fragment_parameters + buildcell_parameters
+                )  # prepend with structural info
 
             self._cell_seed(buildcell_parameters, self.tag)
             bc_file = f"{self.tag}.cell"
-            
 
         with Pool(processes=self.num_processes) as pool:
             args = [
@@ -242,13 +255,10 @@ class RandomizedStructure(Maker):
         """
         bc_file = f"{tag}.cell"
         contents = []
-        flag = False # for printing blocks correctly with '#'
+        flag = False  # for printing blocks correctly with '#'
         for i in buildcell_parameters:
             if i.startswith("%") or flag:
-                if flag and i.startswith("%"):
-                    flag=False
-                else:
-                    flag=True
+                flag = not (flag and i.startswith("%"))
                 contents.append(i + "\n")
             else:
                 contents.append("#" + i + "\n")
