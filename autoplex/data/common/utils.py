@@ -40,7 +40,7 @@ from autoplex.fitting.common.regularization import (
     label_stoichiometry_volume,
 )
 
-logging.basicConfig(level=logging.DEBUG, format="[%(levelname)s] %(message)s")
+logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 
 
 def flatten(atoms_object: Atoms | Iterable, recursive: bool = False) -> list[Atoms]:
@@ -770,20 +770,18 @@ def plot_energy_forces(
 
     Parameters
     ----------
-    title:
+    title: str
         Title of the plot.
-    energy_limit:
+    energy_limit: float
         Energy limit for data filtering.
-    force_limit:
+    force_limit: list
         Force limit for data filtering.
-    species_list:
+    species_list: str
         List of species.
-    train_name:
+    train_name: str
         name of the training data file.
-    test_name:
+    test_name: str
         name of the test data file.
-
-
     """
     if species_list is None:
         species_list = ["Si"]
@@ -964,17 +962,17 @@ def cur_select(
 
     Parameters
     ----------
-    atoms : list of ase.Atoms
+    atoms: list of ase.Atoms
         The atoms for which to perform CUR selection.
-    selected_descriptor : str
+    selected_descriptor: str
         The quip descriptor string to use for the calculation.
-    kernel_exp : float
+    kernel_exp: float
         The kernel exponent to use in the calculation.
-    select_nums : int
+    select_nums: int
         The number of atoms to select.
-    stochastic : bool
+    stochastic: bool
         Whether to perform stochastic CUR selection.
-    random_seed : int
+    random_seed: int
         The seed for the random number generator.
 
     Returns
@@ -984,7 +982,8 @@ def cur_select(
 
     Notes
     -----
-    This function calculates the descriptor vector for each atom, then performs CUR selection on the resulting vectors.
+    This function calculates the descriptor vector for each atom,
+    then performs CUR selection on the resulting vectors.
     """
     if random_seed is not None:
         np.random.seed(random_seed)
@@ -1046,17 +1045,17 @@ def cur_select(
     return None
 
 
-def boltz(e: float, emin: float, kT: float) -> float:
+def boltz(e: float, emin: float, kt: float) -> float:
     """
     Calculate the Boltzmann factor for a given energy.
 
     Parameters
     ----------
-    e : float
+    e: float
         The energy for which to calculate the Boltzmann factor.
-    emin : float
+    emin: float
         The minimum energy to consider in the calculation.
-    kT : float
+    kt: float
         The product of the Boltzmann constant and the temperature.
 
     Returns
@@ -1066,48 +1065,49 @@ def boltz(e: float, emin: float, kT: float) -> float:
 
     Notes
     -----
-    The Boltzmann factor is calculated as exp(-(e - emin) / kT).
+    The Boltzmann factor is calculated as exp(-(e - emin) / kt).
     """
-    return np.exp(-(e - emin) / (kT))
+    return np.exp(-(e - emin) / (kt))
 
 
 def boltzhist_cur_oneShot(
-    atoms,
-    descriptor,
-    isol_es,
-    bolt_frac=0.1,
-    bolt_max_num=3000,
-    cur_num=100,
-    kernel_exp=4,
-    kT=0.3,
-    energy_label="energy",
-    P=None,
-    random_seed=None,
+    atoms: list[Atoms] | list[list[Atoms]],
+    descriptor: str,
+    isolated_atom_energies: dict | None = None,
+    bolt_frac: float = 0.1,
+    bolt_max_num: int = 3000,
+    cur_num: int = 100,
+    kernel_exp: float = 4,
+    kt: float = 0.3,
+    energy_label: str = "energy",
+    pressures: list[float] | list[list[float]] | None = None,
+    random_seed: int = None,
 ) -> list | None:
     """
     Sample atoms from a list according to boltzmann energy weighting and CUR diversity.
 
     Parameters
     ----------
-    atoms : list[ase.Atoms] or list[list[ase.Atoms]]
+    atoms: list[ase.Atoms] or list[list[ase.Atoms]]
         The atoms from which to select. If this is a list of lists, it is flattened.
-    descriptor : str
+    descriptor: str
         The quippy SOAP descriptor string for CUR.
-    isol_es : dict
-        Dictionary of isolated energy values for species.
-    bolt_frac : float
+    isolated_atom_energies: dict
+        Dictionary of isolated energy values for species. Required for 'boltzhist_cur'
+        selection method. Default is None.
+    bolt_frac: float
         The fraction to control the flat Boltzmann selection number.
-    bolt_max_num : int
+    bolt_max_num: int
         The maximum number of atoms to select by Boltzmann-weighted flat histogram.
-    cur_num : int
+    cur_num: int
         The number of atoms to select by CUR.
-    kernel_exp : float
+    kernel_exp: float
         The exponent for the dot-product SOAP kernel.
-    kT : float
+    kt: float
         The product of the Boltzmann constant and the temperature, in eV.
-    energy_label : str
+    energy_label: str
         The label for the energy property in the atoms.
-    P : list[float] or list[list[float]]
+    pressures: list[float] or list[list[float]]
         The pressures at which the atoms have been optimized, in GPa.
     random_seed : int
         The seed for the random number generator.
@@ -1119,8 +1119,8 @@ def boltzhist_cur_oneShot(
 
     Notes
     -----
-    This function selects the most diverse atoms based on the chosen algorithm.
-    The algorithm uses a combination of CUR selection and Boltzmann weighting to select the atoms.
+    The algorithm uses a combination of CUR selection and Boltzmann weighting
+    to select the atoms with diversity and low energy.
     """
     if random_seed is not None:
         np.random.seed(random_seed)
@@ -1131,7 +1131,7 @@ def boltzhist_cur_oneShot(
     else:
         fatoms = atoms
 
-    if P is None:
+    if pressures is None:
         logging.info("Pressures not supplied, attempting to use pressure in atoms dict")
 
         try:
@@ -1140,25 +1140,25 @@ def boltzhist_cur_oneShot(
             print("No pressures, so can't Boltzmann weight")
 
     else:
-        ps = flatten_list(P)
+        ps = flatten_list(pressures)
 
     enthalpies = []
 
     at_ids = [atom.get_atomic_numbers() for atom in fatoms]
 
-    if isol_es is None:
-        raise ValueError("isol_es cannot be None!")
+    if isolated_atom_energies is None:
+        raise ValueError("isolated_atom_energies cannot be None!")
 
     if energy_label == "energy":
         formation_energies = []
         for ct, atom in enumerate(fatoms):
             if "energy" in atom.info:
                 formation_energy = atom.info["energy"] - sum(
-                    [isol_es[j] for j in at_ids[ct]]
+                    [isolated_atom_energies[j] for j in at_ids[ct]]
                 )
             else:
                 formation_energy = atom.get_potential_energy() - sum(
-                    [isol_es[j] for j in at_ids[ct]]
+                    [isolated_atom_energies[j] for j in at_ids[ct]]
                 )
             formation_energies.append(formation_energy)
         formation_energies = np.array(formation_energies)
@@ -1166,7 +1166,8 @@ def boltzhist_cur_oneShot(
     else:
         formation_energies = np.array(
             [
-                atom.info[energy_label] - sum([isol_es[j] for j in at_ids[ct]])
+                atom.info[energy_label]
+                - sum([isolated_atom_energies[j] for j in at_ids[ct]])
                 for ct, atom in enumerate(fatoms)
             ]
         )
@@ -1184,8 +1185,8 @@ def boltzhist_cur_oneShot(
         if bin_i == len(histo[1][1:]):
             bin_i = bin_i - 1
         p = 1.0 / histo[0][bin_i] if histo[0][bin_i] > 0.0 else 0.0
-        if kT > 0.0:
-            p *= np.exp(-(H - min_H) / kT)
+        if kt > 0.0:
+            p *= np.exp(-(H - min_H) / kt)
         config_prob.append(p)
 
     select_num = round(bolt_frac * len(fatoms))
@@ -1223,44 +1224,46 @@ def boltzhist_cur_oneShot(
 
 
 def boltzhist_cur_dualIter(
-    atoms,
-    descriptor,
-    isol_es,
-    bolt_frac=0.1,
-    bolt_max_num=3000,
-    cur_num=100,
-    kernel_exp=4,
-    kT=0.3,
-    energy_label="energy",
-    P=None,
-    random_seed=None,
+    atoms: list[Atoms] | list[list[Atoms]],
+    descriptor: str,
+    isolated_atom_energies: dict | None = None,
+    bolt_frac: float = 0.1,
+    bolt_max_num: int = 3000,
+    cur_num: int = 100,
+    kernel_exp: float = 4,
+    kt: float = 0.3,
+    energy_label: str = "energy",
+    pressures: list[list[float]] | None = None,
+    random_seed: int = None,
 ) -> list | None:
     """
     Execute sampling with two iterations.
 
-    Each iteration includes a Boltzmann flat histogram in enthalpy followed by a CUR process.
+    Each iteration includes a Boltzmann flat histogram in enthalpy
+    followed by a CUR process.
 
     Parameters
     ----------
-    atoms : list[list[ase.Atoms]]
-        The atoms from which to select. This is a list of lists.
-    descriptor : str
+    atoms: list[ase.Atoms] or list[list[ase.Atoms]]
+        The atoms from which to select. If this is a list of lists, it is flattened.
+    descriptor: str
         The quippy SOAP descriptor string for CUR.
-    isol_es : dict
-        Dictionary of isolated energy values for species.
-    bolt_frac : float
+    isolated_atom_energies: dict
+        Dictionary of isolated energy values for species. Required for 'boltzhist_cur'
+        selection method. Default is None.
+    bolt_frac: float
         The fraction to control the flat Boltzmann selection number.
-    bolt_max_num : int
+    bolt_max_num: int
         The maximum number of atoms to select by Boltzmann-weighted flat histogram.
-    cur_num : int
+    cur_num: int
         The number of atoms to select by CUR.
-    kernel_exp : float
+    kernel_exp: float
         The exponent for the dot-product SOAP kernel.
-    kT : float
+    kt: float
         The product of the Boltzmann constant and the temperature, in eV.
-    energy_label : str
+    energy_label: str
         The label for the energy property in the atoms.
-    P : list[list[float]]
+    pressures: list[float] or list[list[float]]
         The pressures at which the atoms have been optimized, in GPa.
     random_seed : int
         The seed for the random number generator.
@@ -1277,19 +1280,19 @@ def boltzhist_cur_dualIter(
     """
     atom_minima = [ats[-1] for ats in atoms]
     minima_indices = [ats[-1].info["unique_starting_index"] for ats in atoms]
-    pressure_minima = [pressure[-1] for pressure in P]
+    pressure_minima = None if pressures is None else [p[-1] for p in pressures]
 
     selected_minima = boltzhist_cur_oneShot(
         atoms=atom_minima,
         descriptor=descriptor,
-        isol_es=isol_es,
+        isolated_atom_energies=isolated_atom_energies,
         bolt_frac=bolt_frac,
         bolt_max_num=bolt_max_num,
         cur_num=cur_num,
         kernel_exp=kernel_exp,
-        kT=kT,
+        kt=kt,
         energy_label=energy_label,
-        P=pressure_minima,
+        pressures=pressure_minima,
         random_seed=random_seed,
     )
 
@@ -1303,19 +1306,21 @@ def boltzhist_cur_dualIter(
     ]
     selected__indices = [minima_indices.index(item) for item in selected_minima_indices]
     selected_trajs = [atoms[i] for i in selected__indices]
-    selected_trajs_pressure = [P[j] for j in selected__indices]
+    selected_trajs_pressure = (
+        None if pressures is None else [pressures[j] for j in selected__indices]
+    )
 
     return boltzhist_cur_oneShot(
         atoms=selected_trajs,
         descriptor=descriptor,
-        isol_es=isol_es,
+        isolated_atom_energies=isolated_atom_energies,
         bolt_frac=bolt_frac,
         bolt_max_num=bolt_max_num,
         cur_num=cur_num,
         kernel_exp=kernel_exp,
-        kT=kT,
+        kt=kt,
         energy_label=energy_label,
-        P=selected_trajs_pressure,
+        pressures=selected_trajs_pressure,
         random_seed=random_seed,
     )
 
@@ -1327,9 +1332,9 @@ def convexhull_cur(
     bolt_max_num: int = 3000,
     cur_num: int = 100,
     kernel_exp: float = 4,
-    kT: float = 0.5,
+    kt: float = 0.5,
     energy_label: str = "REF_energy",
-    isol_es: dict = None,
+    isolated_atom_energies: dict = None,
     element_order: list | None = None,
     scheme: str = "linear-hull",
 ) -> list | None:
@@ -1338,30 +1343,36 @@ def convexhull_cur(
 
     Parameters
     ----------
-    atoms : list of ase.Atoms
+    atoms: list of ase.Atoms
         The atoms for which to perform CUR selection.
-    bolt_frac : float
-        The fraction to control the proportion of atoms kept during the Boltzmann selection step.
-    bolt_max_num : int
-        The maximum number of atoms to select by Boltzmann flat histogram.
-    cur_num : int
+    bolt_frac: float
+        The fraction to control the proportion of atoms kept
+        during the Boltzmann selection step.
+    bolt_max_num: int
+        The maximum number of atoms to select by Boltzmann flat
+        histogram.
+    cur_num: int
         The number of atoms to select by CUR.
-    kernel_exp : float
+    kernel_exp: float
         The kernel exponent to use in the calculation.
-    kT : float
-        The product of the Boltzmann constant and the temperature, in eV.
-    energy_label : str
+    kt: float
+        The product of the Boltzmann constant and the temperature,
+        in eV.
+    energy_label: str
         The label for the energy property in the atoms.
-    descriptor : str, optional
+    descriptor: str, optional
         The quip descriptor string to use for the calculation.
-    isol_es : dict, optional
+    isolated_atom_energies: dict, optional
         The isolated atom energies for each element in the system.
-    element_order : list of str, optional
+    element_order: list of str, optional
         The order of elements for the isolated atom energies.
-    scheme : str, optional
-        The scheme to use for the convex hull calculation. Default is 'linear-hull' (2D E,V hull).
-        For 2-component systems with varying stoichiometry, use 'volume-stoichiometry' (3D E,V,mole-fraction hull).
-        TODO: need to generalise this to ND hulls for mcp systems. GST good test case.
+    scheme: str, optional
+        The scheme to use for the convex hull calculation.
+        Default is 'linear-hull' (2D E,V hull).
+        For 2-component systems with varying stoichiometry,
+        use 'volume-stoichiometry' (3D E,V,mole-fraction hull).
+        TODO: need to generalise this to ND hulls for mcp systems.
+        GST good test case.
 
     Returns
     -------
@@ -1380,10 +1391,8 @@ def convexhull_cur(
     else:
         fatoms = atoms
 
-    if isol_es is None:
-        raise KeyError(
-            "isol_es (isolated_atom_energies) must be supplied for convexhull_cur"
-        )
+    if isolated_atom_energies is None:
+        raise KeyError("isolated_atom_energies must be supplied for convexhull_cur")
 
     if scheme == "linear-hull":
         hull, p = get_convex_hull(fatoms, energy_name=energy_label)
@@ -1397,7 +1406,7 @@ def convexhull_cur(
     elif scheme == "volume-stoichiometry":
         points = label_stoichiometry_volume(
             fatoms,
-            isolated_atoms_energies=isol_es,
+            isolated_atoms_energies=isolated_atom_energies,
             energy_name=energy_label,
             element_order=element_order,
         )
@@ -1408,7 +1417,7 @@ def convexhull_cur(
                 get_e_distance_to_hull_3D(
                     hull,
                     at,
-                    isolated_atoms_energies=isol_es,
+                    isolated_atoms_energies=isolated_atom_energies,
                     energy_name=energy_label,
                     element_order=element_order,
                 )
@@ -1431,8 +1440,8 @@ def convexhull_cur(
         if bin_i == len(histo[1][1:]):
             bin_i = bin_i - 1
         p = 1.0 / histo[0][bin_i] if histo[0][bin_i] > 0.0 else 0.0
-        if kT > 0.0:
-            p *= np.exp(-(ec - min_ec) / kT)
+        if kt > 0.0:
+            p *= np.exp(-(ec - min_ec) / kt)
         config_prob.append(p)
 
     select_num = round(bolt_frac * len(fatoms))
@@ -1476,11 +1485,11 @@ def data_distillation(
 
     Parameters
     ----------
-    vasp_ref_dir:
+    vasp_ref_dir: str
         VASP reference data directory.
-    f_max:
+    f_max: float
         maximally allowed force.
-    force_label : str
+    force_label: str
         The label for the force property in the atoms.
 
     Returns

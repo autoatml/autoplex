@@ -1,18 +1,24 @@
 """Utility functions for rss."""
 from __future__ import annotations
 
+import ast
 import json
 import os
 from multiprocessing import Pool
 from pathlib import Path
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
+
+if TYPE_CHECKING:
+    from pymatgen.core import Structure
 
 import ase.io
 import matgl
 import numpy as np
 import quippy.potential
+from ase import Atoms
 from ase.constraints import (
     FixConstraint,
+    FixSymmetry,
     UnitCellFilter,
     slice2enlist,
 )
@@ -28,7 +34,7 @@ from pymatgen.io.ase import AseAtomsAdaptor
 from autoplex.fitting.common.utils import extract_gap_label
 
 
-class myPotential(quippy.potential.Potential):
+class CustomPotential(quippy.potential.Potential):
     """A custom potential class that modifies the outputs of potentials."""
 
     def calculate(self, *args, **kwargs):
@@ -49,12 +55,17 @@ class myPotential(quippy.potential.Potential):
 def extract_pairstyle(
     ace_label: str, ace_json: str, ace_table: str
 ) -> tuple[dict[str, int], list[str]]:
-    """Extract the pair style and coefficients from ACE potential files for running LAMMPS.
+    """
+    Extract the pair style and coefficients from ACE potential files for running LAMMPS.
 
-    Args:
-        ace_label (str): Label for the ACE potential.
-        ace_json (str): Path to the JSON file of ACE potential.
-        ace_table (str): Path to the table file containing pairwise coefficients of ACE potential.
+    Parameters
+    ----------
+        ace_label: str
+            Label for the ACE potential.
+        ace_json: str
+            Path to the JSON file of ACE potential.
+        ace_table: str
+            Path to the table file containing pairwise coefficients of ACE potential.
     """
     with open(ace_json) as file:
         data = json.load(file)
@@ -118,17 +129,17 @@ class HookeanRepulsion(FixConstraint):
 
         Parameters
         ----------
-        a1 : int
+        a1: int
            Atom 1 index
-        a2 : can be one of three options
+        a2: can be one of three options
            1) Atom 2 index
            2) a fixed point in cartesian space to which to tether a1
            3) a plane given as (A, B, C, D) in A x + B y + C z + D = 0.
            4) 'cell' :: selects the unit cell to constrain
-        k : float
+        k: float
            Hooke's law (spring) constant to apply when distance
            exceeds threshold_length. Units are eV Å^-2.
-        rt : float
+        rt: float
            Threshold length above which no Hookean force is applied.
            This argument is not supplied in case 3. Units of Å.
 
@@ -191,14 +202,12 @@ class HookeanRepulsion(FixConstraint):
 
         Do nothing for this constraint.
         """
-        return
 
     def adjust_momenta(self, atoms, momenta):
         """Adjust momenta to match the constraints.
 
         Do nothing for this constraint.
         """
-        return
 
     def adjust_forces(self, atoms, forces):
         """Adjust forces on the atoms to match the constraints."""
@@ -284,14 +293,14 @@ class HookeanRepulsion(FixConstraint):
                 raise IndexError("Constraint not part of slice")
             self.indices = newa
         elif (self._type == "point") or (self._type == "plane"):
-            newa = -1  # Error condition
+            new_a = -1  # Error condition
             for new, old in slice2enlist(ind, len(atoms)):
                 if old == self.index:
-                    newa = new
+                    new_a = new
                     break
-            if newa == -1:
+            if new_a == -1:
                 raise IndexError("Constraint not part of slice")
-            self.index = newa
+            self.index = new_a
 
     def __repr__(self):
         """Return a representation of the constraint."""
@@ -303,30 +312,86 @@ class HookeanRepulsion(FixConstraint):
 
 
 def process_rss(
-    atom,
-    mlip_path,
-    output_file_name,
-    mlip_type,
-    scalar_pressure_method,
-    scalar_exp_pressure,
-    scalar_pressure_exponential_width,
-    scalar_pressure_low,
-    scalar_pressure_high,
-    max_steps,
-    force_tol,
-    stress_tol,
-    Hookean_repul,
-    hookean_paras,
-    write_traj,
-    device,
-    isol_es,
-    config_type,
+    atom: Atoms,
+    mlip_type: str,
+    mlip_path: str,
+    output_file_name: str = "RSS_relax_results",
+    scalar_pressure_method: str = "exp",
+    scalar_exp_pressure: float = 100,
+    scalar_pressure_exponential_width: float = 0.2,
+    scalar_pressure_low: float = 0,
+    scalar_pressure_high: float = 50,
+    max_steps: int = 1000,
+    force_tol: float = 0.01,
+    stress_tol: float = 0.01,
+    hookean_repul: bool = False,
+    hookean_paras: dict | None = None,
+    write_traj: bool = True,
+    device: str = "cpu",
+    isolated_atom_energies: dict[int, float] | None = None,
+    config_type: str = "traj",
+    keep_symmetry: bool = True,
 ) -> str | None:
-    """Run RSS on a single thread using MLIPs."""
+    """Run RSS on a single thread using MLIPs.
+
+    Parameters
+    ----------
+    atom: Atoms
+        ASE Atoms object representing the atomic configuration.
+    mlip_type: str
+        Choose one specific MLIP type:
+        'GAP' | 'J-ACE' | 'P-ACE' | 'NequIP' | 'M3GNet' | 'MACE'.
+    mlip_path: str
+        Path to the MLIP model.
+    output_file_name: str
+        Prefix for the trajectory/log file name. The actual output file name
+        may be composed of this prefix, an index, and file types.
+    scalar_pressure_method: str
+        Method for adding external pressures. Default is 'exp'.
+    scalar_exp_pressure: float
+        Scalar exponential pressure. Default is 100.
+    scalar_pressure_exponential_width: float
+        Width for scalar pressure exponential. Default is 0.2.
+    scalar_pressure_low: float
+        Low limit for scalar pressure. Default is 0.
+    scalar_pressure_high: float
+        High limit for scalar pressure. Default is 50.
+    max_steps: int
+        Maximum number of steps for relaxation. Default is 1000.
+    force_tol: float
+        Force residual tolerance for relaxation. Default is 0.01.
+    stress_tol: float
+        Stress residual tolerance for relaxation. Default is 0.01.
+    hookean_repul: bool
+        If true, apply Hookean repulsion. Default is False.
+    hookean_paras: dict[tuple[int, int], tuple[float, float]]
+        Parameters for Hookean repulsion as a dictionary of tuples. Default is None.
+    write_traj: bool
+        If true, write trajectory of RSS. Default is True.
+    device: str
+        Specify device to use "cuda" or "cpu".
+    isolated_atom_energies: dict
+        Dictionary of isolated atoms energies.
+    config_type: str
+        Specify the type of configurations generated from RSS.
+    keep_symmetry: bool
+        If true, preserve symmetry during relaxation.
+
+    Returns
+    -------
+    str | None
+        Output string containing path for the results of the RSS relaxation.
+    """
+    if hookean_paras is not None:
+        hookean_paras = {
+            ast.literal_eval(k) if isinstance(k, str) else k: v
+            for k, v in hookean_paras.items()
+        }
+
     if mlip_type == "GAP":
         gap_label = os.path.join(mlip_path, "gap_file.xml")
         gap_control = "Potential xml_label=" + extract_gap_label(gap_label)
-        pot = myPotential(args_str=gap_control, param_filename=gap_label)
+        pot = CustomPotential(args_str=gap_control, param_filename=gap_label)
 
     elif mlip_type == "J-ACE":
         from ase.calculators.lammpslib import LAMMPSlib
@@ -345,8 +410,10 @@ def process_rss(
 
     elif mlip_type == "NEQUIP":
         nequip_label = os.path.join(mlip_path, "deployed_nequip_model.pth")
-        if isol_es:
-            ele_syms = [chemical_symbols[int(e_num)] for e_num in isol_es]
+        if isolated_atom_energies:
+            ele_syms = [
+                chemical_symbols[int(e_num)] for e_num in isolated_atom_energies
+            ]
 
         else:
             raise ValueError("isol_es is empty or not defined!")
@@ -366,138 +433,199 @@ def process_rss(
         pot = MACECalculator(model_paths=mace_label, device=device)
 
     unique_starting_index = atom.info["unique_starting_index"]
-    log_file_name = output_file_name + "_" + str(unique_starting_index) + ".log"
-    with open(log_file_name, "w") as log_file:
-        if Hookean_repul:
-            print("Hookean repulsion is used")
-            hks = []
-            atom_num = atom.get_atomic_numbers()
-            for i in range(len(atom_num)):
-                for j in range(i + 1, len(atom_num)):
-                    if (atom_num[i], atom_num[j]) in hookean_paras:
-                        if (
-                            hookean_paras[(atom_num[i], atom_num[j])][0] != 0
-                            and hookean_paras[(atom_num[i], atom_num[j])][1] != 0
-                        ):
-                            hks.append(
-                                HookeanRepulsion(
-                                    i, j, *hookean_paras[(atom_num[i], atom_num[j])]
-                                )
-                            )
-                    elif (
-                        (atom_num[j], atom_num[i]) in hookean_paras
-                        and hookean_paras[(atom_num[j], atom_num[i])][0] != 0
-                        and hookean_paras[(atom_num[j], atom_num[i])][1] != 0
-                    ):
-                        hks.append(
-                            HookeanRepulsion(
-                                j, i, *hookean_paras[(atom_num[j], atom_num[i])]
-                            )
+    log_file = output_file_name + "_" + str(unique_starting_index) + ".log"
+    constraint_list = []
+    if hookean_repul and hookean_paras:
+        atom_num = atom.get_atomic_numbers()
+        for i in range(len(atom_num)):
+            for j in range(i + 1, len(atom_num)):
+                if (
+                    (atom_num[i], atom_num[j]) in hookean_paras
+                    and hookean_paras[(atom_num[i], atom_num[j])][0] != 0
+                    and hookean_paras[(atom_num[i], atom_num[j])][1] != 0
+                ):
+                    # print(f"Hookean repulsion is used for {atom_num[i]}-{atom_num[j]}!")
+                    constraint_list.append(
+                        HookeanRepulsion(
+                            i, j, *hookean_paras[(atom_num[i], atom_num[j])]
                         )
-            atom.set_constraint(hks)
+                    )
+                elif (
+                    (atom_num[j], atom_num[i]) in hookean_paras
+                    and hookean_paras[(atom_num[j], atom_num[i])][0] != 0
+                    and hookean_paras[(atom_num[j], atom_num[i])][1] != 0
+                ):
+                    # print(f"Hookean repulsion is used for {atom_num[j]}-{atom_num[i]}!")
+                    constraint_list.append(
+                        HookeanRepulsion(
+                            i, j, *hookean_paras[(atom_num[j], atom_num[i])]
+                        )
+                    )
 
-        atom.calc = pot
+    if keep_symmetry:
+        print("Creating FixSymmetry calculator and maintaining initial symmetry!")
+        constraint_list.append(FixSymmetry(atom, symprec=1.0e-4))
 
-        if scalar_pressure_method == "exp":
-            scalar_pressure_tmp = scalar_exp_pressure * GPa
-            if scalar_pressure_exponential_width > 0.0:
-                scalar_pressure_tmp *= np.random.exponential(
-                    scalar_pressure_exponential_width
-                )
-        elif scalar_pressure_method == "uniform":
-            scalar_pressure_tmp = (
-                np.random.uniform(low=scalar_pressure_low, high=scalar_pressure_high)
-                * GPa
+    if constraint_list:
+        atom.set_constraint(constraint_list)
+
+    atom.calc = pot
+
+    if scalar_pressure_method == "exp":
+        scalar_pressure_tmp = scalar_exp_pressure * GPa
+        if scalar_pressure_exponential_width > 0.0:
+            scalar_pressure_tmp *= np.random.exponential(
+                scalar_pressure_exponential_width
             )
-        atom.info["RSS_applied_pressure"] = scalar_pressure_tmp / GPa
-        atom = UnitCellFilter(atom, scalar_pressure=scalar_pressure_tmp)
+    elif scalar_pressure_method == "uniform":
+        scalar_pressure_tmp = (
+            np.random.uniform(low=scalar_pressure_low, high=scalar_pressure_high) * GPa
+        )
+    atom.info["RSS_applied_pressure"] = scalar_pressure_tmp / GPa
+    atom = UnitCellFilter(atom, scalar_pressure=scalar_pressure_tmp)
 
-        try:
-            optimizer = PreconLBFGS(
-                atom, precon=Exp(3), use_armijo=True, logfile=log_file, master=True
+    try:
+        optimizer = PreconLBFGS(
+            atom, precon=Exp(3), use_armijo=True, logfile=log_file, master=True
+        )
+        traj = []
+
+        def build_traj():
+            atom_copy = atom.copy()
+            atom_copy.info["energy"] = atom.atoms.get_potential_energy()
+            # atom_copy.info["energy"] = atom.info["energy"].copy() # Applicable to gap_fit, not others
+            atom_copy.info["enthalpy"] = atom.get_potential_energy().copy()
+            # Note that the UnitCellFilter returns enthalpy using scalar_pressure_tmp!!
+            # virial = atom.info["virial"].copy()
+            # volume = atom.atoms.get_volume().copy()
+            # stress = voigt_6_to_full_3x3_stress(atom.atoms.info["stress"])
+            # atom_copy.info["RSS_applied_pressure"] = -stress.trace() / 3.0 / GPa  # unit: GPa
+            traj.append(atom_copy)
+
+        optimizer.attach(build_traj)
+        optimizer.run(fmax=force_tol, smax=stress_tol, steps=max_steps)
+
+        minim_stat = "converged" if optimizer.converged() else "unconverged"
+
+        for traj_at_i, traj_at in enumerate(traj):
+            traj_at.info["RSS_minim_iter"] = traj_at_i
+            traj_at.info["config_type"] = config_type
+            traj_at.info["minim_stat"] = minim_stat
+
+        if write_traj:
+            traj_file_name = (
+                output_file_name + "_traj_" + str(unique_starting_index) + ".extxyz"
             )
-            traj = []
+            ase.io.write(traj_file_name, traj, parallel=False)
+        del traj[-1].info["minim_stat"]
+        traj[-1].info["config_type"] = minim_stat + "_minimum"
 
-            def build_traj():
-                atom_copy = atom.copy()
-                atom_copy.info["energy"] = atom.atoms.get_potential_energy()
-                # atom_copy.info["energy"] = atom.info["energy"].copy() # Applicable to gap_fit, not others
-                atom_copy.info["enthalpy"] = atom.get_potential_energy().copy()
-                # Note that the UnitCellFilter returns enthalpy using scalar_pressure_tmp!!
-                # virial = atom.info["virial"].copy()
-                # volume = atom.atoms.get_volume().copy()
-                # stress = voigt_6_to_full_3x3_stress(atom.atoms.info["stress"])
-                # atom_copy.info["RSS_applied_pressure"] = -stress.trace() / 3.0 / GPa  # unit: GPa
-                traj.append(atom_copy)
+        local_minima = traj[-1]
 
-            optimizer.attach(build_traj)
-            optimizer.run(fmax=force_tol, smax=stress_tol, steps=max_steps)
+        if local_minima.info["config_type"] == "converged_minimum":
+            dir_path = Path.cwd()
+            return os.path.join(dir_path, traj_file_name)
+        return None
 
-            minim_stat = "converged" if optimizer.converged() else "unconverged"
-
-            for traj_at_i, traj_at in enumerate(traj):
-                traj_at.info["RSS_minim_iter"] = traj_at_i
-                traj_at.info["config_type"] = config_type
-                traj_at.info["minim_stat"] = minim_stat
-
-            if write_traj:
-                traj_file_name = (
-                    output_file_name + "_traj_" + str(unique_starting_index) + ".extxyz"
-                )
-                ase.io.write(traj_file_name, traj, parallel=False)
-            del traj[-1].info["minim_stat"]
-            traj[-1].info["config_type"] = minim_stat + "_minimum"
-
-            local_minima = traj[-1]
-
-            if local_minima.info["config_type"] == "converged_minimum":
-                dir_path = Path.cwd()
-                return os.path.join(dir_path, traj_file_name)
-            return None
-
-        except RuntimeError:
-            print("RuntimeError occurred during optimization! Return none!")
-            return None
+    except RuntimeError:
+        print("RuntimeError occurred during optimization! Return none!")
+        return None
 
 
 def minimize_structures(
-    mlip_path,
-    index,
-    input_structure,
-    output_file_name,
-    mlip_type,
-    scalar_pressure_method,
-    scalar_exp_pressure,
-    scalar_pressure_exponential_width,
-    scalar_pressure_low,
-    scalar_pressure_high,
-    max_steps,
-    force_tol,
-    stress_tol,
-    Hookean_repul,
-    hookean_paras,
-    write_traj,
-    num_processes_rss,
-    device,
-    isol_es,
-    config_type,
-    struct_start_index,
+    mlip_type: str,
+    mlip_path: str,
+    iteration_index: str,
+    structures: list[Structure],
+    output_file_name: str = "RSS_relax_results",
+    scalar_pressure_method: str = "exp",
+    scalar_exp_pressure: float = 100,
+    scalar_pressure_exponential_width: float = 0.2,
+    scalar_pressure_low: float = 0,
+    scalar_pressure_high: float = 50,
+    max_steps: int = 1000,
+    force_tol: float = 0.01,
+    stress_tol: float = 0.01,
+    hookean_repul: bool = False,
+    hookean_paras: dict[tuple[int, int], tuple[float, float]] | None = None,
+    write_traj: bool = True,
+    num_processes_rss: int = 1,
+    device: str = "cpu",
+    isolated_atom_energies: dict[int, float] | None = None,
+    config_type: str = "traj",
+    struct_start_index: int = 0,
+    keep_symmetry: bool = True,
 ) -> list[str | None]:
-    """Run RSS in parallel."""
-    atoms = [AseAtomsAdaptor().get_atoms(structure) for structure in input_structure]
+    """Run RSS in parallel.
 
-    if Hookean_repul:
+    Parameters
+    ----------
+    mlip_type: str
+        Choose one specific MLIP type:
+        'GAP' | 'J-ACE' | 'P-ACE' | 'NequIP' | 'M3GNet' | 'MACE'.
+    mlip_path: str
+        Path to the MLIP model.
+    iteration_index: str
+        Index for the current iteration.
+    structures: list of Structure
+        List of structures to be relaxed.
+    output_file_name: str
+        Prefix for the trajectory/log file name. The actual output file name
+        may be composed of this prefix, an index, and file types.
+    scalar_pressure_method: str
+        Method for adding external pressures. Default is 'exp'.
+    scalar_exp_pressure: float
+        Scalar exponential pressure. Default is 100.
+    scalar_pressure_exponential_width: float
+        Width for scalar pressure exponential. Default is 0.2.
+    scalar_pressure_low: float
+        Low limit for scalar pressure. Default is 0.
+    scalar_pressure_high: float
+        High limit for scalar pressure. Default is 50.
+    max_steps: int
+        Maximum number of steps for relaxation. Default is 1000.
+    force_tol: float
+        Force residual tolerance for relaxation. Default is 0.01.
+    stress_tol: float
+        Stress residual tolerance for relaxation. Default is 0.01.
+    hookean_repul: bool
+        If true, apply Hookean repulsion. Default is False.
+    hookean_paras: dict
+        Parameters for Hookean repulsion as a dictionary of tuples. Default is None.
+    write_traj: bool
+        If true, write trajectory of RSS. Default is True.
+    num_processes_rss: int
+        Number of processes used for running RSS.
+    device: str
+        Specify device to use "cuda" or "cpu".
+    isolated_atom_energies: dict
+        Dictionary of isolated atoms energies.
+    config_type: str
+        Specify the type of configurations generated from RSS
+    struct_start_index: int
+        Specify the starting index within a list
+    keep_symmetry: bool
+        If true, preserve symmetry during relaxation.
+
+    Returns
+    -------
+    list
+        Output list[str] containing paths for the results of the RSS relaxation.
+    """
+    atoms = [AseAtomsAdaptor().get_atoms(structure) for structure in structures]
+
+    if hookean_repul:
         print("Hookean repulsion is used!")
 
     for i, atom in enumerate(atoms):
-        atom.info["unique_starting_index"] = index + f"{i+struct_start_index}"
+        atom.info["unique_starting_index"] = iteration_index + f"{i+struct_start_index}"
 
     args = [
         (
             atom,
+            mlip_type,
             mlip_path,
             output_file_name,
-            mlip_type,
             scalar_pressure_method,
             scalar_exp_pressure,
             scalar_pressure_exponential_width,
@@ -506,12 +634,13 @@ def minimize_structures(
             max_steps,
             force_tol,
             stress_tol,
-            Hookean_repul,
+            hookean_repul,
             hookean_paras,
             write_traj,
             device,
-            isol_es,
+            isolated_atom_energies,
             config_type,
+            keep_symmetry,
         )
         for atom in atoms
     ]
@@ -529,8 +658,8 @@ def split_structure_into_groups(structures: list, num_groups: int) -> list[list]
     Parameters
     ----------
     structures: list
-        list of structures
-    num_groups: int, mandatory
+        List of structures
+    num_groups: int
         Number of structure groups, used for assigning tasks across multiple nodes,
         with each node handling one group.
     """

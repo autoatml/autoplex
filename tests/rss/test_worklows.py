@@ -4,8 +4,8 @@ os.environ["OMP_NUM_THREADS"] = "1"
 from jobflow import run_locally, Flow
 from jobflow import Response, job
 from autoplex.data.rss.jobs import RandomizedStructure, do_rss_single_node, do_rss_multi_node
-from autoplex.data.common.jobs import Sampling, VASP_collect_data, Data_preprocessing
-from autoplex.data.common.flows import DFTStaticMaker
+from autoplex.data.common.jobs import sample_data, collect_dft_data, preprocess_data
+from autoplex.data.common.flows import DFTStaticLabelling
 from autoplex.fitting.common.flows import MLIPFitMaker
 from typing import List, Optional, Dict, Any
 from ase.io import read
@@ -15,7 +15,7 @@ import shutil
 
 
 @job
-def mock_RSS(input_dir: str = None,
+def mock_rss(input_dir: str = None,
              selection_method: str = 'cur',
              num_of_selection: int = 3,
              bcur_params: Optional[str] = None,
@@ -25,7 +25,7 @@ def mock_RSS(input_dir: str = None,
              dimer: bool = True,
              dimer_range: list = None,
              dimer_num: int = None,
-             custom_set: Optional[str] = None,
+             custom_incar: Optional[str] = None,
              vasp_ref_file: str = 'vasp_ref.extxyz',
              rss_group: str = 'initial',
              test_ratio: float = 0.1,
@@ -41,25 +41,25 @@ def mock_RSS(input_dir: str = None,
              kt: float = None,
              **fit_kwargs,):
     
-    job2 = Sampling(selection_method=selection_method, 
+    job2 = sample_data(selection_method=selection_method, 
                     num_of_selection=num_of_selection, 
                     bcur_params=bcur_params,
                     dir=input_dir,
                     random_seed=random_seed)
-    job3 = DFTStaticMaker(e0_spin=e0_spin, 
+    job3 = DFTStaticLabelling(e0_spin=e0_spin, 
                        isolated_atom=isolated_atom, 
                        dimer=dimer,
                        dimer_range=dimer_range,
                        dimer_num=dimer_num,
-                       custom_set=custom_set, 
+                       custom_incar=custom_incar, 
                        ).make(structures=job2.output)
-    job4 = VASP_collect_data(vasp_ref_file=vasp_ref_file, 
+    job4 = collect_dft_data(vasp_ref_file=vasp_ref_file, 
                              rss_group=rss_group, 
                              vasp_dirs=job3.output)
-    job5 = Data_preprocessing(test_ratio=test_ratio, 
+    job5 = preprocess_data(test_ratio=test_ratio, 
                               regularization=regularization, 
                               distillation=distillation, 
-                              f_max=f_max, 
+                              force_max=f_max, 
                               vasp_ref_dir=job4.output['vasp_ref_dir'], pre_database_dir=pre_database_dir)
     job6 = MLIPFitMaker(mlip_type=mlip_type, 
                         ref_energy_name=ref_energy_name,
@@ -68,7 +68,7 @@ def mock_RSS(input_dir: str = None,
                         ).make(database_dir=job5.output, 
                                isol_es=job4.output['isol_es'],
                                num_processes_fit=num_processes_fit,
-                               preprocessing_data=False,
+                               apply_data_preprocessing=False,
                                **fit_kwargs)
     job_list = [job2, job3, job4, job5, job6]
 
@@ -86,7 +86,7 @@ def mock_RSS(input_dir: str = None,
 
 
 @job
-def mock_do_RSS_iterations(input: Dict[str, Optional[Any]] = {'test_error': None,
+def mock_do_rss_iterations(input: Dict[str, Optional[Any]] = {'test_error': None,
                                                          'pre_database_dir': None,
                                                          'mlip_path': None,
                                                          'isol_es': None,
@@ -126,9 +126,9 @@ def mock_do_RSS_iterations(input: Dict[str, Optional[Any]] = {'test_error': None
         print('Current iter index:', current_iter)
         print(f'The error of {current_iter}th iteration:', input['test_error'])
 
-        bcur_params['kT'] = kt
+        bcur_params['kt'] = kt
 
-        job2 = Sampling(selection_method=selection_method1, 
+        job2 = sample_data(selection_method=selection_method1, 
                         num_of_selection=num_of_selection1, 
                         bcur_params=bcur_params,
                         dir=input_dir,
@@ -136,7 +136,7 @@ def mock_do_RSS_iterations(input: Dict[str, Optional[Any]] = {'test_error': None
         job3 = do_rss_single_node(mlip_type=mlip_type, 
                       iteration_index=f'{current_iter}th', 
                       mlip_path=input['mlip_path'], 
-                      structure=job2.output,
+                      structures=job2.output,
                       scalar_pressure_method=scalar_pressure_method,
                       scalar_exp_pressure=scalar_exp_pressure,
                       scalar_pressure_exponential_width=scalar_pressure_exponential_width,
@@ -145,16 +145,16 @@ def mock_do_RSS_iterations(input: Dict[str, Optional[Any]] = {'test_error': None
                       max_steps=max_steps,
                       force_tol=force_tol,
                       stress_tol=stress_tol,
-                      Hookean_repul=Hookean_repul,
+                      hookean_repul=Hookean_repul,
                       write_traj=write_traj,
                       num_processes_rss=num_processes_rss,
                       device=device)
-        job4 = Sampling(selection_method=selection_method2, 
+        job4 = sample_data(selection_method=selection_method2, 
                         num_of_selection=num_of_selection2, 
                         bcur_params=bcur_params,
                         traj_path=job3.output,
                         random_seed=random_seed,
-                        isol_es=input["isol_es"])
+                        isolated_atom_energies=input["isol_es"])
         
         job_list = [job2, job3, job4]
 
@@ -162,7 +162,7 @@ def mock_do_RSS_iterations(input: Dict[str, Optional[Any]] = {'test_error': None
     
 
 @job
-def mock_do_RSS_iterations_multi_jobs(input: Dict[str, Optional[Any]] = {'test_error': None,
+def mock_do_rss_iterations_multi_jobs(input: Dict[str, Optional[Any]] = {'test_error': None,
                                                          'pre_database_dir': None,
                                                          'mlip_path': None,
                                                          'isol_es': None,
@@ -206,7 +206,7 @@ def mock_do_RSS_iterations_multi_jobs(input: Dict[str, Optional[Any]] = {'test_e
 
         bcur_params['kT'] = kt
 
-        job2 = Sampling(selection_method=selection_method1, 
+        job2 = sample_data(selection_method=selection_method1, 
                         num_of_selection=num_of_selection1, 
                         bcur_params=bcur_params,
                         dir=input_dir,
@@ -223,17 +223,17 @@ def mock_do_RSS_iterations_multi_jobs(input: Dict[str, Optional[Any]] = {'test_e
                       max_steps=max_steps,
                       force_tol=force_tol,
                       stress_tol=stress_tol,
-                      Hookean_repul=Hookean_repul,
+                      hookean_repul=Hookean_repul,
                       write_traj=write_traj,
                       num_processes_rss=num_processes_rss,
                       device=device,
                       num_groups=num_groups,)
-        job4 = Sampling(selection_method=selection_method2, 
+        job4 = sample_data(selection_method=selection_method2, 
                         num_of_selection=num_of_selection2, 
                         bcur_params=bcur_params,
                         traj_path=job3.output,
                         random_seed=random_seed,
-                        isol_es=input["isol_es"],
+                        isolated_atom_energies=input["isol_es"],
                         remove_traj_files=remove_traj_files)
         
         job_list = [job2, job3, job4]
@@ -263,7 +263,7 @@ def test_mock_workflow(test_dir, mock_vasp, memory_jobstore):
 
     mock_vasp(ref_paths, fake_run_vasp_kwargs)
 
-    job1=mock_RSS(input_dir=test_files_dir,
+    job1=mock_rss(input_dir=test_files_dir,
                   selection_method='cur',
                   num_of_selection=18,
                   bcur_params={'soap_paras': {'l_max': 3,
@@ -279,10 +279,10 @@ def test_mock_workflow(test_dir, mock_vasp, memory_jobstore):
                  random_seed=42,
                  e0_spin=True,
                  isolated_atom=True,
-                 dimer=True,
-                 dimer_range=[1.5, 2.0],
-                 dimer_num=3,
-                 custom_set={
+                 dimer=False,
+                 dimer_range=None,
+                 dimer_num=None,
+                 custom_incar={
                         "ADDGRID": None, 
                         "ENCUT": 200,
                         "EDIFF": 1E-04,
@@ -323,7 +323,7 @@ def test_mock_workflow(test_dir, mock_vasp, memory_jobstore):
                  kt=0.6
                 )
 
-    job2 = mock_do_RSS_iterations(input=job1.output,
+    job2 = mock_do_rss_iterations(input=job1.output,
                       input_dir=test_files_dir,
                       selection_method1='cur',
                       selection_method2='bcur1s',
@@ -340,15 +340,15 @@ def test_mock_workflow(test_dir, mock_vasp, memory_jobstore):
                                    },
                                    'frac_of_bcur': 0.8,
                                    'bolt_max_num': 3000,
-                                   'kernel_exp': 4, 
+                                   'kernel_exp': 4.0, 
                                    'energy_label': 'energy'},
                       random_seed=None,
                       e0_spin=False,
-                      isolated_atom=True,
-                      dimer=True,
+                      isolated_atom=False,
+                      dimer=False,
                       dimer_range=None,
                       dimer_num=None,
-                      custom_set=None,
+                      custom_incar=None,
                       vasp_ref_file='vasp_ref.extxyz',
                       rss_group='initial',
                       test_ratio=0.1,
@@ -418,7 +418,7 @@ def test_mock_workflow_multi_node(test_dir, mock_vasp, memory_jobstore):
 
     mock_vasp(ref_paths, fake_run_vasp_kwargs)
 
-    job1=mock_RSS(input_dir=test_files_dir,
+    job1=mock_rss(input_dir=test_files_dir,
                   selection_method='cur',
                   num_of_selection=18,
                   bcur_params={'soap_paras': {'l_max': 3,
@@ -434,10 +434,10 @@ def test_mock_workflow_multi_node(test_dir, mock_vasp, memory_jobstore):
                  random_seed=42,
                  e0_spin=True,
                  isolated_atom=True,
-                 dimer=True,
-                 dimer_range=[1.5, 2.0],
-                 dimer_num=3,
-                 custom_set={
+                 dimer=False,
+                 dimer_range=None,
+                 dimer_num=None,
+                 custom_incar={
                         "ADDGRID": None, 
                         "ENCUT": 200,
                         "EDIFF": 1E-04,
@@ -478,7 +478,7 @@ def test_mock_workflow_multi_node(test_dir, mock_vasp, memory_jobstore):
                  kt=0.6
                 )
 
-    job2 = mock_do_RSS_iterations_multi_jobs(input=job1.output,
+    job2 = mock_do_rss_iterations_multi_jobs(input=job1.output,
                       input_dir=test_files_dir,
                       selection_method1='cur',
                       selection_method2='bcur1s',
@@ -495,15 +495,15 @@ def test_mock_workflow_multi_node(test_dir, mock_vasp, memory_jobstore):
                                    },
                                    'frac_of_bcur': 0.8,
                                    'bolt_max_num': 3000,
-                                   'kernel_exp': 4, 
+                                   'kernel_exp': 4.0, 
                                    'energy_label': 'energy'},
                       random_seed=None,
                       e0_spin=False,
                       isolated_atom=True,
-                      dimer=True,
+                      dimer=False,
                       dimer_range=None,
                       dimer_num=None,
-                      custom_set=None,
+                      custom_incar=None,
                       vasp_ref_file='vasp_ref.extxyz',
                       rss_group='initial',
                       test_ratio=0.1,

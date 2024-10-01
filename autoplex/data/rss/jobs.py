@@ -15,46 +15,48 @@ if TYPE_CHECKING:
 
 import ase.io
 import numpy as np
+from ase import Atoms
 from ase.data import atomic_numbers, covalent_radii
 from jobflow import Flow, Maker, Response, job
+from pymatgen.io.ase import AseAtomsAdaptor
 
+from autoplex.data.common.utils import flatten
 from autoplex.data.rss.utils import minimize_structures, split_structure_into_groups
 
 
 @dataclass
 class RandomizedStructure(Maker):
     """
-    Maker to create random structures by 'buildcell'.
+    Maker to create random structures using the 'buildcell' tool.
 
     Parameters
     ----------
-    name : str
+    name: str
         Name of the flows produced by this maker.
     struct_number : int
         Expected number of generated randomized unit cells.
-    tag : (str)
-        name of the seed file for builcell.
-    input_file_name: str
-        input file of buildcell to set parameters
-    output_file_name : str
-        A file to store all generated structures.
-    remove_tmp_files : bool
-        Remove all temporary files raised by buildcell to save memory
-    buildcell_options : dict
-        Customized parameters for buildcell
-    cell_seed_path : str
-        Path to the custom buildcell control file, which ends with ".cell". If this file exists,
-        the buildcell_options argument will no longer take effect
+    tag: str
+        Tag of systems. It can also be used for setting up elements and stoichiometry.
+        For example, 'SiO2' will generate structures with a 2:1 ratio of Si to O.
+    output_file_name: str
+        Name of the file to store all generated structures.
+    remove_tmp_files: bool
+        Remove all temporary files raised by buildcell to save memory.
+    buildcell_option: dict
+        Customized parameters for buildcell.
+    cell_seed_path: str
+        Path to the custom buildcell control file, which ends with '.cell'. If this file exists,
+        the buildcell_option argument will no longer take effect.
     num_processes: int
-        number of processes to use for parallel computation.
+        Number of processes to use for parallel computation.
     """
 
-    name: str = "Build_random_cells"
+    name: str = "build_random_cells"
     struct_number: int = 20
     tag: str = "Si"
     output_file_name: str = "random_structs.extxyz"
     remove_tmp_files: bool = True
-    buildcell_options: dict | None = None
+    buildcell_option: dict | None = None
     cell_seed_path: str | None = None
     num_processes: int = 32
 
@@ -66,35 +68,37 @@ class RandomizedStructure(Maker):
                 raise FileNotFoundError(
                     f"No file found at the specified path: {self.cell_seed_path}"
                 )
-            bt_file = self.cell_seed_path
+            bc_file = self.cell_seed_path
 
         else:
             buildcell_parameters = [
-                "VARVOL=15",
                 "SPECIES=Si%NUM=1",
-                "NFORM=1-7",
-                "SYMMOPS=1-8",
                 "SLACK=0.25",
                 "OVERLAP=0.1",
                 "COMPACT",
                 "MINSEP=1.5",
             ]
 
-            buildcell_parameters = self._update_buildcell_options(
-                self.buildcell_options, buildcell_parameters
-            )
+            if self.buildcell_option is not None:
+                buildcell_parameters = self._update_buildcell_option(
+                    self.buildcell_option, buildcell_parameters
+                )
 
             elements = self._extract_elements(self.tag)  # {"Si":1, "O":2}
 
-            if "SPECIES" not in self.buildcell_options:
+            if self.buildcell_option is None or "SPECIES" not in self.buildcell_option:
                 make_species = self._make_species(elements)  # Si%NUM=1,O%NUM=2
-                buildcell_parameters = self._update_buildcell_options(
+                buildcell_parameters = self._update_buildcell_option(
                     {"SPECIES": make_species}, buildcell_parameters
                 )
 
             if (
-                "VARVOL" not in self.buildcell_options
-                or "MINSEP" not in self.buildcell_options
+                self.buildcell_option is None
+                or (
+                    "VARVOL" not in self.buildcell_option
+                    and "TARGVOL" not in self.buildcell_option
+                )
+                or "MINSEP" not in self.buildcell_option
             ):
                 r0 = {}
                 varvol = {}
@@ -105,23 +109,30 @@ class RandomizedStructure(Maker):
                     r0[ele] = covalent_radii[atomic_numbers[ele]]
 
                     if self._is_metal(ele):
-                        varvol[ele] = 4.5 * np.power(r0[ele], 3)
+                        varvol[ele] = 5.5 * np.power(r0[ele], 3)
                     else:
-                        varvol[ele] = 12.0 * np.power(r0[ele], 3)
+                        varvol[ele] = 14.5 * np.power(r0[ele], 3)
 
                     total_varvol_formula += varvol[ele] * elements[ele]
 
                     num_atom_formula += elements[ele]
 
-                if "VARVOL" not in self.buildcell_options:
+                if self.buildcell_option is None or (
+                    "VARVOL" not in self.buildcell_option
+                    and "TARGVOL" not in self.buildcell_option
+                ):
                     mean_var = total_varvol_formula / num_atom_formula * len(elements)
-                    buildcell_parameters = self._update_buildcell_options(
-                        {"VARVOL": mean_var}, buildcell_parameters
+                    buildcell_parameters = self._update_buildcell_option(
+                        {"TARGVOL": f"{mean_var*0.8}-{mean_var*1.2}"},
+                        buildcell_parameters,
                     )
 
-                if "MINSEP" not in self.buildcell_options:
+                if (
+                    self.buildcell_option is None
+                    or "MINSEP" not in self.buildcell_option
+                ):
                     minsep = self._make_minsep(r0)
-                    buildcell_parameters = self._update_buildcell_options(
+                    buildcell_parameters = self._update_buildcell_option(
                         {
                             "MINSEP": minsep,
                         },
@@ -129,11 +140,11 @@ class RandomizedStructure(Maker):
                     )
 
             self._cell_seed(buildcell_parameters, self.tag)
-            bt_file = f"{self.tag}.cell"
+            bc_file = f"{self.tag}.cell"
 
         with Pool(processes=self.num_processes) as pool:
             args = [
-                (i, bt_file, self.tag, self.remove_tmp_files)
+                (i, bc_file, self.tag, self.remove_tmp_files)
                 for i in range(self.struct_number)
             ]
             atoms_group = pool.starmap(self._parallel_process, args)
@@ -142,18 +153,20 @@ class RandomizedStructure(Maker):
             self.output_file_name, atoms_group, parallel=False, format="extxyz"
         )
 
-        dir_path = Path.cwd()
+        # structure = [AseAtomsAdaptor().get_structure(at) for at in atoms_group]
+        return os.path.join(Path.cwd(), self.output_file_name)
+        # return structure
 
-        return os.path.join(dir_path, self.output_file_name)
-
-    def _update_buildcell_options(self, updates, origin):
+    def _update_buildcell_option(self, updates, origin) -> list:
         """
-        Update buildcell options based on a dictionary of updates.
+        Update buildcell parameters based on a dictionary of updates.
 
         Parameters
         ----------
-        updates : dict
-            A dictionary with option as key and new value as value.
+        updates: dict
+            A dictionary consisting of new values to update buildcell parameters.
+        origin: list
+            The default list of buildcell parameters.
         """
         updated_keys = set()
 
@@ -171,23 +184,35 @@ class RandomizedStructure(Maker):
 
     def _cell_seed(
         self,
-        buildcell_options,
-        tag,
+        buildcell_parameters: list,
+        tag: str,
     ):
         """
-        Prepare random cells in self.directory.
+        Prepare the seed file for buildcell.
 
-        Arguments:
-        buildcell options :: (list of str) e.g. ['VARVOL=20']
+        Parameters
+        ----------
+        buildcell_parameters: (list of str) e.g. ['VARVOL=20']
+            List of paramerers for creating the seed file for buildcell.
+        tag: str
+            Tag of systems.
         """
         bc_file = f"{tag}.cell"
         contents = []
-        contents.extend(["#" + i + "\n" for i in buildcell_options])
+        contents.extend(["#" + i + "\n" for i in buildcell_parameters])
 
         with open(bc_file, "w") as f:
             f.writelines(contents)
 
-    def _is_metal(self, element_symbol):
+    def _is_metal(self, element_symbol: str) -> bool:
+        """
+        Check if the given element symbol represents a metal.
+
+        Parameters
+        ----------
+        element_symbol: str
+            Chemical symbol of the element to check.
+        """
         metals = [
             "Li",
             "Be",
@@ -286,8 +311,21 @@ class RandomizedStructure(Maker):
 
         return element_symbol in metals
 
-    def _extract_elements(self, input_str):
-        elements = {}
+    def _extract_elements(self, input_str: str) -> dict[str, int]:
+        """
+        Extract elements and their counts from a chemical formula string.
+
+        Parameters
+        ----------
+        input_str: str
+            A string representing a chemical formula (e.g., "SiO2").
+
+        Returns
+        -------
+        Dict[str, int]
+            A dictionary. For example, the input "SiO2" would return {"Si": 1, "O": 2}.
+        """
+        elements: dict[str, int] = {}
         pattern = re.compile(r"([A-Z][a-z]*)(\d*)")
         matches = pattern.findall(input_str)
 
@@ -301,44 +339,89 @@ class RandomizedStructure(Maker):
 
         return elements
 
-    def _make_species(self, elements):
+    def _make_species(self, elements: dict[str, int]) -> str:
+        """
+        Create a formatted string from a dictionary of element symbols and their counts.
+
+        Parameters
+        ----------
+        elements: dict
+            A dictionary of element symbols and their counts, e.g., {"Si": 1, "O": 2}.
+
+        Returns
+        -------
+        str
+            A formatter string. For example, the input {"Si": 1, "O": 2} would return "Si%NUM=1,O%NUM=2".
+        """
         output = ""
         for element, count in elements.items():
             output += f"{element}%NUM={count},"
         return output[:-1]
 
-    def _make_minsep(self, r):
+    def _make_minsep(self, r: dict[str, float]) -> str:
+        """
+        Generate a minsep string based on the radii of the elements.
+
+        Parameters
+        ----------
+        r: dict
+            A dictionary of element symbols and their atomic radii.
+
+        Returns
+        -------
+        str
+            A formatted string. For example, the input {"Si": 1.1, "O": 0.66} would
+            return "1.5 Si-Si=1.76 Si-O=1.408 O-O=1.056".
+        """
         keys = list(r.keys())
         if len(keys) == 1:
-            return str(1.5 * r[keys[0]])
+            return str(1.6 * r[keys[0]])
 
         minsep = "1.5 "
         for i in range(len(keys)):
             for j in range(i, len(keys)):
                 el1, el2 = keys[i], keys[j]
                 r1, r2 = r[el1], r[el2]
-                if el1 == el2:
-                    result = r1 * 2.0
-                else:
-                    result = (
-                        (r1 + r2) / 2 * 2.0
-                        if self._is_metal(el1) and self._is_metal(el2)
-                        else (r1 + r2) / 2 * 1.5
-                    )
+                result = (r1 + r2) / 2 * 1.6
+                # if el1 == el2:
+                #     result = r1 * 1.8
+                # else:
+                #     result = (
+                #         (r1 + r2) / 2 * 1.8
+                #         if self._is_metal(el1) and self._is_metal(el2)
+                #         else (r1 + r2) / 2 * 1.5
+                #     )
 
                 minsep += f"{el1}-{el2}={result} "
 
         return minsep[:-1]
 
-    def _parallel_process(self, i, bt_file, tag, remove_tmp_files):
+    def _parallel_process(
+        self, i: int, bc_file: str, tag: str, remove_tmp_files: bool
+    ) -> Atoms:
+        """
+        Run the 'buildcell' command in parallel.
+
+        Parameters
+        ----------
+        i: int
+            Unique index to differentiate temporary files.
+        bc_file: str
+            Path to the input 'buildcell' file.
+        tag: str
+            Tag used to differentiate temporary files.
+        remove_tmp_files: bool
+            If True, remove temporary files after processing.
+
+        """
         tmp_file_name = "tmp." + str(i) + "." + tag + ".cell"
 
-        with open(bt_file) as bt_file_handle, open(
+        with open(bc_file) as bc_file_handle, open(
             tmp_file_name, "w"
         ) as tmp_file_handle:
             run(
                 "buildcell",
-                stdin=bt_file_handle,
+                stdin=bc_file_handle,
                 stdout=tmp_file_handle,
                 shell=True,
                 check=True,
@@ -361,10 +444,11 @@ class RandomizedStructure(Maker):
 
 @job
 def do_rss_single_node(
-    mlip_type: str | None = None,
-    iteration_index: str | None = None,
-    mlip_path: str | None = None,
-    structure: list[Structure] | None = None,
+    mlip_type: str,
+    mlip_path: str,
+    iteration_index: str,
+    structures: list[Structure],
+    output_file_name: str = "RSS_relax_results",
     scalar_pressure_method: str = "exp",
     scalar_exp_pressure: float = 100,
     scalar_pressure_exponential_width: float = 0.2,
@@ -373,59 +457,67 @@ def do_rss_single_node(
     max_steps: int = 1000,
     force_tol: float = 0.01,
     stress_tol: float = 0.01,
-    Hookean_repul: bool = False,
+    hookean_repul: bool = False,
     hookean_paras: dict[tuple[int, int], tuple[float, float]] | None = None,
     write_traj: bool = True,
     num_processes_rss: int = 1,
     device: str = "cpu",
-    isol_es: dict[int, float] | None = None,
+    isolated_atom_energies: dict[int, float] | None = None,
     struct_start_index: int = 0,
     config_type: str = "traj",
+    keep_symmetry: bool = True,
 ) -> list[str | None]:
     """
-    Perform sandom structure searching (RSS) using a MLIP.
+    Perform sandom structure searching (RSS) on one node using a machine learning interatomic potential (MLIP).
 
     Parameters
     ----------
-    mlip_type : str, mandatory
+    mlip_type: str
         Choose one specific MLIP type:
-        'GAP' | 'ACE' | 'NequIP' | 'M3GNet' | 'MACE'.
-    iteration_index : str, mandatory
-        Index for the current iteration.
-    mlip_path : str, mandatory
+        'GAP' | 'J-ACE' | 'P-ACE' | 'NequIP' | 'M3GNet' | 'MACE'.
+    mlip_path: str
         Path to the MLIP model.
-    structure : list of Structure, mandatory
+    iteration_index: str
+        Index for the current iteration.
+    structures: list of Structure
         List of structures to be relaxed.
-    scalar_pressure_method : str
-        Method for scalar pressure. Default is 'exp'.
-    scalar_exp_pressure : float
+    output_file_name: str
+        Prefix for the trajectory/log file name. The actual output file name
+        may be composed of this prefix, an index, and file types.
+    scalar_pressure_method: str
+        Method for adding external pressures. Default is 'exp'.
+    scalar_exp_pressure: float
         Scalar exponential pressure. Default is 100.
-    scalar_pressure_exponential_width : float
+    scalar_pressure_exponential_width: float
         Width for scalar pressure exponential. Default is 0.2.
-    scalar_pressure_low : float
+    scalar_pressure_low: float
         Low limit for scalar pressure. Default is 0.
-    scalar_pressure_high : float
+    scalar_pressure_high: float
         High limit for scalar pressure. Default is 50.
-    max_steps : int
+    max_steps: int
         Maximum number of steps for relaxation. Default is 1000.
-    force_tol : float
-        Force tolerance for relaxation. Default is 0.01.
-    stress_tol : float
-        Stress tolerance for relaxation. Default is 0.01.
-    Hookean_repul : bool
-        Whether to apply Hookean repulsion. Default is False.
-    hookean_paras : dict
+    force_tol: float
+        Force residual tolerance for relaxation. Default is 0.01.
+    stress_tol: float
+        Stress residual tolerance for relaxation. Default is 0.01.
+    hookean_repul: bool
+        If true, apply Hookean repulsion. Default is False.
+    hookean_paras: dict
         Parameters for Hookean repulsion as a dictionary of tuples. Default is None.
-    write_traj : bool
-        Whether to write trajectory. Default is True.
+    write_traj: bool
+        If true, write trajectory of RSS. Default is True.
     num_processes_rss: int
         Number of processes used for running RSS.
     device: str
-        Specify device to use cuda or cpu.
+        Specify device to use "cuda" or "cpu".
+    isolated_atom_energies: dict
+        Dictionary of isolated atoms energies.
     struct_start_index: int
         Specify the starting index within a list
     config_type: str
         Specify the type of configurations generated from RSS
+    keep_symmetry: bool
+        If true, preserve symmetry during relaxation.
 
     Returns
     -------
@@ -433,11 +525,11 @@ def do_rss_single_node(
         Output list[str] containing paths for the results of the RSS relaxation.
     """
     return minimize_structures(
-        mlip_path=mlip_path,
-        index=iteration_index,
-        input_structure=structure,
-        output_file_name="RSS_relax_results",
         mlip_type=mlip_type,
+        mlip_path=mlip_path,
+        iteration_index=iteration_index,
+        structures=structures,
+        output_file_name=output_file_name,
         scalar_pressure_method=scalar_pressure_method,
         scalar_exp_pressure=scalar_exp_pressure,
         scalar_pressure_exponential_width=scalar_pressure_exponential_width,
@@ -446,23 +538,26 @@ def do_rss_single_node(
         max_steps=max_steps,
         force_tol=force_tol,
         stress_tol=stress_tol,
-        Hookean_repul=Hookean_repul,
+        hookean_repul=hookean_repul,
         hookean_paras=hookean_paras,
         write_traj=write_traj,
         num_processes_rss=num_processes_rss,
         device=device,
-        isol_es=isol_es,
+        isolated_atom_energies=isolated_atom_energies,
         struct_start_index=struct_start_index,
         config_type=config_type,
+        keep_symmetry=keep_symmetry,
     )
 
 
 @job
 def do_rss_multi_node(
-    mlip_type: str | None = None,
-    iteration_index: str | None = None,
-    mlip_path: str | None = None,
-    structure: list[Structure] | None = None,
+    mlip_type: str,
+    mlip_path: str,
+    iteration_index: str,
+    structure: list[Structure] | list[list[Structure]] | None = None,
+    structure_paths: str | list[str] | None = None,
+    output_file_name: str = "RSS_relax_results",
     scalar_pressure_method: str = "exp",
     scalar_exp_pressure: float = 100,
     scalar_pressure_exponential_width: float = 0.2,
@@ -471,72 +566,94 @@ def do_rss_multi_node(
     max_steps: int = 1000,
     force_tol: float = 0.01,
     stress_tol: float = 0.01,
-    Hookean_repul: bool = False,
+    hookean_repul: bool = False,
     hookean_paras: dict[tuple[int, int], tuple[float, float]] | None = None,
     write_traj: bool = True,
     num_processes_rss: int = 1,
     device: str = "cpu",
-    isol_es: dict[int, float] | None = None,
-    num_groups: int = 5,
+    isolated_atom_energies: dict[int, float] | None = None,
+    num_groups: int = 1,
     config_type: str = "traj",
+    keep_symmetry: bool = True,
 ) -> list[list | None]:
     """
-    Perform sandom structure searching (RSS) using a MLIP.
+    Perform sandom structure searching (RSS) on multiple nodes using a machine learning interatomic potential (MLIP).
 
     Parameters
     ----------
-    mlip_type : str, mandatory
+    mlip_type: str
         Choose one specific MLIP type:
-        'GAP' | 'ACE' | 'NequIP' | 'M3GNet' | 'MACE'.
-    iteration_index : str, mandatory
-        Index for the current iteration.
-    mlip_path : str, mandatory
+        'GAP' | 'J-ACE' | 'P-ACE' | 'NequIP' | 'M3GNet' | 'MACE'.
+    mlip_path: str
         Path to the MLIP model.
-    structure : list of Structure, mandatory
+    iteration_index: str
+        Index for the current iteration.
+    structures: list of Structure
         List of structures to be relaxed.
-    scalar_pressure_method : str, mandatory
-        Method for scalar pressure. Default is 'exp'.
-    scalar_exp_pressure : float, optional
+    structure_paths: str | list[str]
+        Path(s) to structures to be used in the RSS process.
+    output_file_name: str
+        Prefix for the trajectory/log file name. The actual output file name
+        may be composed of this prefix, an index, and file types.
+    scalar_pressure_method: str
+        Method for adding external pressures. Default is 'exp'.
+    scalar_exp_pressure: float
         Scalar exponential pressure. Default is 100.
-    scalar_pressure_exponential_width : float, optional
+    scalar_pressure_exponential_width: float
         Width for scalar pressure exponential. Default is 0.2.
-    scalar_pressure_low : float, optional
+    scalar_pressure_low: float
         Low limit for scalar pressure. Default is 0.
-    scalar_pressure_high : float, optional
+    scalar_pressure_high: float
         High limit for scalar pressure. Default is 50.
-    max_steps : int, mandatory
+    max_steps: int
         Maximum number of steps for relaxation. Default is 1000.
-    force_tol : float, mandatory
-        Force tolerance for relaxation. Default is 0.01.
-    stress_tol : float, optional
-        Stress tolerance for relaxation. Default is 0.01.
-    Hookean_repul : bool, optional
-        Whether to apply Hookean repulsion. Default is False.
-    hookean_paras : dict, optional
+    force_tol: float
+        Force residual tolerance for relaxation. Default is 0.01.
+    stress_tol: float
+        Stress residual tolerance for relaxation. Default is 0.01.
+    hookean_repul: bool
+        If true, apply Hookean repulsion. Default is False.
+    hookean_paras: dict
         Parameters for Hookean repulsion as a dictionary of tuples. Default is None.
-    write_traj : bool, mandatory
-        Whether to write trajectory. Default is True.
-    num_processes_rss: int, mandatory
-        Number of processes used for running RSS on one node.
-    device: str, mandatory
-        Specify device to use cuda or cpu.
-    num_groups: int, mandatory
+    write_traj: bool
+        If true, write trajectory of RSS. Default is True.
+    num_processes_rss: int
+        Number of processes used for running RSS.
+    device: str
+        Specify device to use "cuda" or "cpu".
+    isolated_atom_energies: dict
+        Dictionary of isolated atoms energies.
+    struct_start_index: int
+        Specify the starting index within a list
+    num_groups: int
         Number of structure groups, used for assigning tasks across multiple nodes,
         with each node handling one group.
     config_type: str
         Specify the type of configurations generated from RSS
+    keep_symmetry: bool
+        If true, preserve symmetry during relaxation.
 
     Returns
     -------
     list
-        Output list containing paths for the results of the RSS relaxation.
+        Output list[str] containing paths for the results of the RSS relaxation.
     """
     job_list = []
 
-    if structure is None:
-        raise ValueError("The 'structure' cannot be None!")
+    if structure_paths is not None:
+        if isinstance(structure_paths, list):
+            atoms = [ase.io.read(dir, index=":") for dir in structure_paths]
+            atoms = flatten(atoms, recursive=True)
+        elif isinstance(structure_paths, str):
+            atoms = ase.io.read(structure_paths, index=":")
+        structure = [AseAtomsAdaptor().get_structure(at) for at in atoms]
+    elif structure is not None and isinstance(structure[0], list):
+        structure = flatten(structure, recursive=False)
 
-    structure_groups = split_structure_into_groups(structure, num_groups)
+    if structure is not None and isinstance(structure, list):
+        structure_groups = split_structure_into_groups(structure, num_groups)
+    else:
+        raise ValueError("Invalid structure format. It must be a list of structures.")
 
     rss_info = []
 
@@ -545,9 +662,10 @@ def do_rss_multi_node(
     for i in range(num_groups):
         rss = do_rss_single_node(
             mlip_type=mlip_type,
-            iteration_index=iteration_index,
             mlip_path=mlip_path,
-            structure=structure_groups[i],
+            iteration_index=iteration_index,
+            structures=structure_groups[i],
+            output_file_name=output_file_name,
             scalar_pressure_method=scalar_pressure_method,
             scalar_exp_pressure=scalar_exp_pressure,
             scalar_pressure_exponential_width=scalar_pressure_exponential_width,
@@ -556,14 +674,15 @@ def do_rss_multi_node(
             max_steps=max_steps,
             force_tol=force_tol,
             stress_tol=stress_tol,
-            Hookean_repul=Hookean_repul,
+            hookean_repul=hookean_repul,
             hookean_paras=hookean_paras,
             write_traj=write_traj,
             num_processes_rss=num_processes_rss,
             device=device,
-            isol_es=isol_es,
+            isolated_atom_energies=isolated_atom_energies,
             struct_start_index=struct_start_index,
             config_type=config_type,
+            keep_symmetry=keep_symmetry,
         )
 
         struct_start_index += len(structure_groups[i])

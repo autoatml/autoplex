@@ -2,238 +2,370 @@
 
 from __future__ import annotations
 
-from jobflow import Flow, Response, job
+from dataclasses import dataclass
 
-from autoplex.data.common.flows import DFTStaticMaker
+from jobflow import Flow, Maker, Response, job
+
+from autoplex.data.common.flows import DFTStaticLabelling
 from autoplex.data.common.jobs import (
-    Data_preprocessing,
-    Sampling,
-    VASP_collect_data,
+    collect_dft_data,
+    preprocess_data,
+    sample_data,
 )
 from autoplex.data.rss.jobs import RandomizedStructure, do_rss_multi_node
 from autoplex.fitting.common.flows import MLIPFitMaker
 
+__all__ = ["BuildMultiRandomizedStructure", "initial_rss", "do_rss_iterations"]
+
+
+@dataclass
+class BuildMultiRandomizedStructure(Maker):
+    """
+    Maker to create random structures by 'buildcell'.
+
+    Parameters
+    ----------
+    tag: str
+        Tag of systems. It can also be used for setting up elements and stoichiometry.
+        For example, 'SiO2' will generate structures with a 2:1 ratio of Si to O.
+    generated_struct_numbers: list[int]
+        Expected number of generated randomized unit cells.
+    buildcell_option: dict
+        Customized parameters for buildcell.
+    remove_tmp_files: bool
+        Remove all temporary files raised by buildcell to save memory.
+    cur_selection: bool
+        If true, sample structures using CUR.
+    selected_struct_numbers: list
+        Number of structures to be sampled.
+    bcur_params: dict
+        Parameters for Boltzmann CUR selection.
+    random_seed: int
+        A seed to ensure reproducibility of CUR selection.
+    num_processes: int
+        Number of processes to use for parallel computation.
+    name: str
+        Name of the flows produced by this maker.
+    """
+
+    tag: str
+    generated_struct_numbers: list[int]
+    buildcell_options: list[dict] | None = None
+    remove_tmp_files: bool = True
+    cur_selection: bool = False
+    selected_struct_numbers: list[int] | None = None
+    bcur_params: dict | None = None
+    random_seed: int | None = None
+    num_processes: int = 1
+    name: str = "do_randomized_structure_generation"
+
+    @job
+    def make(self):
+        """Maker to create random structures by buildcell."""
+        job_list = []
+        final_structures = []
+        for i, struct_number in enumerate(self.generated_struct_numbers):
+            buildcell_option = None
+            if self.buildcell_options is not None:
+                assert len(self.generated_struct_numbers) == len(self.buildcell_options)
+                buildcell_option = self.buildcell_options[i]
+            job_struct = RandomizedStructure(
+                tag=self.tag,
+                struct_number=struct_number,
+                remove_tmp_files=self.remove_tmp_files,
+                buildcell_option=buildcell_option,
+                num_processes=self.num_processes,
+            ).make()
+            job_struct.name = f"{self.name}_{i}"
+
+            if self.cur_selection:
+                assert len(self.generated_struct_numbers) == len(
+                    self.selected_struct_numbers
+                )
+                job_cur = sample_data(
+                    selection_method="cur",
+                    num_of_selection=self.selected_struct_numbers[i],
+                    bcur_params=self.bcur_params,
+                    dir=job_struct.output,
+                    random_seed=self.random_seed,
+                )
+                job_cur.name = f"sampling_{i}"
+                job_list.append(job_struct)
+                job_list.append(job_cur)
+                final_structures.append(job_cur.output)
+            else:
+                job_list.append(job_struct)
+                final_structures.append(job_struct.output)
+
+        return Response(
+            replace=Flow(job_list),
+            output=final_structures,
+        )
+
 
 @job
-def initial_RSS(
-    struct_number: int = 10000,
-    tag: str = "GeSb2Te4",
-    selection_method: str = "cur",
-    num_of_selection: int = 3,
+def initial_rss(
+    tag: str,
+    generated_struct_numbers: list[int],
+    selected_struct_numbers: list[int] | None = None,
+    buildcell_options: list[dict] | None = None,
+    num_processes_buildcell: int = 1,
+    cur_selection: bool = False,
     bcur_params: dict | None = None,
-    random_seed: int = None,
+    random_seed: int | None = None,
     e0_spin: bool = False,
-    isolated_atom: bool = True,
-    dimer: bool = True,
-    dimer_range: list = None,
-    dimer_num: int = 10,
-    custom_set: dict | None = None,
-    config_types: list[str] | None = None,
+    isolatedatom_box: list[float] | None = None,
+    isolated_atom: bool = False,
+    dimer: bool = False,
+    dimer_box: list[float] | None = None,
+    dimer_range: list | None = None,
+    dimer_num: int = 21,
+    custom_incar: dict | None = None,
+    custom_potcar: dict | None = None,
+    config_type: str | None = None,
     vasp_ref_file: str = "vasp_ref.extxyz",
     rss_group: str = "initial",
     test_ratio: float = 0.1,
-    regularization: bool = True,
-    distillation: bool = True,
-    f_max: float = 200,
+    regularization: bool = False,
+    scheme: str | None = None,
+    distillation: bool = False,
+    force_max: float | None = None,
+    force_label: str = "REF_forces",
     pre_database_dir: str | None = None,
     mlip_type: str = "GAP",
-    mlip_hyper: dict | None = None,
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",
-    num_processes_fit: int | None = None,
-    kt: float = None,
+    auto_delta: bool = False,
+    num_processes_fit: int = 1,
     **fit_kwargs,
 ):
     """
     Run initial Random Structure Searching (RSS) workflow from scratch.
 
-    The workflow consists of the following jobs:
-    job1 - RandomizedStructure: Generates randomized structures
-    job2 - Sampling: Samples a subset of the generated structures using CUR
-    job3 - DFTStaticMaker: Runs single-point calculations on the sampled structures
-    job4 - VASP_collect_data: Collects VASP calculation data
-    job5 - Data_preprocessing: Preprocesses the data for fitting ML models
-    job6 - MLIPFitMaker: Fits a ML interatomic potential (MLIP)
-
     Parameters
     ----------
-    struct_number : int, optional
-        Number of structures to generate. Default is 10000.
-    tag : str, optional
-        Tag for the generated structures. Default is 'GeSb2Te4'.
-    selection_method : str, optional
-        Method for selecting structures. Default is 'cur'.
-    num_of_selection : int, optional
-        Number of structures to select. Default is 3.
-    bcur_params : str, optional
-        Parameters for the CUR method. Default is None.
-    random_seed : int, optional
-        Seed for random number generator. Default is None.
-    e0_spin : bool, optional
-        Whether to include spin polarization in the static calculations of isolated atoms and dimers. Default is False.
-    isolated_atom : bool, optional
-        Whether to include isolated atom calculations. Default is True.
-    dimer : bool, optional
-        Whether to include dimer calculations. Default is True.
-    dimer_range : list, optional
-        Distance range for dimer calculations. Default is None.
-    dimer_num : int, optional
-        Number of dimers generated for calculations. Default is None.
-    custom_set : dict, optional
-        Custom set of parameters for VASP. Default is None.
-    config_types : list[str], optional
-        List of configuration types corresponding to the structures. If provided,
-        should have the same length as the 'structures' list. If None, defaults
-        to 'bulk'. Default is None.
-    vasp_ref_file : str, optional
-        File name of collected VASP data. Default is 'vasp_ref.extxyz'.
-    rss_group : str, optional
-        Group name of structures for RSS. Default is 'initial'.
-    test_ratio : float, optional
-        The proportion of the test set after splitting the data. Default is 0.1.
-    regularization : bool, optional
-        Whether to apply regularization. This only works for GAP. Default is True.
-    distillation : bool, optional
-        Whether to apply distillation of structures. Default is True.
-    f_max : float, optional
-        Maximum force value to exclude structures. Default is 200.
-    pre_database_dir : str, optional
-        Directory for the preprocessed database. Default is None.
-    mlip_type : str, optional
-        Type of MLIP to fit. Default is 'GAP'.
-    mlip_hyper : str, optional
-        Hyperparameters for the MLIP. Default is None.
-    ref_energy_name : str, optional
-        Reference energy name. Default is "REF_energy".
-    ref_force_name : str, optional
-        Reference force name. Default is "REF_forces".
-    ref_virial_name : str, optional
-        Reference virial name. Default is "REF_virial".
-    num_processes_fit : int, optional
-        Number of processes for fitting. Default is None.
-    kt : float, optional
-        Value of kT. Default is None.
-    fit_kwargs : dict, optional
-        Additional arguments for the machine learning fit. Default is None.
+    tag: str
+        Tag of systems. It can also be used for setting up elements and stoichiometry.
+        For example, 'SiO2' will generate structures with a 2:1 ratio of Si to O.
+    generated_struct_numbers: list[int]
+        Expected number of generated randomized unit cells.
+    selected_struct_numbers: list[int], optional
+        Number of structures to be sampled. Default is None.
+    buildcell_options: list[dict], optional
+        Customized parameters for buildcell. Default is None.
+    num_processes_buildcell: int, optional
+        Number of processes to use for parallel computation during buildcell generation. Default is 1.
+    cur_selection: bool, optional
+        If true, sample structures using CUR. Default is False.
+    bcur_params: dict, optional
+        Parameters for Boltzmann CUR selection. Default is None.
+    random_seed: int, optional
+        A seed to ensure reproducibility of CUR selection. Default is None.
+    e0_spin: bool, optional
+        If true, include spin polarization in isolated atom and dimer calculations. Default is False.
+    isolatedatom_box: list[float], optional
+        List of the lattice constants for an isolated atom configuration. Default is None.
+    isolated_atom: bool, optional
+        If true, perform single-point calculations for isolated atoms. Default is False.
+    dimer: bool, optional
+        If true, perform single-point calculations for dimers. Default is False.
+    dimer_box: list[float], optional
+        The lattice constants of a dimer box. Default is None.
+    dimer_range: list[float], optional
+        Range of distances for dimer calculations. Default is None.
+    dimer_num: int, optional
+        Number of different distances to consider for dimer calculations. Default is 21.
+    custom_incar: dict, optional
+        Dictionary of custom VASP input parameters. If provided, will update the
+        default parameters. Default is None.
+    custom_potcar: dict, optional
+        Dictionary of POTCAR settings to update. Keys are element symbols, values are the desired POTCAR labels.
+        Default is None.
+    config_type: str, optional
+        Configuration type for the VASP calculations. Default is None.
+    vasp_ref_file: str, optional
+        Reference file for VASP data. Default is 'vasp_ref.extxyz'.
+    rss_group: str, optional
+        Group name for GAP RSS. Default is 'initial'.
+    test_ratio: float, optional
+        The proportion of the test set after splitting the data.
+        If None, no splitting will be performed. Default is 0.1.
+    regularization: bool, optional
+        If true, apply regularization. This only works for GAP. Default is False.
+    scheme: str, optional
+        Scheme to use for regularization. Default is None.
+    distillation: bool, optional
+        If true, apply data distillation. Default is False.
+    force_max: float, optional
+        Maximum force value to exclude structures. Default is None.
+    force_label: str, optional
+        The label of force values to use for distillation. Default is 'REF_forces'.
+    pre_database_dir: str, optional
+        Directory where the previous database was saved. Default is None.
+    mlip_type: str, optional
+        Choose one specific MLIP type to be fitted: 'GAP' | 'J-ACE' | 'P-ACE' | 'NEQUIP' | 'M3GNET' | 'MACE'.
+        Default is 'GAP'.
+    ref_energy_name: str, optional
+        Reference energy name. Default is 'REF_energy'.
+    ref_force_name: str, optional
+        Reference force name. Default is 'REF_forces'.
+    ref_virial_name: str, optional
+        Reference virial name. Default is 'REF_virial'.
+    auto_delta: bool, optional
+        If true, apply automatic determination of delta for GAP terms. Default is False.
+    num_processes_fit: int, optional
+        Number of processes used for fitting. Default is 1.
+    **fit_kwargs:
+        Additional keyword arguments for the MLIP fitting process.
 
     Output
     ------
-    - test_error: float
-        The test error of the fitted MLIP.
-    - pre_database_dir: str
-        The directory of the preprocessed database.
-    - mlip_path: str
-        The path to the fitted MLIP.
-    - isol_es: dict
-        The isolated energy values.
-    - current_iter: int
-        The current iteration index, set to 0.
-    - kt: float
-        The value of kT.
+    dict
+        a dictionary whose keys contains:
+        - test_error: float
+            The test error of the fitted MLIP.
+        - pre_database_dir: str
+            The directory of the preprocessed database.
+        - mlip_path: str
+            The path to the fitted MLIP.
+        - isol_es: dict
+            The isolated energy values.
+        - current_iter: int
+            The current iteration index, set to 0.
     """
-    job1 = RandomizedStructure(struct_number=struct_number, tag=tag).make()
-    job2 = Sampling(
-        selection_method=selection_method,
-        num_of_selection=num_of_selection,
+    if isolatedatom_box is None:
+        isolatedatom_box = [20.0, 20.0, 20.0]
+    if dimer_box is None:
+        dimer_box = [20.0, 20.0, 20.0]
+
+    do_randomized_structure_generation = BuildMultiRandomizedStructure(
+        generated_struct_numbers=generated_struct_numbers,
+        buildcell_options=buildcell_options,
+        selected_struct_numbers=selected_struct_numbers,
+        tag=tag,
+        num_processes=num_processes_buildcell,
+        cur_selection=cur_selection,
         bcur_params=bcur_params,
-        dir=job1.output,
         random_seed=random_seed,
-    )
-    job3 = DFTStaticMaker(
+    ).make()
+    do_dft_static = DFTStaticLabelling(
         e0_spin=e0_spin,
+        isolatedatom_box=isolatedatom_box,
         isolated_atom=isolated_atom,
         dimer=dimer,
+        dimer_box=dimer_box,
         dimer_range=dimer_range,
         dimer_num=dimer_num,
-        custom_set=custom_set,
-    ).make(structures=job2.output, config_types=config_types)
-    job4 = VASP_collect_data(
-        vasp_ref_file=vasp_ref_file, rss_group=rss_group, vasp_dirs=job3.output
+        custom_incar=custom_incar,
+        custom_potcar=custom_potcar,
+    ).make(
+        structures=do_randomized_structure_generation.output, config_type=config_type
     )
-    job5 = Data_preprocessing(
+    do_data_collection = collect_dft_data(
+        vasp_ref_file=vasp_ref_file, rss_group=rss_group, vasp_dirs=do_dft_static.output
+    )
+    do_data_preprocessing = preprocess_data(
         test_ratio=test_ratio,
         regularization=regularization,
+        scheme=scheme,
         distillation=distillation,
-        f_max=f_max,
-        vasp_ref_dir=job4.output["vasp_ref_dir"],
+        force_max=force_max,
+        force_label=force_label,
+        vasp_ref_dir=do_data_collection.output["vasp_ref_dir"],
         pre_database_dir=pre_database_dir,
+        isolated_atom_energies=do_data_collection.output["isol_es"],
     )
-    job6 = MLIPFitMaker(
+    do_mlip_fit = MLIPFitMaker(
         mlip_type=mlip_type,
-        mlip_hyper=mlip_hyper,
         ref_energy_name=ref_energy_name,
         ref_force_name=ref_force_name,
         ref_virial_name=ref_virial_name,
     ).make(
-        database_dir=job5.output,
-        isol_es=job4.output["isol_es"],
+        database_dir=do_data_preprocessing.output,
+        isol_es=do_data_collection.output["isol_es"],
         num_processes_fit=num_processes_fit,
-        preprocessing_data=False,
+        apply_data_preprocessing=False,
+        auto_delta=auto_delta,
+        glue_xml=False,
         **fit_kwargs,
     )
 
-    job_list = [job1, job2, job3, job4, job5, job6]
+    job_list = [
+        do_randomized_structure_generation,
+        do_dft_static,
+        do_data_collection,
+        do_data_preprocessing,
+        do_mlip_fit,
+    ]
 
     return Response(
         replace=Flow(job_list),
         output={
-            "test_error": job6.output["test_error"],
-            "pre_database_dir": job5.output,
-            "mlip_path": job6.output["mlip_path"],
-            "isol_es": job4.output["isol_es"],
-            "current_iter": 0,
-            "kt": 0.6,
+            "test_error": do_mlip_fit.output["test_error"],
+            "pre_database_dir": do_data_preprocessing.output,
+            "mlip_path": do_mlip_fit.output["mlip_path"],
+            "isol_es": do_data_collection.output["isol_es"],
         },
     )
 
 
 @job
-def do_RSS_iterations(
+def do_rss_iterations(
     input: dict,
-    struct_number: int = 10000,
-    tag: str = "GeSb2Te4",
-    selection_method1: str = "cur",
-    selection_method2: str = "bcur",
-    num_of_selection1: int = 3,
-    num_of_selection2: int = 5,
+    tag: str,
+    generated_struct_numbers: list[int],
+    selected_struct_numbers: list[int] | None = None,
+    buildcell_options: list[dict] | None = None,
+    num_processes_buildcell: int = 1,
+    cur_selection: bool = False,
+    selection_method: str = None,
+    num_of_selection: int = None,
     bcur_params: dict | None = None,
-    random_seed: int = None,
+    random_seed: int | None = None,
     e0_spin: bool = False,
-    isolated_atom: bool = True,
-    dimer: bool = True,
-    dimer_range: list = None,
-    dimer_num: int = 10,
-    custom_set: dict | None = None,
+    isolatedatom_box: list[float] | None = None,
+    isolated_atom: bool = False,
+    dimer: bool = False,
+    dimer_box: list[float] | None = None,
+    dimer_range: list | None = None,
+    dimer_num: int = 21,
+    custom_incar: dict | None = None,
+    custom_potcar: dict | None = None,
     config_types: list[str] | None = None,
     vasp_ref_file: str = "vasp_ref.extxyz",
-    rss_group: str = "initial",
+    rss_group: str = "rss",
     test_ratio: float = 0.1,
-    regularization: bool = True,
+    regularization: bool = False,
+    scheme: str | None = None,
     distillation: bool = True,
-    f_max: float = 200,
+    force_max: float = 200,
+    force_label: str = "REF_forces",
     mlip_type: str = "GAP",
-    mlip_hyper: dict | None = None,
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",
-    num_processes_fit: int = None,
+    auto_delta: bool = False,
+    num_processes_fit: int = 1,
     scalar_pressure_method: str = "exp",
     scalar_exp_pressure: float = 100,
     scalar_pressure_exponential_width: float = 0.2,
     scalar_pressure_low: float = 0,
     scalar_pressure_high: float = 50,
-    max_steps: int = 10,
-    force_tol: float = 0.1,
-    stress_tol: float = 0.1,
-    Hookean_repul: bool = False,
+    max_steps: int = 200,
+    force_tol: float = 0.05,
+    stress_tol: float = 0.05,
+    hookean_repul: bool = False,
+    hookean_paras: dict[tuple[int, int], tuple[float, float]] | None = None,
+    keep_symmetry: bool = False,
     write_traj: bool = True,
-    num_processes_rss: int = 4,
+    num_processes_rss: int = 1,
     device: str = "cpu",
     stop_criterion: float = 0.01,
-    max_iteration_number: int = 9,
-    num_groups: int = 5,
-    config_type: str = "traj",
+    max_iteration_number: int = 5,
+    num_groups: int = 1,
+    initial_kt: float = 0.3,
+    current_iter_index: int = 1,
     **fit_kwargs,
 ):
     """
@@ -241,24 +373,181 @@ def do_RSS_iterations(
 
     Each iteration involves generating new structures, sampling, running
     VASP calculations, collecting data, preprocessing data, and fitting a new MLIP.
-    """
-    valid_keys = {
-        "test_error",
-        "pre_database_dir",
-        "mlip_path",
-        "isol_es",
-        "current_iter",
-        "kt",
-    }
 
-    for key in input:
-        if key not in valid_keys:
-            raise ValueError(
-                f"Invalid key '{key}' in input dictionary. Allowed keys are: {valid_keys}"
-            )
+    Parameters
+    ----------
+    input : dict
+        A dictionary parameter used to pass specific input data required during the RSS iterations.
+        The keys in this dictionary should be one of the following valid keys:
+            - test_error: float
+                The test error of the fitted MLIP.
+            - pre_database_dir: str
+                The directory of the preprocessed database.
+            - mlip_path: str
+                The path to the fitted MLIP.
+            - isol_es: dict
+                The isolated energy values.
+            - current_iter: int
+                The current iteration index.
+            - kt: float
+                The value of kt.
+    tag: str
+        Tag of systems. It can also be used for setting up elements and stoichiometry.
+        For example, 'SiO2' will generate structures with a 2:1 ratio of Si to O.
+    generated_struct_numbers: list[int]
+        Expected number of generated randomized unit cells.
+    selected_struct_numbers: list[int], optional
+        Number of structures to be sampled. Default is None.
+    buildcell_options: list[dict], optional
+        Customized parameters for buildcell. Default is None.
+    num_processes_buildcell: int, optional
+        Number of processes to use for parallel computation during buildcell generation. Default is 1.
+    cur_selection: bool, optional
+        If true, sample structures using CUR. Default is False.
+    selection_method: str, optional
+        Method for selecting samples from the generated structures. Default is None.
+    num_of_selection: int, optional
+        Number of structures to be selected. Default is None.
+    bcur_params: dict, optional
+        Parameters for Boltzmann CUR selection. Default is None.
+    random_seed: int, optional
+        A seed to ensure reproducibility of CUR selection. Default is None.
+    e0_spin: bool, optional
+        If true, include spin polarization in isolated atom and dimer calculations. Default is False.
+    isolatedatom_box: list[float], optional
+        List of the lattice constants for an isolated atom configuration. Default is None.
+    isolated_atom: bool, optional
+        If true, perform single-point calculations for isolated atoms
+        only once. Default is False.
+    dimer: bool, optional
+        If true, perform single-point calculations for dimers only once. Default is False.
+    dimer_box: list[float], optional
+        The lattice constants of a dimer box. Default is None.
+    dimer_range: list[float], optional
+        Range of distances for dimer calculations. Default is None.
+    dimer_num: int, optional
+        Number of different distances to consider for dimer calculations. Default is 21.
+    custom_incar: dict, optional
+        Dictionary of custom VASP input parameters. If provided, will update the
+        default parameters. Default is None.
+    custom_potcar: dict, optional
+        Dictionary of POTCAR settings to update. Keys are element symbols, values are the desired POTCAR labels.
+        Default is None.
+    config_types: list[str], optional
+        Configuration types for the VASP calculations. Default is None.
+    vasp_ref_file: str, optional
+        Reference file for VASP data. Default is 'vasp_ref.extxyz'.
+    rss_group: str, optional
+        Group name for GAP RSS. Default is 'rss'.
+    test_ratio: float, optional
+        The proportion of the test set after splitting the data. Default is 0.1.
+    regularization: bool, optional
+        If true, apply regularization. This only works for GAP. Default is False.
+    scheme: str, optional
+        Scheme to use for regularization. Default is None.
+    distillation: bool, optional
+        If true, apply data distillation. Default is True.
+    force_max: float, optional
+        Maximum force value to exclude structures. Default is 200.
+    force_label: str, optional
+        The label of force values to use for distillation. Default is 'REF_forces'.
+    mlip_type: str, optional
+        Choose one specific MLIP type: 'GAP' | 'J-ACE' | 'P-ACE' | 'NequIP' | 'M3GNet' | 'MACE'. Default is 'GAP'.
+    ref_energy_name: str, optional
+        Reference energy name. Default is 'REF_energy'.
+    ref_force_name: str, optional
+        Reference force name. Default is 'REF_forces'.
+    ref_virial_name: str, optional
+        Reference virial name. Default is 'REF_virial'.
+    auto_delta: bool, optional
+        If true, apply automatic determination of delta for GAP terms. Default is False.
+    num_processes_fit: int, optional
+        Number of processes used for fitting. Default is 1.
+    scalar_pressure_method: str, optional
+        Method for adding external pressures. Default is 'exp'.
+    scalar_exp_pressure: float, optional
+        Scalar exponential pressure. Default is 100.
+    scalar_pressure_exponential_width: float, optional
+        Width for scalar pressure exponential. Default is 0.2.
+    scalar_pressure_low: float, optional
+        Low limit for scalar pressure. Default is 0.
+    scalar_pressure_high: float, optional
+        High limit for scalar pressure. Default is 50.
+    max_steps: int, optional
+        Maximum number of steps for relaxation. Default is 200.
+    force_tol: float, optional
+        Force residual tolerance for relaxation. Default is 0.05.
+    stress_tol: float, optional
+        Stress residual tolerance for relaxation. Default is 0.05.
+    hookean_repul: bool, optional
+        If true, apply Hookean repulsion. Default is False.
+    hookean_paras: dict[tuple[int, int], tuple[float, float]], optional
+        Parameters for Hookean repulsion as a dictionary of tuples. Default is None.
+    keep_symmetry: bool, optional
+        If true, preserve symmetry during relaxation. Default is False.
+    write_traj: bool, optional
+        If true, write trajectory of RSS. Default is True.
+    num_processes_rss: int, optional
+        Number of processes used for running RSS. Default is 1.
+    device: str, optional
+        Specify device to use "cuda" or "cpu". Default is "cpu".
+    stop_criterion: float, optional
+        Convergence criterion for stopping RSS iterations. Default is 0.01.
+    max_iteration_number: int, optional
+        Maximum number of RSS iterations to perform. Default is 5.
+    num_groups: int, optional
+        Number of structure groups, used for assigning tasks across multiple nodes. Default is 1.
+    initial_kt: float, optional
+        Initial temperature (in eV) for Boltzmann sampling. Default is 0.3.
+    current_iter_index: int, optional
+        Index for the current RSS iteration. Default is 1.
+    **fit_kwargs:
+        Additional keyword arguments for the MLIP fitting process.
+
+    Output
+    ------
+    dict
+        a dictionary whose keys contains:
+        - test_error: float
+            The test error of the fitted MLIP.
+        - pre_database_dir: str
+            The directory of the preprocessed database.
+        - mlip_path: str
+            The path to the fitted MLIP.
+        - isol_es: dict
+            The isolated energy values.
+        - current_iter: int
+            The current iteration index.
+        - kt: float
+            The temperature (in eV) for Boltzmann sampling.
+    """
+    if "kt" not in input:
+        input["kt"] = initial_kt
+        print("The key 'kt' is not in input. Creating 'kt' is done.")
+
+    if "current_iter" not in input:
+        input["current_iter"] = current_iter_index
+        print(
+            "The key 'current_iter' is not in input. Creating 'current_iter' is done."
+        )
 
     test_error = input.get("test_error")
     current_iter = input.get("current_iter")
+
+    config_type = (
+        (config_types[0] if input["kt"] > 0.1 else config_types[-1])
+        if config_types
+        else None
+    )
+
+    if isolatedatom_box is None:
+        isolatedatom_box = [20.0, 20.0, 20.0]
+    if dimer_box is None:
+        dimer_box = [20.0, 20.0, 20.0]
+
+    print(
+        f"The configuration type of structures generated in the current iteration will be {config_type}!"
+    )
 
     if (
         test_error is not None
@@ -266,29 +555,29 @@ def do_RSS_iterations(
         and current_iter is not None
         and current_iter < max_iteration_number
     ):
-        kt = input["kt"] - 0.1 if input["kt"] > 0.15 else 0.1
-        print("kt:", kt)
-        current_iter += 1
+        print("kt:", input.get("kt"))
         print("Current iter index:", current_iter)
         print(f"The error of {current_iter}th iteration:", test_error)
 
         if bcur_params is None:
             bcur_params = {}
-        bcur_params["kT"] = kt
+        bcur_params["kt"] = input.get("kt")
 
-        job1 = RandomizedStructure(struct_number=struct_number, tag=tag).make()
-        job2 = Sampling(
-            selection_method=selection_method1,
-            num_of_selection=num_of_selection1,
+        do_randomized_structure_generation = BuildMultiRandomizedStructure(
+            generated_struct_numbers=generated_struct_numbers,
+            buildcell_options=buildcell_options,
+            selected_struct_numbers=selected_struct_numbers,
+            tag=tag,
+            num_processes=num_processes_buildcell,
+            cur_selection=cur_selection,
             bcur_params=bcur_params,
-            dir=job1.output,
             random_seed=random_seed,
-        )
-        job3 = do_rss_multi_node(
+        ).make()
+        do_rss = do_rss_multi_node(
             mlip_type=mlip_type,
             iteration_index=f"{current_iter}th",
             mlip_path=input["mlip_path"],
-            structure=job2.output,
+            structure_paths=do_randomized_structure_generation.output,
             scalar_pressure_method=scalar_pressure_method,
             scalar_exp_pressure=scalar_exp_pressure,
             scalar_pressure_exponential_width=scalar_pressure_exponential_width,
@@ -297,67 +586,148 @@ def do_RSS_iterations(
             max_steps=max_steps,
             force_tol=force_tol,
             stress_tol=stress_tol,
-            Hookean_repul=Hookean_repul,
+            hookean_repul=hookean_repul,
+            hookean_paras=hookean_paras,
+            keep_symmetry=keep_symmetry,
             write_traj=write_traj,
             num_processes_rss=num_processes_rss,
             device=device,
             num_groups=num_groups,
             config_type=config_type,
         )
-        job4 = Sampling(
-            selection_method=selection_method2,
-            num_of_selection=num_of_selection2,
+        do_data_sampling = sample_data(
+            selection_method=selection_method,
+            num_of_selection=num_of_selection,
             bcur_params=bcur_params,
-            traj_path=job3.output,
+            traj_path=do_rss.output,
             random_seed=random_seed,
-            isol_es=input["isol_es"],
+            isolated_atom_energies=input["isol_es"],
         )
-        job5 = DFTStaticMaker(
+        do_dft_static = DFTStaticLabelling(
             e0_spin=e0_spin,
+            isolatedatom_box=isolatedatom_box,
             isolated_atom=isolated_atom,
             dimer=dimer,
+            dimer_box=dimer_box,
             dimer_range=dimer_range,
             dimer_num=dimer_num,
-            custom_set=custom_set,
-        ).make(structures=job4.output, config_types=config_types)
-        job6 = VASP_collect_data(
-            vasp_ref_file=vasp_ref_file, rss_group=rss_group, vasp_dirs=job5.output
+            custom_incar=custom_incar,
+            custom_potcar=custom_potcar,
+        ).make(structures=do_data_sampling.output, config_type=config_type)
+        do_data_collection = collect_dft_data(
+            vasp_ref_file=vasp_ref_file,
+            rss_group=rss_group,
+            vasp_dirs=do_dft_static.output,
         )
-        job7 = Data_preprocessing(
+        do_data_preprocessing = preprocess_data(
             test_ratio=test_ratio,
             regularization=regularization,
+            scheme=scheme,
             distillation=distillation,
-            f_max=f_max,
-            vasp_ref_dir=job6.output["vasp_ref_dir"],
+            force_max=force_max,
+            force_label=force_label,
+            vasp_ref_dir=do_data_collection.output["vasp_ref_dir"],
             pre_database_dir=input["pre_database_dir"],
+            isolated_atom_energies=input["isol_es"],
         )
-        job8 = MLIPFitMaker(
+        do_mlip_fit = MLIPFitMaker(
             mlip_type=mlip_type,
-            mlip_hyper=mlip_hyper,
             ref_energy_name=ref_energy_name,
             ref_force_name=ref_force_name,
             ref_virial_name=ref_virial_name,
         ).make(
-            database_dir=job7.output,
+            database_dir=do_data_preprocessing.output,
             isol_es=input["isol_es"],
             num_processes_fit=num_processes_fit,
-            preprocessing_data=False,
+            apply_data_preprocessing=False,
+            auto_delta=auto_delta,
+            glue_xml=False,
             **fit_kwargs,
         )
 
-        job9 = do_RSS_iterations(
+        kt = input["kt"] - 0.1 if (input["kt"] - 0.1) > 0.1 else 0.1
+        current_iter += 1
+        if isolated_atom:
+            isolated_atom = False
+        if dimer:
+            dimer = False
+
+        do_iteration = do_rss_iterations(
             input={
-                "test_error": job8.output["test_error"],
-                "pre_database_dir": job7.output,
-                "mlip_path": job8.output["mlip_path"],
+                "test_error": do_mlip_fit.output["test_error"],
+                "pre_database_dir": do_data_preprocessing.output,
+                "mlip_path": do_mlip_fit.output["mlip_path"],
                 "isol_es": input["isol_es"],
                 "current_iter": current_iter,
                 "kt": kt,
             },
+            generated_struct_numbers=generated_struct_numbers,
+            selected_struct_numbers=selected_struct_numbers,
+            tag=tag,
+            buildcell_options=buildcell_options,
+            num_processes_buildcell=num_processes_buildcell,
+            cur_selection=cur_selection,
+            selection_method=selection_method,
+            num_of_selection=num_of_selection,
+            bcur_params=bcur_params,
+            random_seed=random_seed,
+            e0_spin=e0_spin,
+            isolatedatom_box=isolatedatom_box,
+            isolated_atom=isolated_atom,
+            dimer=dimer,
+            dimer_box=dimer_box,
+            dimer_range=dimer_range,
+            dimer_num=dimer_num,
+            custom_incar=custom_incar,
+            custom_potcar=custom_potcar,
+            config_types=config_types,
+            vasp_ref_file=vasp_ref_file,
+            rss_group=rss_group,
+            test_ratio=test_ratio,
+            regularization=regularization,
+            scheme=scheme,
+            distillation=distillation,
+            force_max=force_max,
+            force_label=force_label,
+            mlip_type=mlip_type,
+            ref_energy_name=ref_energy_name,
+            ref_force_name=ref_force_name,
+            ref_virial_name=ref_virial_name,
+            auto_delta=auto_delta,
+            num_processes_fit=num_processes_fit,
+            scalar_pressure_method=scalar_pressure_method,
+            scalar_exp_pressure=scalar_exp_pressure,
+            scalar_pressure_exponential_width=scalar_pressure_exponential_width,
+            scalar_pressure_low=scalar_pressure_low,
+            scalar_pressure_high=scalar_pressure_high,
+            max_steps=max_steps,
+            force_tol=force_tol,
+            stress_tol=stress_tol,
+            hookean_repul=hookean_repul,
+            hookean_paras=hookean_paras,
+            keep_symmetry=keep_symmetry,
+            write_traj=write_traj,
+            num_processes_rss=num_processes_rss,
+            device=device,
+            stop_criterion=stop_criterion,
+            max_iteration_number=max_iteration_number,
+            num_groups=num_groups,
+            initial_kt=initial_kt,
+            current_iter_index=current_iter_index,
+            **fit_kwargs,
         )
 
-        job_list = [job1, job2, job3, job4, job5, job6, job7, job8, job9]
+        job_list = [
+            do_randomized_structure_generation,
+            do_rss,
+            do_data_sampling,
+            do_dft_static,
+            do_data_collection,
+            do_data_preprocessing,
+            do_mlip_fit,
+            do_iteration,
+        ]
 
-        return Response(detour=job_list, output=job9.output)
+        return Response(detour=job_list, output=do_iteration.output)
 
-    return Response(output=input)
+    return input

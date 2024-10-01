@@ -128,7 +128,7 @@ def test_mlip_fit_maker_with_kwargs(
         split_ratio=0.4,
         regularization=False,
         distillation=True,
-        f_max=40,
+        force_max=40,
     )
 
     responses = run_locally(
@@ -201,11 +201,11 @@ def test_mlip_fit_maker_jace(
     jacefit = MLIPFitMaker(
         mlip_type="J-ACE",
     ).make(
-        isolated_atoms_energies={3: -0.28649227, 17: -0.25638457},
+        isolated_atom_energies={3: -0.28649227, 17: -0.25638457},
         fit_input=fit_input_dict,
         pre_database_dir=str(test_files_dir),
         pre_xyz_files=["pre_xyz_train.extxyz", "pre_xyz_test.extxyz"],
-        preprocessing_data=True,
+        apply_data_preprocessing=True,
         num_processes_fit=4,
         order=3,
         totaldegree=6,
@@ -247,11 +247,11 @@ def test_mlip_fit_maker_nequip(
         mlip_type="NEQUIP",
     ).make(
         fit_input=fit_input_dict,
-        isolated_atoms_energies={3: -0.28649227, 17: -0.25638457},
+        isolated_atom_energies={3: -0.28649227, 17: -0.25638457},
         pre_database_dir=str(test_files_dir),
         pre_xyz_files=["pre_xyz_train.extxyz", "pre_xyz_test.extxyz"],
         num_processes_fit=1,
-        preprocessing_data=True,
+        apply_data_preprocessing=True,
         r_max=3.14,
         max_epochs=10,
         device="cpu",
@@ -291,11 +291,11 @@ def test_mlip_fit_maker_m3gnet(
         mlip_type="M3GNET",
     ).make(
         fit_input=fit_input_dict,
-        isolated_atoms_energies={3: -0.28649227, 17: -0.25638457},
+        isolated_atom_energies={3: -0.28649227, 17: -0.25638457},
         pre_database_dir=str(test_files_dir),
         pre_xyz_files=["pre_xyz_train.extxyz", "pre_xyz_test.extxyz"],
         num_processes_fit=1,
-        preprocessing_data=True,
+        apply_data_preprocessing=True,
         cutoff=3.0,
         threebody_cutoff=2.0,
         batch_size=1,
@@ -346,7 +346,7 @@ def test_mlip_fit_maker_mace(
         pre_database_dir=str(test_files_dir),
         pre_xyz_files=["pre_xyz_train.extxyz", "pre_xyz_test.extxyz"],
         num_processes_fit=1,
-        preprocessing_data=True,
+        apply_data_preprocessing=True,
         model="MACE",
         config_type_weights='{"Default":1.0}',
         hidden_irreps="32x0e + 32x1o",
@@ -451,7 +451,7 @@ def test_mlip_fit_maker_glue_xml(
         auto_delta=False,
         glue_xml=True,
         general={"core_param_file": "glue.xml", "core_ip_args": "{IP Glue}"},
-        preprocessing_data=True,
+        apply_data_preprocessing=True,
     )
 
     responses = run_locally(
@@ -491,7 +491,7 @@ def test_mlip_fit_maker_with_automated_separated_dataset(
         fit_input=fit_input_dict,
         pre_database_dir=str(test_files_dir),
         pre_xyz_files=["pre_xyz_train_more_data.extxyz", "pre_xyz_test_more_data.extxyz"],
-        preprocessing_data=True,
+        apply_data_preprocessing=True,
         **{"separated": True}
     )
 

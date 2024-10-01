@@ -1,6 +1,7 @@
-from __future__ import annotations
+import os 
+os.environ["OMP_NUM_THREADS"] = "1"
+
 from autoplex.data.rss.jobs import RandomizedStructure
-import os
 
 
 def test_extract_elements():
@@ -36,9 +37,9 @@ def test_make_minsep():
     rs = RandomizedStructure()
     radii = {"Si": 1.1, "O": 0.66}
     minsep = rs._make_minsep(radii)
-    assert "Si-Si=2.2" in minsep  # r1 * 2.0
-    assert "Si-O=1.32" in minsep  # (r1 + r2) / 2 * 1.5
-    assert "O-O=1.32" in minsep   # r1 * 2.0
+    assert "Si-Si=1.7600000000000002" in minsep  # r1 * 1.8
+    assert "Si-O=1.4080000000000004" in minsep  # (r1 + r2) / 2 * 1.5
+    assert "O-O=1.056" in minsep   # r1 * 1.8
 
 
 def test_update_buildcell_options():
@@ -47,7 +48,7 @@ def test_update_buildcell_options():
     buildcell_parameters = ['VARVOL=15',
                             'NFORM=1-7',
                             ]
-    buildcell_update = rs._update_buildcell_options(options, buildcell_parameters)
+    buildcell_update = rs._update_buildcell_option(options, buildcell_parameters)
     print("Updated buildcell parameters:", buildcell_update)
     assert 'VARVOL=20' in buildcell_update
     assert 'SPECIES=Si%NUM=1,O%NUM=2' in buildcell_update
@@ -61,14 +62,12 @@ def test_output_from_scratch(memory_jobstore):
     job = RandomizedStructure(struct_number=3,
                               tag='SiO2',
                               output_file_name='random_structs.extxyz',
-                              buildcell_options={'VARVOL': 20,
-                                                 'SYMMOPS':'1-2'},
+                              buildcell_option={'VARVOL': 20,
+                                                'SYMMOPS':'1-2'},
                               num_processes=4).make()
     
     responses = run_locally(job, ensure_success=True, create_folders=True, store=memory_jobstore)
-    assert Path(job.output.resolve(memory_jobstore)).exists()
-    atoms = read(Path(job.output.resolve(memory_jobstore)), index=":")
-    assert len(atoms) == 3
+    assert len(read(job.output.resolve(memory_jobstore), index=":")) == 3
 
     dir = Path('.')
     path_to_job_files = list(dir.glob("job*"))
@@ -86,9 +85,7 @@ def test_output_from_cell_seed(test_dir, memory_jobstore):
                               num_processes=3).make()
     
     responses = run_locally(job, ensure_success=True, create_folders=True, store=memory_jobstore)
-    assert Path(job.output.resolve(memory_jobstore)).exists()
-    atoms = read(Path(job.output.resolve(memory_jobstore)), index=":")
-    assert len(atoms) == 3
+    assert len(read(job.output.resolve(memory_jobstore),index=":")) == 3
     
     dir = Path('.')
     path_to_job_files = list(dir.glob("job*"))
@@ -96,5 +93,56 @@ def test_output_from_cell_seed(test_dir, memory_jobstore):
         shutil.rmtree(path)
 
 
+def test_build_multi_randomized_structure(memory_jobstore):
+    from autoplex.data.rss.flows import BuildMultiRandomizedStructure
+    from jobflow import run_locally, Flow
+    from autoplex.data.common.utils import flatten
+    from pathlib import Path
+    import shutil
+    bcur_params={'soap_paras': {'l_max': 3,
+                                'n_max': 3,
+                                'atom_sigma': 0.5,
+                                'cutoff': 4.0,
+                                'cutoff_transition_width': 1.0,
+                                'zeta': 4.0,
+                                'average': True,
+                                'species': True,
+                                },
+                }
+    generate_structure = BuildMultiRandomizedStructure(tag="Si",
+        generated_struct_numbers=[50,50],
+        buildcell_options=[{'VARVOL': 20, 
+                            'VARVOL_RANGE': '0.75 1.25',
+                            'NATOM': '{6,8,10,12,14,16,18,20,22,24}',
+                            'NFORM': '1'}, 
+                           {'SYMMOPS':'1-2',
+                            'NATOM': '{7,9,11,13,15,17,19,21,23}',
+                            'NFORM': '1'}],
+        num_processes=8,
+        cur_selection=True,
+        selected_struct_numbers=[8,2],
+        bcur_params=bcur_params,
+        random_seed=None).make()
 
-    
+    job = Flow(generate_structure, output=generate_structure.output) 
+    responses = run_locally(job, 
+                            ensure_success=True, 
+                            create_folders=True, 
+                            store=memory_jobstore)
+
+    structures = job.output.resolve(memory_jobstore)
+
+    n_atoms = [struct.num_sites for struct in flatten(structures, recursive=False)]
+
+    assert max(n_atoms) < 25
+
+    even_count = sum(1 for n in n_atoms if n % 2 == 0)
+    odd_count = sum(1 for n in n_atoms if n % 2 != 0)
+
+    assert even_count == 8
+    assert odd_count == 2
+
+    dir = Path('.')
+    path_to_job_files = list(dir.glob("job*"))
+    for path in path_to_job_files:
+        shutil.rmtree(path)

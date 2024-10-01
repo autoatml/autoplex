@@ -2,7 +2,7 @@ import os
 os.environ["OMP_NUM_THREADS"] = "1"
 
 from pymatgen.io.ase import AseAtomsAdaptor
-from autoplex.data.common.jobs import Sampling
+from autoplex.data.common.jobs import sample_data
 from jobflow import run_locally
 from pathlib import Path
 from ase.io import read
@@ -60,7 +60,7 @@ def test_sampling_cur_job(test_dir, memory_jobstore):
     atoms = read(test_files_dir, index=':')
     structures = [AseAtomsAdaptor.get_structure(atom) for atom in atoms]
 
-    job = Sampling(
+    job = sample_data(
         selection_method='cur',
         num_of_selection=5,
         bcur_params={'soap_paras': {'l_max': 3,
@@ -121,14 +121,14 @@ def test_sampling_bcur1s(test_dir):
                 ' average=' + str(soap_paras['average'])
 
     selected_atoms = boltzhist_cur_oneShot(atoms=atoms,
-                                   isol_es={14: -0.81},
+                                   isolated_atom_energies={14: -0.81},
                                    bolt_frac=0.3, 
                                    bolt_max_num=3000,
                                    cur_num=num_of_selection, 
                                    kernel_exp=4, 
-                                   kT=0.1, 
+                                   kt=0.1, 
                                    energy_label='energy',
-                                   P=None,  
+                                   pressures=None,  
                                    descriptor=descriptor,
                                    random_seed=42,                          
                                    )
@@ -204,14 +204,14 @@ def test_sampling_bcur2i():
 
     selected_atoms = boltzhist_cur_dualIter(
                     atoms=atoms,
-                    isol_es={13: 0.2},
+                    isolated_atom_energies={13: 0.2},
                     bolt_frac=0.8, 
                     bolt_max_num=5,
                     cur_num=3, 
                     kernel_exp=4, 
-                    kT=0.3, 
+                    kt=0.3, 
                     energy_label='energy',
-                    P=pressures,  
+                    pressures=pressures,  
                     descriptor=descriptor,
                     random_seed=42,                          
                 )
@@ -235,7 +235,7 @@ def test_sampling_bcur1s_job(test_dir, memory_jobstore):
     atoms = read(test_files_dir, index=':')
     structures = [AseAtomsAdaptor.get_structure(atom) for atom in atoms]
     
-    job = Sampling(selection_method='bcur1s',
+    job = sample_data(selection_method='bcur1s',
                    num_of_selection=5,
                    bcur_params={'soap_paras': {'l_max': 3,
                                 'n_max': 3,
@@ -250,7 +250,7 @@ def test_sampling_bcur1s_job(test_dir, memory_jobstore):
                                 'energy_label': 'REF_energy'
                     },
                     structure=structures, 
-                    isol_es={14: -0.84696938},
+                    isolated_atom_energies={14: -0.84696938},
                     random_seed=42)
 
     response = run_locally(
@@ -278,7 +278,7 @@ def test_sampling_random_job(test_dir, memory_jobstore):
     atoms = read(test_files_dir, index=':')
     structures = [AseAtomsAdaptor.get_structure(atom) for atom in atoms]
     
-    job = Sampling(selection_method='random',
+    job = sample_data(selection_method='random',
                    num_of_selection=5,
                    structure=structures,
                    random_seed=42)
@@ -308,7 +308,7 @@ def test_sampling_uniform_job(test_dir, memory_jobstore):
     atoms = read(test_files_dir, index=':')
     structures = [AseAtomsAdaptor.get_structure(atom) for atom in atoms]
     
-    job = Sampling(selection_method='uniform',
+    job = sample_data(selection_method='uniform',
                    num_of_selection=5,
                    structure=structures,
                    random_seed=42)

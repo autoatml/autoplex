@@ -20,7 +20,7 @@ def test_gap_rss(test_dir, memory_jobstore):
     job = do_rss_single_node(mlip_type='GAP',
                 iteration_index='0',
                 mlip_path=mlip_path,
-                structure=structures,
+                structures=structures,
                 scalar_pressure_method='exp',
                 scalar_exp_pressure=100,
                 scalar_pressure_exponential_width=0.2,
@@ -29,11 +29,11 @@ def test_gap_rss(test_dir, memory_jobstore):
                 max_steps=10,
                 force_tol=0.1,
                 stress_tol=0.1,
-                Hookean_repul=False,
+                hookean_repul=False,
                 write_traj=True,
                 num_processes_rss=4,
                 device="cpu",
-                isol_es={14: -0.84696938})
+                isolated_atom_energies={14: -0.84696938})
     
     response = run_locally(
         job,
@@ -76,11 +76,11 @@ def test_gap_rss_multi_jobs(test_dir, memory_jobstore):
                 max_steps=1000,
                 force_tol=0.01,
                 stress_tol=0.0001,
-                Hookean_repul=False,
+                hookean_repul=False,
                 write_traj=True,
                 num_processes_rss=4,
                 device="cpu",
-                isol_es={14: -0.84696938},
+                isolated_atom_energies={14: -0.84696938},
                 num_groups=2,)
     
     response = run_locally(
@@ -167,7 +167,7 @@ def test_nequip_rss(test_dir, memory_jobstore):
     job = do_rss_single_node(mlip_type='NEQUIP',
                 iteration_index='0',
                 mlip_path=mlip_path,
-                structure=structures,
+                structures=structures,
                 scalar_pressure_method='exp',
                 scalar_exp_pressure=100,
                 scalar_pressure_exponential_width=0.2,
@@ -176,11 +176,11 @@ def test_nequip_rss(test_dir, memory_jobstore):
                 max_steps=10,
                 force_tol=0.1,
                 stress_tol=0.1,
-                Hookean_repul=False,
+                hookean_repul=False,
                 write_traj=True,
                 num_processes_rss=4,
                 device="cpu",
-                isol_es={14: -0.84696938})
+                isolated_atom_energies={14: -0.84696938})
     
     response = run_locally(
         job,
@@ -213,7 +213,7 @@ def test_m3gnet_rss(test_dir, memory_jobstore):
     job = do_rss_single_node(mlip_type='M3GNET',
                 iteration_index='0',
                 mlip_path=mlip_path,
-                structure=structures,
+                structures=structures,
                 scalar_pressure_method='exp',
                 scalar_exp_pressure=100,
                 scalar_pressure_exponential_width=0.2,
@@ -222,11 +222,11 @@ def test_m3gnet_rss(test_dir, memory_jobstore):
                 max_steps=10,
                 force_tol=0.1,
                 stress_tol=0.1,
-                Hookean_repul=False,
+                hookean_repul=False,
                 write_traj=True,
                 num_processes_rss=4,
                 device="cpu",
-                isol_es={14: -0.84696938})
+                isolated_atom_energies={14: -0.84696938})
     
     response = run_locally(
         job,
@@ -259,7 +259,7 @@ def test_mace_rss(test_dir, memory_jobstore):
     job = do_rss_single_node(mlip_type='MACE',
                 iteration_index='0',
                 mlip_path=mlip_path,
-                structure=structures,
+                structures=structures,
                 scalar_pressure_method='exp',
                 scalar_exp_pressure=100,
                 scalar_pressure_exponential_width=0.2,
@@ -268,11 +268,11 @@ def test_mace_rss(test_dir, memory_jobstore):
                 max_steps=10,
                 force_tol=0.1,
                 stress_tol=0.1,
-                Hookean_repul=False,
+                hookean_repul=False,
                 write_traj=True,
                 num_processes_rss=4,
                 device="cpu",
-                isol_es={14: -0.84696938})
+                isolated_atom_energies={14: -0.84696938})
     
     response = run_locally(
         job,

@@ -10,11 +10,18 @@ def test_gap_fit_maker(test_dir, memory_jobstore):
     database_dir = test_dir / "fitting/rss_training_dataset/"
 
     gapfit = MLIPFitMaker().make(
-        auto_delta=False,
+        auto_delta=True,
         glue_xml=False,
-        twob={"delta": 2.0, "cutoff": 4},
-        threeb={"n_sparse": 10},
-        preprocessing_data=False,
+        twob={"cutoff": 6.84,
+              "n_sparse": 30,},
+        threeb={"cutoff": 2.223},
+        soap={"l_max": 8,
+              "n_max": 8,
+              "atom_sigma": 0.75,
+              "n_sparse": 2000,
+              "cutoff": 3.42},
+        general={"three_body": True},
+        apply_data_preprocessing=False,
         database_dir=database_dir    
         )
 
@@ -37,9 +44,9 @@ def test_jace_fit_maker(test_dir, memory_jobstore):
     jacefit = MLIPFitMaker(
         mlip_type="J-ACE",
     ).make(
-        isolated_atoms_energies={14: -0.84696938},
+        isolated_atom_energies={14: -0.84696938},
         num_processes_fit=4,
-        preprocessing_data=False,
+        apply_data_preprocessing=False,
         database_dir=database_dir,
         order=2,
         totaldegree=4,
@@ -63,9 +70,9 @@ def test_nqeuip_fit_maker(test_dir, memory_jobstore):
     nequipfit = MLIPFitMaker(
        mlip_type="NEQUIP",
     ).make(
-        isolated_atoms_energies={14: -0.84696938},
+        isolated_atom_energies={14: -0.84696938},
         num_processes_fit=1,
-        preprocessing_data=False,
+        apply_data_preprocessing=False,
         database_dir=database_dir,
         r_max=3.14,
         max_epochs=10,
@@ -90,9 +97,9 @@ def test_m3gnet_fit_maker(test_dir, memory_jobstore):
     nequipfit = MLIPFitMaker(
             mlip_type="M3GNET",
     ).make(
-        isolated_atoms_energies={14: -0.84696938},
+        isolated_atom_energies={14: -0.84696938},
         num_processes_fit=1,
-        preprocessing_data=False,
+        apply_data_preprocessing=False,
         database_dir=database_dir,
         cutoff=3.0,
         threebody_cutoff=2.0,
@@ -125,9 +132,9 @@ def test_mace_fit_maker(test_dir, memory_jobstore):
     nequipfit = MLIPFitMaker(
                 mlip_type="MACE",
     ).make(
-        isolated_atoms_energies={14: -0.84696938},
+        isolated_atom_energies={14: -0.84696938},
         num_processes_fit=1,
-        preprocessing_data=False,
+        apply_data_preprocessing=False,
         database_dir=database_dir,
         model="MACE",
         config_type_weights='{"Default":1.0}',
