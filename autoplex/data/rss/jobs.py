@@ -49,6 +49,12 @@ class RandomizedStructure(Maker):
         the buildcell_option argument will no longer take effect.
     num_processes: int
         Number of processes to use for parallel computation.
+    fragment: Atoms | list[Atoms] (optional)
+        Fragment(s) for random structures, e.g. molecules, to be placed indivudally intact.
+        atoms.arrays should have a 'fragment_id' key with unique identifiers for each fragment if in same Atoms.
+        atoms.cell must be defined (e.g. Atoms.cell = np.eye(3)*20).
+    fragment_ratios: list[int] (optional)
+        Ratios of each fragment to be included in the random structures. Defaults to 1:1 for all specified.
     """
 
     name: str = "build_random_cells"
@@ -59,6 +65,8 @@ class RandomizedStructure(Maker):
     buildcell_option: dict | None = None
     cell_seed_path: str | None = None
     num_processes: int = 32
+    fragment_file: str | None = None
+    fragment_ratios: list[int] | None = None
 
     @job
     def make(self):
@@ -72,7 +80,7 @@ class RandomizedStructure(Maker):
 
         else:
             buildcell_parameters = [
-                "SPECIES=Si%NUM=1",
+                # "SPECIES=Si%NUM=1", # no need for this default if you don't specify species?
                 "SLACK=0.25",
                 "OVERLAP=0.1",
                 "COMPACT",
@@ -85,8 +93,13 @@ class RandomizedStructure(Maker):
                 )
 
             elements = self._extract_elements(self.tag)  # {"Si":1, "O":2}
+            
+            if "SPECIES" in self.buildcell_option and self.fragment_file is not None:
+                raise ValueError("Cannot use 'SPECIES' and 'fragment' together in buildcell options.\n"
+                                 "Specify your fragment only and use NFORM to control their number.")
 
-            if self.buildcell_option is None or "SPECIES" not in self.buildcell_option:
+            if self.buildcell_option is None or \
+                ("SPECIES" not in self.buildcell_option and self.fragment_file is None):
                 make_species = self._make_species(elements)  # Si%NUM=1,O%NUM=2
                 buildcell_parameters = self._update_buildcell_option(
                     {"SPECIES": make_species}, buildcell_parameters
@@ -138,9 +151,39 @@ class RandomizedStructure(Maker):
                         },
                         buildcell_parameters,
                     )
+                    
+            if self.fragment_file is not None:
+                
+                self.fragment = ase.io.read(self.fragment_file, index=":")
+                
+                if len(self.fragment) == 1:
+                    self.fragment = self.fragment[0]
+                    
+                if isinstance(self.fragment, Atoms):
+                    fragment_ratios = [1 for _ in self.fragment]
+                    if 'fragment_id' not in self.fragment.arrays.keys():
+                        self.fragment.arrays['fragment_id'] = [f'{1}-f' for i in self.fragment]
+                        
+                elif isinstance(self.fragment, list) and self.fragment_ratios is None:
+                    fragment_ratios = [1 for _ in range(sum([len(i) for i in self.fragment]))]
+                    write_fragment = self.fragment[0]
+                    for frag in self.fragment[1:]: # merge all separate fragments into one Atoms object
+                        write_fragment += frag
+                    
+                fragment_parameters = ['%BLOCK POSITIONS_FRAC',]
+                symbols = self.fragment.get_chemical_symbols()
+                for i, val in enumerate(self.fragment.arrays['positions']):
+                    newline = (f"{symbols[i]} {val[0]:.8f} {val[1]:.8f} {val[2]:.8f}"
+                                            f" # {self.fragment.arrays['fragment_id'][i]}"
+                                            f" % NUM={fragment_ratios[i]}")
+                    fragment_parameters.append(newline)
+                fragment_parameters.append('%ENDBLOCK POSITIONS_FRAC')
+                
+                buildcell_parameters = fragment_parameters + buildcell_parameters # prepend with structural info
 
             self._cell_seed(buildcell_parameters, self.tag)
             bc_file = f"{self.tag}.cell"
+            
 
         with Pool(processes=self.num_processes) as pool:
             args = [
@@ -193,13 +236,22 @@ class RandomizedStructure(Maker):
         Parameters
         ----------
         buildcell_parameters: (list of str) e.g. ['VARVOL=20']
-            List of paramerers for creating the seed file for buildcell.
+            List of parameters for creating the seed file for buildcell.
         tag: str
             Tag of systems.
         """
         bc_file = f"{tag}.cell"
         contents = []
-        contents.extend(["#" + i + "\n" for i in buildcell_parameters])
+        flag = False # for printing blocks correctly with '#'
+        for i in buildcell_parameters:
+            if i.startswith("%") or flag:
+                if flag and i.startswith("%"):
+                    flag=False
+                else:
+                    flag=True
+                contents.append(i + "\n")
+            else:
+                contents.append("#" + i + "\n")
 
         with open(bc_file, "w") as f:
             f.writelines(contents)

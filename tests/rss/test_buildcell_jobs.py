@@ -73,6 +73,44 @@ def test_output_from_scratch(memory_jobstore):
     path_to_job_files = list(dir.glob("job*"))
     for path in path_to_job_files:
         shutil.rmtree(path)
+        
+def test_fragment_buildcell(memory_jobstore):
+    from jobflow import run_locally
+    from ase.io import read
+    from pathlib import Path
+    import shutil
+    import numpy as np
+    from ase.build import molecule
+    from ase.io import write
+    
+    ice_density = 0.0307 # molecules/A^3
+    
+    h2o = molecule('H2O')
+    h2o.arrays['fragment_id'] = np.array([0,0,0])
+    h2o.cell = np.ones(3)*10
+    h2o.wrap()
+    write('h2o.xyz', h2o)
+    
+    job = RandomizedStructure(struct_number=4,
+                              tag='water',
+                              output_file_name='random_h20_structs.extxyz',
+                              buildcell_option={'VARVOL': 1/ice_density,
+                                                'SYMMOPS':'1-2',
+                                                'NFORM': '2-5',
+                                                'MINSEP': 2.0,
+                                                'SLACK': 0.1,
+                                                'SYSTEM': 'Orth'},
+                              fragment_file=os.path.join(os.getcwd(), 'h2o.xyz'),
+                              fragment_ratios=None,
+                              num_processes=4).make()
+    
+    responses = run_locally(job, ensure_success=True, create_folders=True, store=memory_jobstore)
+    assert len(read(job.output.resolve(memory_jobstore), index=":")) == 4
+
+    dir = Path('.')
+    path_to_job_files = list(dir.glob("job*"))
+    for path in path_to_job_files:
+        shutil.rmtree(path)
 
 def test_output_from_cell_seed(test_dir, memory_jobstore):
     from jobflow import run_locally
