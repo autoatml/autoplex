@@ -34,7 +34,7 @@ dependencies = [
      "typing",
      "nequip",
      "hiphive",
-     "dgl==2.1.0",
+     "dgl==2.2.1",
      "torchdata==0.7.1",
      # quippy-ase support for py3.12 tracked in https://github.com/libAtoms/QUIP/issues/645
      "quippy-ase==0.9.14; python_version < '3.12'",
@@ -73,7 +73,7 @@ strict = [
      "lightning-utilities==0.11.2",
      "numpy==1.26.4",
      "typing",
-     "dgl==2.1.0",
+     "dgl==2.2.1",
      "torchdata==0.7.1",
 ]
 dev = ["pre-commit>=2.12.1"]
