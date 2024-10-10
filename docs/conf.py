@@ -162,8 +162,6 @@ html_theme_options = {
 
 # html_static_path = ["_static"]
 
-html_css_files = ['custom.css']
-
 # hide sphinx footer
 html_show_sphinx = False
 html_show_sourcelink = False
