@@ -21,7 +21,7 @@
     "n_sparse": 15,
     "covariance_type": "ard_se",
     "delta": 2.00 ,
-    "theta_uniform": 0.5 ,
+    "theta_uniform": 1.0 ,
     "sparse_method": "uniform",
     "compact_clusters": "T"
   },
@@ -47,7 +47,7 @@
     "cutoff_transition_width": 0.5,
     "central_weight": 1.0,
     "n_sparse": 6000,
-    "delta": 0.50,
+    "delta": 0.5,
     "f0": 0.0,
     "covariance_type": "dot_product",
     "sparse_method": "cur_points"

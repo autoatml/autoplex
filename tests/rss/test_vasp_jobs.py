@@ -8,8 +8,12 @@ import shutil
 from pathlib import Path
 
 def test_vasp_static(test_dir, mock_vasp, memory_jobstore):
-    from autoplex.data.common.jobs import VASP_collect_data
-    from autoplex.data.common.flows import DFTStaticMaker
+    from autoplex.data.common.jobs import collect_dft_data
+    from autoplex.data.common.flows import DFTStaticLabelling
+
+    from atomate2.settings import Atomate2Settings
+    settings = Atomate2Settings()
+    print('!!!!!:', settings.VASP_VDW_KERNEL_DIR)  # 检查设置是否已正确加载
     
     poscar_paths = {
         f"static_bulk_{i}": test_dir / f"vasp/rss/Si_bulk_{i+1}/inputs/POSCAR"
@@ -38,12 +42,14 @@ def test_vasp_static(test_dir, mock_vasp, memory_jobstore):
 
     mock_vasp(ref_paths, fake_run_vasp_kwargs)
 
-    job1 = DFTStaticMaker(isolated_atom=True, 
+    job1 = DFTStaticLabelling(isolated_atom=True, 
                           e0_spin=True, 
+                          isolatedatom_box=[20.0, 20.5, 21.0],
                           dimer=True, 
+                          dimer_box=[15.0, 15.5, 16.0],
                           dimer_range=[1.5, 2.0],
                           dimer_num=3,
-                          custom_set={
+                          custom_incar={
                             "ADDGRID": None, 
                             "ENCUT": 200,
                             "EDIFF": 1E-04,
@@ -71,7 +77,7 @@ def test_vasp_static(test_dir, mock_vasp, memory_jobstore):
                     },
                     ).make(structures=test_structures)
     
-    job2 = VASP_collect_data(vasp_dirs=job1.output)
+    job2 = collect_dft_data(vasp_dirs=job1.output)
     
     response = run_locally(
         Flow([job1,job2]),

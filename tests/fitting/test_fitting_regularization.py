@@ -2,6 +2,7 @@ from __future__ import annotations
 import pytest
 from ase.io import read
 from ase.atoms import Atom
+import copy
 from autoplex.fitting.common.regularization import (
     set_sigma,
     get_convex_hull,
@@ -21,6 +22,7 @@ from autoplex.fitting.common.regularization import (
 def test_set_sigma(test_dir):
     # data setup
     test_atoms = read(test_dir / 'fitting/pre_xyz_train_more_data.extxyz', ':')
+    test_atoms_copy = copy.deepcopy(test_atoms)
     isol_es = {3: -0.28649227, 17: -0.28649227}
     reg_minmax = [(0.1, 1), (0.001, 0.1),
                   (0.0316, 0.316),
@@ -36,7 +38,7 @@ def test_set_sigma(test_dir):
     atoms_modi = set_sigma(test_atoms,
                            reg_minmax,
                            scheme='linear-hull',
-                           config_type_override={'test': [1e-4, 1e-4, 1e-4]}
+                           config_type_override={'test': (1e-4, 1e-4, 1e-4)}
                            )
     assert atoms_modi[2].info['energy_sigma'] == 1e-4
 
@@ -49,7 +51,7 @@ def test_set_sigma(test_dir):
                            reg_minmax,
                            scheme='linear-hull',
                            max_energy=0.05,
-                           isolated_atoms_energies=isol_es,
+                           isolated_atom_energies=isol_es,
                            element_order=[3, 17],
                            )
     assert len(atoms_modi) < len(test_atoms)
@@ -58,7 +60,7 @@ def test_set_sigma(test_dir):
     atoms_modi = set_sigma(test_atoms,
                            reg_minmax,
                            scheme='volume-stoichiometry',
-                           isolated_atoms_energies=isol_es,
+                           isolated_atom_energies=isol_es,
                            element_order=[3, 17],
                            )
     assert True  # TODO: modify this to test actual condition
