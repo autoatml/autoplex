@@ -84,28 +84,29 @@ def test_fragment_buildcell(memory_jobstore):
     from ase.io import write
     
     ice_density = 0.0307 # molecules/A^3
-    
     h2o = molecule('H2O')
     h2o.arrays['fragment_id'] = np.array([0,0,0])
     h2o.cell = np.ones(3)*10
-    h2o.wrap()
     write('h2o.xyz', h2o)
     
     job = RandomizedStructure(struct_number=4,
                               tag='water',
                               output_file_name='random_h20_structs.extxyz',
                               buildcell_option={'VARVOL': 1/ice_density,
-                                                'SYMMOPS':'1-2',
-                                                'NFORM': '2-5',
+                                                'VARVOL_RANGE=0.8 1.2'
+                                                'SYMMOPS':'1-8',
+                                                'NFORM': '{2-5}',
                                                 'MINSEP': 2.0,
                                                 'SLACK': 0.1,
                                                 'SYSTEM': 'Orth'},
                               fragment_file=os.path.join(os.getcwd(), 'h2o.xyz'),
                               fragment_ratios=None,
+                              remove_tmp_files=True,
                               num_processes=4).make()
     
-    responses = run_locally(job, ensure_success=True, create_folders=True, store=memory_jobstore)
-    assert len(read(job.output.resolve(memory_jobstore), index=":")) == 4
+    _ = run_locally(job, ensure_success=True, create_folders=True, store=memory_jobstore)
+    ats = read(job.output.resolve(memory_jobstore), index=":")
+    assert len(ats) == 4 and np.all(ats[0].positions[0] != ats[0].positions[1])
 
     dir = Path('.')
     path_to_job_files = list(dir.glob("job*"))

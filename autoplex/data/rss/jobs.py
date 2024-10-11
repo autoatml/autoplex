@@ -178,11 +178,17 @@ class RandomizedStructure(Maker):
                     ]:  # merge all separate fragments into one Atoms object
                         write_fragment += frag
 
+                fc = self.fragment.cell
                 fragment_parameters = [
+                    "%BLOCK LATTICE_CART",
+                    f"{fc[0,0]:10.5f} {fc[0,1]:10.5f} {fc[0,2]:10.5f}",
+                    f"{fc[1,0]:10.5f} {fc[1,1]:10.5f} {fc[1,2]:10.5f}",
+                    f"{fc[2,0]:10.5f} {fc[2,1]:10.5f} {fc[2,2]:10.5f}",
+                    "%ENDBLOCK LATTICE_CART",
                     "%BLOCK POSITIONS_FRAC",
                 ]
                 symbols = self.fragment.get_chemical_symbols()
-                for i, val in enumerate(self.fragment.arrays["positions"]):
+                for i, val in enumerate(self.fragment.get_scaled_positions()):
                     newline = (
                         f"{symbols[i]} {val[0]:.8f} {val[1]:.8f} {val[2]:.8f}"
                         f" # {self.fragment.arrays['fragment_id'][i]}"
