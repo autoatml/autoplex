@@ -52,7 +52,7 @@ docs = [
     "autodoc_pydantic==2.0.1",
     "ipython",
     "jsonschema[format]",
-    "myst_parser==2.0.0",
+    "myst_parser==4.0.0",
     "numpydoc==1.6.0",
     "sphinx-copybutton==0.5.2",
     "sphinx==7.2.6",
