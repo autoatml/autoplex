@@ -13,7 +13,6 @@ def test_vasp_static(test_dir, mock_vasp, memory_jobstore):
 
     from atomate2.settings import Atomate2Settings
     settings = Atomate2Settings()
-    print('!!!!!:', settings.VASP_VDW_KERNEL_DIR)  # 检查设置是否已正确加载
     
     poscar_paths = {
         f"static_bulk_{i}": test_dir / f"vasp/rss/Si_bulk_{i+1}/inputs/POSCAR"

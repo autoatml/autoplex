@@ -86,21 +86,22 @@ def test_fragment_buildcell(memory_jobstore):
     ice_density = 0.0307 # molecules/A^3
     h2o = molecule('H2O')
     h2o.arrays['fragment_id'] = np.array([0,0,0])
-    h2o.cell = np.ones(3)*10
+    h2o.cell = np.ones(3)*20
     write('h2o.xyz', h2o)
     
     job = RandomizedStructure(struct_number=4,
                               tag='water',
                               output_file_name='random_h20_structs.extxyz',
-                              buildcell_option={'VARVOL': 1/ice_density,
-                                                'VARVOL_RANGE=0.8 1.2'
-                                                'SYMMOPS':'1-8',
-                                                'NFORM': '{2-5}',
-                                                'MINSEP': 2.0,
-                                                'SLACK': 0.1,
-                                                'SYSTEM': 'Orth'},
+                              buildcell_option={'TARGVOL': f'{1/ice_density*0.8}-{1/ice_density*1.2}',
+                                                'SYMMOPS': '1-4',
+                                                'NFORM': '500',
+                                                'MINSEP': '2.0',
+                                                'SLACK': 0.25,
+                                                'OVERLAP': 0.1,
+                                                'SYSTEM': 'Cubi'
+                                                },
                               fragment_file=os.path.join(os.getcwd(), 'h2o.xyz'),
-                              fragment_ratios=None,
+                              fragment_numbers=None,
                               remove_tmp_files=True,
                               num_processes=4).make()
     

@@ -101,7 +101,7 @@ def set_sigma(
 
     elif scheme == "volume-stoichiometry":
         print("Regularising with 3D volume-mole fraction hull")
-        if isolated_atom_energies == {}:
+        if len(isolated_atom_energies) == 0:
             raise ValueError("Need to supply dictionary of isolated energies.")
 
         isolated_atom_energies = {

@@ -29,8 +29,8 @@ from pymatgen.io.vasp.outputs import Vasprun
 
 from autoplex.data.common.utils import (
     ElementCollection,
-    boltzhist_cur_dualIter,
-    boltzhist_cur_oneShot,
+    boltzhist_cur_dual_iter,
+    boltzhist_cur_one_shot,
     create_soap_descriptor,
     cur_select,
     data_distillation,
@@ -466,7 +466,7 @@ def sample_data(
                 raise ValueError("Please provide the energy of isolated atoms!")
 
             if selection_method == "bcur1s":
-                selected_atoms = boltzhist_cur_oneShot(
+                selected_atoms = boltzhist_cur_one_shot(
                     atoms=atoms,
                     isolated_atom_energies=isolated_atom_energies,
                     bolt_frac=bcur_params["frac_of_bcur"],
@@ -480,7 +480,7 @@ def sample_data(
                     random_seed=random_seed,
                 )
             else:
-                selected_atoms = boltzhist_cur_dualIter(
+                selected_atoms = boltzhist_cur_dual_iter(
                     atoms=atoms,
                     isolated_atom_energies=isolated_atom_energies,
                     bolt_frac=bcur_params["frac_of_bcur"],

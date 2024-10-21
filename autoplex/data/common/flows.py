@@ -288,7 +288,7 @@ class DFTStaticLabelling(Maker):
         - 'config_type': List of configuration types corresponding to each directory.
     """
 
-    name: str = "do_dft_static"
+    name: str = "do_dft_labelling"
     isolated_atom: bool = False
     isolated_species: list[str] | None = None
     e0_spin: bool = False

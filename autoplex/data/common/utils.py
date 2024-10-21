@@ -5,6 +5,7 @@ import random
 import shutil
 import warnings
 from multiprocessing import Pool
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -993,6 +994,14 @@ def cur_select(
     -----
     This function calculates the descriptor vector for each atom,
     then performs CUR selection on the resulting vectors.
+
+    Adapted from:
+    *    Title: Research data supporting "De novo exploration and self-guided learning of potential-energy surfaces"
+    *    Script: select_by_descriptor.py
+    *    Author: Noam Bernstein, Gábor Csányi and Volker L. Deringer
+    *    Date 11/10/2019
+    *    Availability: https://www.repository.cam.ac.uk/items/3aff252b-a583-4e7c-afc9-9dc1540cc37e
+    *    License: Attribution 4.0 International (CC BY 4.0) license.
     """
     if random_seed is not None:
         np.random.seed(random_seed)
@@ -1054,35 +1063,10 @@ def cur_select(
     return None
 
 
-def boltz(e: float, emin: float, kt: float) -> float:
-    """
-    Calculate the Boltzmann factor for a given energy.
-
-    Parameters
-    ----------
-    e: float
-        The energy for which to calculate the Boltzmann factor.
-    emin: float
-        The minimum energy to consider in the calculation.
-    kt: float
-        The product of the Boltzmann constant and the temperature.
-
-    Returns
-    -------
-    float
-        The calculated Boltzmann factor.
-
-    Notes
-    -----
-    The Boltzmann factor is calculated as exp(-(e - emin) / kt).
-    """
-    return np.exp(-(e - emin) / (kt))
-
-
-def boltzhist_cur_oneShot(
+def boltzhist_cur_one_shot(
     atoms: list[Atoms] | list[list[Atoms]],
     descriptor: str,
-    isolated_atom_energies: dict | None = None,
+    isolated_atom_energies: dict,
     bolt_frac: float = 0.1,
     bolt_max_num: int = 3000,
     cur_num: int = 100,
@@ -1103,7 +1087,7 @@ def boltzhist_cur_oneShot(
         The quippy SOAP descriptor string for CUR.
     isolated_atom_energies: dict
         Dictionary of isolated energy values for species. Required for 'boltzhist_cur'
-        selection method. Default is None.
+        selection method.
     bolt_frac: float
         The fraction to control the flat Boltzmann selection number.
     bolt_max_num: int
@@ -1130,6 +1114,14 @@ def boltzhist_cur_oneShot(
     -----
     The algorithm uses a combination of CUR selection and Boltzmann weighting
     to select the atoms with diversity and low energy.
+
+    Adapted from:
+    *    Title: Research data supporting "De novo exploration and self-guided learning of potential-energy surfaces"
+    *    Script: select_enthalpy_flat_histogram.py
+    *    Author: Noam Bernstein, Gábor Csányi and Volker L. Deringer
+    *    Date 11/10/2019
+    *    Availability: https://www.repository.cam.ac.uk/items/3aff252b-a583-4e7c-afc9-9dc1540cc37e
+    *    License: Attribution 4.0 International (CC BY 4.0) license.
     """
     if random_seed is not None:
         np.random.seed(random_seed)
@@ -1154,9 +1146,6 @@ def boltzhist_cur_oneShot(
     enthalpies = []
 
     at_ids = [atom.get_atomic_numbers() for atom in fatoms]
-
-    if isolated_atom_energies is None:
-        raise ValueError("isolated_atom_energies cannot be None!")
 
     if energy_label == "energy":
         formation_energies = []
@@ -1206,7 +1195,7 @@ def boltzhist_cur_oneShot(
     selected_bolt_ats = []
     for _ in range(select_num):
         config_prob /= np.sum(config_prob)
-        cumul_prob = np.cumsum(config_prob)  # cumulate prob
+        cumul_prob = np.cumsum(config_prob)
         rv = np.random.uniform()
         config_i = np.searchsorted(cumul_prob, rv)
         selected_bolt_ats.append(fatoms[config_i])
@@ -1216,7 +1205,6 @@ def boltzhist_cur_oneShot(
         del fatoms[config_i]
         enthalpies = np.delete(enthalpies, config_i)
 
-    # implement CUR
     if cur_num < select_num:
         selected_atoms = cur_select(
             atoms=selected_bolt_ats,
@@ -1232,10 +1220,10 @@ def boltzhist_cur_oneShot(
     return selected_atoms
 
 
-def boltzhist_cur_dualIter(
+def boltzhist_cur_dual_iter(
     atoms: list[Atoms] | list[list[Atoms]],
     descriptor: str,
-    isolated_atom_energies: dict | None = None,
+    isolated_atom_energies: dict,
     bolt_frac: float = 0.1,
     bolt_max_num: int = 3000,
     cur_num: int = 100,
@@ -1291,7 +1279,7 @@ def boltzhist_cur_dualIter(
     minima_indices = [ats[-1].info["unique_starting_index"] for ats in atoms]
     pressure_minima = None if pressures is None else [p[-1] for p in pressures]
 
-    selected_minima = boltzhist_cur_oneShot(
+    selected_minima = boltzhist_cur_one_shot(
         atoms=atom_minima,
         descriptor=descriptor,
         isolated_atom_energies=isolated_atom_energies,
@@ -1319,7 +1307,7 @@ def boltzhist_cur_dualIter(
         None if pressures is None else [pressures[j] for j in selected__indices]
     )
 
-    return boltzhist_cur_oneShot(
+    return boltzhist_cur_one_shot(
         atoms=selected_trajs,
         descriptor=descriptor,
         isolated_atom_energies=isolated_atom_energies,
@@ -1660,7 +1648,7 @@ def handle_rss_trajectory(
         raise ValueError("No valid trajectory path was obtained!")
 
     for traj in traj_path:
-        if traj is not None:
+        if traj is not None and Path(traj).exists():
             print("Processing trajectory:", traj)
             at = ase.io.read(traj, index=":")
             atoms.append(at)

@@ -32,6 +32,12 @@ class BuildMultiRandomizedStructure(Maker):
         Expected number of generated randomized unit cells.
     buildcell_option: dict
         Customized parameters for buildcell.
+    fragment: Atoms | list[Atoms] (optional)
+        Fragment(s) for random structures, e.g. molecules, to be placed indivudally intact.
+        atoms.arrays should have a 'fragment_id' key with unique identifiers for each fragment if in same Atoms.
+        atoms.cell must be defined (e.g. Atoms.cell = np.eye(3)*20).
+    fragment_numbers: list[str] (optional)
+        Numbers of each fragment to be included in the random structures. Defaults to 1 for all specified.
     remove_tmp_files: bool
         Remove all temporary files raised by buildcell to save memory.
     cur_selection: bool
@@ -46,11 +52,14 @@ class BuildMultiRandomizedStructure(Maker):
         Number of processes to use for parallel computation.
     name: str
         Name of the flows produced by this maker.
+
     """
 
     tag: str
     generated_struct_numbers: list[int]
     buildcell_options: list[dict] | None = None
+    fragment_file: str | None = None
+    fragment_numbers: list[str] | None = None
     remove_tmp_files: bool = True
     cur_selection: bool = False
     selected_struct_numbers: list[int] | None = None
@@ -74,6 +83,8 @@ class BuildMultiRandomizedStructure(Maker):
                 struct_number=struct_number,
                 remove_tmp_files=self.remove_tmp_files,
                 buildcell_option=buildcell_option,
+                fragment_file=self.fragment_file,
+                fragment_numbers=self.fragment_numbers,
                 num_processes=self.num_processes,
             ).make()
             job_struct.name = f"{self.name}_{i}"
@@ -109,6 +120,8 @@ def initial_rss(
     generated_struct_numbers: list[int],
     selected_struct_numbers: list[int] | None = None,
     buildcell_options: list[dict] | None = None,
+    fragment_file: str | None = None,
+    fragment_numbers: list[str] | None = None,
     num_processes_buildcell: int = 1,
     cur_selection: bool = False,
     bcur_params: dict | None = None,
@@ -154,6 +167,12 @@ def initial_rss(
         Number of structures to be sampled. Default is None.
     buildcell_options: list[dict], optional
         Customized parameters for buildcell. Default is None.
+    fragment: Atoms | list[Atoms] (optional)
+        Fragment(s) for random structures, e.g. molecules, to be placed indivudally intact.
+        atoms.arrays should have a 'fragment_id' key with unique identifiers for each fragment if in same Atoms.
+        atoms.cell must be defined (e.g. Atoms.cell = np.eye(3)*20).
+    fragment_numbers: list[str] (optional)
+        Numbers of each fragment to be included in the random structures. Defaults to 1 for all specified.
     num_processes_buildcell: int, optional
         Number of processes to use for parallel computation during buildcell generation. Default is 1.
     cur_selection: bool, optional
@@ -242,6 +261,8 @@ def initial_rss(
     do_randomized_structure_generation = BuildMultiRandomizedStructure(
         generated_struct_numbers=generated_struct_numbers,
         buildcell_options=buildcell_options,
+        fragment_file=fragment_file,
+        fragment_numbers=fragment_numbers,
         selected_struct_numbers=selected_struct_numbers,
         tag=tag,
         num_processes=num_processes_buildcell,
@@ -317,6 +338,8 @@ def do_rss_iterations(
     generated_struct_numbers: list[int],
     selected_struct_numbers: list[int] | None = None,
     buildcell_options: list[dict] | None = None,
+    fragment_file: str | None = None,
+    fragment_numbers: list[str] | None = None,
     num_processes_buildcell: int = 1,
     cur_selection: bool = False,
     selection_method: str = None,
@@ -400,6 +423,12 @@ def do_rss_iterations(
         Number of structures to be sampled. Default is None.
     buildcell_options: list[dict], optional
         Customized parameters for buildcell. Default is None.
+    fragment: Atoms | list[Atoms] (optional)
+        Fragment(s) for random structures, e.g. molecules, to be placed indivudally intact.
+        atoms.arrays should have a 'fragment_id' key with unique identifiers for each fragment if in same Atoms.
+        atoms.cell must be defined (e.g. Atoms.cell = np.eye(3)*20).
+    fragment_numbers: list[str] (optional)
+        Numbers of each fragment to be included in the random structures. Defaults to 1 for all specified.
     num_processes_buildcell: int, optional
         Number of processes to use for parallel computation during buildcell generation. Default is 1.
     cur_selection: bool, optional
@@ -521,21 +550,12 @@ def do_rss_iterations(
         - kt: float
             The temperature (in eV) for Boltzmann sampling.
     """
-    if "kt" not in input:
-        input["kt"] = initial_kt
-        print("The key 'kt' is not in input. Creating 'kt' is done.")
-
-    if "current_iter" not in input:
-        input["current_iter"] = current_iter_index
-        print(
-            "The key 'current_iter' is not in input. Creating 'current_iter' is done."
-        )
-
     test_error = input.get("test_error")
-    current_iter = input.get("current_iter")
+    current_iter = input.get("current_iter", current_iter_index)
+    current_kt = input.get("kt", initial_kt)
 
     config_type = (
-        (config_types[0] if input["kt"] > 0.1 else config_types[-1])
+        (config_types[0] if current_kt > 0.1 else config_types[-1])
         if config_types
         else None
     )
@@ -555,17 +575,19 @@ def do_rss_iterations(
         and current_iter is not None
         and current_iter < max_iteration_number
     ):
-        print("kt:", input.get("kt"))
+        print("Current kt:", current_kt)
         print("Current iter index:", current_iter)
         print(f"The error of {current_iter}th iteration:", test_error)
 
         if bcur_params is None:
             bcur_params = {}
-        bcur_params["kt"] = input.get("kt")
+        bcur_params["kt"] = current_kt
 
         do_randomized_structure_generation = BuildMultiRandomizedStructure(
             generated_struct_numbers=generated_struct_numbers,
             buildcell_options=buildcell_options,
+            fragment_file=fragment_file,
+            fragment_numbers=fragment_numbers,
             selected_struct_numbers=selected_struct_numbers,
             tag=tag,
             num_processes=num_processes_buildcell,
@@ -645,7 +667,7 @@ def do_rss_iterations(
             **fit_kwargs,
         )
 
-        kt = input["kt"] - 0.1 if (input["kt"] - 0.1) > 0.1 else 0.1
+        kt = current_kt - 0.1 if (current_kt - 0.1) > 0.1 else 0.1
         current_iter += 1
         if isolated_atom:
             isolated_atom = False
@@ -665,6 +687,8 @@ def do_rss_iterations(
             selected_struct_numbers=selected_struct_numbers,
             tag=tag,
             buildcell_options=buildcell_options,
+            fragment_file=fragment_file,
+            fragment_numbers=fragment_numbers,
             num_processes_buildcell=num_processes_buildcell,
             cur_selection=cur_selection,
             selection_method=selection_method,

@@ -39,7 +39,7 @@ def machine_learning_fit(
 
     Parameters
     ----------
-    database_dir: Path
+    database_dir: Str | Path
         Path to the directory containing the database.
     species_list: list
         List of element names (strings) involved in the training dataset
@@ -61,7 +61,7 @@ def machine_learning_fit(
     ref_virial_name: str
         Reference virial name.
     device: str
-        Device to be used for model fitting, either "cpu" or "gpu".
+        Device to be used for model fitting, either "cpu" or "cuda".
     hyperpara_opt: bool
         Perform hyperparameter optimization using XPOT
         (XPOT: https://pubs.aip.org/aip/jcp/article/159/2/024803/2901815)

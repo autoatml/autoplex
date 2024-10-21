@@ -765,6 +765,14 @@ def m3gnet_fitting(
     -------
     dict
         A dictionary with train_error, test_error, path_to_mlip
+
+    Adapted from:
+    *    Title: Tutorials of Materials Graph Library (MatGL)
+    *    Author: Tsz Wai Ko, Chi Chen and Shyue Ping Ong
+    *    Version: 1.1.3
+    *    Date 7/8/2024
+    *    Availability: https://matgl.ai/tutorials%2FTraining%20a%20M3GNet%20Potential%20with%20PyTorch%20Lightning.html
+    *    License: BSD 3-Clause License
     """
     default_hyperparameters = load_mlip_hyperparameter_defaults(
         mlip_fit_parameter_file_path=path_to_default_hyperparameters
@@ -798,16 +806,9 @@ def m3gnet_fitting(
     os.makedirs(os.path.join(results_dir, exp_name), exist_ok=True)
 
     with open("output.txt", "w") as f:
-        # Backup original stdout stream.
         original_stdout = sys.stdout
-
-        # Set stdout to the file object.
         sys.stdout = f
-
-        # Print something (it goes to the file).
         print("This line will be written to the file.")
-
-        # Restore original stdout stream.
         sys.stdout = original_stdout
 
     with open("m3gnet.log", "w") as log_file:
@@ -824,7 +825,6 @@ def m3gnet_fitting(
             and "dimer" not in at.info["config_type"]
         ]
 
-        # prepare train dataset
         (
             train_structs,
             train_energies,
@@ -866,7 +866,6 @@ def m3gnet_fitting(
 
         if os.path.exists(os.path.join(db_dir, "test.extxyz")):
             test_data = ase.io.read(os.path.join(db_dir, "test.extxyz"), index=":")
-            # prepare test dataset
             (
                 test_structs,
                 test_energies,
@@ -1085,13 +1084,7 @@ def mace_fitting(
         Path to directory containing the training and testing data files.
     path_to_default_hyperparameters: str or Path.
         Path to mlip-defaults.json.
-    <<<<<<< HEAD
-    ref_energy_name: str, optional
-    =======
-    device: str
-        specify device to use cuda or cpu.
     ref_energy_name : str, optional
-    >>>>>>> upstream/main
         Reference energy name.
     ref_force_name: str, optional
         Reference force name.

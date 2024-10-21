@@ -53,8 +53,8 @@ class RandomizedStructure(Maker):
         Fragment(s) for random structures, e.g. molecules, to be placed indivudally intact.
         atoms.arrays should have a 'fragment_id' key with unique identifiers for each fragment if in same Atoms.
         atoms.cell must be defined (e.g. Atoms.cell = np.eye(3)*20).
-    fragment_ratios: list[int] (optional)
-        Ratios of each fragment to be included in the random structures. Defaults to 1:1 for all specified.
+    fragment_numbers: list[str] (optional)
+        Numbers of each fragment to be included in the random structures. Defaults to 1 for all specified.
     """
 
     name: str = "build_random_cells"
@@ -66,7 +66,7 @@ class RandomizedStructure(Maker):
     cell_seed_path: str | None = None
     num_processes: int = 32
     fragment_file: str | None = None
-    fragment_ratios: list[int] | None = None
+    fragment_numbers: list[str] | None = None
 
     @job
     def make(self):
@@ -80,7 +80,6 @@ class RandomizedStructure(Maker):
 
         else:
             buildcell_parameters = [
-                # "SPECIES=Si%NUM=1", # no need for this default if you don't specify species?
                 "SLACK=0.25",
                 "OVERLAP=0.1",
                 "COMPACT",
@@ -162,40 +161,46 @@ class RandomizedStructure(Maker):
                     self.fragment = self.fragment[0]
 
                 if isinstance(self.fragment, Atoms):
-                    fragment_ratios = [1 for _ in self.fragment]
+                    if self.fragment_numbers is None:
+                        fragment_numbers = [1 for _ in self.fragment]
+                    else:
+                        fragment_numbers = self.fragment_numbers
                     if "fragment_id" not in self.fragment.arrays:
                         self.fragment.arrays["fragment_id"] = [
                             f"{1}-f" for i in self.fragment
                         ]
 
-                elif isinstance(self.fragment, list) and self.fragment_ratios is None:
-                    fragment_ratios = [
-                        1 for _ in range(sum([len(i) for i in self.fragment]))
-                    ]
+                elif isinstance(self.fragment, list):
+                    if self.fragment_numbers is None:
+                        fragment_numbers = [
+                            1 for _ in range(sum([len(i) for i in self.fragment]))
+                        ]
+                    else:
+                        fragment_numbers = self.fragment_numbers
                     write_fragment = self.fragment[0]
                     for frag in self.fragment[
                         1:
                     ]:  # merge all separate fragments into one Atoms object
                         write_fragment += frag
 
-                fc = self.fragment.cell
                 fragment_parameters = [
-                    "%BLOCK LATTICE_CART",
-                    f"{fc[0,0]:10.5f} {fc[0,1]:10.5f} {fc[0,2]:10.5f}",
-                    f"{fc[1,0]:10.5f} {fc[1,1]:10.5f} {fc[1,2]:10.5f}",
-                    f"{fc[2,0]:10.5f} {fc[2,1]:10.5f} {fc[2,2]:10.5f}",
-                    "%ENDBLOCK LATTICE_CART",
-                    "%BLOCK POSITIONS_FRAC",
+                    "%BLOCK POSITIONS_ABS",
                 ]
                 symbols = self.fragment.get_chemical_symbols()
-                for i, val in enumerate(self.fragment.get_scaled_positions()):
-                    newline = (
-                        f"{symbols[i]} {val[0]:.8f} {val[1]:.8f} {val[2]:.8f}"
-                        f" # {self.fragment.arrays['fragment_id'][i]}"
-                        f" % NUM={fragment_ratios[i]}"
-                    )
+                for i, val in enumerate(self.fragment.get_positions(wrap=True)):
+                    if i == 0:
+                        newline = (
+                            f"{symbols[i]} {val[0]:.8f} {val[1]:.8f} {val[2]:.8f}"
+                            f" # {self.fragment.arrays['fragment_id'][i]}"
+                            f" % NUM={fragment_numbers[i]}"
+                        )
+                    else:
+                        newline = (
+                            f"{symbols[i]} {val[0]:.8f} {val[1]:.8f} {val[2]:.8f}"
+                            f" # {self.fragment.arrays['fragment_id'][i]}"
+                        )
                     fragment_parameters.append(newline)
-                fragment_parameters.append("%ENDBLOCK POSITIONS_FRAC")
+                fragment_parameters.append("%ENDBLOCK POSITIONS_ABS")
 
                 buildcell_parameters = (
                     fragment_parameters + buildcell_parameters
@@ -210,6 +215,10 @@ class RandomizedStructure(Maker):
                 for i in range(self.struct_number)
             ]
             atoms_group = pool.starmap(self._parallel_process, args)
+
+        atoms_group = [
+            atom for atom in atoms_group if not np.isnan(atom.get_positions()).any()
+        ]
 
         ase.io.write(
             self.output_file_name, atoms_group, parallel=False, format="extxyz"
@@ -440,6 +449,8 @@ class RandomizedStructure(Maker):
         str
             A formatted string. For example, the input {"Si": 1.1, "O": 0.66} would
             return "1.5 Si-Si=1.76 Si-O=1.408 O-O=1.056".
+
+        TODO: set up robust heuristics for multi-component systems
         """
         keys = list(r.keys())
         if len(keys) == 1:
@@ -451,14 +462,6 @@ class RandomizedStructure(Maker):
                 el1, el2 = keys[i], keys[j]
                 r1, r2 = r[el1], r[el2]
                 result = (r1 + r2) / 2 * 1.6
-                # if el1 == el2:
-                #     result = r1 * 1.8
-                # else:
-                #     result = (
-                #         (r1 + r2) / 2 * 1.8
-                #         if self._is_metal(el1) and self._is_metal(el2)
-                #         else (r1 + r2) / 2 * 1.5
-                #     )
 
                 minsep += f"{el1}-{el2}={result} "
 

@@ -105,10 +105,10 @@ def test_gap_rss_multi_jobs(test_dir, memory_jobstore):
     
     assert round(enthalpy_pseudo,3) == round(enthalpy_cal,3)
 
-    # dir = Path('.')
-    # path_to_job_files = list(dir.glob("job*"))
-    # for path in path_to_job_files:
-    #     shutil.rmtree(path)
+    dir = Path('.')
+    path_to_job_files = list(dir.glob("job*"))
+    for path in path_to_job_files:
+        shutil.rmtree(path)
 
 
 # def test_jace_rss(test_dir, memory_jobstore):
