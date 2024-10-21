@@ -100,8 +100,9 @@ that can be used to construct customized randomized structures workflows.
 
 ## VASP settings
 
-For the single-atom displaced as well as the randomized structures the [TightDFTStaticMaker](#autoplex.data.phonons.flows.TightDFTStaticMaker) (for huge single-atom 
-displaced supercells with lattice parameters > 18 Å the [TightDFTStaticMakerBigSupercells](#autoplex.data.phonons.flows.TightDFTStaticMakerBigSupercells)) is used to set up the 
+### add how to change iso atom and relax settings
+
+For the single-atom displaced as well as the randomized structures the [TightDFTStaticMaker](#autoplex.data.phonons.flows.TightDFTStaticMaker) is used to set up the 
 VASP calculation input and settings. PBEsol is the default GGA functional.
 
 The `TightDFTStaticMaker` settings can be overridden by 
