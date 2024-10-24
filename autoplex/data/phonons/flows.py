@@ -85,6 +85,7 @@ class TightDFTStaticMaker(PhononDisplacementMaker):
     input_set_generator: VaspInputGenerator = field(
         default_factory=lambda: StaticSetGenerator(
             user_incar_settings={
+                "ALGO": "Normal",  # not switching to Fast because it's not precise enough for the fit
                 "IBRION": -1,
                 "ISPIN": 1,
                 "ISMEAR": 0,
@@ -93,7 +94,6 @@ class TightDFTStaticMaker(PhononDisplacementMaker):
                 "EDIFF": 1e-7,
                 "LAECHG": False,
                 "LREAL": False,
-                "ALGO": "Normal",  # not switching to Fast because it's not precise enough for the fit
                 "NSW": 0,
                 "LCHARG": False,  # Do not write the CHGCAR file
                 "LWAVE": False,  # Do not write the WAVECAR file
@@ -216,6 +216,7 @@ class DFTPhononMaker(PhononMaker):
                 run_vasp_kwargs={"handlers": {}},
                 input_set_generator=TightRelaxSetGenerator(
                     user_incar_settings={
+                        "ALGO": "Normal",
                         "ISPIN": 1,
                         "LAECHG": False,
                         "ISMEAR": 0,
@@ -239,6 +240,7 @@ class DFTPhononMaker(PhononMaker):
             input_set_generator=StaticSetGenerator(
                 auto_ispin=False,
                 user_incar_settings={
+                    "ALGO": "Normal",
                     "ISPIN": 1,
                     "LAECHG": False,
                     "ISMEAR": 0,
@@ -329,6 +331,7 @@ class RandomStructuresDataGenerator(Maker):
             run_vasp_kwargs={"handlers": {}},
             input_set_generator=TightRelaxSetGenerator(
                 user_incar_settings={
+                    "ALGO": "Normal",
                     "ISPIN": 1,
                     "LAECHG": False,
                     "ISYM": 0,  # to be changed
@@ -391,18 +394,23 @@ class RandomStructuresDataGenerator(Maker):
         jobs.append(relaxed)
         structure = relaxed.output.structure
 
-        supercell_matrix_job = reduce_supercell_size_job(
-            structure=structure,
-            min_length=self.supercell_settings.get("min_length", 12),
-            max_length=self.supercell_settings.get("max_length", 25),
-            fallback_min_length=self.supercell_settings.get("fallback_min_length", 10),
-            max_atoms=self.supercell_settings.get("max_atoms", 500),
-            min_atoms=self.supercell_settings.get("min_atoms", 50),
-            step_size=self.supercell_settings.get("step_size", 1.0),
+        supercell_matrix = self.supercell_settings.get(mp_id, {}).get(
+            "supercell_matrix"
         )
-        jobs.append(supercell_matrix_job)
-
-        supercell_matrix = supercell_matrix_job.output
+        if not supercell_matrix:
+            supercell_matrix_job = reduce_supercell_size_job(
+                structure=structure,
+                min_length=self.supercell_settings.get("min_length", 12),
+                max_length=self.supercell_settings.get("max_length", 25),
+                fallback_min_length=self.supercell_settings.get(
+                    "fallback_min_length", 10
+                ),
+                max_atoms=self.supercell_settings.get("max_atoms", 500),
+                min_atoms=self.supercell_settings.get("min_atoms", 50),
+                step_size=self.supercell_settings.get("step_size", 1.0),
+            )
+            jobs.append(supercell_matrix_job)
+            supercell_matrix = supercell_matrix_job.output
 
         random_rattle_sc = generate_randomized_structures(
             structure=structure,
@@ -754,6 +762,7 @@ class IsoAtomStaticMaker(StaticMaker):
         default_factory=lambda: StaticSetGenerator(
             user_kpoints_settings={"reciprocal_density": 1},
             user_incar_settings={
+                "ALGO": "Normal",
                 "ISPIN": 1,
                 "LAECHG": False,
                 "ISMEAR": 0,
@@ -804,6 +813,7 @@ class IsoAtomMaker(Maker):
             isolated_atom_static_input_set = StaticSetGenerator(
                 user_kpoints_settings={"grid_density": 1},
                 user_incar_settings={
+                    "ALGO": "Normal",
                     "ISPIN": 1,
                     "LAECHG": False,
                     "ISMEAR": 0,

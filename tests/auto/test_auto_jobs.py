@@ -44,6 +44,53 @@ def relax_maker():
         )
     )
 
+@pytest.fixture(scope="class")
+def ref_paths():
+    return {
+        "tight relax 1": "dft_ml_data_generation/tight_relax_1/",
+        "tight relax 2": "dft_ml_data_generation/tight_relax_2/",
+        "static": "dft_ml_data_generation/static/",
+        "dft static 1/2": "dft_ml_data_generation/phonon_static_1/",
+        "dft static 2/2": "dft_ml_data_generation/phonon_static_2/",
+        "dft static 1/3": "dft_ml_data_generation/rand_static_1/",
+        "dft static 2/3": "dft_ml_data_generation/rand_static_2/",
+        "dft static 3/3": "dft_ml_data_generation/rand_static_3/",
+    }
+
+@pytest.fixture(scope="class")
+def ref_paths_check_sc_mat():
+    return {
+        "tight relax 1": "dft_ml_data_generation/tight_relax_1/",
+        "tight relax 2": "dft_ml_data_generation/tight_relax_2/",
+        "static": "dft_ml_data_generation/static/",
+        "dft static 1/2": "dft_ml_data_generation/phonon_static_1_sc_mat/",
+        "dft static 2/2": "dft_ml_data_generation/phonon_static_2_sc_mat/",
+        "dft static 1/3": "dft_ml_data_generation/rand_static_1/",
+        "dft static 2/3": "dft_ml_data_generation/rand_static_2/",
+        "dft static 3/3": "dft_ml_data_generation/rand_static_3/",
+    }
+
+@pytest.fixture(scope="class")
+def fake_run_vasp_kwargs():
+    return {
+        "tight relax 1": {"incar_settings": ["NSW", "ISMEAR"]},
+        "tight relax 2": {"incar_settings": ["NSW", "ISMEAR"]},
+        "dft static 1/2": {"incar_settings": ["NSW"]},
+        "dft static 2/2": {"incar_settings": ["NSW"]},
+        "dft static 1/3": {
+            "incar_settings": ["NSW"],
+            "check_inputs": ["incar", "kpoints", "potcar"],
+        },
+        "dft static 2/3": {
+            "incar_settings": ["NSW"],
+            "check_inputs": ["incar", "kpoints", "potcar"],
+        },
+        "dft static 3/3": {
+            "incar_settings": ["NSW"],
+            "check_inputs": ["incar", "kpoints", "potcar"],
+        },
+    }
+
 
 def test_complete_benchmark(clean_dir, test_dir, memory_jobstore):
     from monty.serialization import loadfn
@@ -180,45 +227,24 @@ def test_get_iso_atom(vasp_test_dir, mock_vasp, clean_dir, memory_jobstore):
     )
 
 
-def test_dft_task_doc(vasp_test_dir, mock_vasp, test_dir, memory_jobstore, relax_maker, clean_dir):
+def test_dft_task_doc(
+        vasp_test_dir,
+        mock_vasp,
+        test_dir,
+        memory_jobstore,
+        relax_maker,
+        ref_paths,
+        fake_run_vasp_kwargs,
+        clean_dir
+):
     path_to_struct = vasp_test_dir / "dft_ml_data_generation" / "POSCAR"
     structure = Structure.from_file(path_to_struct)
 
-    dft_phonon_workflow = dft_phonopy_gen_data(structure=structure, displacements=[0.01], symprec=0.1,
+    dft_phonon_workflow = dft_phonopy_gen_data(structure=structure, mp_id="test", displacements=[0.01], symprec=0.1,
                                                phonon_displacement_maker=TightDFTStaticMaker(),
                                                phonon_bulk_relax_maker=relax_maker,
                                                phonon_static_energy_maker=StaticMaker(),
                                                supercell_settings={"min_length": 10, "min_atoms": 20})
-
-    ref_paths = {
-        "tight relax 1": "dft_ml_data_generation/tight_relax_1/",
-        "tight relax 2": "dft_ml_data_generation/tight_relax_2/",
-        "static": "dft_ml_data_generation/static/",
-        "dft static 1/2": "dft_ml_data_generation/phonon_static_1/",
-        "dft static 2/2": "dft_ml_data_generation/phonon_static_2/",
-        "dft static 1/3": "dft_ml_data_generation/rand_static_1/",
-        "dft static 2/3": "dft_ml_data_generation/rand_static_2/",
-        "dft static 3/3": "dft_ml_data_generation/rand_static_3/",
-    }
-
-    fake_run_vasp_kwargs = {
-        "tight relax 1": {"incar_settings": ["NSW", "ISMEAR"]},
-        "tight relax 2": {"incar_settings": ["NSW", "ISMEAR"]},
-        "dft static 1/2": {"incar_settings": ["NSW"]},
-        "dft static 2/2": {"incar_settings": ["NSW"]},
-        "dft static 1/3": {
-            "incar_settings": ["NSW"],
-            "check_inputs": ["incar", "kpoints", "potcar"],
-        },
-        "dft static 2/3": {
-            "incar_settings": ["NSW"],
-            "check_inputs": ["incar", "kpoints", "potcar"],
-        },
-        "dft static 3/3": {
-            "incar_settings": ["NSW"],
-            "check_inputs": ["incar", "kpoints", "potcar"],
-        },
-    }
 
     # automatically use fake VASP and write POTCAR.spec during the test
     mock_vasp(ref_paths, fake_run_vasp_kwargs)
@@ -236,3 +262,46 @@ def test_dft_task_doc(vasp_test_dir, mock_vasp, test_dir, memory_jobstore, relax
         dft_phonon_workflow.output.resolve(store=memory_jobstore)["phonon_data"]["001"],
         PhononBSDOSDoc,
     )
+
+
+def test_dft_phonpy_gen_data_manual_supercell_matrix(
+        vasp_test_dir,
+        mock_vasp,
+        test_dir,
+        memory_jobstore,
+        relax_maker,
+        ref_paths_check_sc_mat,
+        fake_run_vasp_kwargs,
+        clean_dir
+):
+    path_to_struct = vasp_test_dir / "dft_ml_data_generation" / "POSCAR"
+    structure = Structure.from_file(path_to_struct)
+
+    supercell_settings = {
+        "test": {
+            "supercell_matrix": [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+        },
+        "min_length": 1,
+        "max_length": 25,
+        "min_atoms": 2
+    }
+
+    dft_phonon_workflow = dft_phonopy_gen_data(structure=structure, mp_id="test", displacements=[0.01], symprec=0.1,
+                                               phonon_displacement_maker=TightDFTStaticMaker(),
+                                               phonon_bulk_relax_maker=relax_maker,
+                                               phonon_static_energy_maker=StaticMaker(),
+                                               supercell_settings=supercell_settings)
+
+    # automatically use fake VASP and write POTCAR.spec during the test
+    mock_vasp(ref_paths_check_sc_mat, fake_run_vasp_kwargs)
+
+    # run the flow or job and ensure that it finished running successfully
+    responses = run_locally(
+        dft_phonon_workflow,
+        create_folders=True,
+        ensure_success=True,
+        store=memory_jobstore,
+    )
+
+    result_structure = dft_phonon_workflow.output.resolve(store=memory_jobstore)['phonon_data']['001'].structure
+    assert result_structure.lattice.abc == pytest.approx(structure.lattice.abc, rel=0.005)
