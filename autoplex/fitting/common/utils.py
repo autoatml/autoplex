@@ -14,6 +14,8 @@ from functools import partial
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from autoplex_previous.autoplex.data.phonons.utils import logger
+
 if TYPE_CHECKING:
     from pymatgen.core import Structure
 
@@ -1162,42 +1164,52 @@ def mace_fitting(
                         f"The type of {parameter} should be {type(mace_hypers[parameter])}!"
                     )
 
-    model = mace_hypers["model"]
-    config_type_weights = mace_hypers["config_type_weights"]
-    hidden_irreps = mace_hypers["hidden_irreps"]
-    r_max = mace_hypers["r_max"]
-    batch_size = mace_hypers["batch_size"]
-    max_num_epochs = mace_hypers["max_num_epochs"]
-    start_swa = mace_hypers["start_swa"]
-    ema_decay = mace_hypers["ema_decay"]
-    correlation = mace_hypers["correlation"]
-    loss = mace_hypers["loss"]
-    default_dtype = mace_hypers["default_dtype"]
+    boolean_hypers=["distributed","distributed", "pair_repulsion", "amsgrad", "swa", "stage_two", "keep_checkpoint", "save_all_checkpoints", "restart_latest", "save_cpu", "wandb", "compute_statistics", "foundation_model_readout", "ema"]
+    boolean_str_hypers=["compute_avg_num_neighbors", "compute_stress", "compute_forces", "multi_processed_test", "pin_memory", "foundation_filter_elements", "multiheads_finetuning", "keep_isolated_atoms", "shuffle"]
 
-    hypers = [
-        "--name=MACE_model",
-        f"--train_file={db_dir}/train.extxyz",
-        f"--valid_file={db_dir}/test.extxyz",
-        f"--config_type_weights={config_type_weights}",
-        f"--model={model}",
-        f"--hidden_irreps={hidden_irreps}",
-        f"--energy_key={ref_energy_name}",
-        f"--forces_key={ref_force_name}",
-        f"--r_max={r_max}",
-        f"--correlation={correlation}",
-        f"--batch_size={batch_size}",
-        f"--max_num_epochs={max_num_epochs}",
-        "--swa",
-        f"--start_swa={start_swa}",
-        "--ema",
-        f"--ema_decay={ema_decay}",
-        "--amsgrad",
-        f"--loss={loss}",
-        "--restart_latest",
-        "--seed=123",
-        f"--default_dtype={default_dtype}",
-        f"--device={device}",
-    ]
+    hypers=[]
+    for hyper in mace_hypers:
+        if hyper in boolean_hypers:
+            if mace_hypers[hyper] is True:
+                hypers.append(f"--{hyper}")
+        elif hyper in boolean_str_hypers:
+            if mace_hypers[hyper] is True:
+                hypers.append(f"--{hyper}")
+        elif hyper in ["train_file", "test_file"]:
+            logger.warn("Train and test files have default names.")
+        else:
+            hypers.append(f"--{hyper}={mace_hypers[hyper]}")
+
+    hypers.append(f"--train_file={db_dir}/train.extxyz")
+    hypers.append(f"--valid_file={db_dir}/test.extxyz")
+    hypers.append(f"--energy_key={ref_energy_name}") # check how this should be set in the best way
+    hypers.append(f"--forces_key={ref_force_name}")
+    #hypers.append(f"--virial_key={ref_virial_name}") #?
+    print(hypers)
+    # hypers = [
+    #     "--name=MACE_model",
+    #     f"--train_file={db_dir}/train.extxyz",
+    #     f"--valid_file={db_dir}/test.extxyz",
+    #     f"--config_type_weights={config_type_weights}", #same here?
+    #     f"--model={model}",
+    #     f"--hidden_irreps={hidden_irreps}", # is this always needed?
+    #     f"--energy_key={ref_energy_name}",
+    #     f"--forces_key={ref_force_name}", # we likely need a stress weight as well?
+    #     f"--r_max={r_max}",
+    #     f"--correlation={correlation}",
+    #     f"--batch_size={batch_size}",
+    #     f"--max_num_epochs={max_num_epochs}",
+    #     "--swa",
+    #     f"--start_swa={start_swa}",
+    #     "--ema",
+    #     f"--ema_decay={ema_decay}",
+    #     "--amsgrad",
+    #     f"--loss={loss}",
+    #     "--restart_latest",
+    #     "--seed=123", # shouldn't we define this more flexible?
+    #     f"--default_dtype={default_dtype}",
+    #     f"--device={device}",
+    # ]
 
     run_mace(hypers)
 
