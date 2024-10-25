@@ -1184,6 +1184,8 @@ def mace_fitting(
     hypers.append(f"--valid_file={db_dir}/test.extxyz")
     hypers.append(f"--energy_key={ref_energy_name}") # check how this should be set in the best way
     hypers.append(f"--forces_key={ref_force_name}")
+    if ref_virial_name is not None:
+        hypers.append(f"--virials_key={ref_virial_name}")
     #hypers.append(f"--virial_key={ref_virial_name}") #?
     print(hypers)
     # hypers = [
