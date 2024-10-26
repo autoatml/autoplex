@@ -1,0 +1,57 @@
+{
+  "GAP": {
+    "general": {
+      "at_file": "train.extxyz",
+      "default_sigma": "{0.0001 0.05 0.05 0}",
+      "energy_parameter_name": "REF_energy",
+      "force_parameter_name": "REF_forces",
+      "virial_parameter_name": "REF_virial",
+      "sparse_jitter": 1.0e-8,
+      "do_copy_at_file": "F",
+      "openmp_chunk_size": 10000,
+      "gp_file": "gap_file.xml",
+      "two_body": true,
+      "three_body": false,
+      "soap": true
+    },
+    "twob": {
+      "distance_Nb order": 2,
+      "f0": 0.0,
+      "add_species": "T",
+      "cutoff": 5.0,
+      "n_sparse": 15,
+      "covariance_type": "ard_se",
+      "delta": 2.00 ,
+      "theta_uniform": 0.5 ,
+      "sparse_method": "uniform",
+      "compact_clusters": "T"
+    },
+    "threeb": {
+      "distance_Nb order": 3,
+      "f0": 0.0,
+      "add_species": "T",
+      "cutoff": 3.25,
+      "n_sparse": 100,
+      "covariance_type": "ard_se",
+      "delta": 2.00 ,
+      "theta_uniform": 1.0 ,
+      "sparse_method": "uniform",
+      "compact_clusters": "T"
+    },
+    "soap": {
+      "add_species": "T",
+      "l_max": 10,
+      "n_max": 12,
+      "atom_sigma": 0.5,
+      "zeta": 4,
+      "cutoff": 5.0,
+      "cutoff_transition_width": 0.5,
+      "central_weight": 1.0,
+      "n_sparse": 6000,
+      "delta": 0.50,
+      "f0": 0.0,
+      "covariance_type": "dot_product",
+      "sparse_method": "cur_points"
+    }
+  }
+}
