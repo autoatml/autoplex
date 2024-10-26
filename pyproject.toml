@@ -41,7 +41,8 @@ dependencies = [
 ]
 
 [tool.setuptools.packages.find]
-exclude = ["tutorials", "tests"]
+where = ["src"]
+#exclude = ["tutorials", "tests"]
 
 [tool.setuptools.package-data]
 "autoplex.fitting.common" = ["gap-defaults.json"]
@@ -173,7 +174,8 @@ source = [
 ]
 
 [tool.coverage.run]
-include = ["autoplex/*"]
+include = ["src/"]
+#include = ["autoplex/*"]
 
 [tool.mypy]
 ignore_missing_imports = true
