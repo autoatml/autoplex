@@ -45,7 +45,7 @@ where = ["src"]
 #exclude = ["tutorials", "tests"]
 
 [tool.setuptools.package-data]
-"autoplex.fitting.common" = ["gap-defaults.json"]
+"autoplex.fitting.common" = ["*.json"]
 
 [project.optional-dependencies]
 docs = [
