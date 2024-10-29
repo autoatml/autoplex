@@ -1087,6 +1087,7 @@ def mace_fitting(
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",
+    use_defaults=True,
     fit_kwargs: dict | None = None,
 ) -> dict:
     """
@@ -1148,11 +1149,14 @@ def mace_fitting(
             atoms=atoms, ref_virial_name=ref_virial_name, out_file_name="train.extxyz"
         )
 
-    default_hyperparameters = load_mlip_hyperparameter_defaults(
-        mlip_fit_parameter_file_path=path_to_default_hyperparameters
-    )
+    if use_defaults:
+        default_hyperparameters = load_mlip_hyperparameter_defaults(
+            mlip_fit_parameter_file_path=path_to_default_hyperparameters
+        )
 
-    mace_hypers = default_hyperparameters["MACE"]
+        mace_hypers = default_hyperparameters["MACE"]
+    else:
+        mace_hypers={}
 
     if fit_kwargs:
         for parameter in mace_hypers:
@@ -1177,7 +1181,7 @@ def mace_fitting(
                 hypers.append(f"--{hyper}")
         elif hyper in ["train_file", "test_file"]:
             logger.warn("Train and test files have default names.")
-        elif hyper in ["energy_key", "virial_key", "forces_key"]:
+        elif hyper in ["energy_key", "virial_key", "forces_key", "device"]:
             logger.warn("energy_key, virial_key and forces_key "
                         "have default names.")
         else:
@@ -1192,6 +1196,8 @@ def mace_fitting(
         hypers.append(f"--forces_key={ref_force_name}")
     if ref_virial_name is not None:
         hypers.append(f"--virials_key={ref_virial_name}")
+    if device is not None:
+        hypers.append(f"--device={device}")
 
     run_mace(hypers)
 
