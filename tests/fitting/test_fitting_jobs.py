@@ -143,18 +143,34 @@ def test_mace_finetuning_maker(test_dir, memory_jobstore, clean_dir):
         preprocessing_data=False,
         database_dir=database_dir,
         use_defaults=False,
-        model="MACE",
-        config_type_weights='{"Default":1.0}',
-        hidden_irreps="32x0e + 32x1o",
-        r_max=3.0,
-        batch_size=5,
-        max_num_epochs=10,
-        start_swa=5,
-        ema_decay=0.99,
-        correlation=3,
-        loss="huber",
-        default_dtype="float32",
-        device="cpu",
+        name="MACE_final",
+        foundation_model="large",
+        #model_dir = "${OUTDIR}",
+        #log_dir = "${OUTDIR}/logs",
+        #checkpoints_dir = "${OUTDIR}/checkpoints",
+        #results_dir = "${OUTDIR}/results" \
+        # downloads_dir = "${OUTDIR}/downloads" \
+                                                                                                                            - -train_file = "./train.xyz" \
+                                                                                                                                            - -valid_file = "./valid.xyz" \
+                                                                                                                                                            - -r_max = 6 \
+                                                                                                                                                                       - -loss = "huber" \
+                                                                                                                                                                                 - -energy_weight = 1000.0 \
+                                                                                                                                                                                                    - -forces_weight = 1000.0 \
+                                                                                                                                                                                                                       - -stress_weight = 1.0 \
+                                                                                                                                                                                                                                          - -E0s = "average" \
+                                                                                                                                                                                                                                                   - -scaling = "rms_forces_scaling" \
+                                                                                                                                                                                                                                                                - -batch_size = 1 \
+                                                                                                                                                                                                                                                                                - -max_num_epochs = 400 \
+                                                                                                                                                                                                                                                                                                    - -ema \
+                                                                                                                                                                                                                                                                                                    - -ema_decay = 0.99 \
+                                                                                                                                                                                                                                                                                                                   - -amsgrad \
+                                                                                                                                                                                                                                                                                                                   - -default_dtype = "float64" \
+                                                                                                                                                                                                                                                                                                                                      - -restart_latest \
+                                                                                                                                                                                                                                                                                                                                      - -lr = 0.0001 \
+                                                                                                                                                                                                                                                                                                                                              - -patience = 20 \
+                                                                                                                                                                                                                                                                                                                                                            - -device = cuda \
+                                                                                                                                                                                                                                                                                                                                                                        - -save_cpu \
+                                                                                                                                                                                                                                                                                                                                                                        - -seed = 3
     )
 
     responses = run_locally(
