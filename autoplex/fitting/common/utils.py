@@ -1158,15 +1158,10 @@ def mace_fitting(
     else:
         mace_hypers={}
 
-    if fit_kwargs:
-        for parameter in mace_hypers:
-            if (parameter in fit_kwargs):
-                if isinstance(fit_kwargs[parameter], type(mace_hypers[parameter])):
-                    mace_hypers[parameter] = fit_kwargs[parameter]
-                else:
-                    raise TypeError(
-                        f"The type of {parameter} should be {type(mace_hypers[parameter])}!"
-                    )
+
+    # TODO: should we do a type check? not sure
+    #  as it will be a lot of work to keep it updated
+    mace_hypers.update(fit_kwargs)
 
     boolean_hypers=["distributed","distributed", "pair_repulsion", "amsgrad", "swa", "stage_two", "keep_checkpoint", "save_all_checkpoints", "restart_latest", "save_cpu", "wandb", "compute_statistics", "foundation_model_readout", "ema"]
     boolean_str_hypers=["compute_avg_num_neighbors", "compute_stress", "compute_forces", "multi_processed_test", "pin_memory", "foundation_filter_elements", "multiheads_finetuning", "keep_isolated_atoms", "shuffle"]
@@ -1198,6 +1193,8 @@ def mace_fitting(
         hypers.append(f"--virials_key={ref_virial_name}")
     if device is not None:
         hypers.append(f"--device={device}")
+
+    print(hypers)
 
     run_mace(hypers)
 

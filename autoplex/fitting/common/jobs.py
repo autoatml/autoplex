@@ -148,9 +148,9 @@ def machine_learning_fit(
             ref_energy_name=ref_energy_name,
             ref_force_name=ref_force_name,
             ref_virial_name=ref_virial_name,
-            fit_kwargs=fit_kwargs,
             use_defaults=use_defaults,
             device=device,
+            fit_kwargs=fit_kwargs,
         )
 
     check_conv = check_convergence(train_test_error["test_error"])

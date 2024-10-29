@@ -135,8 +135,11 @@ def test_mace_fit_maker(test_dir, memory_jobstore, clean_dir):
 def test_mace_finetuning_maker(test_dir, memory_jobstore, clean_dir):
     database_dir = test_dir / "fitting/rss_training_dataset/"
     # TODO: make a finetuning script and get data from Jonas
-    nequipfit = MLIPFitMaker(
+    macefit = MLIPFitMaker(
                 mlip_type="MACE",
+        ref_energy_name=None,
+        ref_force_name=None,
+        ref_virial_name=None,
     ).make(
         isolated_atoms_energies={14: -0.84696938},
         num_processes_fit=1,
@@ -144,40 +147,33 @@ def test_mace_finetuning_maker(test_dir, memory_jobstore, clean_dir):
         database_dir=database_dir,
         use_defaults=False,
         name="MACE_final",
-        foundation_model="large",
-        #model_dir = "${OUTDIR}",
-        #log_dir = "${OUTDIR}/logs",
-        #checkpoints_dir = "${OUTDIR}/checkpoints",
-        #results_dir = "${OUTDIR}/results" \
-        # downloads_dir = "${OUTDIR}/downloads" \
-                                                                                                                            - -train_file = "./train.xyz" \
-                                                                                                                                            - -valid_file = "./valid.xyz" \
-                                                                                                                                                            - -r_max = 6 \
-                                                                                                                                                                       - -loss = "huber" \
-                                                                                                                                                                                 - -energy_weight = 1000.0 \
-                                                                                                                                                                                                    - -forces_weight = 1000.0 \
-                                                                                                                                                                                                                       - -stress_weight = 1.0 \
-                                                                                                                                                                                                                                          - -E0s = "average" \
-                                                                                                                                                                                                                                                   - -scaling = "rms_forces_scaling" \
-                                                                                                                                                                                                                                                                - -batch_size = 1 \
-                                                                                                                                                                                                                                                                                - -max_num_epochs = 400 \
-                                                                                                                                                                                                                                                                                                    - -ema \
-                                                                                                                                                                                                                                                                                                    - -ema_decay = 0.99 \
-                                                                                                                                                                                                                                                                                                                   - -amsgrad \
-                                                                                                                                                                                                                                                                                                                   - -default_dtype = "float64" \
-                                                                                                                                                                                                                                                                                                                                      - -restart_latest \
-                                                                                                                                                                                                                                                                                                                                      - -lr = 0.0001 \
-                                                                                                                                                                                                                                                                                                                                              - -patience = 20 \
-                                                                                                                                                                                                                                                                                                                                                            - -device = cuda \
-                                                                                                                                                                                                                                                                                                                                                                        - -save_cpu \
-                                                                                                                                                                                                                                                                                                                                                                        - -seed = 3
+        foundation_model='"large"',
+        r_max = 6,
+        loss = "huber",
+        energy_weight = 1000.0,
+        forces_weight = 1000.0,
+        stress_weight = 1.0 ,
+        E0s = "average",
+        scaling = "rms_forces_scaling",
+        batch_size = 1,
+        max_num_epochs = 2,
+        ema=True,
+        ema_decay = 0.99,
+        amsgrad=True,
+        default_dtype = "float64",
+        restart_latest=True,
+        lr = 0.0001,
+        patience = 20,
+        device = "cpu",
+        save_cpu =True,
+        seed = 3,
     )
 
     responses = run_locally(
-        nequipfit, ensure_success=True, create_folders=True, store=memory_jobstore
+        macefit, ensure_success=True, create_folders=True, store=memory_jobstore
     )
 
-    assert Path(nequipfit.output["mlip_path"].resolve(memory_jobstore)).exists()
+    assert Path(macefit.output["mlip_path"].resolve(memory_jobstore)).exists()
 
 
 
