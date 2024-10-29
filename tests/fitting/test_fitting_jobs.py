@@ -48,7 +48,7 @@ def test_jace_fit_maker(test_dir, memory_jobstore, clean_dir):
 
 
 
-def test_nqeuip_fit_maker(test_dir, memory_jobstore, clean_dir):
+def test_nequip_fit_maker(test_dir, memory_jobstore, clean_dir):
     database_dir = test_dir / "fitting/rss_training_dataset/"
 
     nequipfit = MLIPFitMaker(

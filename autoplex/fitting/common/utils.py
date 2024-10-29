@@ -1156,7 +1156,7 @@ def mace_fitting(
 
     if fit_kwargs:
         for parameter in mace_hypers:
-            if parameter in fit_kwargs:
+            if (parameter in fit_kwargs):
                 if isinstance(fit_kwargs[parameter], type(mace_hypers[parameter])):
                     mace_hypers[parameter] = fit_kwargs[parameter]
                 else:
@@ -1177,41 +1177,21 @@ def mace_fitting(
                 hypers.append(f"--{hyper}")
         elif hyper in ["train_file", "test_file"]:
             logger.warn("Train and test files have default names.")
+        elif hyper in ["energy_key", "virial_key", "forces_key"]:
+            logger.warn("energy_key, virial_key and forces_key "
+                        "have default names.")
         else:
             hypers.append(f"--{hyper}={mace_hypers[hyper]}")
 
     hypers.append(f"--train_file={db_dir}/train.extxyz")
     hypers.append(f"--valid_file={db_dir}/test.extxyz")
-    hypers.append(f"--energy_key={ref_energy_name}") # check how this should be set in the best way
-    hypers.append(f"--forces_key={ref_force_name}")
+
+    if ref_energy_name is not None:
+        hypers.append(f"--energy_key={ref_energy_name}")
+    if ref_force_name is not None:
+        hypers.append(f"--forces_key={ref_force_name}")
     if ref_virial_name is not None:
         hypers.append(f"--virials_key={ref_virial_name}")
-    #hypers.append(f"--virial_key={ref_virial_name}") #?
-    print(hypers)
-    # hypers = [
-    #     "--name=MACE_model",
-    #     f"--train_file={db_dir}/train.extxyz",
-    #     f"--valid_file={db_dir}/test.extxyz",
-    #     f"--config_type_weights={config_type_weights}", #same here?
-    #     f"--model={model}",
-    #     f"--hidden_irreps={hidden_irreps}", # is this always needed?
-    #     f"--energy_key={ref_energy_name}",
-    #     f"--forces_key={ref_force_name}", # we likely need a stress weight as well?
-    #     f"--r_max={r_max}",
-    #     f"--correlation={correlation}",
-    #     f"--batch_size={batch_size}",
-    #     f"--max_num_epochs={max_num_epochs}",
-    #     "--swa",
-    #     f"--start_swa={start_swa}",
-    #     "--ema",
-    #     f"--ema_decay={ema_decay}",
-    #     "--amsgrad",
-    #     f"--loss={loss}",
-    #     "--restart_latest",
-    #     "--seed=123", # shouldn't we define this more flexible?
-    #     f"--default_dtype={default_dtype}",
-    #     f"--device={device}",
-    # ]
 
     run_mace(hypers)
 
