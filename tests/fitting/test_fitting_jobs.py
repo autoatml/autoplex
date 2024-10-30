@@ -133,21 +133,23 @@ def test_mace_fit_maker(test_dir, memory_jobstore, clean_dir):
     assert Path(macefit.output["mlip_path"].resolve(memory_jobstore)).exists()
 
 def test_mace_finetuning_maker(test_dir, memory_jobstore, clean_dir):
-    database_dir = test_dir / "fitting/rss_training_dataset/"
-    # TODO: make a finetuning script and get data from Jonas
+    database_dir = test_dir / "fitting/finetuning_dataset"
+
+
     macefit = MLIPFitMaker(
                 mlip_type="MACE",
         ref_energy_name=None,
         ref_force_name=None,
         ref_virial_name=None,
     ).make(
-        isolated_atoms_energies={14: -0.84696938},
+        #isolated_atoms_energies={14: -0.84696938},
         num_processes_fit=1,
         preprocessing_data=False,
         database_dir=database_dir,
         use_defaults=False,
         name="MACE_final",
-        foundation_model='"large"',
+        foundation_model="large",
+        multiheads_finetuning=False,
         r_max = 6,
         loss = "huber",
         energy_weight = 1000.0,
@@ -174,37 +176,3 @@ def test_mace_finetuning_maker(test_dir, memory_jobstore, clean_dir):
     )
 
     assert Path(macefit.output["mlip_path"].resolve(memory_jobstore)).exists()
-
-
-
-
-def test_mace_fit_maker_finetuning(test_dir, memory_jobstore, clean_dir):
-    database_dir = test_dir / "fitting/rss_training_dataset/"
-
-    nequipfit = MLIPFitMaker(
-                mlip_type="MACE",
-    ).make(
-        isolated_atoms_energies={14: -0.84696938},
-        num_processes_fit=1,
-        preprocessing_data=False,
-        database_dir=database_dir,
-        model="MACE",
-        config_type_weights='{"Default":1.0}',
-        hidden_irreps="32x0e + 32x1o",
-        r_max=3.0,
-        batch_size=5,
-        max_num_epochs=10,
-        start_swa=5,
-        ema_decay=0.99,
-        correlation=3,
-        loss="huber",
-        default_dtype="float32",
-        device="cpu",
-    )
-
-    responses = run_locally(
-        nequipfit, ensure_success=True, create_folders=True, store=memory_jobstore
-    )
-
-    assert Path(nequipfit.output["mlip_path"].resolve(memory_jobstore)).exists()
-

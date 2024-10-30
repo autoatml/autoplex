@@ -1194,7 +1194,6 @@ def mace_fitting(
     if device is not None:
         hypers.append(f"--device={device}")
 
-    print(hypers)
 
     run_mace(hypers)
 
@@ -1204,15 +1203,23 @@ def mace_fitting(
     tables = re.split(r"\+-+\+\n", log_data)
     if tables:
         last_table = tables[-2]
-        matches = re.findall(r"\|\s*(train|valid)\s*\|\s*([\d\.]+)\s*\|", last_table)
+        try:
+            matches = re.findall(r"\|\s*(train_default|valid_default)\s*\|\s*([\d\.]+)\s*\|", last_table)
 
-    return {
-        "train_error": float(matches[0][1]),
-        "test_error": float(matches[1][1]),
-        "mlip_path": Path.cwd(),
-    }
+            return {
+                "train_error": float(matches[0][1]),
+                "test_error": float(matches[1][1]),
+                "mlip_path": Path.cwd(),
+            }
+        except IndexError:
+            # to ensure backward compatibility to mace 0.3.4
+            matches = re.findall(r"\|\s*(train|valid)\s*\|\s*([\d\.]+)\s*\|", last_table)
 
-
+            return {
+                "train_error": float(matches[0][1]),
+                "test_error": float(matches[1][1]),
+                "mlip_path": Path.cwd(),
+            }
 def check_convergence(test_error: float) -> bool:
     """
     Check the convergence of the fit.
