@@ -1154,17 +1154,41 @@ def mace_fitting(
 
         mace_hypers = default_hyperparameters["MACE"]
     else:
-        mace_hypers={}
-
+        mace_hypers = {}
 
     # TODO: should we do a type check? not sure
     #  as it will be a lot of work to keep it updated
     mace_hypers.update(fit_kwargs)
 
-    boolean_hypers=["distributed","distributed", "pair_repulsion", "amsgrad", "swa", "stage_two", "keep_checkpoint", "save_all_checkpoints", "restart_latest", "save_cpu", "wandb", "compute_statistics", "foundation_model_readout", "ema"]
-    boolean_str_hypers=["compute_avg_num_neighbors", "compute_stress", "compute_forces", "multi_processed_test", "pin_memory", "foundation_filter_elements", "multiheads_finetuning", "keep_isolated_atoms", "shuffle"]
+    boolean_hypers = [
+        "distributed",
+        "distributed",
+        "pair_repulsion",
+        "amsgrad",
+        "swa",
+        "stage_two",
+        "keep_checkpoint",
+        "save_all_checkpoints",
+        "restart_latest",
+        "save_cpu",
+        "wandb",
+        "compute_statistics",
+        "foundation_model_readout",
+        "ema",
+    ]
+    boolean_str_hypers = [
+        "compute_avg_num_neighbors",
+        "compute_stress",
+        "compute_forces",
+        "multi_processed_test",
+        "pin_memory",
+        "foundation_filter_elements",
+        "multiheads_finetuning",
+        "keep_isolated_atoms",
+        "shuffle",
+    ]
 
-    hypers=[]
+    hypers = []
     for hyper in mace_hypers:
         if hyper in boolean_hypers:
             if mace_hypers[hyper] is True:
@@ -1174,8 +1198,7 @@ def mace_fitting(
         elif hyper in ["train_file", "test_file"]:
             print("Train and test files have default names.")
         elif hyper in ["energy_key", "virial_key", "forces_key", "device"]:
-            print("energy_key, virial_key and forces_key "
-                        "have default names.")
+            print("energy_key, virial_key and forces_key have default names.")
         else:
             hypers.append(f"--{hyper}={mace_hypers[hyper]}")
 
@@ -1191,7 +1214,6 @@ def mace_fitting(
     if device is not None:
         hypers.append(f"--device={device}")
 
-    print(hypers)
     run_mace(hypers)
 
     try:
@@ -1205,7 +1227,9 @@ def mace_fitting(
     if tables:
         last_table = tables[-2]
         try:
-            matches = re.findall(r"\|\s*(train_default|valid_default)\s*\|\s*([\d\.]+)\s*\|", last_table)
+            matches = re.findall(
+                r"\|\s*(train_default|valid_default)\s*\|\s*([\d\.]+)\s*\|", last_table
+            )
 
             return {
                 "train_error": float(matches[0][1]),
@@ -1214,13 +1238,17 @@ def mace_fitting(
             }
         except IndexError:
             # to ensure backward compatibility to mace 0.3.4
-            matches = re.findall(r"\|\s*(train|valid)\s*\|\s*([\d\.]+)\s*\|", last_table)
+            matches = re.findall(
+                r"\|\s*(train|valid)\s*\|\s*([\d\.]+)\s*\|", last_table
+            )
 
             return {
                 "train_error": float(matches[0][1]),
                 "test_error": float(matches[1][1]),
                 "mlip_path": Path.cwd(),
             }
+
+
 def check_convergence(test_error: float) -> bool:
     """
     Check the convergence of the fit.

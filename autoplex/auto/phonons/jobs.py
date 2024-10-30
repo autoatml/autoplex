@@ -1,8 +1,8 @@
 """General AutoPLEX automation jobs."""
 
 from __future__ import annotations
-from dataclasses import dataclass, field
 
+from dataclasses import field
 from pathlib import Path
 from typing import TYPE_CHECKING
 
