@@ -1224,7 +1224,7 @@ def mace_fitting(
         with open("./logs/MACE_final_run-3.log") as file:
             log_data = file.read()
     tables = re.split(r"\+-+\+\n", log_data)
-    #if tables:
+    # if tables:
     last_table = tables[-2]
     try:
         matches = re.findall(
@@ -1238,9 +1238,7 @@ def mace_fitting(
         }
     except IndexError:
         # to ensure backward compatibility to mace 0.3.4
-        matches = re.findall(
-            r"\|\s*(train|valid)\s*\|\s*([\d\.]+)\s*\|", last_table
-        )
+        matches = re.findall(r"\|\s*(train|valid)\s*\|\s*([\d\.]+)\s*\|", last_table)
 
         return {
             "train_error": float(matches[0][1]),
