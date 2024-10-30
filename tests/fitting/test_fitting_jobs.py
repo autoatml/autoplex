@@ -137,28 +137,73 @@ def test_mace_finetuning_maker(test_dir, memory_jobstore, clean_dir):
 
 
     macefit = MLIPFitMaker(
-                mlip_type="MACE",
+        mlip_type="MACE",
         ref_energy_name=None,
         ref_force_name=None,
         ref_virial_name=None,
     ).make(
-        #isolated_atoms_energies={14: -0.84696938},
         num_processes_fit=1,
         preprocessing_data=False,
         database_dir=database_dir,
         use_defaults=False,
         name="MACE_final",
-        foundation_model="large",
+        foundation_model="small",
         multiheads_finetuning=False,
         r_max = 6,
         loss = "huber",
         energy_weight = 1000.0,
         forces_weight = 1000.0,
         stress_weight = 1.0 ,
+        compute_stress=True,
         E0s = "average",
         scaling = "rms_forces_scaling",
         batch_size = 1,
-        max_num_epochs = 2,
+        max_num_epochs = 1,
+        ema=True,
+        ema_decay = 0.99,
+        amsgrad=True,
+        default_dtype = "float64",
+        restart_latest=True,
+        lr = 0.0001,
+        patience = 20,
+        device = "cpu",
+        save_cpu =True,
+        seed = 3,
+    )
+
+    responses = run_locally(
+        macefit, ensure_success=True, create_folders=True, store=memory_jobstore
+    )
+
+    assert Path(macefit.output["mlip_path"].resolve(memory_jobstore)).exists()
+
+def test_mace_finetuning_maker2(test_dir, memory_jobstore, clean_dir):
+    database_dir = test_dir / "fitting/rss_training_dataset/"
+
+
+    macefit = MLIPFitMaker(
+        mlip_type="MACE",
+        ref_energy_name=None,
+        ref_force_name=None,
+        ref_virial_name=None,
+    ).make(
+        num_processes_fit=1,
+        preprocessing_data=False,
+        database_dir=database_dir,
+        use_defaults=False,
+        name="MACE_final",
+        foundation_model="small",
+        multiheads_finetuning=False,
+        r_max = 6,
+        loss = "huber",
+        energy_weight = 1000.0,
+        forces_weight = 1000.0,
+        stress_weight = 1.0 ,
+        compute_stress=True,
+        E0s = "average",
+        scaling = "rms_forces_scaling",
+        batch_size = 1,
+        max_num_epochs = 1,
         ema=True,
         ema_decay = 0.99,
         amsgrad=True,

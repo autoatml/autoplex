@@ -584,6 +584,74 @@ def test_complete_dft_vs_ml_benchmark_workflow_mace(
         # and too little data
     )
 
+def test_complete_dft_vs_ml_benchmark_workflow_mace_finetuning(
+        vasp_test_dir, mock_vasp, test_dir, memory_jobstore, ref_paths4_mpid, fake_run_vasp_kwargs4_mpid, clean_dir
+):
+    from jobflow import run_locally
+
+    path_to_struct = vasp_test_dir / "dft_ml_data_generation" / "POSCAR"
+    structure = Structure.from_file(path_to_struct)
+
+    complete_workflow_mace = CompleteDFTvsMLBenchmarkWorkflow(
+        ml_models=["MACE"],
+        symprec=1e-2, supercell_settings={"min_length": 8, "min_atoms": 20}, displacements=[0.01],
+        volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
+        benchmark_kwargs={"calculator_kwargs": {"device": "cpu"}}
+    ).make(
+        structure_list=[structure],
+        mp_ids=["test"],
+        benchmark_mp_ids=["mp-22905"],
+        benchmark_structures=[structure],
+        pre_xyz_files=["vasp_ref.extxyz"],
+        pre_database_dir=test_dir / "fitting" / "ref_files",
+        preprocessing_data=True,
+        use_defaults_fitting=False,
+        model="MACE",
+        name="MACE_final",
+        foundation_model="small",
+        multiheads_finetuning=False,
+        r_max=6,
+        loss="huber",
+        energy_weight=1000.0,
+        forces_weight=1000.0,
+        stress_weight=1.0,
+        compute_stress=True,
+        E0s="average",
+        scaling="rms_forces_scaling",
+        batch_size=1,
+        max_num_epochs=1,
+        ema=True,
+        ema_decay=0.99,
+        amsgrad=True,
+        default_dtype="float64",
+        restart_latest=True,
+        lr=0.0001,
+        patience=20,
+        device="cpu",
+        save_cpu=True,
+        seed=3,
+    )
+
+    # automatically use fake VASP and write POTCAR.spec during the test
+    mock_vasp(ref_paths4_mpid, fake_run_vasp_kwargs4_mpid)
+
+    # run the flow or job and ensure that it finished running successfully
+    responses = run_locally(
+        complete_workflow_mace,
+        create_folders=True,
+        ensure_success=True,
+        store=memory_jobstore,
+    )
+
+    assert complete_workflow_mace.jobs[4].name == "complete_benchmark_mp-22905"
+    assert responses[complete_workflow_mace.jobs[-1].output.uuid][1].output[0][0][
+               "benchmark_phonon_rmse"] == pytest.approx(
+        0.45, abs=0.4
+        # result is so bad because hyperparameter quality is reduced to a minimum to save time
+        # and too little data
+    )
+
+
 
 def test_complete_dft_vs_ml_benchmark_workflow_nequip(
         vasp_test_dir, mock_vasp, test_dir, memory_jobstore, ref_paths4_mpid, fake_run_vasp_kwargs4_mpid, clean_dir

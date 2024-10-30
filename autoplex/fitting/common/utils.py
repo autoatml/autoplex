@@ -14,8 +14,6 @@ from functools import partial
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from autoplex_previous.autoplex.data.phonons.utils import logger
-
 if TYPE_CHECKING:
     from pymatgen.core import Structure
 
@@ -1172,12 +1170,11 @@ def mace_fitting(
             if mace_hypers[hyper] is True:
                 hypers.append(f"--{hyper}")
         elif hyper in boolean_str_hypers:
-            if mace_hypers[hyper] is True:
-                hypers.append(f"--{hyper}")
+            hypers.append(f"--{hyper}={mace_hypers[hyper]}")
         elif hyper in ["train_file", "test_file"]:
-            logger.warn("Train and test files have default names.")
+            print("Train and test files have default names.")
         elif hyper in ["energy_key", "virial_key", "forces_key", "device"]:
-            logger.warn("energy_key, virial_key and forces_key "
+            print("energy_key, virial_key and forces_key "
                         "have default names.")
         else:
             hypers.append(f"--{hyper}={mace_hypers[hyper]}")
@@ -1194,12 +1191,16 @@ def mace_fitting(
     if device is not None:
         hypers.append(f"--device={device}")
 
-
+    print(hypers)
     run_mace(hypers)
 
-    with open("./logs/MACE_model_run-123.log") as file:
-        log_data = file.read()
-
+    try:
+        with open("./logs/MACE_model_run-123.log") as file:
+            log_data = file.read()
+    except FileNotFoundError:
+        # to cover finetuning
+        with open("./logs/MACE_final_run-3.log") as file:
+            log_data = file.read()
     tables = re.split(r"\+-+\+\n", log_data)
     if tables:
         last_table = tables[-2]

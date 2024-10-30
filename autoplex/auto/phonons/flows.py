@@ -194,6 +194,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         dft_references: list[PhononBSDOSDoc] | None = None,
         benchmark_structures: list[Structure] | None = None,
         benchmark_mp_ids: list[str] | None = None,
+        use_defaults_fitting: bool = True,
         **fit_kwargs,
     ):
         """
@@ -313,6 +314,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
             add_data_fit = MLIPFitMaker(
                 mlip_type=ml_model,
                 glue_file_path=self.glue_file_path,
+                use_defaults=use_defaults_fitting,
             ).make(
                 species_list=isoatoms.output["species"],
                 isolated_atoms_energies=isoatoms.output["energies"],
