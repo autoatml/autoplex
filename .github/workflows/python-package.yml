@@ -31,6 +31,7 @@ jobs:
           ghcr.io/autoatml/autoplex/autoplex:python-${{ matrix.python-version }} \
           bash -c "
           python -m pip install --upgrade pip && \
+          python -n uv cache clean
           python -m uv pip install .[strict,tests] && \
           OMP_NUM_THREADS=1 pytest --cache-clear --cov=autoplex --cov-report term-missing --cov-append --splits 5 --group ${{ matrix.split }} -vv --durations-path /workspace/tests/test_data/.pytest-split-durations
         "
