@@ -14,14 +14,6 @@ from atomate2.forcefields.flows.phonons import PhononMaker as FFPhononMaker
 from atomate2.forcefields.jobs import (
     ForceFieldRelaxMaker,
     ForceFieldStaticMaker,
-    GAPRelaxMaker,
-    GAPStaticMaker,
-    M3GNetRelaxMaker,
-    M3GNetStaticMaker,
-    MACERelaxMaker,
-    MACEStaticMaker,
-    NequipRelaxMaker,
-    NequipStaticMaker,
 )
 from atomate2.vasp.flows.core import DoubleRelaxMaker
 from atomate2.vasp.flows.phonons import PhononMaker
@@ -85,6 +77,7 @@ class TightDFTStaticMaker(PhononDisplacementMaker):
     input_set_generator: VaspInputGenerator = field(
         default_factory=lambda: StaticSetGenerator(
             user_incar_settings={
+                "ALGO": "Normal",  # not switching to Fast because it's not precise enough for the fit
                 "IBRION": -1,
                 "ISPIN": 1,
                 "ISMEAR": 0,
@@ -93,7 +86,6 @@ class TightDFTStaticMaker(PhononDisplacementMaker):
                 "EDIFF": 1e-7,
                 "LAECHG": False,
                 "LREAL": False,
-                "ALGO": "Normal",  # not switching to Fast because it's not precise enough for the fit
                 "NSW": 0,
                 "LCHARG": False,  # Do not write the CHGCAR file
                 "LWAVE": False,  # Do not write the WAVECAR file
@@ -216,6 +208,7 @@ class DFTPhononMaker(PhononMaker):
                 run_vasp_kwargs={"handlers": {}},
                 input_set_generator=TightRelaxSetGenerator(
                     user_incar_settings={
+                        "ALGO": "Normal",
                         "ISPIN": 1,
                         "LAECHG": False,
                         "ISMEAR": 0,
@@ -239,6 +232,7 @@ class DFTPhononMaker(PhononMaker):
             input_set_generator=StaticSetGenerator(
                 auto_ispin=False,
                 user_incar_settings={
+                    "ALGO": "Normal",
                     "ISPIN": 1,
                     "LAECHG": False,
                     "ISMEAR": 0,
@@ -329,6 +323,7 @@ class RandomStructuresDataGenerator(Maker):
             run_vasp_kwargs={"handlers": {}},
             input_set_generator=TightRelaxSetGenerator(
                 user_incar_settings={
+                    "ALGO": "Normal",
                     "ISPIN": 1,
                     "LAECHG": False,
                     "ISYM": 0,  # to be changed
@@ -391,18 +386,23 @@ class RandomStructuresDataGenerator(Maker):
         jobs.append(relaxed)
         structure = relaxed.output.structure
 
-        supercell_matrix_job = reduce_supercell_size_job(
-            structure=structure,
-            min_length=self.supercell_settings.get("min_length", 12),
-            max_length=self.supercell_settings.get("max_length", 25),
-            fallback_min_length=self.supercell_settings.get("fallback_min_length", 10),
-            max_atoms=self.supercell_settings.get("max_atoms", 500),
-            min_atoms=self.supercell_settings.get("min_atoms", 50),
-            step_size=self.supercell_settings.get("step_size", 1.0),
+        supercell_matrix = self.supercell_settings.get(mp_id, {}).get(
+            "supercell_matrix"
         )
-        jobs.append(supercell_matrix_job)
-
-        supercell_matrix = supercell_matrix_job.output
+        if not supercell_matrix:
+            supercell_matrix_job = reduce_supercell_size_job(
+                structure=structure,
+                min_length=self.supercell_settings.get("min_length", 12),
+                max_length=self.supercell_settings.get("max_length", 25),
+                fallback_min_length=self.supercell_settings.get(
+                    "fallback_min_length", 10
+                ),
+                max_atoms=self.supercell_settings.get("max_atoms", 500),
+                min_atoms=self.supercell_settings.get("min_atoms", 50),
+                step_size=self.supercell_settings.get("step_size", 1.0),
+            )
+            jobs.append(supercell_matrix_job)
+            supercell_matrix = supercell_matrix_job.output
 
         random_rattle_sc = generate_randomized_structures(
             structure=structure,
@@ -567,15 +567,20 @@ class MLPhononMaker(FFPhononMaker):
     min_length: float | None = 20.0
     displacement: float = 0.01
     bulk_relax_maker: ForceFieldRelaxMaker | None = field(
-        default_factory=lambda: GAPRelaxMaker(
-            relax_cell=True, relax_kwargs={"interval": 500}
+        default_factory=lambda: ForceFieldRelaxMaker(
+            relax_cell=True,
+            relax_kwargs={"interval": 500},
+            force_field_name="GAP",
         )
     )
     phonon_displacement_maker: ForceFieldStaticMaker | None = field(
-        default_factory=lambda: GAPStaticMaker(name="gap phonon static")
+        default_factory=lambda: ForceFieldStaticMaker(
+            name="gap phonon static",
+            force_field_name="GAP",
+        )
     )
     static_energy_maker: ForceFieldStaticMaker | None = field(
-        default_factory=lambda: GAPStaticMaker()
+        default_factory=lambda: ForceFieldStaticMaker(force_field_name="GAP")
     )
     store_force_constants: bool = False
     get_supercell_size_kwargs: dict = field(
@@ -654,13 +659,18 @@ class MLPhononMaker(FFPhononMaker):
                 calculator_kwargs.update({"model_path": str(potential_file)})
 
             ml_prep = ml_phonon_maker_preparation(
-                bulk_relax_maker=NequipRelaxMaker(
-                    relax_cell=True, relax_kwargs={"interval": 500}
+                bulk_relax_maker=ForceFieldRelaxMaker(
+                    relax_cell=True,
+                    relax_kwargs={"interval": 500},
+                    force_field_name="Nequip",
                 ),
-                phonon_displacement_maker=NequipStaticMaker(
-                    name="nequip phonon static"
+                phonon_displacement_maker=ForceFieldStaticMaker(
+                    name="nequip phonon static",
+                    force_field_name="Nequip",
                 ),
-                static_energy_maker=NequipStaticMaker(),
+                static_energy_maker=ForceFieldStaticMaker(
+                    force_field_name="Nequip",
+                ),
                 calculator_kwargs=calculator_kwargs,
                 relax_maker_kwargs=self.relax_maker_kwargs,
                 static_maker_kwargs=self.static_maker_kwargs,
@@ -671,13 +681,18 @@ class MLPhononMaker(FFPhononMaker):
                 calculator_kwargs = {"path": str(potential_file)}
 
             ml_prep = ml_phonon_maker_preparation(
-                bulk_relax_maker=M3GNetRelaxMaker(
-                    relax_cell=True, relax_kwargs={"interval": 500}
+                bulk_relax_maker=ForceFieldRelaxMaker(
+                    relax_cell=True,
+                    relax_kwargs={"interval": 500},
+                    force_field_name="M3GNet",
                 ),
-                phonon_displacement_maker=M3GNetStaticMaker(
-                    name="m3gnet phonon static"
+                phonon_displacement_maker=ForceFieldStaticMaker(
+                    name="m3gnet phonon static",
+                    force_field_name="M3GNet",
                 ),
-                static_energy_maker=M3GNetStaticMaker(),
+                static_energy_maker=ForceFieldStaticMaker(
+                    force_field_name="M3GNet",
+                ),
                 calculator_kwargs=calculator_kwargs,
                 relax_maker_kwargs=self.relax_maker_kwargs,
                 static_maker_kwargs=self.static_maker_kwargs,
@@ -696,11 +711,18 @@ class MLPhononMaker(FFPhononMaker):
                 )
 
             ml_prep = ml_phonon_maker_preparation(
-                bulk_relax_maker=MACERelaxMaker(
-                    relax_cell=True, relax_kwargs={"interval": 500}
+                bulk_relax_maker=ForceFieldRelaxMaker(
+                    relax_cell=True,
+                    relax_kwargs={"interval": 500},
+                    force_field_name="MACE",
                 ),
-                phonon_displacement_maker=MACEStaticMaker(name="mace phonon static"),
-                static_energy_maker=MACEStaticMaker(),
+                phonon_displacement_maker=ForceFieldStaticMaker(
+                    name="mace phonon static",
+                    force_field_name="MACE",
+                ),
+                static_energy_maker=ForceFieldStaticMaker(
+                    force_field_name="MACE",
+                ),
                 calculator_kwargs=calculator_kwargs,
                 relax_maker_kwargs=self.relax_maker_kwargs,
                 static_maker_kwargs=self.static_maker_kwargs,
@@ -754,6 +776,7 @@ class IsoAtomStaticMaker(StaticMaker):
         default_factory=lambda: StaticSetGenerator(
             user_kpoints_settings={"reciprocal_density": 1},
             user_incar_settings={
+                "ALGO": "Normal",
                 "ISPIN": 1,
                 "LAECHG": False,
                 "ISMEAR": 0,
@@ -804,6 +827,7 @@ class IsoAtomMaker(Maker):
             isolated_atom_static_input_set = StaticSetGenerator(
                 user_kpoints_settings={"grid_density": 1},
                 user_incar_settings={
+                    "ALGO": "Normal",
                     "ISPIN": 1,
                     "LAECHG": False,
                     "ISMEAR": 0,

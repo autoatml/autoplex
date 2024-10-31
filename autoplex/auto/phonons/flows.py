@@ -279,6 +279,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
             if self.add_dft_phonon_struct:
                 add_dft_phon = self.add_dft_phonons(
                     structure=structure,
+                    mp_id=mp_id,
                     displacements=self.displacements,
                     symprec=self.symprec,
                     phonon_bulk_relax_maker=self.phonon_bulk_relax_maker,
@@ -450,6 +451,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
     @staticmethod
     def add_dft_phonons(
         structure: Structure,
+        mp_id: str,
         displacements: list[float],
         symprec: float,
         phonon_bulk_relax_maker: BaseVaspMaker,
@@ -463,6 +465,8 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         ----------
         structure: Structure
             pymatgen Structure object
+        mp_id: str
+            materials project id
         displacements: list[float]
            displacement distance for phonons
         symprec: float
@@ -483,6 +487,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         """
         dft_phonons = dft_phonopy_gen_data(
             structure=structure,
+            mp_id=mp_id,
             displacements=displacements,
             symprec=symprec,
             phonon_bulk_relax_maker=phonon_bulk_relax_maker,
