@@ -3,20 +3,22 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from importlib.metadata import pass_none
 from typing import TYPE_CHECKING
+
+from atomate2.vasp.flows.mp import (
+    MPGGADoubleRelaxMaker,
+    MPGGARelaxMaker,
+    MPGGAStaticMaker,
+)
+from pymatgen.io.vasp.sets import (
+    MPRelaxSet,
+    MPStaticSet,
+)
 
 from autoplex.data.phonons.flows import TightDFTStaticMaker
 from autoplex.fitting.common.utils import (
     MLIP_PHONON_DEFAULTS_FILE_PATH,
     load_mlip_hyperparameter_defaults,
-)
-from atomate2.vasp.flows.mp import MPGGADoubleRelaxMaker, MPGGARelaxMaker, MPGGAStaticMaker
-from pymatgen.io.vasp.sets import (
-    MPRelaxSet,
-    MPScanRelaxSet,
-    MPScanStaticSet,
-    MPStaticSet,
 )
 
 if TYPE_CHECKING:
@@ -41,7 +43,11 @@ from autoplex.auto.phonons.jobs import (
 from autoplex.benchmark.phonons.jobs import write_benchmark_metrics
 from autoplex.fitting.common.flows import MLIPFitMaker
 
-__all__ = ["CompleteDFTvsMLBenchmarkWorkflow", "CompleteDFTvsMLBenchmarkWorkflowMPSettings", "DFTSupercellSettingsMaker"]
+__all__ = [
+    "CompleteDFTvsMLBenchmarkWorkflow",
+    "CompleteDFTvsMLBenchmarkWorkflowMPSettings",
+    "DFTSupercellSettingsMaker",
+]
 
 
 # Volker's idea: provide several default flows with different setting/setups
@@ -611,40 +617,118 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
 @dataclass
 class CompleteDFTvsMLBenchmarkWorkflowMPSettings(CompleteDFTvsMLBenchmarkWorkflow):
     # add mp compatible settings
-    phonon_bulk_relax_maker:BaseVaspMaker = field(
-        default_factory=lambda: MPGGADoubleRelaxMaker.from_relax_maker(MPGGARelaxMaker(run_vasp_kwargs={"handlers": ()},input_set_generator=MPRelaxSet(
-            force_gamma=True, auto_metal_kpoints=True, inherit_incar=False,
-            user_incar_settings={"NPAR": 4, "EDIFF": 1e-7, "EDIFFG": 1e-6, "ALGO": "NORMAL", "ISPIN": 1, "LREAL": False,
-                                 "LCHARG": False, "ISMEAR": 0,
-                                 "KSPACING": 0.2}))))
+    phonon_bulk_relax_maker: BaseVaspMaker = field(
+        default_factory=lambda: MPGGADoubleRelaxMaker.from_relax_maker(
+            MPGGARelaxMaker(
+                run_vasp_kwargs={"handlers": ()},
+                input_set_generator=MPRelaxSet(
+                    force_gamma=True,
+                    auto_metal_kpoints=True,
+                    inherit_incar=False,
+                    user_incar_settings={
+                        "NPAR": 4,
+                        "EDIFF": 1e-7,
+                        "EDIFFG": 1e-6,
+                        "ALGO": "NORMAL",
+                        "ISPIN": 1,
+                        "LREAL": False,
+                        "LCHARG": False,
+                        "ISMEAR": 0,
+                        "KSPACING": 0.2,
+                    },
+                ),
+            )
+        )
+    )
     rattled_bulk_relax_maker: BaseVaspMaker = field(
-        default_factory=lambda: MPGGADoubleRelaxMaker.from_relax_maker(MPGGARelaxMaker(run_vasp_kwargs={"handlers": ()},input_set_generator=MPRelaxSet(
-            force_gamma=True, auto_metal_kpoints=True, inherit_incar=False,
-            user_incar_settings={"NPAR": 4, "EDIFF": 1e-7, "EDIFFG": 1e-6, "ALGO": "NORMAL", "ISPIN": 1, "LREAL": False,
-                                 "LCHARG": False, "ISMEAR": 0,
-                                 "KSPACING": 0.2}))))
-    displacement_maker: BaseVaspMaker= field(
-        default_factory=lambda: MPGGAStaticMaker(run_vasp_kwargs={"handlers": ()}, name="dft phonon static",
+        default_factory=lambda: MPGGADoubleRelaxMaker.from_relax_maker(
+            MPGGARelaxMaker(
+                run_vasp_kwargs={"handlers": ()},
+                input_set_generator=MPRelaxSet(
+                    force_gamma=True,
+                    auto_metal_kpoints=True,
+                    inherit_incar=False,
+                    user_incar_settings={
+                        "NPAR": 4,
+                        "EDIFF": 1e-7,
+                        "EDIFFG": 1e-6,
+                        "ALGO": "NORMAL",
+                        "ISPIN": 1,
+                        "LREAL": False,
+                        "LCHARG": False,
+                        "ISMEAR": 0,
+                        "KSPACING": 0.2,
+                    },
+                ),
+            )
+        )
+    )
+    displacement_maker: BaseVaspMaker = field(
+        default_factory=lambda: MPGGAStaticMaker(
+            run_vasp_kwargs={"handlers": ()},
+            name="dft phonon static",
             input_set_generator=MPStaticSet(
-            force_gamma=True, auto_metal_kpoints=True, inherit_incar=False,
-            user_incar_settings={"NPAR": 4, "EDIFF": 1e-7, "EDIFFG": 1e-6, "ALGO": "NORMAL", "ISPIN": 1,
-                                 "LREAL": False, "LCHARG": False, "ISMEAR": 0,
-                                 "KSPACING": 0.2})))
-    isolated_atom_maker: BaseVaspMaker = field(default_factory=lambda: MPGGAStaticMaker(run_vasp_kwargs={"handlers": ()},
+                force_gamma=True,
+                auto_metal_kpoints=True,
+                inherit_incar=False,
+                user_incar_settings={
+                    "NPAR": 4,
+                    "EDIFF": 1e-7,
+                    "EDIFFG": 1e-6,
+                    "ALGO": "NORMAL",
+                    "ISPIN": 1,
+                    "LREAL": False,
+                    "LCHARG": False,
+                    "ISMEAR": 0,
+                    "KSPACING": 0.2,
+                },
+            ),
+        )
+    )
+    isolated_atom_maker: BaseVaspMaker = field(
+        default_factory=lambda: MPGGAStaticMaker(
+            run_vasp_kwargs={"handlers": ()},
             input_set_generator=MPStaticSet(
-            user_kpoints_settings={"reciprocal_density": 1},
-            force_gamma=True, auto_metal_kpoints=True, inherit_incar=False,
-            user_incar_settings={"NPAR": 4, "EDIFF": 1e-7, "EDIFFG": 1e-6, "ALGO": "NORMAL", "ISPIN": 1,
-                                 "LREAL": False, "LCHARG": False, "ISMEAR": 0})))
+                user_kpoints_settings={"reciprocal_density": 1},
+                force_gamma=True,
+                auto_metal_kpoints=True,
+                inherit_incar=False,
+                user_incar_settings={
+                    "NPAR": 4,
+                    "EDIFF": 1e-7,
+                    "EDIFFG": 1e-6,
+                    "ALGO": "NORMAL",
+                    "ISPIN": 1,
+                    "LREAL": False,
+                    "LCHARG": False,
+                    "ISMEAR": 0,
+                },
+            ),
+        )
+    )
 
-    phonon_static_energy_maker: BaseVaspMaker= field(
-        default_factory=lambda: MPGGAStaticMaker(run_vasp_kwargs={"handlers": ()}, name="dft phonon static",
+    phonon_static_energy_maker: BaseVaspMaker = field(
+        default_factory=lambda: MPGGAStaticMaker(
+            run_vasp_kwargs={"handlers": ()},
+            name="dft phonon static",
             input_set_generator=MPStaticSet(
-            force_gamma=True, auto_metal_kpoints=True, inherit_incar=False,
-            user_incar_settings={"NPAR": 4, "EDIFF": 1e-7, "EDIFFG": 1e-6, "ALGO": "NORMAL", "ISPIN": 1,
-                                 "LREAL": False, "LCHARG": False, "ISMEAR": 0,
-                                 "KSPACING": 0.2})))
-
+                force_gamma=True,
+                auto_metal_kpoints=True,
+                inherit_incar=False,
+                user_incar_settings={
+                    "NPAR": 4,
+                    "EDIFF": 1e-7,
+                    "EDIFFG": 1e-6,
+                    "ALGO": "NORMAL",
+                    "ISPIN": 1,
+                    "LREAL": False,
+                    "LCHARG": False,
+                    "ISMEAR": 0,
+                    "KSPACING": 0.2,
+                },
+            ),
+        )
+    )
 
 
 # phonon_flow = PhononMaker(name =f'{name}_flow', bulk_relax_maker=MPGGADoubleRelaxMaker(name='relax'), born_maker=None,
