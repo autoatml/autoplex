@@ -616,7 +616,108 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
 
 @dataclass
 class CompleteDFTvsMLBenchmarkWorkflowMPSettings(CompleteDFTvsMLBenchmarkWorkflow):
-    # add mp compatible settings
+    """
+    Maker to construct a DFT (VASP) based dataset, composed of the following two configuration types.
+
+    (1) single atom displaced supercells (based on the atomate2 PhononMaker subroutines)
+    (2) supercells with randomly displaced atoms (based on the ase rattled function).
+
+    Machine-learned interatomic potential(s) are then fitted on the dataset, followed by
+    benchmarking the resulting potential(s) to DFT (VASP) level using the provided benchmark
+    structure(s) and comparing the respective DFT and MLIP-based Phonon calculations.
+    The benchmark metrics are provided in form of a phonon band structure comparison and
+    q-point-wise phonons RMSE plots, as well as a summary text file.
+
+    Parameters
+    ----------
+    name : str
+        Name of the flow produced by this maker.
+    add_dft_phonon_struct: bool.
+        If True, will add displaced supercells via phonopy for DFT calculation.
+    add_dft_random_struct: bool.
+        If True, will add randomly distorted structures for DFT calculation.
+    add_rss_struct: bool.
+        If True, will add RSS generated structures for DFT calculation.
+        n_structures: int.
+        The total number of randomly displaced structures to be generated.
+    displacement_maker: BaseVaspMaker
+        Maker used for a static calculation for a supercell.
+    phonon_bulk_relax_maker: BaseVaspMaker
+        Maker used for the bulk relax unit cell calculation.
+    rattled_bulk_relax_maker: BaseVaspMaker
+        Maker used for the bulk relax unit cell calculation.
+    phonon_static_energy_maker: BaseVaspMaker
+        Maker used for the static energy unit cell calculation.
+    isolated_atom_maker: IsoAtomStaticMaker
+        VASP maker for the isolated atom calculation.
+    n_structures : int.
+        Total number of distorted structures to be generated.
+        Must be provided if distorting volume without specifying a range, or if distorting angles.
+        Default=10.
+    displacements: list[float]
+        displacement distances for phonons
+    symprec: float
+        Symmetry precision to use in the
+        reduction of symmetry to find the primitive/conventional cell
+        (use_primitive_standard_structure, use_conventional_standard_structure)
+        and to handle all symmetry-related tasks in phonopy.
+    uc: bool.
+        If True, will generate randomly distorted structures (unitcells)
+        and add static computation jobs to the flow.
+    distort_type : int.
+        0- volume distortion, 1- angle distortion, 2- volume and angle distortion. Default=0.
+    volume_scale_factor_range : list[float]
+        [min, max] of volume scale factors.
+        e.g. [0.90, 1.10] will distort volume +-10%.
+    volume_custom_scale_factors : list[float]
+        Specify explicit scale factors (if range is not specified).
+        If None, will default to [0.90, 0.95, 0.98, 0.99, 1.01, 1.02, 1.05, 1.10].
+    min_distance: float
+        Minimum separation allowed between any two atoms.
+        Default= 1.5A.
+    angle_percentage_scale: float
+        Angle scaling factor.
+        Default= 10 will randomly distort angles by +-10% of original value.
+    angle_max_attempts: int.
+        Maximum number of attempts to distort structure before aborting.
+        Default=1000.
+    w_angle: list[float]
+        List of angle indices to be changed i.e. 0=alpha, 1=beta, 2=gamma.
+        Default= [0, 1, 2].
+    rattle_type: int.
+        0- standard rattling, 1- Monte-Carlo rattling. Default=0.
+    rattle_std: float.
+        Rattle amplitude (standard deviation in normal distribution).
+        Default=0.01.
+        Note that for MC rattling, displacements generated will roughly be
+        rattle_mc_n_iter**0.5 * rattle_std for small values of n_iter.
+    rattle_seed: int.
+        Seed for setting up NumPy random state from which random numbers are generated.
+        Default=42.
+    rattle_mc_n_iter: int.
+        Number of Monte Carlo iterations.
+        Larger number of iterations will generate larger displacements.
+        Default=10.
+    ml_models: list[str]
+        list of the ML models to be used. Default is GAP.
+    hyper_para_loop: bool
+        making it easier to loop through several hyperparameter sets.
+    atomwise_regularization_list: list
+        List of atom-wise regularization parameters that are checked.
+    soap_delta_list: list
+        List of SOAP delta values that are checked.
+    n_sparse_list: list
+        List of GAP n_sparse values that are checked.
+    supercell_settings: dict
+        settings for supercell generation
+    benchmark_kwargs: dict
+        kwargs for the benchmark flows
+    summary_filename_prefix: str
+        Prefix of the result summary file.
+    glue_file_path: str
+        Name of the glue.xml file path.
+    """
+
     phonon_bulk_relax_maker: BaseVaspMaker = field(
         default_factory=lambda: MPGGADoubleRelaxMaker.from_relax_maker(
             MPGGARelaxMaker(
