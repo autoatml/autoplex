@@ -212,6 +212,57 @@ complete_flow = CompleteDFTvsMLBenchmarkWorkflow(
     ...
 )
 ```
+### Finetuning MACE-MP-0
+
+It is also possible to finetune MACE-MP-0. To do so, you need to install MACE-torch 0.3.7. 
+Currently, this can only be done by cloning the git-repo and installing it from there: []()
+
+It is now important that you switch off the default settings for the fitting procedure (use_defaults_fitting=False).
+If one wants to perform very low-data fine-tuning (less than 4 additional structures), please also think about switching off `preprocessing_data` 
+as this will disable the test/train split. 
+
+The following workflow `CompleteDFTvsMLBenchmarkWorkflowMPSettings` uses Materials Project default settings slightly adapted to phonon runs (more accurate convergence, ALGO=Normal).
+It can also be used without finetuning option. To finetune optimally, please adapt the MACE fitting parameters yourself.
+
+```python
+complete_workflow_mace = CompleteDFTvsMLBenchmarkWorkflowMPSettings(
+        ml_models=["MACE"],
+        volume_custom_scale_factors=[0.95,1.00,1.05], rattle_type=0, distort_type=0,
+        ...
+    ).make(
+        structure_list=[structure],
+        mp_ids=["mpid"],
+        benchmark_mp_ids=["mpid"],
+        benchmark_structures=[structure],
+        preprocessing_data=True,
+        use_defaults_fitting=False,
+        model="MACE",
+        name="MACE_final",
+        foundation_model="large",
+        multiheads_finetuning=False,
+        r_max=6,
+        loss="huber",
+        energy_weight=1000.0,
+        forces_weight=1000.0,
+        stress_weight=1.0,
+        compute_stress=True,
+        E0s="average",
+        scaling="rms_forces_scaling",
+        batch_size=1,
+        max_num_epochs=200,
+        ema=True,
+        ema_decay=0.99,
+        amsgrad=True,
+        default_dtype="float64",
+        restart_latest=True,
+        lr=0.0001,
+        patience=20,
+        device="cpu",
+        save_cpu=True,
+        seed=3,
+    )
+    
+
 
 ## Example script for `autoplex` workflow using GAP to fit and benchmark a Si database
 

@@ -1,0 +1,2 @@
+/dss/dsshome1/00/di82tut/miniconda3/envs/autoplex_test/lib/python3.11/site-packages/pymatgen/io/vasp/sets.py:937: BadInputSetWarning: POTCAR data with symbol Sn_d is not known by pymatgen to correspond with the selected user_potcar_functional='PBE'. This POTCAR is known to correspond with functionals ['PBE_54', 'PBE_52']. Please verify that you are using the right POTCARs!
+  warnings.warn(
