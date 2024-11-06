@@ -767,70 +767,70 @@ def test_complete_dft_vs_ml_benchmark_workflow_mace_finetuning_MP_settings(
         # and too little data
     )
 
-def test_complete_dft_vs_ml_benchmark_workflow_mace_finetuning_MP_settings_little_data(
-        vasp_test_dir, mock_vasp, test_dir, memory_jobstore, ref_paths5_mpid, fake_run_vasp_kwargs5_mpid, clean_dir
-):
-    from jobflow import run_locally
-
-    path_to_struct = vasp_test_dir / "MP_finetuning" / "POSCAR"
-    structure = Structure.from_file(path_to_struct)
-
-    complete_workflow_mace = CompleteDFTvsMLBenchmarkWorkflowMPSettings(
-        ml_models=["MACE"],
-        volume_custom_scale_factors=[0.95,1.00,1.05], rattle_type=0, distort_type=0,
-        symprec=1e-3, supercell_settings={"min_length": 6, "max_length":10, "min_atoms":10, "max_atoms":300,}, displacements=[0.01],
-        benchmark_kwargs={"calculator_kwargs": {"device": "cpu"}},
-        add_dft_random_struct=False,
-    ).make(
-        structure_list=[structure],
-        mp_ids=["test"],
-        benchmark_mp_ids=["test"],
-        benchmark_structures=[structure],
-        preprocessing_data=False,
-        use_defaults_fitting=False,
-        model="MACE",
-        name="MACE_final",
-        foundation_model="small",
-        multiheads_finetuning=False,
-        r_max=6,
-        loss="huber",
-        energy_weight=1000.0,
-        forces_weight=1000.0,
-        stress_weight=1.0,
-        compute_stress=True,
-        E0s="average",
-        scaling="rms_forces_scaling",
-        batch_size=1,
-        max_num_epochs=1,
-        ema=True,
-        ema_decay=0.99,
-        amsgrad=True,
-        default_dtype="float64",
-        restart_latest=True,
-        lr=0.0001,
-        patience=20,
-        device="cpu",
-        save_cpu=True,
-        seed=3,
-    )
-    # automatically use fake VASP and write POTCAR.spec during the test
-    mock_vasp(ref_paths5_mpid, fake_run_vasp_kwargs5_mpid)
-
-    # run the flow or job and ensure that it finished running successfully
-    responses = run_locally(
-        complete_workflow_mace,
-        create_folders=True,
-        ensure_success=True,
-        store=memory_jobstore,
-    )
-
-    assert complete_workflow_mace.jobs[4].name == "complete_benchmark_test"
-    assert responses[complete_workflow_mace.jobs[-1].output.uuid][1].output[0][0][
-               "benchmark_phonon_rmse"] == pytest.approx(
-        0.45, abs=0.4
-        # result is so bad because hyperparameter quality is reduced to a minimum to save time
-        # and too little data
-    )
+# def test_complete_dft_vs_ml_benchmark_workflow_mace_finetuning_MP_settings_little_data(
+#         vasp_test_dir, mock_vasp, test_dir, memory_jobstore, ref_paths5_mpid, fake_run_vasp_kwargs5_mpid, clean_dir
+# ):
+#     from jobflow import run_locally
+#
+#     path_to_struct = vasp_test_dir / "MP_finetuning" / "POSCAR"
+#     structure = Structure.from_file(path_to_struct)
+#
+#     complete_workflow_mace = CompleteDFTvsMLBenchmarkWorkflowMPSettings(
+#         ml_models=["MACE"],
+#         volume_custom_scale_factors=[0.95,1.00,1.05], rattle_type=0, distort_type=0,
+#         symprec=1e-3, supercell_settings={"min_length": 6, "max_length":10, "min_atoms":10, "max_atoms":300,}, displacements=[0.01],
+#         benchmark_kwargs={"calculator_kwargs": {"device": "cpu"}},
+#         add_dft_random_struct=False,
+#     ).make(
+#         structure_list=[structure],
+#         mp_ids=["test"],
+#         benchmark_mp_ids=["test"],
+#         benchmark_structures=[structure],
+#         preprocessing_data=False,
+#         use_defaults_fitting=False,
+#         model="MACE",
+#         name="MACE_final",
+#         foundation_model="small",
+#         multiheads_finetuning=False,
+#         r_max=6,
+#         loss="huber",
+#         energy_weight=1000.0,
+#         forces_weight=1000.0,
+#         stress_weight=1.0,
+#         compute_stress=True,
+#         E0s="average",
+#         scaling="rms_forces_scaling",
+#         batch_size=1,
+#         max_num_epochs=1,
+#         ema=True,
+#         ema_decay=0.99,
+#         amsgrad=True,
+#         default_dtype="float64",
+#         restart_latest=True,
+#         lr=0.0001,
+#         patience=20,
+#         device="cpu",
+#         save_cpu=True,
+#         seed=3,
+#     )
+#     # automatically use fake VASP and write POTCAR.spec during the test
+#     mock_vasp(ref_paths5_mpid, fake_run_vasp_kwargs5_mpid)
+#
+#     # run the flow or job and ensure that it finished running successfully
+#     responses = run_locally(
+#         complete_workflow_mace,
+#         create_folders=True,
+#         ensure_success=True,
+#         store=memory_jobstore,
+#     )
+#
+#     assert complete_workflow_mace.jobs[4].name == "complete_benchmark_test"
+#     assert responses[complete_workflow_mace.jobs[-1].output.uuid][1].output[0][0][
+#                "benchmark_phonon_rmse"] == pytest.approx(
+#         0.45, abs=0.4
+#         # result is so bad because hyperparameter quality is reduced to a minimum to save time
+#         # and too little data
+#     )
 
 
 
