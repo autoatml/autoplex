@@ -264,7 +264,7 @@ complete_workflow_mace = CompleteDFTvsMLBenchmarkWorkflowMPSettings(
         save_cpu=True,
         seed=3,
     )
-    
+```    
 
 
 ## Example script for `autoplex` workflow using GAP to fit and benchmark a Si database
