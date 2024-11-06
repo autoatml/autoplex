@@ -355,6 +355,8 @@ def dft_phonopy_gen_data(
                         "LVTOT": False,  # Do not write LOCPOT file
                         "LORBIT": 0,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
                         "LOPTICS": False,  # No PCDAT file
+                        "NSW": 200,
+                        "NELM": 500,
                         # to be removed
                         "NPAR": 4,
                     }
@@ -507,6 +509,8 @@ def dft_random_gen_data(
                     "LVTOT": False,  # Do not write LOCPOT file
                     "LORBIT": 0,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
                     "LOPTICS": False,  # No PCDAT file
+                    "NSW": 200,
+                    "NELM": 500,
                     # to be removed
                     "NPAR": 4,
                 }
