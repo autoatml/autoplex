@@ -215,7 +215,9 @@ complete_flow = CompleteDFTvsMLBenchmarkWorkflow(
 ### Finetuning MACE-MP-0
 
 It is also possible to finetune MACE-MP-0. To do so, you need to install MACE-torch 0.3.7. 
-Currently, this can only be done by cloning the git-repo and installing it from there: []()
+Currently, this can only be done by cloning the git-repo and installing it from there: 
+[https://github.com/ACEsuit/mace/](https://github.com/ACEsuit/mace/). We currently install the main branch from there
+automatically within autoplex.
 
 It is now important that you switch off the default settings for the fitting procedure (use_defaults_fitting=False).
 Please be careful with performing very low-data finetuning. Currently, we use a stratified split for splitting the 
