@@ -89,6 +89,7 @@ def mock_vasp(
     import atomate2.vasp.jobs.defect
     import atomate2.vasp.run
     from atomate2.vasp.sets.base import VaspInputGenerator
+    from pymatgen.io.vasp.sets import VaspInputSet
 
     def mock_run_vasp(*args, **kwargs):
         from jobflow import CURRENT_JOB
@@ -117,6 +118,7 @@ def mock_vasp(
     monkeypatch.setattr(atomate2.vasp.jobs.base, "run_vasp", mock_run_vasp)
     monkeypatch.setattr(atomate2.vasp.jobs.defect, "run_vasp", mock_run_vasp)
     monkeypatch.setattr(VaspInputGenerator, "get_input_set", mock_get_input_set)
+    monkeypatch.setattr(VaspInputSet, "get_input_set", mock_get_input_set)
 #    monkeypatch.setattr(VaspInputGenerator, "get_nelect", mock_get_nelect)
 
     def _run(ref_paths, fake_run_vasp_kwargs=None):
