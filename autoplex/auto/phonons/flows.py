@@ -731,33 +731,6 @@ class CompleteDFTvsMLBenchmarkWorkflowMPSettings(CompleteDFTvsMLBenchmarkWorkflo
     )
 
 
-# phonon_flow = PhononMaker(name =f'{name}_flow', bulk_relax_maker=MPGGADoubleRelaxMaker(name='relax'), born_maker=None,
-# phonon_displacement_maker=MPGGAStaticMaker(), static_energy_maker=None,
-# min_length=20).make(structure)    #TODO: min_len=20A
-#
-# #updated VASP Settings
-# phonon_flow = update_user_incar_settings(phonon_flow,
-# {"NPAR": 4, "EDIFF": 1e-7, "EDIFFG": 1e-6, "ALGO": "NORMAL", "ISPIN": 1,
-# "LREAL": False, "LCHARG": False, "ISMEAR": 0})
-#
-# #input set for relaxation
-# phonon_flow = update_user_incar_settings(phonon_flow,
-# {"NPAR": 4, "EDIFF": 1e-7, "EDIFFG": 1e-6, "ALGO": "NORMAL", "ISPIN": 1,
-# "LREAL": False, "LCHARG": False, "ISMEAR": 0},
-# name_filter="relax")
-
-# # input set for static supercell calculation
-# phonon_flow = update_user_incar_settings(phonon_flow,
-#                                          {"NPAR": 4, "EDIFF": 1e-7, "EDIFFG": 1e-6, "ALGO": "NORMAL", "ISPIN": 1,
-#                                           "LREAL": False, "LCHARG": False, "ISMEAR": 0}, name_filter="MP GGA static")
-#
-# # update kpoint settings (relaxation and static energy calculation)
-# phonon_flow = update_user_kpoints_settings(phonon_flow, {"reciprocal_density": 300})
-# # update kpoint settings (static supercell calculation)
-# phonon_flow = update_user_kpoints_settings(phonon_flow, kpoints_updates=Kpoints(kpts=[[1, 1, 1]]),
-#                                            name_filter="MP GGA static")
-
-
 @dataclass
 class DFTSupercellSettingsMaker(Maker):
     """
