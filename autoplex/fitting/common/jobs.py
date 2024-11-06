@@ -89,7 +89,7 @@ def machine_learning_fit(
         "test_phonon.extxyz",
         "test_rand_struc.extxyz",
     ]
-    # TODO: add possibility to deactivate defaults to all ML potentials
+
     if mlip_type == "GAP":
         for train_name, test_name in zip(train_files, test_files):
             if (database_dir / train_name).exists() and (
