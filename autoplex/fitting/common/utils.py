@@ -1162,7 +1162,6 @@ def mace_fitting(
 
     boolean_hypers = [
         "distributed",
-        "distributed",
         "pair_repulsion",
         "amsgrad",
         "swa",

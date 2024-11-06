@@ -218,8 +218,9 @@ It is also possible to finetune MACE-MP-0. To do so, you need to install MACE-to
 Currently, this can only be done by cloning the git-repo and installing it from there: []()
 
 It is now important that you switch off the default settings for the fitting procedure (use_defaults_fitting=False).
-If one wants to perform very low-data fine-tuning (less than 4 additional structures), please also think about switching off `preprocessing_data` 
-as this will disable the test/train split. 
+Please be careful with performing very low-data finetuning. Currently, we use a stratified split for splitting the 
+data into train and test data, i.e. there will be at least one data point from the dataset including single displaced 
+cells and one rattled structure. 
 
 The following workflow `CompleteDFTvsMLBenchmarkWorkflowMPSettings` uses Materials Project default settings slightly adapted to phonon runs (more accurate convergence, ALGO=Normal).
 It can also be used without finetuning option. To finetune optimally, please adapt the MACE fitting parameters yourself.
