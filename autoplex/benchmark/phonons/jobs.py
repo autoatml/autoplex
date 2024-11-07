@@ -38,7 +38,7 @@ def write_benchmark_metrics(
         encoding="utf-8",
     ) as file:
         file.write(
-            "%-11s%-11s%-12s%-18s%-12s%-55s%-16s%-14s"
+            "%-11s%-11s%-12s%-18s%-12s%-55s%-16s%-16s%-14s"
             % (
                 "Potential",
                 "Structure",
@@ -46,6 +46,7 @@ def write_benchmark_metrics(
                 "Displacement (Å)",
                 "RMSE (THz)",
                 "Hyperparameters (atom-wise f, n_sparse, SOAP delta)",
+                "Database type",
                 "imagmodes(pot)",
                 "imagmodes(dft)",
             )
@@ -58,22 +59,14 @@ def write_benchmark_metrics(
             encoding="utf-8",
         ) as file:
             # Build the SOAP dictionary or suffix value
-            soap_or_suffix = (
-                {
-                    f"f={metric['atomwise_regularization_parameter']}": metric[
-                        "soap_dict"
-                    ]
-                }
-                if metric["soap_dict"] is not None
-                else {
-                    f"f={metric['atomwise_regularization_parameter']}": metric["suffix"]
-                }
-            )
+            soap_params = {
+                f"f={metric['atomwise_regularization_parameter']}": metric["soap_dict"]
+            }
 
             file.write(
                 f"\n{metric['ml_model']:<11}{structure_composition:<11}{metric['mp_id']:<12}"
                 f"{metric['displacement']:<18.2f}{metric['benchmark_phonon_rmse']:<12.5f}"
-                f"{soap_or_suffix!s:<55}{metric['ml_imaginary_modes']!s:<16}"
+                f"{soap_params!s:<55}{metric['suffix']!s:<16}{metric['ml_imaginary_modes']!s:<16}"
                 f"{metric['dft_imaginary_modes']!s:<5}"
             )
 

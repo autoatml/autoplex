@@ -1433,48 +1433,46 @@ class TestCompleteDFTvsMLBenchmarkWorkflow:
         from jobflow import run_locally
 
         ref_paths = {
-            "test_bulk_rattled_maker_mp-22905": "dft_ml_data_generation/tight_relax_ISPIN2/",
-            "test_bulk_phonon_maker_mp-22905": "dft_ml_data_generation/tight_relax_ISPIN2/",
+            "tight relax_mp-22905": "dft_ml_data_generation/tight_relax_ISPIN2/",
             # it's not a DoubleRelaxMaker in the test
-            "test_phonon_static_energy_maker_mp-22905": "dft_ml_data_generation/tight_relax_ISPIN2/",
+            "static_mp-22905": "dft_ml_data_generation/tight_relax_ISPIN2/",
             "Cl-stat_iso_atom": "Cl_iso_atoms_ISMEAR1/Cl-statisoatom/",
             "Li-stat_iso_atom": "Li_iso_atoms_ISMEAR1/Li-statisoatom/",
-            "test_displacement_maker 1/2_mp-22905": "dft_ml_data_generation/phonon_static_1_ISPIN2/",
-            "test_displacement_maker 2/2_mp-22905": "dft_ml_data_generation/phonon_static_2_ISPIN2/",
-            "test_displacement_maker 1/12_mp-22905": "dft_ml_data_generation/rand_static_1_ISPIN2/",
-            "test_displacement_maker 2/12_mp-22905": "dft_ml_data_generation/rand_static_1_ISPIN2/",
-            "test_displacement_maker 3/12_mp-22905": "dft_ml_data_generation/rand_static_1_ISPIN2/",
-            "test_displacement_maker 4/12_mp-22905": "dft_ml_data_generation/rand_static_4_ISPIN2/",
-            "test_displacement_maker 5/12_mp-22905": "dft_ml_data_generation/rand_static_4_ISPIN2/",
-            "test_displacement_maker 6/12_mp-22905": "dft_ml_data_generation/rand_static_4_ISPIN2/",
-            "test_displacement_maker 7/12_mp-22905": "dft_ml_data_generation/rand_static_8_ISPIN2/",
-            "test_displacement_maker 8/12_mp-22905": "dft_ml_data_generation/rand_static_8_ISPIN2/",
-            "test_displacement_maker 9/12_mp-22905": "dft_ml_data_generation/rand_static_8_ISPIN2/",
-            "test_displacement_maker 10/12_mp-22905": "dft_ml_data_generation/rand_static_12_ISPIN2/",
-            "test_displacement_maker 11/12_mp-22905": "dft_ml_data_generation/rand_static_12_ISPIN2/",
-            "test_displacement_maker 12/12_mp-22905": "dft_ml_data_generation/rand_static_12_ISPIN2/",
+            "dft phonon static 1/2_mp-22905": "dft_ml_data_generation/phonon_static_1_ISPIN2/",
+            "dft phonon static 2/2_mp-22905": "dft_ml_data_generation/phonon_static_2_ISPIN2/",
+            "dft rattle static 1/12_mp-22905": "dft_ml_data_generation/rand_static_1_ISPIN2/",
+            "dft rattle static 2/12_mp-22905": "dft_ml_data_generation/rand_static_1_ISPIN2/",
+            "dft rattle static 3/12_mp-22905": "dft_ml_data_generation/rand_static_1_ISPIN2/",
+            "dft rattle static 4/12_mp-22905": "dft_ml_data_generation/rand_static_4_ISPIN2/",
+            "dft rattle static 5/12_mp-22905": "dft_ml_data_generation/rand_static_4_ISPIN2/",
+            "dft rattle static 6/12_mp-22905": "dft_ml_data_generation/rand_static_4_ISPIN2/",
+            "dft rattle static 7/12_mp-22905": "dft_ml_data_generation/rand_static_8_ISPIN2/",
+            "dft rattle static 8/12_mp-22905": "dft_ml_data_generation/rand_static_8_ISPIN2/",
+            "dft rattle static 9/12_mp-22905": "dft_ml_data_generation/rand_static_8_ISPIN2/",
+            "dft rattle static 10/12_mp-22905": "dft_ml_data_generation/rand_static_12_ISPIN2/",
+            "dft rattle static 11/12_mp-22905": "dft_ml_data_generation/rand_static_12_ISPIN2/",
+            "dft rattle static 12/12_mp-22905": "dft_ml_data_generation/rand_static_12_ISPIN2/",
         }
 
         fake_run_vasp_kwargs = {
-            "test_bulk_rattled_maker_mp-22905": {"incar_settings": ["ISPIN"]},
-            "test_bulk_phonon_maker_mp-22905": {"incar_settings": ["ISPIN"]},
-            "test_phonon_static_energy_maker_mp-22905": {"incar_settings": ["ISPIN"]},
+            "tight relax_mp-22905": {"incar_settings": ["ISPIN"]},
+            "static_mp-22905": {"incar_settings": ["ISPIN"]},
             "Cl-stat_iso_atom": {"incar_settings": ["ISMEAR"]},
             "Li-stat_iso_atom": {"incar_settings": ["ISMEAR"]},
-            "test_displacement_maker 1/2_mp-22905": {"incar_settings": ["ISPIN"]},
-            "test_displacement_maker 2/2_mp-22905": {"incar_settings": ["ISPIN"]},
-            "test_displacement_maker 1/12_mp-22905": {"incar_settings": ["ISPIN"]},
-            "test_displacement_maker 2/12_mp-22905": {"incar_settings": ["ISPIN"]},
-            "test_displacement_maker 3/12_mp-22905": {"incar_settings": ["ISPIN"]},
-            "test_displacement_maker 4/12_mp-22905": {"incar_settings": ["ISPIN"]},
-            "test_displacement_maker 5/12_mp-22905": {"incar_settings": ["ISPIN"]},
-            "test_displacement_maker 6/12_mp-22905": {"incar_settings": ["ISPIN"]},
-            "test_displacement_maker 7/12_mp-22905": {"incar_settings": ["ISPIN"]},
-            "test_displacement_maker 8/12_mp-22905": {"incar_settings": ["ISPIN"]},
-            "test_displacement_maker 9/12_mp-22905": {"incar_settings": ["ISPIN"]},
-            "test_displacement_maker 10/12_mp-22905": {"incar_settings": ["ISPIN"]},
-            "test_displacement_maker 11/12_mp-22905": {"incar_settings": ["ISPIN"]},
-            "test_displacement_maker 12/12_mp-22905": {"incar_settings": ["ISPIN"]},
+            "dft phonon static 1/2_mp-22905": {"incar_settings": ["ISPIN"]},
+            "dft phonon static 2/2_mp-22905": {"incar_settings": ["ISPIN"]},
+            "dft rattle static 1/12_mp-22905": {"incar_settings": ["ISPIN"]},
+            "dft rattle static 2/12_mp-22905": {"incar_settings": ["ISPIN"]},
+            "dft rattle static 3/12_mp-22905": {"incar_settings": ["ISPIN"]},
+            "dft rattle static 4/12_mp-22905": {"incar_settings": ["ISPIN"]},
+            "dft rattle static 5/12_mp-22905": {"incar_settings": ["ISPIN"]},
+            "dft rattle static 6/12_mp-22905": {"incar_settings": ["ISPIN"]},
+            "dft rattle static 7/12_mp-22905": {"incar_settings": ["ISPIN"]},
+            "dft rattle static 8/12_mp-22905": {"incar_settings": ["ISPIN"]},
+            "dft rattle static 9/12_mp-22905": {"incar_settings": ["ISPIN"]},
+            "dft rattle static 10/12_mp-22905": {"incar_settings": ["ISPIN"]},
+            "dft rattle static 11/12_mp-22905": {"incar_settings": ["ISPIN"]},
+            "dft rattle static 12/12_mp-22905": {"incar_settings": ["ISPIN"]},
         }
 
         path_to_struct = vasp_test_dir / "dft_ml_data_generation" / "POSCAR"
@@ -1491,20 +1489,20 @@ class TestCompleteDFTvsMLBenchmarkWorkflow:
             name="test_iso_atom_maker",  # this will always be overwritten by "{specie}-stat_iso_atom"
             input_set_generator=test_iso_atom_static_input_set,
         )
-        test_phonon_displacement_maker = TightDFTStaticMaker(
-            name="test_displacement_maker",
+        test_displacement_maker = TightDFTStaticMaker(
+            name="test_displacement_maker", # overwritten by autoplex default
             input_set_generator=test_iso_atom_static_input_set
         )
         test_rattled_bulk_relax_maker = TightRelaxMaker(
-            name="test_bulk_rattled_maker",
+            name="test_bulk_rattled_maker", # overwritten by autoplex default
             input_set_generator=test_iso_atom_static_input_set,
         )
         test_phonon_bulk_relax_maker = TightRelaxMaker(
-            name="test_bulk_phonon_maker",
+            name="test_bulk_phonon_maker", # overwritten by autoplex default
             input_set_generator=test_iso_atom_static_input_set,
         )
         test_phonon_static_energy_maker = StaticMaker(
-            name="test_phonon_static_energy_maker",
+            name="test_phonon_static_energy_maker", # overwritten by autoplex default
             input_set_generator=test_iso_atom_static_input_set,
         )
         test_different_makers_wf = CompleteDFTvsMLBenchmarkWorkflow(
@@ -1513,7 +1511,7 @@ class TestCompleteDFTvsMLBenchmarkWorkflow:
             supercell_settings={"min_length": 8, "min_atoms": 20},
             displacements=[0.01],
             volume_custom_scale_factors=[0.975, 0.975, 0.975, 1.0, 1.0, 1.0, 1.025, 1.025, 1.025, 1.05, 1.05, 1.05],
-            displacement_maker=test_phonon_displacement_maker,
+            displacement_maker=test_displacement_maker,
             phonon_bulk_relax_maker=test_phonon_bulk_relax_maker,
             phonon_static_energy_maker=test_phonon_static_energy_maker,
             rattled_bulk_relax_maker=test_rattled_bulk_relax_maker,
@@ -1539,9 +1537,9 @@ class TestCompleteDFTvsMLBenchmarkWorkflow:
             store=memory_jobstore,
         )
 
-        assert "test_phonon_static_energy_maker" in str(responses)
-        assert "test_bulk_phonon_maker" in str(responses)
-        assert "test_bulk_rattled_maker" in str(responses)
+        assert "test_phonon_static_energy_maker" not in str(responses)
+        assert "test_bulk_phonon_maker" not in str(responses)
+        assert "test_bulk_rattled_maker" not in str(responses)
 
 
 def test_phonon_dft_ml_data_generation_flow(

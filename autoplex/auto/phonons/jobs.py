@@ -359,6 +359,8 @@ def dft_phonopy_gen_data(
                         "LVTOT": False,  # Do not write LOCPOT file
                         "LORBIT": 0,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
                         "LOPTICS": False,  # No PCDAT file
+                        "NSW": 200,
+                        "NELM": 500,
                         # to be removed
                         "NPAR": 4,
                     }
@@ -387,6 +389,11 @@ def dft_phonopy_gen_data(
                 },
             )
         )
+
+    # always set autoplex default as job name
+    phonon_displacement_maker.name = "dft phonon static"
+    phonon_bulk_relax_maker.name = "tight relax"
+    phonon_static_energy_maker.name = "static"
 
     for displacement in displacements:
         dft_phonons = DFTPhononMaker(
@@ -511,11 +518,17 @@ def dft_random_gen_data(
                     "LVTOT": False,  # Do not write LOCPOT file
                     "LORBIT": 0,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
                     "LOPTICS": False,  # No PCDAT file
+                    "NSW": 200,
+                    "NELM": 500,
                     # to be removed
                     "NPAR": 4,
                 }
             ),
         )
+
+    # always set autoplex default as job name
+    displacement_maker.name = "dft rattle static"
+    rattled_bulk_relax_maker.name = "tight relax"
 
     # TODO: decide if we should remove the additional response here as well
     # looks like only the output is changing

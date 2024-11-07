@@ -1,19 +1,43 @@
 from __future__ import annotations
 
-import os
-
 from atomate2.vasp.powerups import update_user_incar_settings
 from atomate2.common.schemas.phonons import PhononBSDOSDoc
 from pymatgen.core.structure import Structure
 from atomate2.forcefields.jobs import (
     GAPRelaxMaker,
     GAPStaticMaker,
-
 )
 
 from autoplex.data.common.flows import GenerateTrainingDataForTesting
 from autoplex.data.phonons.flows import IsoAtomMaker, RandomStructuresDataGenerator, MLPhononMaker
+from atomate2.vasp.jobs.core import TightRelaxMaker
+from atomate2.vasp.sets.core import TightRelaxSetGenerator
+import pytest
 
+@pytest.fixture(scope="class")
+def relax_maker():
+    return TightRelaxMaker(
+            run_vasp_kwargs={"handlers": {}},
+            input_set_generator=TightRelaxSetGenerator(
+                user_incar_settings={
+                    "ISPIN": 1,
+                    "LAECHG": False,
+                    "ISMEAR": 0,
+                    "ENCUT": 700,
+                    "ISYM": 0,
+                    "SIGMA": 0.05,
+                    "LCHARG": False,  # Do not write the CHGCAR file
+                    "LWAVE": False,  # Do not write the WAVECAR file
+                    "LVTOT": False,  # Do not write LOCPOT file
+                    "LORBIT": 0,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
+                    "LOPTICS": False,  # No PCDAT file
+                    "NSW": 200,
+                    "NELM": 500,
+                    # to be removed
+                    "NPAR": 4,
+                }
+            ),
+        )
 
 def test_ml_phonon_maker(test_dir, clean_dir, memory_jobstore):
     from jobflow import run_locally
@@ -43,7 +67,7 @@ def test_ml_phonon_maker(test_dir, clean_dir, memory_jobstore):
     assert isinstance(ml_phonon_bs_doc, PhononBSDOSDoc)
 
 
-def test_data_generation_distort_type_0(vasp_test_dir, mock_vasp, clean_dir):
+def test_data_generation_distort_type_0(vasp_test_dir, mock_vasp, relax_maker, clean_dir):
     from jobflow import run_locally
 
     path_to_struct = vasp_test_dir / "dft_ml_data_generation" / "POSCAR"
@@ -64,7 +88,7 @@ def test_data_generation_distort_type_0(vasp_test_dir, mock_vasp, clean_dir):
             "check_inputs": ["incar", "kpoints", "potcar"],
         },
     }
-    data_gen_dt_0 = RandomStructuresDataGenerator(distort_type=0).make(
+    data_gen_dt_0 = RandomStructuresDataGenerator(distort_type=0, bulk_relax_maker=relax_maker).make(
         structure=structure,
         mp_id=test_mpid,
         volume_custom_scale_factors=[1.0],
@@ -84,7 +108,7 @@ def test_data_generation_distort_type_0(vasp_test_dir, mock_vasp, clean_dir):
         assert responses[data_gen_dt_0.output[0].uuid][1].replace.jobs[inx].name == name
 
 
-def test_data_generation_distort_type_1(vasp_test_dir, mock_vasp, clean_dir):
+def test_data_generation_distort_type_1(vasp_test_dir, mock_vasp, relax_maker, clean_dir):
     from jobflow import run_locally
 
     path_to_struct = vasp_test_dir / "dft_ml_data_generation" / "POSCAR"
@@ -150,7 +174,7 @@ def test_data_generation_distort_type_1(vasp_test_dir, mock_vasp, clean_dir):
             "check_inputs": ["incar", "potcar"],
         },
     }
-    data_gen_dt_1 = RandomStructuresDataGenerator(n_structures=3, distort_type=1).make(
+    data_gen_dt_1 = RandomStructuresDataGenerator(n_structures=3, distort_type=1, bulk_relax_maker=relax_maker).make(
         structure=structure,
         mp_id=test_mpid,
         volume_custom_scale_factors=[1.0],
@@ -172,7 +196,7 @@ def test_data_generation_distort_type_1(vasp_test_dir, mock_vasp, clean_dir):
         assert responses[data_gen_dt_1.output[0].uuid][1].replace.jobs[inx].name == name
 
 
-def test_data_generation_distort_type_2(vasp_test_dir, mock_vasp, clean_dir):
+def test_data_generation_distort_type_2(vasp_test_dir, mock_vasp, relax_maker, clean_dir):
     from jobflow import run_locally
 
     path_to_struct = vasp_test_dir / "dft_ml_data_generation" / "POSCAR"
@@ -198,7 +222,7 @@ def test_data_generation_distort_type_2(vasp_test_dir, mock_vasp, clean_dir):
             "check_inputs": ["incar", "potcar"],
         },
     }
-    data_gen_dt_2 = RandomStructuresDataGenerator(distort_type=2).make(
+    data_gen_dt_2 = RandomStructuresDataGenerator(distort_type=2, bulk_relax_maker=relax_maker).make(
         structure=structure,
         mp_id=test_mpid,
         volume_custom_scale_factors=[
@@ -222,7 +246,7 @@ def test_data_generation_distort_type_2(vasp_test_dir, mock_vasp, clean_dir):
         assert responses[data_gen_dt_2.output[0].uuid][1].replace.jobs[inx].name == name
 
 
-def test_data_generation_volume_range(vasp_test_dir, mock_vasp, clean_dir):
+def test_data_generation_volume_range(vasp_test_dir, mock_vasp, relax_maker, clean_dir):
     from jobflow import run_locally
 
     path_to_struct = vasp_test_dir / "dft_ml_data_generation" / "POSCAR"
@@ -258,7 +282,7 @@ def test_data_generation_volume_range(vasp_test_dir, mock_vasp, clean_dir):
             "check_inputs": ["incar", "potcar"],
         },
     }
-    data_gen_vol = RandomStructuresDataGenerator(distort_type=0).make(
+    data_gen_vol = RandomStructuresDataGenerator(distort_type=0, bulk_relax_maker=relax_maker).make(
         structure=structure,
         mp_id=test_mpid,
         volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],

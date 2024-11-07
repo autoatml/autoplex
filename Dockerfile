@@ -65,5 +65,6 @@ WORKDIR /workspace
 # Copy the current directory contents into the container at /workspace
 COPY . /workspace
 
-# Install autoplex
+# Install autoplex and clear cache
 RUN uv pip install .[strict,docs]
+RUN uv cache clean

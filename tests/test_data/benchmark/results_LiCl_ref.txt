@@ -1,9 +1,9 @@
-Potential  Structure  MPID        Displacement (Å)  RMSE (THz)  Hyperparameters (atom-wise f, n_sparse, SOAP delta)    imagmodes(pot)  imagmodes(dft)
-GAP        LiCl       mp-22905    0.01              0.87425     {'f=0.1': ''}                                          False           False
-GAP        LiCl       mp-22905    0.01              0.63839     {'f=0.1': ''}                                          False           False
-GAP        LiCl       mp-22905    0.01              0.55506     {'f=0.1': '_wo_sigma'}                                 False           False
-GAP        LiCl       mp-22905    0.01              0.43216     {'f=0.1': '_phonon'}                                   False           False
-GAP        LiCl       mp-22905    0.01              0.54584     {'f=0.1': '_rand_struc'}                               False           False
-GAP        LiCl       mp-22905    0.01              0.43216     {'f=0.1': {'n_sparse': 3000, 'delta': 1.0}}            False           False
-GAP        LiCl       mp-22905    0.01              0.36478     {'f=0.1': {'n_sparse': 5000, 'delta': 1.0}}            False           False
-GAP        LiCl       mp-22905    0.01              0.38100     {'f=0.1': {'n_sparse': 5000, 'delta': 1.0}}            False           False
+Potential  Structure  MPID        Displacement (Å)  RMSE (THz)  Hyperparameters (atom-wise f, n_sparse, SOAP delta)    Database type   imagmodes(pot)  imagmodes(dft)
+GAP        LiCl       mp-22905    0.01              0.87425     {'f=0.1': None}                                                        False           False
+GAP        LiCl       mp-22905    0.01              0.63839     {'f=0.1': None}                                                        False           False
+GAP        LiCl       mp-22905    0.01              0.55506     {'f=0.1': None}                                        _wo_sigma       False           False
+GAP        LiCl       mp-22905    0.01              0.43216     {'f=0.1': None}                                        _phonon         False           False
+GAP        LiCl       mp-22905    0.01              0.54584     {'f=0.1': None}                                        _rand_struc     False           False
+GAP        LiCl       mp-22905    0.01              0.43216     {'f=0.1': {'n_sparse': 3000, 'delta': 1.0}}            _rand_struc     False           False
+GAP        LiCl       mp-22905    0.01              0.36478     {'f=0.1': {'n_sparse': 5000, 'delta': 1.0}}            _rand_struc     False           False
+GAP        LiCl       mp-22905    0.01              0.38100     {'f=0.1': {'n_sparse': 5000, 'delta': 1.0}}            _rand_struc     False           False
