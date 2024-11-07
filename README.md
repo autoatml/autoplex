@@ -59,6 +59,8 @@ A short guide to contributing to autoplex can be found [here](https://autoatml.g
 
 # Workflow overview
 
+## Phonon workflow
+
 The following [Mermaid](https://mermaid.live/) diagram will give you an overview of the flows and jobs in the default autoplex workflow:
 ```mermaid
 flowchart TD
