@@ -16,24 +16,23 @@ from autoplex.fitting.common.utils import (
 )
 
 current_dir = Path(__file__).absolute().parent
-GAP_DEFAULTS_FILE_PATH = current_dir / "mlip-phonon-defaults.json"
+GAP_DEFAULTS_FILE_PATH = current_dir / "gap-defaults.json"
 
 
 @job
 def machine_learning_fit(
     database_dir: str | Path,
     species_list: list,
-    isolated_atoms_energies: dict | None = None,
+    isolated_atom_energies: dict | None = None,
     num_processes_fit: int = 32,
     auto_delta: bool = True,
     glue_xml: bool = False,
-    glue_file_path: str = "glue.xml",
     mlip_type: str | None = None,
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",
     device: str = "cuda",
-    hyper_param_optimization: bool = False,
+    hyperpara_opt: bool = False,
     **fit_kwargs,
 ):
     """
@@ -41,35 +40,34 @@ def machine_learning_fit(
 
     Parameters
     ----------
-    database_dir: str | Path
-        the database directory.
-    isolated_atoms_energies: dict | None
-        Dict of isolated atoms energies.
+    database_dir: Str | Path
+        Path to the directory containing the database.
+    species_list: list
+        List of element names (strings) involved in the training dataset
+    isolated_atom_energies: dict
+        Dictionary of isolated atoms energies.
     num_processes_fit: int
-        number of processes for fitting.
+        Number of processes for fitting.
     auto_delta: bool
-        automatically determine delta for 2b, 3b and SOAP terms.
+        Automatically determine delta for 2b, 3b and soap terms.
     glue_xml: bool
-        use the glue.xml core potential instead of fitting 2b terms.
-    glue_file_path: str
-        Name of the glue.xml file path.
+        Use the glue.xml core potential instead of fitting 2b terms.
     mlip_type: str
-        Choose one specific MLIP type:
+        Choose one specific MLIP type to be fitted:
         'GAP' | 'J-ACE' | 'P-ACE' | 'NEQUIP' | 'M3GNET' | 'MACE'
-    species_list : list.
-            List of element names (str)
-    ref_energy_name : str, optional
+    ref_energy_name: str
         Reference energy name.
-    ref_force_name : str, optional
+    ref_force_name: str
         Reference force name.
-    ref_virial_name : str, optional
+    ref_virial_name: str
         Reference virial name.
     device: str
-        specify device to use cuda or cpu.
-    hyper_param_optimization: bool
-        call hyperparameter optimization (HPO) or not
-    fit_kwargs : dict.
-        dict including more fit keyword args.
+        Device to be used for model fitting, either "cpu" or "cuda".
+    hyperpara_opt: bool
+        Perform hyperparameter optimization using XPOT
+        (XPOT: https://pubs.aip.org/aip/jcp/article/159/2/024803/2901815)
+    fit_kwargs: dict
+        Additional keyword arguments for MLIP fitting.
     """
     if isinstance(database_dir, str):  # data_prep_job.output is returned as string
         database_dir = Path(database_dir)
@@ -103,14 +101,13 @@ def machine_learning_fit(
                     ref_virial_name=ref_virial_name,
                     train_name=train_name,
                     test_name=test_name,
-                    glue_file_path=glue_file_path,
                     fit_kwargs=fit_kwargs,
                 )
 
     elif mlip_type == "J-ACE":
         train_test_error = jace_fitting(
             db_dir=database_dir,
-            isolated_atoms_energies=isolated_atoms_energies,
+            isolated_atoms_energies=isolated_atom_energies,
             ref_energy_name=ref_energy_name,
             ref_force_name=ref_force_name,
             ref_virial_name=ref_virial_name,
@@ -121,7 +118,7 @@ def machine_learning_fit(
     elif mlip_type == "NEQUIP":
         train_test_error = nequip_fitting(
             db_dir=database_dir,
-            isolated_atoms_energies=isolated_atoms_energies,
+            isolated_atoms_energies=isolated_atom_energies,
             ref_energy_name=ref_energy_name,
             ref_force_name=ref_force_name,
             ref_virial_name=ref_virial_name,

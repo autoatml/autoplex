@@ -1,12 +1,18 @@
 import os 
+os.environ["OMP_NUM_THREADS"] = "1"
 
 from pymatgen.core.structure import Structure
 from jobflow import run_locally, Flow
 from ase.io import read
+import shutil
+from pathlib import Path
 
-def test_vasp_static(test_dir, mock_vasp, memory_jobstore, clean_dir):
-    from autoplex.data.common.jobs import VASP_collect_data
-    from autoplex.data.common.flows import DFTStaticMaker
+def test_vasp_static(test_dir, mock_vasp, memory_jobstore):
+    from autoplex.data.common.jobs import collect_dft_data
+    from autoplex.data.common.flows import DFTStaticLabelling
+
+    from atomate2.settings import Atomate2Settings
+    settings = Atomate2Settings()
     
     poscar_paths = {
         f"static_bulk_{i}": test_dir / f"vasp/rss/Si_bulk_{i+1}/inputs/POSCAR"
@@ -35,12 +41,14 @@ def test_vasp_static(test_dir, mock_vasp, memory_jobstore, clean_dir):
 
     mock_vasp(ref_paths, fake_run_vasp_kwargs)
 
-    job1 = DFTStaticMaker(isolated_atom=True, 
+    job1 = DFTStaticLabelling(isolated_atom=True, 
                           e0_spin=True, 
+                          isolatedatom_box=[20.0, 20.5, 21.0],
                           dimer=True, 
+                          dimer_box=[15.0, 15.5, 16.0],
                           dimer_range=[1.5, 2.0],
                           dimer_num=3,
-                          custom_set={
+                          custom_incar={
                             "ADDGRID": None, 
                             "ENCUT": 200,
                             "EDIFF": 1E-04,
@@ -68,7 +76,7 @@ def test_vasp_static(test_dir, mock_vasp, memory_jobstore, clean_dir):
                     },
                     ).make(structures=test_structures)
     
-    job2 = VASP_collect_data(vasp_dirs=job1.output)
+    job2 = collect_dft_data(vasp_dirs=job1.output)
     
     response = run_locally(
         Flow([job1,job2]),
@@ -79,7 +87,7 @@ def test_vasp_static(test_dir, mock_vasp, memory_jobstore, clean_dir):
 
     dict_vasp = job2.output.resolve(memory_jobstore)
 
-    path_to_vasp, isol_energy = dict_vasp['vasp_ref_dir'], dict_vasp['isol_es']
+    path_to_vasp, isol_energy = dict_vasp['vasp_ref_dir'], dict_vasp['isolated_atom_energies']
 
     atoms = read(path_to_vasp, index=":")
     config_types = [at.info['config_type'] for at in atoms]
@@ -89,6 +97,11 @@ def test_vasp_static(test_dir, mock_vasp, memory_jobstore, clean_dir):
     assert 'IsolatedAtom' in config_types
     assert config_types.count("dimer") == 3
     assert config_types.count("bulk") == 18
+
+    dir = Path('.')
+    path_to_job_files = list(dir.glob("job*"))
+    for path in path_to_job_files:
+        shutil.rmtree(path)
 
 
 def test_vasp_check_convergence(test_dir):

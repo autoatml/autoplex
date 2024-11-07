@@ -3,6 +3,7 @@
 # adapted from MorrowChem's RSS routines.
 from __future__ import annotations
 
+import ast
 import traceback
 from contextlib import suppress
 from typing import TYPE_CHECKING
@@ -16,15 +17,15 @@ if TYPE_CHECKING:
 
 def set_sigma(
     atoms: list[Atoms],
-    reg_minmax,
-    isolated_atoms_energies: dict | None = None,
-    scheme="linear-hull",
-    energy_name="REF_energy",
-    force_name="REF_forces",
-    virial_name="REF_virial",
-    element_order=None,
-    max_energy=20.0,
-    config_type_override=None,
+    reg_minmax: list[tuple],
+    isolated_atom_energies: dict | None = None,
+    scheme: str = "linear-hull",
+    energy_name: str = "REF_energy",
+    force_name: str = "REF_forces",
+    virial_name: str = "REF_virial",
+    element_order: list | None = None,
+    max_energy: float = 20.0,
+    config_type_override: dict | None = None,
 ) -> list[Atoms]:
     """
     Handle automatic regularisation based on distance to convex hull, amongst other things.
@@ -91,7 +92,7 @@ def set_sigma(
 
             continue
 
-    isolated_atoms_energies = isolated_atoms_energies or {}
+    isolated_atom_energies = isolated_atom_energies or {}
 
     if scheme == "linear-hull":
         print("Regularising with linear hull")
@@ -100,11 +101,15 @@ def set_sigma(
 
     elif scheme == "volume-stoichiometry":
         print("Regularising with 3D volume-mole fraction hull")
-        if isolated_atoms_energies == {}:
+        if len(isolated_atom_energies) == 0:
             raise ValueError("Need to supply dictionary of isolated energies.")
 
+        isolated_atom_energies = {
+            ast.literal_eval(k) if isinstance(k, str) else k: v
+            for k, v in isolated_atom_energies.items()
+        }
         points = label_stoichiometry_volume(
-            atoms, isolated_atoms_energies, energy_name, element_order=element_order
+            atoms, isolated_atom_energies, energy_name, element_order=element_order
         )  # label atoms with volume and mole fraction
         hull = calculate_hull_3D(points)  # calculate 3D convex hull
         get_e_distance_func = get_e_distance_to_hull_3D  # type: ignore
@@ -112,9 +117,9 @@ def set_sigma(
     points = {}
     for group in sorted(
         {  # check if set comprehension is running as supposed to
-            at.info.get("gap_rss_group")
+            at.info.get("rss_group")
             for at in atoms
-            if not at.info.get("gap_rss_nonperiodic")
+            if not at.info.get("rss_nonperiodic")
         }
     ):
         points[group] = []
@@ -122,9 +127,9 @@ def set_sigma(
     for at in atoms:
         try:
             # skip non-periodic configs, volume is meaningless
-            if at.info.get("gap_rss_nonperiodic"):
+            if at.info.get("rss_nonperiodic"):
                 continue
-            points[at.info.get("gap_rss_group")].append(at)
+            points[at.info.get("rss_group")].append(at)
         except Exception:
             pass
 
@@ -132,11 +137,18 @@ def set_sigma(
         print("group:", group)
 
         for val in atoms_group:
+            if val in atoms_modi:
+                continue
+
+            if "energy_sigma" in val.info:
+                atoms_modi.append(val)
+                continue
+
             de = get_e_distance_func(
                 hull,
                 val,
                 energy_name=energy_name,
-                isolated_atoms_energies=isolated_atoms_energies,
+                isolated_atoms_energies=isolated_atom_energies,
             )
 
             if de > max_energy:
@@ -209,8 +221,11 @@ def set_sigma(
                 )
             )
         print(
-            f"{label:>20s}{data.mean():>20.4f}{data.std():>20.4f}"
-            f"{(data == data.min()).sum():>20d}{(data == data.max()).sum():>20d}"
+            f"{label:>20s}"
+            f"{data.mean():>20.4f}"
+            f"{data.std():>20.4f}"
+            f"{(data == data.min()).sum():>20d}"
+            f"{(data == data.max()).sum():>20d}"
         )
 
     return atoms_modi
@@ -411,6 +426,10 @@ def label_stoichiometry_volume(
         list of atomic numbers in order of choice (e.g. [42, 16] for MoS2)
 
     """
+    isolated_atoms_energies = {
+        ast.literal_eval(k) if isinstance(k, str) else k: v
+        for k, v in isolated_atoms_energies.items()
+    }
     points_list = []
     for atom in atoms_list:
         try:
@@ -569,6 +588,10 @@ def get_e_distance_to_hull_3D(
         list of atomic numbers in order of choice (e.g. [42, 16] for MoS2)
 
     """
+    isolated_atoms_energies = {
+        ast.literal_eval(k) if isinstance(k, str) else k: v
+        for k, v in isolated_atoms_energies.items()
+    }
     mole_frac = get_mole_frac(atoms, element_order=element_order)
     energy = (
         atoms.info[energy_name]

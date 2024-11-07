@@ -52,14 +52,14 @@ from autoplex.data.common.utils import (
 )
 
 current_dir = Path(__file__).absolute().parent
-MLIP_PHONON_DEFAULTS_FILE_PATH = current_dir / "mlip-phonon-defaults.json"
-MLIP_RSS_DEFAULTS_FILE_PATH = current_dir / "mlip-rss-defaults.json"
+GAP_DEFAULTS_FILE_PATH = current_dir / "gap-defaults.json"
+MLIP_DEFAULTS_FILE_PATH = current_dir / "mlip-defaults.json"
 
 
 def gap_fitting(
     db_dir: Path,
     species_list: list | None = None,
-    path_to_default_hyperparameters: Path | str = MLIP_PHONON_DEFAULTS_FILE_PATH,
+    path_to_default_hyperparameters: Path | str = GAP_DEFAULTS_FILE_PATH,
     num_processes_fit: int = 32,
     auto_delta: bool = True,
     glue_xml: bool = False,
@@ -68,63 +68,57 @@ def gap_fitting(
     ref_virial_name: str = "REF_virial",
     train_name: str = "train.extxyz",
     test_name: str = "test.extxyz",
-    glue_file_path: str = "glue.xml",
     fit_kwargs: dict | None = None,  # pylint: disable=E3701
 ) -> dict:
     """
-    GAP fit and validation job.
+    Perform the GAP (Gaussian approximation potential) model fitting.
 
     Parameters
     ----------
-    db_dir: str or path.
+    db_dir: str or path
         Path to database directory.
-    species_list : list.
-        List of element names (str)
+    species_list: list
+        List of element names (strings)
     path_to_default_hyperparameters : str or Path.
-        Path to mlip-phonon-defaults.json.
-    num_processes_fit: int.
+        Path to gap-defaults.json.
+    num_processes_fit: int
         Number of processes used for gap_fit
     auto_delta: bool
-        automatically determine delta for 2b, 3b and soap terms.
+        Automatically determine delta for 2b, 3b and soap terms.
     glue_xml: bool
         use the glue.xml core potential instead of fitting 2b terms.
-    ref_energy_name : str, optional
+    ref_energy_name: str
         Reference energy name.
-    ref_force_name : str, optional
+    ref_force_name : str
         Reference force name.
-    ref_virial_name : str, optional
+    ref_virial_name: str
         Reference virial name.
     train_name: str
-        Name of the training dataset file.
+        Name of the training set file.
     test_name: str
-        Name of the test dataset file.
-    glue_file_path: str
-        Name of the glue.xml file path.
-    fit_kwargs: dict.
-        optional dictionary with parameters for gap fitting with keys same as
-        mlip-phonon-defaults.json.
+        Name of the test set file.
+    fit_kwargs: dict
+        Additional keyword arguments for GAP fitting with keys same as
+        those in gap-defaults.json.
 
     Returns
     -------
-    dict[str, float]
-        A dictionary with train_error, test_error
+    dict
+        A dictionary with train_error, test_error, path_to_mlip
 
     """
-    # keep additional pre- and suffixes
     gap_file_xml = train_name.replace("train", "gap_file").replace(".extxyz", ".xml")
     mlip_path: Path = prepare_fit_environment(
-        db_dir, Path.cwd(), glue_xml, train_name, test_name, glue_file_path
+        db_dir, Path.cwd(), glue_xml, train_name, test_name
     )
 
     db_atoms = ase.io.read(os.path.join(db_dir, train_name), index=":")
     train_data_path = os.path.join(db_dir, train_name)
     test_data_path = os.path.join(db_dir, test_name)
 
-    default_hyperparameters = load_mlip_hyperparameter_defaults(
+    gap_default_hyperparameters = load_mlip_hyperparameter_defaults(
         mlip_fit_parameter_file_path=path_to_default_hyperparameters
     )
-
-    gap_default_hyperparameters = default_hyperparameters["GAP"]
 
     gap_default_hyperparameters["general"].update({"gp_file": gap_file_xml})
     gap_default_hyperparameters["general"]["energy_parameter_name"] = ref_energy_name
@@ -248,7 +242,7 @@ def gap_fitting(
 
 def jace_fitting(
     db_dir: str | Path,
-    path_to_default_hyperparameters: Path | str = MLIP_RSS_DEFAULTS_FILE_PATH,
+    path_to_default_hyperparameters: Path | str = MLIP_DEFAULTS_FILE_PATH,
     isolated_atoms_energies: dict | None = None,
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
@@ -259,46 +253,45 @@ def jace_fitting(
     """
     Perform the ACE (Atomic Cluster Expansion) potential fitting.
 
-    This function sets up and executes a Julia script to perform ACE fitting using specified parameters
-    and input data located in the provided directory. It handles the input/output of atomic configurations,
-    sets up the ACE model, and calculates training and testing errors after fitting.
+    This function sets up and executes a Julia script to perform ACE fitting.
+    It also calculates training and testing errors after fitting.
 
     Parameters
     ----------
     db_dir: str or Path
-        directory containing the training and testing data files.
-    path_to_default_hyperparameters : str or Path.
-        Path to mlip-rss-defaults.json.
-    isolated_atoms_energies: dict:
-        mandatory dictionary mapping element numbers to isolated energies.
-    ref_energy_name : str, optional
+        Path to directory containing the training and testing data files.
+    path_to_default_hyperparameters: str or Path.
+        Path to mlip-defaults.json.
+    isolated_atoms_energies: dict
+        Mandatory dictionary mapping element numbers to isolated energies.
+    ref_energy_name: str
         Reference energy name.
-    ref_force_name : str, optional
+    ref_force_name: str
         Reference force name.
-    ref_virial_name : str, optional
+    ref_virial_name: str
         Reference virial name.
     num_processes_fit: int
-        number of processes to use for parallel computation.
-    fit_kwargs: dict.
-        optional dictionary with parameters for ace fitting with keys same as
-        mlip-rss-defaults.json.
+        Number of processes used for jace_fit.
+    fit_kwargs: dict
+        Additional keyword arguments for ACE fitting with keys same as
+        those in mlip-defaults.json.
 
-    Keyword Arguments
-    -----------------
+    Tunable hyperparameters
+    -----------------------
     order: int
-        order of ACE.
+        Order of ACE.
     totaldegree: int
-        total degree of the polynomial terms in the ACE model.
+        Total degree of the polynomial terms in the ACE model.
     cutoff: float
-        cutoff distance for atomic interactions in the ACE model.
+        Cutoff distance for atomic interactions in the ACE model.
     solver: str
-        solver to be used for fitting the ACE model. Default is "BLR" (Bayesian Linear Regression).
+        Solver for fitting the ACE model. Default is "BLR" (Bayesian Linear Regression).
         For very large-scale parameter estimation problems, using "LSQR" solver.
 
     Returns
     -------
-    dict[str, float]
-        A dictionary containing train_error, test_error, and the path to the fitted MLIP.
+    dict
+        A dictionary with train_error, test_error, path_to_mlip
 
     Raises
     ------
@@ -432,29 +425,28 @@ export2lammps("acemodel.yace", model)
 
 def nequip_fitting(
     db_dir: Path,
-    path_to_default_hyperparameters: Path | str = MLIP_RSS_DEFAULTS_FILE_PATH,
+    path_to_default_hyperparameters: Path | str = MLIP_DEFAULTS_FILE_PATH,
     isolated_atoms_energies: dict | None = None,
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",
     fit_kwargs: dict | None = None,
-    device: str = "cuda",
+    device: str = "cpu",
 ) -> dict:
     """
     Perform the NequIP potential fitting.
 
-    This function sets up and executes a python script to perform NequIP fitting using specified parameters
-    and input data located in the provided directory. It handles the input/output of atomic configurations,
-    sets up the NequIP model, and calculates training and testing errors after fitting.
+    This function sets up and executes a python script to perform NequIP fitting.
+    It also calculates training and testing errors after fitting.
 
     Parameters
     ----------
-    db_dir: Path
-        directory containing the training and testing data files.
-    path_to_default_hyperparameters : str or Path.
-        Path to mlip-rss-defaults.json.
+    db_dir: str or Path
+        Path to directory containing the training and testing data files.
+    path_to_default_hyperparameters: str or Path.
+        Path to mlip-defaults.json.
     isolated_atoms_energies: dict
-        mandatory dictionary mapping element numbers to isolated energies.
+        Mandatory dictionary mapping element numbers to isolated energies.
     ref_energy_name : str, optional
         Reference energy name.
     ref_force_name : str, optional
@@ -462,38 +454,38 @@ def nequip_fitting(
     ref_virial_name : str, optional
         Reference virial name.
     device: str
-        specify device to use cuda or cpu
-    fit_kwargs: dict.
-        optional dictionary with parameters for nequip fitting with keys same as
-        mlip-rss-defaults.json.
+        Specify device to use "cuda" or "cpu"
+    fit_kwargs: dict
+        Additional keyword arguments for NequIP fitting with keys same as
+        those in mlip-defaults.json.
 
-    Keyword Arguments
-    -----------------
+    Tunable hyperparameters
+    -----------------------
     r_max: float
-        cutoff radius in length units
+        Cutoff radius in length units
     num_layers: int
-        number of interaction blocks
+        Number of interaction blocks
     l_max: int
-        maximum irrep order (rotation order) for the network's features
+        Maximum irrep order (rotation order) for the network's features
     num_features: int
-        multiplicity of the features
+        Multiplicity of the features
     num_basis: int
-        number of basis functions used in the radial basis
+        Number of basis functions used in the radial basis
     invariant_layers: int
-        number of radial layers
+        Number of radial layers
     invariant_neurons: int
-        number of hidden neurons in radial function
+        Number of hidden neurons in radial function
     batch_size: int
-        batch size
+        Batch size
     learning_rate: float
-        learning rate
+        Learning rate
     default_dtype: str
-        type of float to use, e.g. float32 and float64
+        Type of float to use, e.g. float32 and float64
 
     Returns
     -------
-    dict[str, float]
-        A dictionary containing train_error, test_error, and the path to the fitted MLIP.
+    dict
+        A dictionary with train_error, test_error, path_to_mlip
 
     Raises
     ------
@@ -711,36 +703,39 @@ per_species_rescale_scales: dataset_forces_rms
 
 def m3gnet_fitting(
     db_dir: Path,
-    path_to_default_hyperparameters: Path | str = MLIP_RSS_DEFAULTS_FILE_PATH,
-    device: str = "cuda",
+    path_to_default_hyperparameters: Path | str = MLIP_DEFAULTS_FILE_PATH,
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",
+    device: str = "cpu",
     fit_kwargs: dict | None = None,
 ) -> dict:
     """
     Perform the M3GNet potential fitting.
 
+    This function sets up and executes a python script to perform M3GNet fitting.
+    It also calculates training and testing errors after fitting.
+
     Parameters
     ----------
-    db_dir: Path
-        Directory containing the training and testing data files.
-    path_to_default_hyperparameters : str or Path.
-        Path to mlip-rss-defaults.json.
-    device: str
-        Device on which the model will be trained, e.g., 'cuda' or 'cpu'.
-    ref_energy_name : str, optional
+    db_dir: str or Path
+        Path to directory containing the training and testing data files.
+    path_to_default_hyperparameters: str or Path.
+        Path to mlip-defaults.json.
+    ref_energy_name: str, optional
         Reference energy name.
-    ref_force_name : str, optional
+    ref_force_name: str, optional
         Reference force name.
-    ref_virial_name : str, optional
+    ref_virial_name: str, optional
         Reference virial name.
-    fit_kwargs: dict.
-        optional dictionary with parameters for m3gnet fitting with keys same as
-        mlip-rss-defaults.json.
+    device: str
+        Specify device to use "cuda" or "cpu".
+    fit_kwargs: dict
+        Additional keyword arguments for M3GNet fitting with keys same as
+        those in mlip-defaults.json.
 
-    Keyword Arguments
-    -----------------
+    Tunable hyperparameters
+    -----------------------
     exp_name: str
         Name of the experiment, used for saving model checkpoints and logs.
     results_dir: str
@@ -768,9 +763,8 @@ def m3gnet_fitting(
 
     Returns
     -------
-    dict[str, float]
-        A dictionary containing keys such as 'train_error', 'test_error', and 'path_to_fitted_model',
-        representing the training error, test error, and the location of the saved model, respectively.
+    dict
+        A dictionary with train_error, test_error, path_to_mlip
 
     Adapted from:
     *    Title: Tutorials of Materials Graph Library (MatGL)
@@ -812,16 +806,9 @@ def m3gnet_fitting(
     os.makedirs(os.path.join(results_dir, exp_name), exist_ok=True)
 
     with open("output.txt", "w") as f:
-        # Backup original stdout stream.
         original_stdout = sys.stdout
-
-        # Set stdout to the file object.
         sys.stdout = f
-
-        # Print something (it goes to the file).
         print("This line will be written to the file.")
-
-        # Restore original stdout stream.
         sys.stdout = original_stdout
 
     with open("m3gnet.log", "w") as log_file:
@@ -838,7 +825,6 @@ def m3gnet_fitting(
             and "dimer" not in at.info["config_type"]
         ]
 
-        # prepare train dataset
         (
             train_structs,
             train_energies,
@@ -880,7 +866,6 @@ def m3gnet_fitting(
 
         if os.path.exists(os.path.join(db_dir, "test.extxyz")):
             test_data = ase.io.read(os.path.join(db_dir, "test.extxyz"), index=":")
-            # prepare test dataset
             (
                 test_structs,
                 test_energies,
@@ -1080,64 +1065,63 @@ def m3gnet_fitting(
 
 def mace_fitting(
     db_dir: Path,
-    path_to_default_hyperparameters: Path | str = MLIP_RSS_DEFAULTS_FILE_PATH,
-    device: str = "cuda",
+    path_to_default_hyperparameters: Path | str = MLIP_DEFAULTS_FILE_PATH,
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",
+    device: str = "cpu",
     fit_kwargs: dict | None = None,
 ) -> dict:
     """
     Perform the MACE potential fitting.
 
-    This function sets up and executes a python script to perform MACE fitting using specified parameters
-    and input data located in the provided directory. It handles the input/output of atomic configurations,
-    sets up the NequIP model, and calculates training and testing errors after fitting.
+    This function sets up and executes a python script to perform MACE fitting.
+    It also calculates training and testing errors after fitting.
 
     Parameters
     ----------
-    db_dir: Path
-        directory containing the training and testing data files.
-    path_to_default_hyperparameters : str or Path.
-        Path to mlip-rss-defaults.json.
-    device: str
-        specify device to use cuda or cpu.
+    db_dir: str or Path
+        Path to directory containing the training and testing data files.
+    path_to_default_hyperparameters: str or Path.
+        Path to mlip-defaults.json.
     ref_energy_name : str, optional
         Reference energy name.
-    ref_force_name : str, optional
+    ref_force_name: str, optional
         Reference force name.
-    ref_virial_name : str, optional
+    ref_virial_name: str, optional
         Reference virial name.
-    fit_kwargs: dict.
-        optional dictionary with parameters for mace fitting with keys same as
-        mlip-rss-defaults.json.
+    device: str
+        Specify device to use "cuda" or "cpu".
+    fit_kwargs: dict
+        Additional keyword arguments for MACE fitting with keys same as
+        those in mlip-defaults.json.
 
-    Keyword Arguments
-    -----------------
+    Tunable hyperparameters
+    -----------------------
     model: str
-        type of model to be trained
+        type of model to be trained.
     config_type_weights: str
-        weights of config types
+        weights of config types.
     hidden_irreps: str
-        control the model size
+        control the model size.
     r_max: float
-        cutoff radius controls the locality of the model
+        cutoff radius controls the locality of the model.
     batch_size: int
-        batch size (note that batch size cannot be larger than the size of training datasets)
+        batch size (note that batch size cannot be larger than the size of training datasets).
     start_swa: str
         if the keyword --swa is enabled, the energy weight of the loss is increased
-        for the last ~20% of the training epochs (from --start_swa epochs)
+        for the last ~20% of the training epochs (from --start_swa epochs).
     correlation: int
-        correlation order corresponds to the order that MACE induces at each layer
+        correlation order corresponds to the order that MACE induces at each layer.
     loss: str
-        loss functions
+        loss functions.
     default_dtype: str
-        type of float to use, e.g. float32 and float64
+        type of float to use, e.g. float32 and float64.
 
     Returns
     -------
-    dict[str, float]
-        A dictionary containing train_error, test_error, and the path to the fitted MLIP.
+    dict
+        A dictionary with train_error, test_error, path_to_mlip.
 
     """
     if ref_virial_name is not None:
@@ -1242,8 +1226,8 @@ def load_mlip_hyperparameter_defaults(mlip_fit_parameter_file_path: str | Path) 
 
     Parameters
     ----------
-    mlip_fit_parameter_file_path : str or Path.
-        Path to MLIP default parameter JSON files.
+    gap_fit_parameter_file_path : str or Path.
+        Path to gap-defaults.json.
 
     Returns
     -------
@@ -1266,18 +1250,18 @@ def gap_hyperparameter_constructor(
     Parameters
     ----------
     gap_parameter_dict : dict.
-        dictionary with gap hyperparameters.
+        Dictionary with gap hyperparameters.
     include_two_body : bool.
-        bool indicating whether to include two-body hyperparameters
+        Bool indicating whether to include two-body hyperparameters.
     include_three_body : bool.
-        bool indicating whether to include three-body hyperparameters
+        Bool indicating whether to include three-body hyperparameters.
     include_soap : bool.
-        bool indicating whether to include soap hyperparameters
+        Bool indicating whether to include soap hyperparameters.
 
     Returns
     -------
-        list
-           gap fit input parameter string.
+    list
+        gap fit input parameter string.
     """
     dict_wo_term_name = gap_parameter_dict.copy()
     if "two_body" in dict_wo_term_name["general"]:
@@ -1333,13 +1317,13 @@ def get_list_of_vasp_calc_dirs(flow_output) -> list[str]:
 
     Parameters
     ----------
-    flow_output: dict.
-        PhononDFTMLDataGenerationFlow output
+    flow_output: dict
+        PhononDFTMLDataGenerationFlow output.
 
     Returns
     -------
-    list.
-        A list of vasp_calc_dirs
+    list
+        A list of vasp_calc_dirs.
     """
     list_of_vasp_calc_dirs: list[str] = []
     for output in flow_output.values():
@@ -1606,7 +1590,7 @@ def calculate_delta(atoms_db: list[Atoms], e_name: str) -> tuple[float, ndarray]
     atoms_db: list[Atoms]
         list of Ase atoms objects
     e_name: str
-        energy_parameter_name as defined in mlip-phonon-defaults.json
+        energy_parameter_name as defined in gap-defaults.json
 
     Returns
     -------
@@ -1653,7 +1637,7 @@ def compute_pairs_triplets(atoms: Atoms) -> list[float]:
     """
     cutoffs = natural_cutoffs(atoms)
     neighbor_list = NeighborList(
-        cutoffs=cutoffs, skin=0.15, self_interaction=False, bothways=True
+        cutoffs=cutoffs, skin=0.3, self_interaction=False, bothways=True
     )
     neighbor_list.update(atoms)
     counts_list = [
@@ -1701,10 +1685,6 @@ def run_gap(num_processes_fit: int, parameters) -> None:
 
     """
     os.environ["OMP_NUM_THREADS"] = str(num_processes_fit)
-    os.environ["OPENBLAS_NUM_THREADS"] = "1"  # blas library
-    os.environ["BLIS_NUM_THREADS"] = "1"  # blas library
-    os.environ["MKL_NUM_THREADS"] = "1"  # blas library
-    os.environ["NETLIB_NUM_THREADS"] = "1"  # blas library
 
     with (
         open("std_gap_out.log", "w", encoding="utf-8") as file_std,
@@ -1732,10 +1712,6 @@ def run_quip(
 
     """
     os.environ["OMP_NUM_THREADS"] = str(num_processes_fit)
-    os.environ["OPENBLAS_NUM_THREADS"] = "1"  # blas library
-    os.environ["BLIS_NUM_THREADS"] = "1"  # blas library
-    os.environ["MKL_NUM_THREADS"] = "1"  # blas library
-    os.environ["NETLIB_NUM_THREADS"] = "1"  # blas library
 
     init_args = "init_args='IP Glue'" if glue_xml else ""
     quip = (
@@ -1791,25 +1767,22 @@ def prepare_fit_environment(
     glue_xml: bool,
     train_name: str = "train.extxyz",
     test_name: str = "test.extxyz",
-    glue_name: str = "glue.xml",
 ) -> Path:
     """
     Prepare the environment for the fit.
 
     Parameters
     ----------
-    database_dir: Path
+    database_dir:
         Path to database directory.
-    mlip_path: Path
+    mlip_path:
         Path to the MLIP fit run (cwd).
     glue_xml: bool
             use the glue.xml core potential instead of fitting 2b terms.
-    train_name: str
+    train_name:
         name of the training data file.
-    test_name: str
+    test_name:
         name of the test data file.
-    glue_name: str
-        name of the glue.xml file or path.
 
     Returns
     -------
@@ -1825,7 +1798,7 @@ def prepare_fit_environment(
     )
     if glue_xml:
         shutil.copy(
-            os.path.join(database_dir, glue_name),
+            os.path.join(database_dir, "../glue.xml"),  # very improvised on purpose
             os.path.join(mlip_path, "glue.xml"),
         )
 
@@ -1889,7 +1862,7 @@ def convert_xyz_to_structure(
 
 def write_after_distillation_data_split(
     distillation: bool,
-    f_max: float,
+    force_max: float,
     split_ratio: float,
     vasp_ref_name: str = "vasp_ref.extxyz",
     train_name: str = "train.extxyz",
@@ -1916,12 +1889,10 @@ def write_after_distillation_data_split(
         name of the training data file.
     test_name:
         name of the test data file.
-    force_label: str
-        label of the force entries.
     """
     # reject structures with large force components
     atoms = (
-        data_distillation(vasp_ref_name, f_max, force_label)
+        data_distillation(vasp_ref_name, force_max, force_label)
         if distillation
         else ase.io.read(vasp_ref_name, index=":")
     )
@@ -1942,11 +1913,11 @@ def mace_virial_format_conversion(
     Parameters
     ----------
     atoms: ase.atoms.Atoms
-        input structures
+        Input structures.
     ref_virial_name: str
-        virial label
+        Virial label.
     out_file_name: str
-        name of output file
+        Name of output file.
     """
     formatted_atoms = []
     for at in atoms:

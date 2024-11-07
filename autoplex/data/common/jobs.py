@@ -30,10 +30,13 @@ from pymatgen.io.vasp.outputs import Vasprun
 
 from autoplex.data.common.utils import (
     ElementCollection,
-    boltzhist_cur,
+    boltzhist_cur_dual_iter,
+    boltzhist_cur_one_shot,
     create_soap_descriptor,
     cur_select,
     data_distillation,
+    flatten,
+    handle_rss_trajectory,
     mc_rattle,
     random_vary_angle,
     scale_cell,
@@ -43,7 +46,7 @@ from autoplex.data.common.utils import (
 )
 from autoplex.fitting.common.regularization import set_sigma
 
-logging.basicConfig(level=logging.DEBUG, format="[%(levelname)s] %(message)s")
+logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 
 
 @job
@@ -55,7 +58,7 @@ def convert_to_extxyz(job_output, pkl_file, config_type, factor):
     ----------
     job_output:
         the (static) job output object.
-    pkl_file:
+    pkl_file: str
         a pickle file.
     config_type: str
             configuration type of the data.
@@ -180,6 +183,7 @@ def generate_randomized_structures(
     rattle_seed: int = 42,
     rattle_mc_n_iter: int = 10,
     w_angle: list[float] | None = None,
+    adaptive_rattled_supercell_settings: bool = True,
 ):
     """
     Take in a pymatgen Structure object and generates angle/volume distorted + rattled structures.
@@ -228,6 +232,8 @@ def generate_randomized_structures(
         Number of Monte Carlo iterations.
         Larger number of iterations will generate larger displacements.
         Default=10.
+    adaptive_rattled_supercell_settings: bool
+        prevent too big rattled supercells
 
     Returns
     -------
@@ -236,9 +242,6 @@ def generate_randomized_structures(
     """
     if supercell_matrix is None:
         supercell_matrix = [[2, 0, 0], [0, 2, 0], [0, 0, 2]]
-
-    if n_structures < 10:
-        n_structures = 10
 
     supercell = get_supercell(
         unitcell=get_phonopy_structure(structure),
@@ -323,83 +326,82 @@ def generate_randomized_structures(
 
 
 @job
-def sampling(
-    selection_method: Literal["cur", "bcur", "random", "uniform"] = "random",
+def sample_data(
+    selection_method: Literal[
+        "cur", "bcur1s", "bcur2i", "random", "uniform"
+    ] = "random",
     num_of_selection: int = 5,
     bcur_params: dict | None = None,
-    dir: str = None,
-    structure: list[Structure] = None,
-    traj_info: list[dict[str, str | float]] = None,
-    isol_es: dict | None = None,
+    dir: list[str] | str | None = None,
+    structure: list[Structure] | list[list[Structure]] | None = None,
+    traj_path: list | None = None,
+    isolated_atom_energies: dict | None = None,
     random_seed: int = None,
-):
+    remove_traj_files: bool = False,
+) -> list[Structure]:
     """
     Job to sample training configurations from trajectories of MD/RSS.
 
     Parameters
     ----------
-    selection_method : Literal['cur', 'bcur', 'random', 'uniform']
+    selection_method : Literal['cur', 'bcur1s', 'bcur2s', 'random', 'uniform']
        Method for selecting samples. Options include:
         - 'cur': Pure CUR selection.
         - 'bcur': Boltzmann flat histogram in enthalpy, then CUR.
+            - 'bcur1s': Execute bcur with one shot (1s)
+            - 'bcur2i': Execute bcur with two iterations (2i)
         - 'random': Random selection.
         - 'uniform': Uniform selection.
-
-    num_of_selection : int, optional
-        Number of selections to be made. Default is 5.
-
-    bcur_params : dict, optional
+    num_of_selection: int
+       Number of structures to be sampled.
+    bcur_params: dict
         Parameters for Boltzmann CUR selection. The default dictionary includes:
         - 'soap_paras': SOAP descriptor parameters:
-            - 'l_max': int, Maximum degree of spherical harmonics (default 8).
-            - 'n_max': int, Maximum number of radial basis functions (default 8).
-            - 'atom_sigma': float, Width of Gaussian smearing (default 0.75).
-            - 'cutoff': float, Radial cutoff distance (default 5.5).
+            - 'l_max': int, Maximum degree of spherical harmonics (default 12).
+            - 'n_max': int, Maximum number of radial basis functions (default 12).
+            - 'atom_sigma': float, Width of Gaussian smearing (default 0.0875).
+            - 'cutoff': float, Radial cutoff distance (default 10.5).
             - 'cutoff_transition_width': float, Width of the transition region (default 1.0).
             - 'zeta': float, Exponent for dot-product SOAP kernel (default 4.0).
             - 'average': bool, Whether to average the SOAP vectors (default True).
             - 'species': bool, Whether to consider species information (default True).
-        - 'kT': float, Temperature in eV for Boltzmann weighting (default 0.3).
-        - 'frac_of_bcur': float, Fraction of Boltzmann CUR selections (default 0.1).
+        - 'kt': float, Temperature in eV for Boltzmann weighting (default 0.3).
+        - 'frac_of_bcur': float, Fraction of Boltzmann CUR selections (default 0.8).
         - 'bolt_max_num': int, Maximum number of Boltzmann selections (default 3000).
         - 'kernel_exp': float, Exponent for the kernel (default 4.0).
         - 'energy_label': str, Label for the energy data (default 'energy').
-
-    dir : str, optional
+    dir: str
         Directory containing trajectory files for MD/RSS simulations. Default is None.
-
-    structure : list[Structure], optional
+    structure: list[Structure]
         List of structures for sampling. Default is None.
-
-    traj_info : list[dict[str, Union[str, float]]], optional
-        List of dictionaries containing trajectory information. Each dictionary should
-        have keys 'traj_path' and 'pressure'. Default is None.
-
-    isol_es : dict, optional
-        Dictionary of isolated energy values for species. Required for 'boltzhist_CUR'
+    traj_path: list[list[str]]
+        List of lists containing trajectory paths. Default is None.
+    isolated_atom_energies: dict
+        Dictionary of isolated energy values for species. Required for 'boltzhist_cur'
         selection method. Default is None.
-
-    random_seed:
-        Random seed.
+    random_seed: int, optional
+        Seed for random number generation, ensuring reproducibility of sampling.
+    remove_traj_files: bool
+        Remove all trajectory files raised by RSS to save memory
 
     Returns
     -------
     list of ase.Atoms
-        The selected atoms. These are copies of the atoms in the input list.
+        The selected atoms.
     """
     default_bcur_params = {
         "soap_paras": {
-            "l_max": 8,
-            "n_max": 8,
-            "atom_sigma": 0.75,
-            "cutoff": 5.5,
+            "l_max": 12,
+            "n_max": 12,
+            "atom_sigma": 0.0875,
+            "cutoff": 10.5,
             "cutoff_transition_width": 1.0,
             "zeta": 4.0,
             "average": True,
             "species": True,
         },
-        "kT": 0.3,
-        "frac_of_bcur": 0.1,
+        "kt": 0.3,
+        "frac_of_bcur": 0.8,
         "bolt_max_num": 3000,
         "kernel_exp": 4.0,
         "energy_label": "energy",
@@ -412,30 +414,38 @@ def sampling(
     pressures = None
 
     if dir is not None:
-        atoms = read(dir, index=":")
+        if isinstance(dir, list):
+            atoms = [read(i, index=":") for i in dir]
+            atoms = flatten(atoms, recursive=True)
+        else:
+            atoms = read(dir, index=":")
 
     elif structure is not None:
+        if isinstance(structure[0], list):
+            structure = flatten(structure, recursive=False)
         atoms = [AseAtomsAdaptor().get_atoms(at) for at in structure]
 
     else:
-        atoms = []
-        pressures = []
-        if traj_info is None:
-            traj_info = []
-        for traj in traj_info:
-            if traj is not None:
-                print("traj:", traj)
-                at = read(traj["traj_path"], index=":")
-                atoms.extend(at)
-                pressure = [traj["pressure"]] * len(at)
-                pressures.extend(pressure)
+        atoms, pressures = handle_rss_trajectory(traj_path, remove_traj_files)
 
-    if selection_method == "cur" or selection_method == "bcur":
-        n_species = ElementCollection(atoms).get_number_of_species()
-        species_Z = ElementCollection(atoms).get_species_Z()
+    if selection_method in {"cur", "bcur1s", "bcur2i"}:
+        n_species = ElementCollection(
+            flatten(atoms, recursive=True)
+        ).get_number_of_species()
+        species_Z = ElementCollection(flatten(atoms, recursive=True)).get_species_Z()
 
         if not isinstance(bcur_params["soap_paras"], dict):
             raise TypeError("soap_paras must be a dictionary")
+        if not isinstance(bcur_params["kt"], float):
+            raise TypeError("kt must be a float")
+        if not isinstance(bcur_params["frac_of_bcur"], float):
+            raise TypeError("frac_of_bcur must be a float")
+        if not isinstance(bcur_params["bolt_max_num"], int):
+            raise TypeError("bolt_max_num must be an integer")
+        if not isinstance(bcur_params["kernel_exp"], float):
+            raise TypeError("kernel_exp must be a float")
+        if not isinstance(bcur_params["energy_label"], str):
+            raise TypeError("energy_label must be a string")
 
         soap_paras = bcur_params["soap_paras"]
         descriptor = create_soap_descriptor(soap_paras, n_species, species_Z)
@@ -450,25 +460,42 @@ def sampling(
                 random_seed=random_seed,
             )
 
-        elif selection_method == "bcur":
-            if isol_es is not None:
-                isol_es = {int(k): v for k, v in isol_es.items()}
+        elif selection_method in {"bcur1s", "bcur2i"}:
+            if isolated_atom_energies is not None:
+                isolated_atom_energies = {
+                    int(k): v for k, v in isolated_atom_energies.items()
+                }
             else:
                 raise ValueError("Please provide the energy of isolated atoms!")
 
-            selected_atoms = boltzhist_cur(
-                atoms=atoms,
-                isol_es=isol_es,
-                bolt_frac=bcur_params["frac_of_bcur"],
-                bolt_max_num=bcur_params["bolt_max_num"],
-                cur_num=num_of_selection,
-                kernel_exp=bcur_params["kernel_exp"],
-                kT=bcur_params["kT"],
-                energy_label=bcur_params["energy_label"],
-                P=pressures,
-                descriptor=descriptor,
-                random_seed=random_seed,
-            )
+            if selection_method == "bcur1s":
+                selected_atoms = boltzhist_cur_one_shot(
+                    atoms=atoms,
+                    isolated_atom_energies=isolated_atom_energies,
+                    bolt_frac=bcur_params["frac_of_bcur"],
+                    bolt_max_num=bcur_params["bolt_max_num"],
+                    cur_num=num_of_selection,
+                    kernel_exp=bcur_params["kernel_exp"],
+                    kt=bcur_params["kt"],
+                    energy_label=bcur_params["energy_label"],
+                    pressures=pressures,
+                    descriptor=descriptor,
+                    random_seed=random_seed,
+                )
+            else:
+                selected_atoms = boltzhist_cur_dual_iter(
+                    atoms=atoms,
+                    isolated_atom_energies=isolated_atom_energies,
+                    bolt_frac=bcur_params["frac_of_bcur"],
+                    bolt_max_num=bcur_params["bolt_max_num"],
+                    cur_num=num_of_selection,
+                    kernel_exp=bcur_params["kernel_exp"],
+                    kt=bcur_params["kt"],
+                    energy_label=bcur_params["energy_label"],
+                    pressures=pressures,
+                    descriptor=descriptor,
+                    random_seed=random_seed,
+                )
 
         if selected_atoms is None:
             raise ValueError(
@@ -514,33 +541,33 @@ def sampling(
 
 
 @job
-def VASP_collect_data(
+def collect_dft_data(
     vasp_ref_file: str = "vasp_ref.extxyz",
     rss_group: str = "RSS",
     vasp_dirs: dict | None = None,
-):
+) -> dict:
     """
     Collect VASP data from specified directories.
 
     Parameters
     ----------
-    vasp_ref_file : str, optional
+    vasp_ref_file : str
         Reference file for VASP data. Default is 'vasp_ref.extxyz'.
-
-    rss_group : str, optional
+    rss_group : str
         Group name for GAP RSS. Default is 'RSS'.
-
-    vasp_dirs : dict, mandatory
+    vasp_dirs : dict
         Dictionary containing VASP directories and configuration types. Should have keys:
-        - 'dirs_of_vasp': List of directories containing VASP data.
-        - 'config_type': List of configuration types corresponding to each directory.
+        - 'dirs_of_vasp': list
+            List of directories containing VASP data.
+        - 'config_type': list
+            List of configuration types corresponding to each directory.
 
     Returns
     -------
     dict
         A dictionary containing:
         - 'vasp_ref_dir': Directory of the VASP reference file.
-        - 'isol_es': Isolated energy values.
+        - 'isolated_atom_energies': Isolated energy values.
     """
     if vasp_dirs is None:
         raise ValueError(
@@ -562,7 +589,7 @@ def VASP_collect_data(
 
     failed_count = 0
     atoms = []
-    isol_es = {}
+    isolated_atom_energies = {}
 
     for i, val in enumerate(dirs):
         if os.path.exists(os.path.join(val, "vasprun.xml.gz")):
@@ -594,12 +621,14 @@ def VASP_collect_data(
                             at_i.pbc = True
                             at_i.info["rss_group"] = rss_group
                         else:
-                            at_i.info["gap_rss_nonperiodic"] = "T"
+                            at_i.info["rss_nonperiodic"] = "T"
 
                         if at_i.info["config_type"] == "IsolatedAtom":
                             at_ids = at_i.get_atomic_numbers()
                             # array_key = at_ids.tostring()
-                            isol_es[int(at_ids[0])] = at_i.info["REF_energy"]
+                            isolated_atom_energies[int(at_ids[0])] = at_i.info[
+                                "REF_energy"
+                            ]
 
             except ValueError:
                 logging.error(f"Failed to collect number: {i}")
@@ -614,17 +643,27 @@ def VASP_collect_data(
 
     vasp_ref_dir = os.path.join(dir_path, vasp_ref_file)
 
-    return {"vasp_ref_dir": vasp_ref_dir, "isol_es": isol_es}
+    return {
+        "vasp_ref_dir": vasp_ref_dir,
+        "isolated_atom_energies": isolated_atom_energies,
+    }
 
 
-def check_convergence_vasp(file):
+def check_convergence_vasp(path: str) -> bool:
     """
     Check if VASP calculation has converged.
 
-    True if a run is converged both ionically and electronically.
+    Parameters
+    ----------
+    path: Path
+        Path to the vasp output file to check convergence.
 
+    Return
+    ------
+    bool
+        True if a run is converged both ionically and electronically.
     """
-    vasprun = Vasprun(file)
+    vasprun = Vasprun(path)
     converged_e = vasprun.converged_electronic
     converged_i = vasprun.converged_ionic
 
@@ -637,7 +676,7 @@ def safe_strip_hostname(value):
 
     Parameters
     ----------
-    value : str
+    value: str
         The path or URL from which to strip the hostname.
 
     Returns
@@ -654,24 +693,65 @@ def safe_strip_hostname(value):
 
 
 @job
-def Data_preprocessing(
+def preprocess_data(
     vasp_ref_dir: str,
-    test_ratio: float = 0.5,
+    test_ratio: float | None = None,
     regularization: bool = False,
+    scheme: str = "linear-hull",
     distillation: bool = False,
-    f_max: float = 40.0,
+    force_max: float = 40,
     force_label: str = "REF_forces",
-    pre_database_dir: str = None,
-    etup: list[tuple] = None,
-):
-    """Preprocesse data to a suitable format for fiting machine learning models."""
+    pre_database_dir: str | None = None,
+    reg_minmax: list[tuple] | None = None,
+    isolated_atom_energies: dict | None = None,
+) -> Path:
+    """
+    Preprocesse data to before fiting machine learning models.
+
+    This function handles tasks such as splitting the dataset,
+    applying regularization, accumulating database, and filtering
+    structures based on maximum force values.
+
+    Parameters
+    ----------
+    vasp_ref_dir: str
+        Path to the directory containing the reference VASP calculation data.
+    test_ratio: float
+        The proportion of the test set after splitting the data.
+        If None, no splitting will be performed.
+    regularization: bool
+        If true, apply regularization. This only works for GAP.
+    scheme: str
+        Scheme to use for regularization.
+    distillation: bool
+        If True, apply data distillation.
+    force_max: float
+        Maximum force value to exclude structures.
+    force_label: str
+        The label of force values to use for distillation.
+    pre_database_dir : str
+        Directory where the previous database was saved.
+    reg_minmax: list[tuple]
+        A list of tuples representing the minimum and maximum
+        values for regularization.
+    isolated_atom_energies: dict
+        A dictionary containing isolated energy values for different species.
+
+    Returns
+    -------
+    Path
+        The current working directory.
+    """
     atoms = (
-        data_distillation(vasp_ref_dir, f_max, force_label)
+        data_distillation(vasp_ref_dir, force_max, force_label)
         if distillation
         else read(vasp_ref_dir, index=":")
     )
 
-    train_structures, test_structures = stratified_dataset_split(atoms, test_ratio)
+    if test_ratio == 0 or test_ratio is None:
+        train_structures, test_structures = atoms, atoms
+    else:
+        train_structures, test_structures = stratified_dataset_split(atoms, test_ratio)
 
     if pre_database_dir and os.path.exists(pre_database_dir):
         files_to_copy = ["train.extxyz", "test.extxyz"]
@@ -680,8 +760,9 @@ def Data_preprocessing(
         for file_name in files_to_copy:
             source_file_path = os.path.join(pre_database_dir, file_name)
             destination_file_path = os.path.join(current_working_directory, file_name)
-            shutil.copy(source_file_path, destination_file_path)
-            print(f"File {file_name} has been copied to {destination_file_path}")
+            if os.path.exists(source_file_path):
+                shutil.copy(source_file_path, destination_file_path)
+                print(f"File {file_name} has been copied to {destination_file_path}")
 
     write("train.extxyz", train_structures, format="extxyz", append=True)
     write("test.extxyz", test_structures, format="extxyz", append=True)
@@ -689,11 +770,16 @@ def Data_preprocessing(
     if regularization:
         atoms_reg: list[Atoms] = read("train.extxyz", index=":")
 
-        if etup is None:
-            etup = [(0.1, 1), (0.001, 0.1), (0.0316, 0.316), (0.0632, 0.632)]
+        if reg_minmax is None:
+            reg_minmax = [(0.1, 1), (0.001, 0.1), (0.0316, 0.316), (0.0632, 0.632)]
 
-        atom_with_sigma = set_sigma(atoms_reg, etup)
+        atom_with_sigma = set_sigma(
+            atoms=atoms_reg,
+            reg_minmax=reg_minmax,
+            isolated_atom_energies=isolated_atom_energies,
+            scheme=scheme,
+        )
 
-        write("train_with_sigma.extxyz", atom_with_sigma, format="extxyz")
+        write("train.extxyz", atom_with_sigma, format="extxyz")
 
     return Path.cwd()
