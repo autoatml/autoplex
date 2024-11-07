@@ -59,41 +59,6 @@ A short guide to contributing to autoplex can be found [here](https://autoatml.g
 
 # Workflow overview
 
-## Phonon workflow
-
-The following [Mermaid](https://mermaid.live/) diagram will give you an overview of the flows and jobs in the default autoplex workflow:
-```mermaid
-flowchart TD
-    f831581e-1d20-4fa8-aa7d-773ae45a78aa(external) -->|VASP output files info| 25f1b412-6e80-4ea0-a669-126b1d2eefdc(data preprocessing)
-    f831581e-1d20-4fa8-aa7d-773ae45a78aa(external) -->|VASP output files info| 75cee155-2708-4dcf-b8b3-d184d450ed4f(benchmark)
-    e99258a7-6717-4cc9-b629-709bee881cfa(external) -->|'phonon calc dirs', 'phonon data'| 25f1b412-6e80-4ea0-a669-126b1d2eefdc(data preprocessing)
-    e99258a7-6717-4cc9-b629-709bee881cfa(external) -->|'phonon calc dirs', 'phonon data'| 75cee155-2708-4dcf-b8b3-d184d450ed4f(benchmark)
-    38349844-bee1-4869-839f-74ccd753524e(external) -->|'isolated atoms calc dirs'| 25f1b412-6e80-4ea0-a669-126b1d2eefdc(data preprocessing)
-    38349844-bee1-4869-839f-74ccd753524e(external) -->|'energies', 'species'| 0a11a48c-3d9b-454a-9959-f7732967b49f(machine learning fit)
-    38349844-bee1-4869-839f-74ccd753524e(external) -->|'isolated atoms calc dirs'| 75cee155-2708-4dcf-b8b3-d184d450ed4f(benchmark)
-    25f1b412-6e80-4ea0-a669-126b1d2eefdc(data preprocessing) -->|formatted database| 0a11a48c-3d9b-454a-9959-f7732967b49f(machine learning fit)
-    0a11a48c-3d9b-454a-9959-f7732967b49f(machine learning fit) -->|'path to MLIP file'| 75cee155-2708-4dcf-b8b3-d184d450ed4f(benchmark)
-    75cee155-2708-4dcf-b8b3-d184d450ed4f(benchmark) -->|benchmark output info| d5b02fd6-806d-43f4-9f3f-d9de5f0f28e3(write benchmark metrics)
-    subgraph 2bc86ca5-f4bd-47dc-aa9d-45f72d0ab527 [autoplex workflow]
-        subgraph 821b6198-a8c5-45c5-939f-8ff0edd9f5b0 [data generation]
-            f831581e-1d20-4fa8-aa7d-773ae45a78aa(rattled DFT structures)
-        end
-        subgraph 75368ebe-fe58-48a9-aeba-6e81ca9169d6 [data generation]
-            e99258a7-6717-4cc9-b629-709bee881cfa(phonopy based structures)
-        end
-        38349844-bee1-4869-839f-74ccd753524e(isolated atoms calcs)
-        subgraph cdcce0a3-83fe-4590-993c-0b6e3ff5adcb [fit ML potentials]
-            25f1b412-6e80-4ea0-a669-126b1d2eefdc(data preprocessing)
-            0a11a48c-3d9b-454a-9959-f7732967b49f(machine learning fit)
-        end
-        75cee155-2708-4dcf-b8b3-d184d450ed4f(benchmark)
-        d5b02fd6-806d-43f4-9f3f-d9de5f0f28e3(write benchmark metrics)
-    end
-```
-The workflow starts with three flows that generate data for our database:
-* The first flow is preparing the VASP calculation for the isolated atoms (`isolated atoms calcs`).
-* A second flow is preparing the `phonopy` calculations to collect the VASP data from the single-atom displaced supercells (`phonopy based structures`).
-* The third flow is constructing rattled supercells by rattling the atoms, i.e. displacing all atoms' positions (in the default setup), preparing the VASP calculations and collecting the data for the MLIP fit (`rattled DFT structures`).
-
-After a few data preprocessing steps (`data preprocessing`) to filter out data with too strong force values, the MLIP fit (`machine learning fit`) is run and the resulting potential is used for the benchmark against DFT data (`benchmark`).
-Finally, the result metrics are collected in form of output plots and files (`write benchmark metrics`).
+We currently have two different types of workflows available. 
+* Workflow to use random-structure searches for the creation for systematic construction of interatomic potentials
+* Workflow to train accurate interatomic potentials for harmonic phonon properties
