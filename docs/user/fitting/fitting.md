@@ -267,8 +267,8 @@ complete_workflow_mace = CompleteDFTvsMLBenchmarkWorkflowMPSettings(
 ```    
 
 If you do not have internet access on the cluster, please make sure that you have downloaded and deposited the 
-model that you want to finetune on the cluster beforehand. Instead of 'foundation_model="large"', you can then simply
-set 'foundation_model="full_path_on_the_cluster'
+model that you want to finetune on the cluster beforehand. Instead of `foundation_model="large"`, you can then simply
+set `foundation_model="full_path_on_the_cluster"`
 
 ## Example script for `autoplex` workflow using GAP to fit and benchmark a Si database
 
