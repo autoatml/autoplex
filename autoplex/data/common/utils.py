@@ -79,15 +79,16 @@ def flatten(atoms_object: Atoms | Iterable, recursive: bool = False) -> list[Ato
 def rms_dict(x_ref: np.ndarray | list, x_pred: np.ndarray | list) -> dict:
     """Compute RMSE and standard deviation of predictions with reference data.
 
-    x_ref and x_pred should be of same shape.
+    Adapted and adjusted from libatoms GAP tutorial page
+    https://libatoms.github.io/GAP/gap_fitting_tutorial.html#make-simple-plots-of-the-energies-and-forces-on-the-EMT-and-GAP-datas
 
     Parameters
     ----------
-    ----------1·
-    x_ref : np.ndarray.
+    x_ref: np.ndarray.
         list of reference data.
     x_pred: np.ndarray.
         list of prediction.
+    Note that x_ref and x_pred should be of same shape.
 
     Returns
     -------

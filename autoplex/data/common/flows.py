@@ -17,7 +17,10 @@ from atomate2.forcefields.jobs import (
     GAPRelaxMaker,
 )
 from atomate2.vasp.jobs.core import StaticMaker
-from atomate2.vasp.powerups import update_user_incar_settings
+from atomate2.vasp.powerups import (
+    update_user_incar_settings,
+    update_user_potcar_settings,
+)
 from atomate2.vasp.sets.core import StaticSetGenerator
 from custodian.vasp.handlers import (
     FrozenJobErrorHandler,
@@ -41,9 +44,12 @@ from autoplex.data.common.jobs import (
     get_supercell_job,
     plot_force_distribution,
 )
-from autoplex.data.common.utils import ElementCollection
+from autoplex.data.common.utils import (
+    ElementCollection,
+    flatten,
+)
 
-__all__ = ["GenerateTrainingDataForTesting", "DFTStaticMaker"]
+__all__ = ["GenerateTrainingDataForTesting", "DFTStaticLabelling"]
 
 logging.basicConfig(level=logging.DEBUG, format="[%(levelname)s] %(message)s")
 

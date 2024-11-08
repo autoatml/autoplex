@@ -108,4 +108,3 @@ class BuildMultiRandomizedStructure(Maker):
             replace=Flow(job_list),
             output=final_structures,
         )
-    

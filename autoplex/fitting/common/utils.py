@@ -53,6 +53,7 @@ from autoplex.data.common.utils import (
 
 current_dir = Path(__file__).absolute().parent
 GAP_DEFAULTS_FILE_PATH = current_dir / "gap-defaults.json"
+MLIP_PHONON_DEFAULTS_FILE_PATH = current_dir / "gap-defaults.json"
 MLIP_DEFAULTS_FILE_PATH = current_dir / "mlip-defaults.json"
 
 
@@ -276,8 +277,8 @@ def jace_fitting(
         Additional keyword arguments for ACE fitting with keys same as
         those in mlip-defaults.json.
 
-    Tunable hyperparameters
-    -----------------------
+    Keyword Arguments
+    -----------------
     order: int
         Order of ACE.
     totaldegree: int
@@ -459,8 +460,8 @@ def nequip_fitting(
         Additional keyword arguments for NequIP fitting with keys same as
         those in mlip-defaults.json.
 
-    Tunable hyperparameters
-    -----------------------
+    Keyword Arguments
+    -----------------
     r_max: float
         Cutoff radius in length units
     num_layers: int
@@ -734,8 +735,8 @@ def m3gnet_fitting(
         Additional keyword arguments for M3GNet fitting with keys same as
         those in mlip-defaults.json.
 
-    Tunable hyperparameters
-    -----------------------
+    Keyword Arguments
+    -----------------
     exp_name: str
         Name of the experiment, used for saving model checkpoints and logs.
     results_dir: str
@@ -1096,8 +1097,8 @@ def mace_fitting(
         Additional keyword arguments for MACE fitting with keys same as
         those in mlip-defaults.json.
 
-    Tunable hyperparameters
-    -----------------------
+    Keyword Arguments
+    -----------------
     model: str
         type of model to be trained.
     config_type_weights: str
