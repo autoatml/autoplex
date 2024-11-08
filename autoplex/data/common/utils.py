@@ -1477,7 +1477,7 @@ def convexhull_cur(
 
 
 def data_distillation(
-    vasp_ref_dir: str, f_max: float, force_label: str
+    vasp_ref_dir: str, force_max: float, force_label: str
 ) -> list[Atom | Atoms]:
     """
     For data distillation.
@@ -1486,7 +1486,7 @@ def data_distillation(
     ----------
     vasp_ref_dir: str
         VASP reference data directory.
-    f_max: float
+    force_max: float
         maximally allowed force.
     force_label: str
         The label for the force property in the atoms.
@@ -1504,7 +1504,7 @@ def data_distillation(
         forces = np.abs(at.arrays[force_label])
         f_component_max = np.max(forces)
 
-        if f_component_max < f_max:
+        if f_component_max < force_max:
             atoms_distilled.append(at)
 
     print(

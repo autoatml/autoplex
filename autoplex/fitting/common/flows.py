@@ -48,6 +48,8 @@ class MLIPFitMaker(Maker):
         Reference force name.
     ref_virial_name : str
         Reference virial name.
+    glue_file_path: str
+        Name of the glue.xml file path.
     """
 
     name: str = "MLpotentialFit"
@@ -56,6 +58,7 @@ class MLIPFitMaker(Maker):
     ref_energy_name: str = "REF_energy"
     ref_force_name: str = "REF_forces"
     ref_virial_name: str = "REF_virial"
+    glue_file_path: str = "glue.xml"
 
     # TO DO: Combine parameters used only for gap into one category (as noted below),
     # otherwise it will be too specific.
@@ -71,14 +74,14 @@ class MLIPFitMaker(Maker):
         separated: bool = False,
         pre_xyz_files: list[str] | None = None,
         pre_database_dir: str | None = None,
-        atomwise_regularization_param: float = 0.1,  # This is only used for GAP.
+        atomwise_regularization_parameter: float = 0.1,  # This is only used for GAP.
         force_min: float = 0.01,  # unit: eV Å-1
         atom_wise_regularization: bool = True,  # This is only used for GAP.
-        auto_delta: bool = True,  # This is only used for GAP.
+        auto_delta: bool = False,  # This is only used for GAP.
         glue_xml: bool = False,  # This is only used for GAP.
         num_processes_fit: int | None = None,
         apply_data_preprocessing: bool = False,
-        database_dir: str | None = None,
+        database_dir: Path | None = None,
         device: str = "cpu",
         **fit_kwargs,
     ):
@@ -108,7 +111,7 @@ class MLIPFitMaker(Maker):
             Names of the pre-database train xyz file and test xyz file.
         pre_database_dir: str or None
             The pre-database directory.
-        atomwise_regularization_param: float
+        atomwise_regularization_parameter: float
             Regularization value for the atom-wise force components.
         force_min: float
             Minimal force cutoff value for atom-wise regularization.
@@ -122,7 +125,7 @@ class MLIPFitMaker(Maker):
             Number of processes for fitting.
         apply_data_preprocessing: bool
             Determine whether to preprocess the data.
-        database_dir: str
+        database_dir: Path
             Path to the directory containing the database.
         device: str
             Device to be used for model fitting, either "cpu" or "cuda".
@@ -148,7 +151,7 @@ class MLIPFitMaker(Maker):
                 pre_xyz_files=pre_xyz_files,
                 pre_database_dir=pre_database_dir,
                 force_min=force_min,
-                atomwise_regularization_parameter=atomwise_regularization_param,
+                atomwise_regularization_parameter=atomwise_regularization_parameter,
                 atom_wise_regularization=atom_wise_regularization,
             )
             jobs.append(data_prep_job)
@@ -159,6 +162,7 @@ class MLIPFitMaker(Maker):
                 num_processes_fit=num_processes_fit,
                 auto_delta=auto_delta,
                 glue_xml=glue_xml,
+                glue_file_path=self.glue_file_path,
                 mlip_type=self.mlip_type,
                 hyperpara_opt=self.hyperpara_opt,
                 ref_energy_name=self.ref_energy_name,
@@ -173,17 +177,13 @@ class MLIPFitMaker(Maker):
             return Flow(jobs=jobs, output=mlip_fit_job.output, name=self.name)
         # this will only run if train.extxyz and test.extxyz files are present in the database_dir
 
-        # if database_dir is None or not os.path.exists(database_dir):
-        #     raise ValueError(
-        #         "The specified database directory does not exist or was not provided."
-        #     )
-
         mlip_fit_job = machine_learning_fit(
             database_dir=database_dir,
             isolated_atom_energies=isolated_atom_energies,
             num_processes_fit=num_processes_fit,
             auto_delta=auto_delta,
             glue_xml=glue_xml,
+            glue_file_path=self.glue_file_path,
             mlip_type=self.mlip_type,
             hyperpara_opt=self.hyperpara_opt,
             ref_energy_name=self.ref_energy_name,

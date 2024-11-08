@@ -183,12 +183,12 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         structure_list: list[Structure],
         mp_ids,
         split_ratio: float = 0.4,
-        f_max: float = 40.0,
+        force_max: float = 40.0,
         pre_xyz_files: list[str] | None = None,
         pre_database_dir: str | None = None,
-        preprocessing_data: bool = True,
+        apply_data_preprocessing: bool = True,
         atomwise_regularization_parameter: float = 0.1,
-        f_min: float = 0.01,  # unit: eV Å-1
+        force_min: float = 0.01,  # unit: eV Å-1
         atom_wise_regularization: bool = True,
         auto_delta: bool = False,
         dft_references: list[PhononBSDOSDoc] | None = None,
@@ -208,17 +208,17 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         split_ratio: float.
             Parameter to divide the training set and the test set.
             A value of 0.1 means that the ratio of the training set to the test set is 9:1.
-        f_max: float
-            Maximally allowed force in the data set.
+        force_max: float
+            Maximum allowed force in the dataset.
         pre_xyz_files: list[str] or None
             names of the pre-database train xyz file and test xyz file.
         pre_database_dir: str or None
             the pre-database directory.
-        preprocessing_data: bool
-            preprocessing the data.
+        apply_data_preprocessing: bool
+            Apply data preprocessing.
         atomwise_regularization_parameter: float
             regularization value for the atom-wise force components.
-        f_min: float
+        force_min: float
             minimal force cutoff value for atom-wise regularization.
         atom_wise_regularization: bool
             for including atom-wise regularization.
@@ -316,17 +316,17 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                 glue_file_path=self.glue_file_path,
             ).make(
                 species_list=isoatoms.output["species"],
-                isolated_atoms_energies=isoatoms.output["energies"],
+                isolated_atom_energies=isoatoms.output["energies"],
                 fit_input=fit_input,
                 split_ratio=split_ratio,
-                f_max=f_max,
+                force_max=force_max,
                 pre_xyz_files=pre_xyz_files,
                 pre_database_dir=pre_database_dir,
                 atomwise_regularization_parameter=atomwise_regularization_parameter,
-                f_min=f_min,
+                force_min=force_min,
                 atom_wise_regularization=atom_wise_regularization,
                 auto_delta=auto_delta,
-                preprocessing_data=preprocessing_data,
+                apply_data_preprocessing=apply_data_preprocessing,
                 **fit_kwargs,
             )
             flows.append(add_data_fit)
@@ -390,16 +390,17 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                                 glue_file_path=self.glue_file_path,
                             ).make(
                                 species_list=isoatoms.output["species"],
-                                isolated_atoms_energies=isoatoms.output["energies"],
+                                isolated_atom_energies=isoatoms.output["energies"],
                                 fit_input=fit_input,
                                 split_ratio=split_ratio,
-                                f_max=f_max,
+                                force_max=force_max,
                                 pre_xyz_files=pre_xyz_files,
                                 pre_database_dir=pre_database_dir,
                                 atomwise_regularization_parameter=atomwise_reg_parameter,
-                                f_min=f_min,
+                                force_min=force_min,
                                 atom_wise_regularization=atom_wise_regularization,
                                 auto_delta=auto_delta,
+                                apply_data_preprocessing=apply_data_preprocessing,
                                 soap=soap_dict,
                             )
                             flows.append(loop_data_fit)

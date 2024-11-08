@@ -1,7 +1,7 @@
 {
   "GAP": {
     "two_body": "True",
-    "three_body": "True",
+    "three_body": "False",
     "soap": "True"
   },
   "J-ACE": {

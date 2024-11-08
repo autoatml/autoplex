@@ -15,10 +15,6 @@ from autoplex.fitting.common.utils import (
     nequip_fitting,
 )
 
-current_dir = Path(__file__).absolute().parent
-GAP_DEFAULTS_FILE_PATH = current_dir / "gap-defaults.json"
-
-
 @job
 def machine_learning_fit(
     database_dir: str | Path,
@@ -27,6 +23,7 @@ def machine_learning_fit(
     num_processes_fit: int = 32,
     auto_delta: bool = True,
     glue_xml: bool = False,
+    glue_file_path: str = "glue.xml",
     mlip_type: str | None = None,
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
@@ -52,6 +49,8 @@ def machine_learning_fit(
         Automatically determine delta for 2b, 3b and soap terms.
     glue_xml: bool
         Use the glue.xml core potential instead of fitting 2b terms.
+    glue_file_path: str
+        Name of the glue.xml file path.
     mlip_type: str
         Choose one specific MLIP type to be fitted:
         'GAP' | 'J-ACE' | 'P-ACE' | 'NEQUIP' | 'M3GNET' | 'MACE'
@@ -96,6 +95,7 @@ def machine_learning_fit(
                     num_processes_fit=num_processes_fit,
                     auto_delta=auto_delta,
                     glue_xml=glue_xml,
+                    glue_file_path=glue_file_path,
                     ref_energy_name=ref_energy_name,
                     ref_force_name=ref_force_name,
                     ref_virial_name=ref_virial_name,
@@ -107,7 +107,7 @@ def machine_learning_fit(
     elif mlip_type == "J-ACE":
         train_test_error = jace_fitting(
             db_dir=database_dir,
-            isolated_atoms_energies=isolated_atom_energies,
+            isolated_atom_energies=isolated_atom_energies,
             ref_energy_name=ref_energy_name,
             ref_force_name=ref_force_name,
             ref_virial_name=ref_virial_name,
@@ -118,7 +118,7 @@ def machine_learning_fit(
     elif mlip_type == "NEQUIP":
         train_test_error = nequip_fitting(
             db_dir=database_dir,
-            isolated_atoms_energies=isolated_atom_energies,
+            isolated_atom_energies=isolated_atom_energies,
             ref_energy_name=ref_energy_name,
             ref_force_name=ref_force_name,
             ref_virial_name=ref_virial_name,
