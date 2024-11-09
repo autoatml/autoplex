@@ -21,6 +21,7 @@ jobs:
         split: [1, 2, 3, 4, 5]  # Number of splits
 
     steps:
+    - uses: actions/checkout@v3
     - name: Extract version from pyproject.toml
       run: |
           VERSION=$(grep '^version = ' pyproject.toml | sed -E 's/version = "(.*)"/\1/')
