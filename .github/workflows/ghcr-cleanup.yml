@@ -12,5 +12,5 @@ jobs:
       - name: ghcr.io cleanup action
         uses: dataaxiom/ghcr-cleanup-action@v1
         with:
-          packages: autoplex/autoplex,autoplex/autoplex-python-3.12,autoplex/autoplex-python-3.11,autoplex/autoplex-python-3.10
+          packages: autoplex/autoplex-python-3.12,autoplex/autoplex-python-3.11,autoplex/autoplex-python-3.10
           token: ${{ secrets.GITHUB_TOKEN }}

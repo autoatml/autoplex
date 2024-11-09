@@ -21,14 +21,18 @@ jobs:
         split: [1, 2, 3, 4, 5]  # Number of splits
 
     steps:
+    - name: Extract version from pyproject.toml
+      run: |
+          VERSION=$(grep '^version = ' pyproject.toml | sed -E 's/version = "(.*)"/\1/')
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
     - uses: actions/checkout@v3
     - name: Run tests using Docker image for Python ${{ matrix.python-version }}
       run: |
-        docker pull ghcr.io/autoatml/autoplex/autoplex:python-${{ matrix.python-version }}
+        docker pull ghcr.io/autoatml/autoplex/autoplex-python-${{ matrix.python-version }}:${{ env.VERSION }}
         docker run --rm \
           -v ${{ github.workspace }}:/workspace \
           -w /workspace \
-          ghcr.io/autoatml/autoplex/autoplex:python-${{ matrix.python-version }} \
+          ghcr.io/autoatml/autoplex/autoplex-python-${{ matrix.python-version }}:${{ env.VERSION }} \
           bash -c "
           python -m pip install --upgrade pip && \
           python -m uv cache clean
