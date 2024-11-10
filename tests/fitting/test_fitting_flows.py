@@ -317,7 +317,7 @@ def test_mlip_fit_maker_mace(
     macefit = MLIPFitMaker(
         mlip_type="MACE",
     ).make(
-        fit_input=fit_inpfut_dict,
+        fit_input=fit_input_dict,
         pre_database_dir=str(test_files_dir),
         pre_xyz_files=["pre_xyz_train.extxyz", "pre_xyz_test.extxyz"],
         num_processes_fit=1,
