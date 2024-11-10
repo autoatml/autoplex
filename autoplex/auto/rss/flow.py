@@ -5,8 +5,8 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-from ruamel.yaml import YAML 
 from jobflow import Flow, Maker, Response, job
+from ruamel.yaml import YAML
 
 from autoplex.auto.rss.jobs import do_rss_iterations, initial_rss
 
@@ -247,7 +247,7 @@ class RssMaker(Maker):
             - kt: float
                 The temperature (in eV) for Boltzmann sampling.
         """
-        yaml = YAML(typ='safe', pure=True)
+        yaml = YAML(typ="safe", pure=True)
 
         with open(self.path_to_default_config_parameters) as f:
             config = yaml.load(f)
