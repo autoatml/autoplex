@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+from dataclasses import dataclass
 from jobflow import Flow, Maker, Response, job
 from ruamel.yaml import YAML
 
@@ -14,7 +15,7 @@ current_dir = Path(__file__).absolute().parent
 RSS_CONFIGURATION_DEFAULTS_FILE_PATH = current_dir / "rss_default_configuration.yaml"
 
 
-@job
+@dataclass
 class RssMaker(Maker):
     """
     Maker to set up and run RSS for exploring and learning potential-energy surfaces (from scratch).

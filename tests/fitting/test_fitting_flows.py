@@ -360,7 +360,6 @@ def test_mlip_fit_maker_glue_xml(
         auto_delta=False,
         glue_xml=True,
         general={"core_param_file": "glue.xml", "core_ip_args": "{IP Glue}"},
-        apply_data_preprocessing=True,
     )
 
     responses = run_locally(
