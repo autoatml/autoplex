@@ -135,7 +135,7 @@ def test_mlip_fit_maker(test_dir, clean_dir, memory_jobstore, vasp_test_dir, fit
     # Test to check if gap fit runs with default hyperparameter sets (i.e. two_body and soap is True)
     gapfit = MLIPFitMaker().make(
         species_list=["Li", "Cl"],
-        isolated_atoms_energy=[-0.28649227, -0.25638457],
+        isolated_atom_energy=[-0.28649227, -0.25638457],
         fit_input=fit_input_dict,
     )
 
@@ -156,7 +156,7 @@ def test_mlip_fit_maker_with_kwargs(
     # Test to check if gap fit runs with default hyperparameter sets (i.e. include_two_body and include_soap is True)
     gapfit = MLIPFitMaker().make(
         species_list=["Li", "Cl"],
-        isolated_atoms_energy=[-0.28649227, -0.25638457],
+        isolated_atom_energy=[-0.28649227, -0.25638457],
         fit_input=fit_input_dict,
         auto_delta=False,
         glue_xml=False,
@@ -187,7 +187,7 @@ def test_mlip_fit_maker_with_pre_database_dir(
     # Test if gap fit runs with pre_database_dir
     gapfit = MLIPFitMaker().make(
         species_list=["Li", "Cl"],
-        isolated_atoms_energy=[-0.28649227, -0.25638457],
+        isolated_atom_energy=[-0.28649227, -0.25638457],
         fit_input=fit_input_dict,
         pre_database_dir=str(test_files_dir),
         pre_xyz_files=["pre_xyz_train.extxyz", "pre_xyz_test.extxyz"],
@@ -211,7 +211,7 @@ def test_mlip_fit_maker_jace(
     jacefit = MLIPFitMaker(
         mlip_type="J-ACE",
     ).make(
-        isolated_atoms_energies={3: -0.28649227, 17: -0.25638457},
+        isolated_atom_energies={3: -0.28649227, 17: -0.25638457},
         fit_input=fit_input_dict,
         pre_database_dir=str(test_files_dir),
         pre_xyz_files=["pre_xyz_train.extxyz", "pre_xyz_test.extxyz"],
@@ -244,7 +244,7 @@ def test_mlip_fit_maker_nequip(
         mlip_type="NEQUIP",
     ).make(
         fit_input=fit_input_dict,
-        isolated_atoms_energies={3: -0.28649227, 17: -0.25638457},
+        isolated_atom_energies={3: -0.28649227, 17: -0.25638457},
         pre_database_dir=str(test_files_dir),
         pre_xyz_files=["pre_xyz_train.extxyz", "pre_xyz_test.extxyz"],
         num_processes_fit=1,
@@ -275,7 +275,7 @@ def test_mlip_fit_maker_m3gnet(
         mlip_type="M3GNET",
     ).make(
         fit_input=fit_input_dict,
-        isolated_atoms_energies={3: -0.28649227, 17: -0.25638457},
+        isolated_atom_energies={3: -0.28649227, 17: -0.25638457},
         pre_database_dir=str(test_files_dir),
         pre_xyz_files=["pre_xyz_train.extxyz", "pre_xyz_test.extxyz"],
         num_processes_fit=1,
@@ -409,7 +409,7 @@ def test_mlip_fit_maker_with_automated_separated_dataset(
     # Test if gap fit runs with pre_database_dir
     gapfit = MLIPFitMaker().make(
         species_list=["Li", "Cl"],
-        isolated_atoms_energy=[-0.28649227, -0.25638457],
+        isolated_atom_energy=[-0.28649227, -0.25638457],
         fit_input=fit_input_dict,
         pre_database_dir=str(test_files_dir),
         pre_xyz_files=["pre_xyz_train_more_data.extxyz", "pre_xyz_test_more_data.extxyz"],
