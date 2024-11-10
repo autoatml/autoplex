@@ -498,7 +498,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_gap(
         mp_ids=["test"],
         benchmark_mp_ids=["mp-22905"],
         benchmark_structures=[structure],
-        preprocessing_data=True,
+        apply_data_preprocessing=True,
     )
 
     # automatically use fake VASP and write POTCAR.spec during the test
@@ -549,7 +549,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_m3gnet(
         benchmark_structures=[structure],
         pre_xyz_files=["vasp_ref.extxyz"],
         pre_database_dir=test_dir / "fitting" / "ref_files",
-        preprocessing_data=True,
+        apply_data_preprocessing=True,
         cutoff=3.0,
         threebody_cutoff=2.0,
         batch_size=1,
@@ -600,7 +600,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_mace(
         benchmark_structures=[structure],
         pre_xyz_files=["vasp_ref.extxyz"],
         pre_database_dir=test_dir / "fitting" / "ref_files",
-        preprocessing_data=True,
+        apply_data_preprocessing=True,
         model="MACE",
         config_type_weights='{"Default":1.0}',
         hidden_irreps="32x0e + 32x1o",
@@ -789,7 +789,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_nequip(
         benchmark_structures=[structure],
         pre_xyz_files=["vasp_ref.extxyz"],
         pre_database_dir=test_dir / "fitting" / "ref_files",
-        preprocessing_data=True,
+        apply_data_preprocessing=True,
         r_max=4.0,
         num_layers=4,
         l_max=2,
@@ -841,7 +841,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_two_mpids(
         mp_ids=["test", "test2"],
         benchmark_mp_ids=["mp-22905", "test3"],
         benchmark_structures=[structure, structure],
-        preprocessing_data=True,
+        apply_data_preprocessing=True,
     )
 
     # automatically use fake VASP and write POTCAR.spec during the test
@@ -882,7 +882,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_with_hploop(
         mp_ids=["test"],
         benchmark_mp_ids=["mp-22905"],
         benchmark_structures=[structure],
-        preprocessing_data=True,
+        apply_data_preprocessing=True,
     )
 
     # automatically use fake VASP and write POTCAR.spec during the test
@@ -925,7 +925,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_with_sigma_regularization_hploop(
         mp_ids=["test"],
         benchmark_mp_ids=["mp-22905"],
         benchmark_structures=[structure],
-        preprocessing_data=True,
+        apply_data_preprocessing=True,
         **{"regularization": True},
     )
 
@@ -969,7 +969,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_with_sigma_regularization(
         mp_ids=["test"],
         benchmark_mp_ids=["mp-22905"],
         benchmark_structures=[structure],
-        preprocessing_data=True,
+        apply_data_preprocessing=True,
         **{"regularization": True,
            "soap": {"delta": 3.0, "l_max": 12, "n_max": 10, "n_sparse": 8000, "f0": 0.0}},
     )
@@ -1024,7 +1024,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_separated(
         benchmark_structures=[structure],
         pre_xyz_files=["vasp_ref.extxyz"],
         pre_database_dir=test_dir / "fitting" / "ref_files",
-        preprocessing_data=True,
+        apply_data_preprocessing=True,
         **{"separated": True},
     )
 
@@ -1069,7 +1069,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_separated_sigma_reg_hploop_three_
         benchmark_structures=[structure],
         pre_xyz_files=["vasp_ref.extxyz"],
         pre_database_dir=test_dir / "fitting" / "ref_files",
-        preprocessing_data=True,
+        apply_data_preprocessing=True,
         **{"regularization": True, "separated": True},
     )
 
@@ -1115,7 +1115,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_separated_sigma_reg_hploop(
         benchmark_structures=[structure],
         pre_xyz_files=["vasp_ref.extxyz"],
         pre_database_dir=test_dir / "fitting" / "ref_files",
-        preprocessing_data=True,
+        apply_data_preprocessing=True,
         **{"regularization": True, "separated": True},
     )
 
@@ -1171,7 +1171,7 @@ class TestCompleteDFTvsMLBenchmarkWorkflow:
             benchmark_structures=[structure],
             pre_xyz_files=["vasp_ref.extxyz"],
             pre_database_dir=test_dir / "fitting" / "ref_files",
-            preprocessing_data=True,
+            apply_data_preprocessing=True,
             dft_references=None,
             **{"general": {"two_body": True, "three_body": False, "soap": False}}  # reduce unit test run time
         )
@@ -1223,7 +1223,7 @@ class TestCompleteDFTvsMLBenchmarkWorkflow:
             benchmark_structures=[structure],
             pre_xyz_files=["vasp_ref.extxyz"],
             pre_database_dir=test_dir / "fitting" / "ref_files",
-            preprocessing_data=True,
+            apply_data_preprocessing=True,
             dft_references=[dft_reference],
             **{"general": {"two_body": True, "three_body": False, "soap": False}}  # reduce unit test run time
         )
@@ -1272,7 +1272,7 @@ class TestCompleteDFTvsMLBenchmarkWorkflow:
             benchmark_structures=[structure],
             pre_xyz_files=["vasp_ref.extxyz"],
             pre_database_dir=test_dir / "fitting" / "ref_files",
-            preprocessing_data=True,
+            apply_data_preprocessing=True,
             dft_references=None,
             **{"general": {"two_body": True, "three_body": False, "soap": False}}  # reduce unit test run time
         )
@@ -1308,7 +1308,7 @@ class TestCompleteDFTvsMLBenchmarkWorkflow:
             benchmark_structures=[structure],
             pre_xyz_files=["vasp_ref.extxyz"],
             pre_database_dir=test_dir / "fitting" / "ref_files",
-            preprocessing_data=True,
+            apply_data_preprocessing=True,
             dft_references=None,
             **{"general": {"two_body": True, "three_body": False, "soap": False}}  # reduce unit test run time
         )
@@ -1343,7 +1343,7 @@ class TestCompleteDFTvsMLBenchmarkWorkflow:
             benchmark_structures=[structure],
             pre_xyz_files=["vasp_ref.extxyz"],
             pre_database_dir=test_dir / "fitting" / "ref_files",
-            preprocessing_data=True,
+            apply_data_preprocessing=True,
             dft_references=None,
             **{"general": {"two_body": True, "three_body": False, "soap": False}}  # reduce unit test run time
         )
@@ -1456,7 +1456,7 @@ class TestCompleteDFTvsMLBenchmarkWorkflow:
             benchmark_structures=[structure],
             pre_xyz_files=["vasp_ref.extxyz"],
             pre_database_dir=test_dir / "fitting" / "ref_files",
-            preprocessing_data=True,
+            apply_data_preprocessing=True,
             dft_references=None,
             **{"general": {"two_body": True, "three_body": False, "soap": False}}  # reduce unit test run time
         )
@@ -1494,7 +1494,7 @@ def test_phonon_dft_ml_data_generation_flow(
            benchmark_mp_ids=mp_ids,
            pre_xyz_files=["vasp_ref.extxyz"],
            pre_database_dir=test_dir / "fitting" / "ref_files",
-           preprocessing_data=True,
+           apply_data_preprocessing=True,
            **{"general": {"two_body": True, "three_body": False, "soap": False}}  # reduce unit test run time
            )
 
@@ -1508,7 +1508,7 @@ def test_phonon_dft_ml_data_generation_flow(
            benchmark_mp_ids=mp_ids,
            pre_xyz_files=["vasp_ref.extxyz"],
            pre_database_dir=test_dir / "fitting" / "ref_files",
-           preprocessing_data=True,
+           apply_data_preprocessing=True,
            **{"general": {"two_body": True, "three_body": False, "soap": False}}  # reduce unit test run time
            )
     # automatically use fake VASP and write POTCAR.spec during the test

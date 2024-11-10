@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -17,7 +17,10 @@ from atomate2.forcefields.jobs import (
     GAPRelaxMaker,
 )
 from atomate2.vasp.jobs.core import StaticMaker
-from atomate2.vasp.powerups import update_user_incar_settings
+from atomate2.vasp.powerups import (
+    update_user_incar_settings,
+    update_user_potcar_settings,
+)
 from atomate2.vasp.sets.core import StaticSetGenerator
 from custodian.vasp.handlers import (
     FrozenJobErrorHandler,
@@ -41,9 +44,12 @@ from autoplex.data.common.jobs import (
     get_supercell_job,
     plot_force_distribution,
 )
-from autoplex.data.common.utils import ElementCollection
+from autoplex.data.common.utils import (
+    ElementCollection,
+    flatten,
+)
 
-__all__ = ["GenerateTrainingDataForTesting", "DFTStaticMaker"]
+__all__ = ["GenerateTrainingDataForTesting", "DFTStaticLabelling"]
 
 logging.basicConfig(level=logging.DEBUG, format="[%(levelname)s] %(message)s")
 
@@ -237,7 +243,7 @@ class GenerateTrainingDataForTesting(Maker):
 
 
 @dataclass
-class DFTStaticMaker(Maker):
+class DFTStaticLabelling(Maker):
     """
     Maker to set up and run VASP static calculations for input structures, including bulk, isolated atoms, and dimers.
 
@@ -247,65 +253,77 @@ class DFTStaticMaker(Maker):
     ----------
     name: str
         Name of the flow.
-    isolated_atom : bool, optional
-        Whether to perform calculations for isolated atoms. Default is False.
-    isolated_species : list[str], optional
+    isolated_atom: bool
+        If true, perform single-point calculations for isolated atoms. Default is False.
+    isolated_species: list[str]
         List of species for which to perform isolated atom calculations. If None,
         species will be automatically derived from the 'structures' list. Default is None.
-    e0_spin : bool, optional
-        Whether to include spin polarization in isolated atom and dimer calculations.
+    e0_spin: bool
+        If true, include spin polarization in isolated atom and dimer calculations.
         Default is False.
-    dimer : bool, optional
-        Whether to perform calculations for dimers. Default is False.
-    dimer_species : list[str], optional
+    isolatedatom_box: list[float]
+        List of the lattice constants for a isolated_atom configuration.
+    dimer: bool
+        If true, perform single-point calculations for dimers. Default is False.
+    dimer_box: list[float]
+        The lattice constants of a dimer box.
+    dimer_species: list[str]
         List of species for which to perform dimer calculations. If None, species
         will be derived from the 'structures' list. Default is None.
-    dimer_range : list[float], optional
-        Range of distances for dimer calculations. Default is [0.8, 4.8].
-    dimer_num : int, optional
-        Number of different distances to consider for dimer calculations. Default is 22.
-    custom_set : dict, optional
+    dimer_range: list[float]
+        Range of distances for dimer calculations.
+    dimer_num: int
+        Number of different distances to consider for dimer calculations.
+    custom_incar: dict
         Dictionary of custom VASP input parameters. If provided, will update the
         default parameters. Default is None.
+    custom_potcar: dict
+        Dictionary of POTCAR settings to update. Keys are element symbols, values are the desired POTCAR labels.
+        Default is None.
 
     Returns
     -------
-    Response
-        A Response object containing the VASP jobs and the directories where
-        the calculations were set up.
-
+    dict
+        A dictionary containing:
+        - 'dirs_of_vasp': List of directories containing VASP data.
+        - 'config_type': List of configuration types corresponding to each directory.
     """
 
-    name: str = "DFT single-point calculations"
+    name: str = "do_dft_labelling"
     isolated_atom: bool = False
     isolated_species: list[str] | None = None
     e0_spin: bool = False
+    isolatedatom_box: list[float] = field(default_factory=lambda: [20, 20, 20])
     dimer: bool = False
+    dimer_box: list[float] = field(default_factory=lambda: [20, 20, 20])
     dimer_species: list[str] | None = None
     dimer_range: list[float] | None = None
     dimer_num: int = 21
-    custom_set: dict | None = None
+    custom_incar: dict | None = None
+    custom_potcar: dict | None = None
 
     @job
     def make(
         self,
-        structures: list[Structure],
-        config_types: list[str] | None = None,
+        structures: list,
+        config_type: str | None = None,
     ):
         """
         Maker to set up and run VASP static calculations.
 
         Parameters
         ----------
-        structures : list[Structure], optional
+        structures : list[Structure] | list[list[Structure]]
             List of structures for which to run the VASP static calculations. If None,
             no bulk calculations will be performed. Default is None.
-        config_types : list[str], optional
-            List of configuration types corresponding to the structures. If provided,
-            should have the same length as the 'structures' list. If None, defaults
+        config_type : str
+            Configuration types corresponding to the structures. If None, defaults
             to 'bulk'. Default is None.
         """
         job_list = []
+
+        if isinstance(structures[0], list):
+            structures = flatten(structures, recursive=False)
 
         dirs: dict[str, list[str]] = {"dirs_of_vasp": [], "config_type": []}
 
@@ -336,8 +354,8 @@ class DFTStaticMaker(Maker):
             "AMIN": None,
         }
 
-        if self.custom_set is not None:
-            default_custom_set.update(self.custom_set)
+        if self.custom_incar is not None:
+            default_custom_set.update(self.custom_incar)
 
         custom_set = default_custom_set
 
@@ -358,13 +376,16 @@ class DFTStaticMaker(Maker):
             run_vasp_kwargs={"handlers": custom_handlers},
         )
 
+        if self.custom_potcar is not None:
+            st_m = update_user_potcar_settings(st_m, potcar_updates=self.custom_potcar)
+
         if structures:
             for idx, struct in enumerate(structures):
                 static_job = st_m.make(structure=struct)
                 static_job.name = f"static_bulk_{idx}"
                 dirs["dirs_of_vasp"].append(static_job.output.dir_name)
-                if config_types:
-                    dirs["config_type"].append(config_types[idx])
+                if config_type:
+                    dirs["config_type"].append(config_type)
                 else:
                     dirs["config_type"].append("bulk")
                 job_list.append(static_job)
@@ -380,12 +401,18 @@ class DFTStaticMaker(Maker):
                     syms = ElementCollection(atoms).get_species()
 
                 for idx, sym in enumerate(syms):
-                    lattice = Lattice.orthorhombic(20.0, 20.5, 21.0)
+                    lattice = Lattice.orthorhombic(
+                        self.isolatedatom_box[0],
+                        self.isolatedatom_box[1],
+                        self.isolatedatom_box[2],
+                    )
                     isolated_atom_struct = Structure(lattice, [sym], [[0.0, 0.0, 0.0]])
                     static_job = st_m.make(structure=isolated_atom_struct)
                     static_job.name = f"static_isolated_{idx}"
                     static_job = update_user_incar_settings(
-                        static_job, {"KSPACING": 2.0}
+                        # static_job, {"KSPACING": 100.0, "ALGO": "All", "KPAR": 1, "NBANDS": 20}
+                        static_job,
+                        {"KSPACING": 100.0, "ALGO": "All", "KPAR": 1},
                     )
 
                     if self.e0_spin:
@@ -419,7 +446,11 @@ class DFTStaticMaker(Maker):
                                 self.dimer_num - 1 + 0.000000000001
                             )
 
-                        lattice = Lattice.orthorhombic(15.0, 15.5, 16.0)
+                        lattice = Lattice.orthorhombic(
+                            self.dimer_box[0],
+                            self.dimer_box[1],
+                            self.dimer_box[2],
+                        )
                         dimer_struct = Structure(
                             lattice,
                             [pair[0], pair[1]],
@@ -430,7 +461,9 @@ class DFTStaticMaker(Maker):
                         static_job = st_m.make(structure=dimer_struct)
                         static_job.name = f"static_dimer_{dimer_i}"
                         static_job = update_user_incar_settings(
-                            static_job, {"KSPACING": 2.0}
+                            # static_job, {"KSPACING": 100.0, "ALGO": "All", "KPAR": 1, "NBANDS": 20}
+                            static_job,
+                            {"KSPACING": 100.0, "ALGO": "All", "KPAR": 1},
                         )
 
                         if self.e0_spin:

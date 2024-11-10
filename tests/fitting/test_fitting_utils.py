@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os.path
 
-from autoplex.fitting.common.jobs import GAP_DEFAULTS_FILE_PATH  # this will not be needed anymore
+from autoplex.fitting.common.utils import MLIP_PHONON_DEFAULTS_FILE_PATH  # this will not be needed anymore
 from autoplex.fitting.common.utils import (
     load_mlip_hyperparameter_defaults,
     gap_hyperparameter_constructor,
@@ -14,7 +14,7 @@ from autoplex.fitting.common.utils import (
 
 def test_gap_hyperparameter_constructor():
     hyper_parameter_dict = load_mlip_hyperparameter_defaults(
-        mlip_fit_parameter_file_path=GAP_DEFAULTS_FILE_PATH
+        mlip_fit_parameter_file_path=MLIP_PHONON_DEFAULTS_FILE_PATH
     )
 
     gap_hyper_parameter_dict = hyper_parameter_dict["GAP"]
@@ -49,7 +49,7 @@ def test_gap_hyperparameter_constructor():
     assert ref_list == gap_input_list
 
     hyper_parameter_dict = load_mlip_hyperparameter_defaults(
-        mlip_fit_parameter_file_path=GAP_DEFAULTS_FILE_PATH
+        mlip_fit_parameter_file_path=MLIP_PHONON_DEFAULTS_FILE_PATH
     )
 
     gap_hyper_parameter_dict = hyper_parameter_dict["GAP"]
@@ -117,7 +117,7 @@ def test_gap_hyperparameter_constructor():
     # check disable three_body and two_body
 
     hyper_parameter_dict = load_mlip_hyperparameter_defaults(
-        mlip_fit_parameter_file_path=GAP_DEFAULTS_FILE_PATH
+        mlip_fit_parameter_file_path=MLIP_PHONON_DEFAULTS_FILE_PATH
     )
 
     gap_hyper_parameter_dict = hyper_parameter_dict["GAP"]
@@ -181,7 +181,7 @@ def test_gap_hyperparameter_constructor():
     assert ref_list == gap_input_list
 
     hyper_parameter_dict = load_mlip_hyperparameter_defaults(
-        mlip_fit_parameter_file_path=GAP_DEFAULTS_FILE_PATH
+        mlip_fit_parameter_file_path=MLIP_PHONON_DEFAULTS_FILE_PATH
     )
 
     gap_hyper_parameter_dict = hyper_parameter_dict["GAP"]

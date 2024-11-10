@@ -28,7 +28,7 @@ Before the installation, please make sure that you are using one of the supporte
 
 ### Standard installation
 
-Install using ``pip install autoplex``. This will install all the necessary python packages and dependencies needed for MLIP fits.
+Install using ``pip install git+https://github.com/autoatml/autoplex.git``. This will install all the Python packages and dependencies needed for MLIP fits. We will release a version of Autoplex to PyPI in the next few weeks.
 
 Additionally, to be able to fit and validate `ACEpotentials`, one also needs to install julia as autoplex relies on [ACEpotentials](https://acesuit.github.io/ACEpotentials.jl/dev/gettingstarted/installation/) which support fitting of linear ACE and currently no python package exists for the same.
 Please run following commands to enable `ACEpotentials` fitting and functionality.

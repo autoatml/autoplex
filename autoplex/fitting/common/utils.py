@@ -72,42 +72,42 @@ def gap_fitting(
     fit_kwargs: dict | None = None,  # pylint: disable=E3701
 ) -> dict:
     """
-    GAP fit and validation job.
+    Perform the GAP (Gaussian approximation potential) model fitting.
 
     Parameters
     ----------
-    db_dir: str or path.
+    db_dir: str or path
         Path to database directory.
-    species_list : list.
-        List of element names (str)
+    species_list: list
+        List of element names (strings)
     path_to_default_hyperparameters : str or Path.
-        Path to mlip-phonon-defaults.json.
-    num_processes_fit: int.
+        Path to gap-defaults.json.
+    num_processes_fit: int
         Number of processes used for gap_fit
     auto_delta: bool
-        automatically determine delta for 2b, 3b and soap terms.
+        Automatically determine delta for 2b, 3b and soap terms.
     glue_xml: bool
         use the glue.xml core potential instead of fitting 2b terms.
-    ref_energy_name : str, optional
+    ref_energy_name: str
         Reference energy name.
-    ref_force_name : str, optional
+    ref_force_name : str
         Reference force name.
-    ref_virial_name : str, optional
+    ref_virial_name: str
         Reference virial name.
     train_name: str
-        Name of the training dataset file.
+        Name of the training set file.
     test_name: str
-        Name of the test dataset file.
+        Name of the test set file.
     glue_file_path: str
         Name of the glue.xml file path.
-    fit_kwargs: dict.
-        optional dictionary with parameters for gap fitting with keys same as
-        mlip-phonon-defaults.json.
+    fit_kwargs: dict
+        Additional keyword arguments for GAP fitting with keys same as
+        those in gap-defaults.json.
 
     Returns
     -------
-    dict[str, float]
-        A dictionary with train_error, test_error
+    dict
+        A dictionary with train_error, test_error, path_to_mlip
 
     """
     # keep additional pre- and suffixes
@@ -249,7 +249,7 @@ def gap_fitting(
 def jace_fitting(
     db_dir: str | Path,
     path_to_default_hyperparameters: Path | str = MLIP_RSS_DEFAULTS_FILE_PATH,
-    isolated_atoms_energies: dict | None = None,
+    isolated_atom_energies: dict | None = None,
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",
@@ -269,7 +269,7 @@ def jace_fitting(
         directory containing the training and testing data files.
     path_to_default_hyperparameters : str or Path.
         Path to mlip-rss-defaults.json.
-    isolated_atoms_energies: dict:
+    isolated_atom_energies: dict:
         mandatory dictionary mapping element numbers to isolated energies.
     ref_energy_name : str, optional
         Reference energy name.
@@ -302,34 +302,32 @@ def jace_fitting(
 
     Raises
     ------
-    - ValueError: If the `isolated_atoms_energies` dictionary is empty or not provided when required.
+    - ValueError: If the `isolated_atom_energies` dictionary is empty or not provided when required.
     """
     train_atoms = ase.io.read(os.path.join(db_dir, "train.extxyz"), index=":")
     source_file_path = os.path.join(db_dir, "test.extxyz")
     shutil.copy(source_file_path, ".")
-    isolated_atoms_energies_update = {}
+    isolated_atom_energies_update = {}
 
-    if isolated_atoms_energies:
-        for e_num, e_energy in isolated_atoms_energies.items():
-            isolated_atoms_energies_update[chemical_symbols[int(e_num)]] = e_energy
+    if isolated_atom_energies:
+        for e_num, e_energy in isolated_atom_energies.items():
+            isolated_atom_energies_update[chemical_symbols[int(e_num)]] = e_energy
     else:
-        raise ValueError("isolated_atoms_energies parameter is empty or not defined!")
+        raise ValueError("isolated_atom_energies parameter is empty or not defined!")
 
-    formatted_isolated_atoms_energies = (
+    formatted_isolated_atom_energies = (
         "["
         + ", ".join(
             [
                 f":{key} => {value}"
-                for key, value in isolated_atoms_energies_update.items()
+                for key, value in isolated_atom_energies_update.items()
             ]
         )
         + "]"
     )
     formatted_species = (
         "["
-        + ", ".join(
-            [f":{key}" for key, value in isolated_atoms_energies_update.items()]
-        )
+        + ", ".join([f":{key}" for key, value in isolated_atom_energies_update.items()])
         + "]"
     )
 
@@ -375,7 +373,7 @@ model = acemodel(elements={formatted_species},
                 order={order},
                 totaldegree={totaldegree},
                 rcut={cutoff},
-                Eref={formatted_isolated_atoms_energies})
+                Eref={formatted_isolated_atom_energies})
 
 weights = Dict(
             "crystal" => Dict("E" => 30.0, "F" => 1.0 , "V" => 1.0 ),
@@ -433,7 +431,7 @@ export2lammps("acemodel.yace", model)
 def nequip_fitting(
     db_dir: Path,
     path_to_default_hyperparameters: Path | str = MLIP_RSS_DEFAULTS_FILE_PATH,
-    isolated_atoms_energies: dict | None = None,
+    isolated_atom_energies: dict | None = None,
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",
@@ -453,7 +451,7 @@ def nequip_fitting(
         directory containing the training and testing data files.
     path_to_default_hyperparameters : str or Path.
         Path to mlip-rss-defaults.json.
-    isolated_atoms_energies: dict
+    isolated_atom_energies: dict
         mandatory dictionary mapping element numbers to isolated energies.
     ref_energy_name : str, optional
         Reference energy name.
@@ -497,7 +495,7 @@ def nequip_fitting(
 
     Raises
     ------
-    - ValueError: If the `isolated_atoms_energies` dictionary is empty or not provided when required.
+    - ValueError: If the `isolated_atom_energies` dictionary is empty or not provided when required.
     """
     """
     [TODO] train Nequip on virials
@@ -512,15 +510,15 @@ def nequip_fitting(
     num_of_train = len(train_nequip)
     num_of_val = len(test_data)
 
-    isolated_atoms_energies_update = ""
+    isolated_atom_energies_update = ""
     ele_syms = []
-    if isolated_atoms_energies:
-        for e_num in isolated_atoms_energies:
+    if isolated_atom_energies:
+        for e_num in isolated_atom_energies:
             element_symbol = "  - " + chemical_symbols[int(e_num)] + "\n"
-            isolated_atoms_energies_update += element_symbol
+            isolated_atom_energies_update += element_symbol
             ele_syms.append(chemical_symbols[int(e_num)])
     else:
-        raise ValueError("isolated_atoms_energies is empty or not defined!")
+        raise ValueError("isolated_atom_energies is empty or not defined!")
 
     default_hyperparameters = load_mlip_hyperparameter_defaults(
         mlip_fit_parameter_file_path=path_to_default_hyperparameters
@@ -597,7 +595,7 @@ validation_dataset_key_mapping:
   {ref_force_name}: forces
 
 chemical_symbols:
-{isolated_atoms_energies_update}
+{isolated_atom_energies_update}
 wandb: False
 
 verbose: info
@@ -1647,7 +1645,7 @@ def calculate_delta(atoms_db: list[Atoms], e_name: str) -> tuple[float, ndarray]
 
     """
     at_ids = [atom.get_atomic_numbers() for atom in atoms_db]
-    isolated_atoms_energies = {
+    isolated_atom_energies = {
         atom.get_atomic_numbers()[0]: atom.info[e_name]
         for atom in atoms_db
         if "config_type" in atom.info and "IsolatedAtom" in atom.info["config_type"]
@@ -1655,7 +1653,7 @@ def calculate_delta(atoms_db: list[Atoms], e_name: str) -> tuple[float, ndarray]
 
     es_visol = np.array(
         [
-            (atom.info[e_name] - sum([isolated_atoms_energies[j] for j in at_ids[ct]]))
+            (atom.info[e_name] - sum([isolated_atom_energies[j] for j in at_ids[ct]]))
             / len(atom)
             for ct, atom in enumerate(atoms_db)
         ]
@@ -1919,7 +1917,7 @@ def convert_xyz_to_structure(
 
 def write_after_distillation_data_split(
     distillation: bool,
-    f_max: float,
+    force_max: float,
     split_ratio: float,
     vasp_ref_name: str = "vasp_ref.extxyz",
     train_name: str = "train.extxyz",
@@ -1935,7 +1933,7 @@ def write_after_distillation_data_split(
     ----------
     distillation: bool
         For using data distillation.
-    f_max: float
+    force_max: float
         Maximally allowed force in the data set.
     split_ratio: float
         Parameter to divide the training set and the test set.
@@ -1951,7 +1949,7 @@ def write_after_distillation_data_split(
     """
     # reject structures with large force components
     atoms = (
-        data_distillation(vasp_ref_name, f_max, force_label)
+        data_distillation(vasp_ref_name, force_max, force_label)
         if distillation
         else ase.io.read(vasp_ref_name, index=":")
     )

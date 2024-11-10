@@ -27,7 +27,7 @@ __all__ = [
 @dataclass
 class MLIPFitMaker(Maker):
     """
-    Maker to fit ML potentials based on DFT labeled reference data.
+    Maker to fit ML potentials based on DFT labelled reference data.
 
     This Maker will filter the provided dataset in a data preprocessing step and then proceed
     with the MLIP fit (default is GAP).
@@ -37,16 +37,16 @@ class MLIPFitMaker(Maker):
     name : str
         Name of the flows produced by this maker.
     mlip_type: str
-        Choose one specific MLIP type:
+        Choose one specific MLIP type to be fitted:
         'GAP' | 'J-ACE' | 'P-ACE' | 'NEQUIP' | 'M3GNET' | 'MACE'
-    hyper_param_optimization: bool
+    hyperpara_opt: bool
         Perform hyperparameter optimization using XPOT
         (XPOT: https://pubs.aip.org/aip/jcp/article/159/2/024803/2901815)
-    ref_energy_name : str, optional
+    ref_energy_name : str
         Reference energy name.
-    ref_force_name : str, optional
+    ref_force_name : str
         Reference force name.
-    ref_virial_name : str, optional
+    ref_virial_name : str
         Reference virial name.
     glue_file_path: str
         Name of the glue.xml file path.
@@ -56,7 +56,7 @@ class MLIPFitMaker(Maker):
 
     name: str = "MLpotentialFit"
     mlip_type: str = "GAP"
-    hyper_param_optimization: bool = False
+    hyperpara_opt: bool = False
     ref_energy_name: str = "REF_energy"
     ref_force_name: str = "REF_forces"
     ref_virial_name: str = "REF_virial"
@@ -69,41 +69,41 @@ class MLIPFitMaker(Maker):
         self,
         fit_input: dict | None = None,  # This is specific to phonon workflow
         species_list: list | None = None,
-        isolated_atoms_energies: dict | None = None,
+        isolated_atom_energies: dict | None = None,
         split_ratio: float = 0.4,
-        f_max: float = 40.0,
+        force_max: float = 40.0,
         regularization: bool = False,  # This is only used for GAP.
         distillation: bool = True,
         separated: bool = False,
         pre_xyz_files: list[str] | None = None,
         pre_database_dir: str | None = None,
         atomwise_regularization_parameter: float = 0.1,  # This is only used for GAP.
-        f_min: float = 0.01,  # unit: eV Å-1
+        force_min: float = 0.01,  # unit: eV Å-1
         atom_wise_regularization: bool = True,  # This is only used for GAP.
         auto_delta: bool = False,  # This is only used for GAP.
         glue_xml: bool = False,  # This is only used for GAP.
         num_processes_fit: int | None = None,
-        preprocessing_data: bool = True,
-        database_dir: Path | None = None,
-        device: str = "cuda",
+        apply_data_preprocessing: bool = True,
+        database_dir: Path | str | None = None,
+        device: str = "cpu",
         **fit_kwargs,
     ):
         """
-        Make a flow to create ML potential fits.
+        Make a flow for fitting MLIP models.
 
         Parameters
         ----------
-        species_list : list.
-            List of element names (str)
-        isolated_atoms_energies : dict
-            Dict of isolated atoms energies.
-        fit_input : dict.
-            CompletePhononDFTMLDataGenerationFlow output.
-        split_ratio: float.
-            Parameter to divide the training set and the test set.
-            A value of 0.1 means that the ratio of the training set to the test set is 9:1.
-        f_max: float
-            Maximally allowed force in the data set.
+        fit_input: dict
+            Output from the CompletePhononDFTMLDataGenerationFlow process.
+        species_list: list
+            List of element names (strings) involved in the training dataset
+        isolated_atom_energies: dict
+            Dictionary of isolated atoms energies.
+        split_ratio: float
+            Ratio to divide the dataset into training and test sets.
+            A value of 0.1 means 90% training data and 10% test data
+        force_max: float
+            Maximum allowed force in the dataset.
         regularization: bool
             For using sigma regularization.
         distillation: bool
@@ -111,53 +111,49 @@ class MLIPFitMaker(Maker):
         separated: bool
             Repeat the fit for each data_type available in the (combined) database.
         pre_xyz_files: list[str] or None
-            names of the pre-database train xyz file and test xyz file.
-        pre_database_dir:
-            the pre-database directory.
+            Names of the pre-database train xyz file and test xyz file.
+        pre_database_dir: str or None
+            The pre-database directory.
         atomwise_regularization_parameter: float
-            regularization value for the atom-wise force components.
-        f_min: float
-            minimal force cutoff value for atom-wise regularization.
+            Regularization value for the atom-wise force components.
+        force_min: float
+            Minimal force cutoff value for atom-wise regularization.
         atom_wise_regularization: bool
-            for including atom-wise regularization.
+            For including atom-wise regularization.
         auto_delta: bool
-            automatically determine delta for 2b, 3b and soap terms.
+            Automatically determine delta for 2b, 3b and soap terms.
         glue_xml: bool
-            use the glue.xml core potential instead of fitting 2b terms.
+            Use the glue.xml core potential instead of fitting 2b terms.
         num_processes_fit: int
-            number of processes for fitting.
-        preprocessing_data: bool
+            Number of processes for fitting.
+        apply_data_preprocessing: bool
             Determine whether to preprocess the data.
-            If not, one needs to input the path to the training database.
-        database_dir: Path
-            the database directory.
+        database_dir: Path | str
+            Path to the directory containing the database.
         device: str
-            specify device to use cuda or cpu.
-        fit_kwargs : dict
-            dict including MLIP fit keyword args.
+            Device to be used for model fitting, either "cpu" or "cuda".
+        fit_kwargs: dict
+            Additional keyword arguments for MLIP fitting.
         """
-        if database_dir is None:
-            database_dir = Path.cwd()
-
         if self.mlip_type not in ["GAP", "J-ACE", "P-ACE", "NEQUIP", "M3GNET", "MACE"]:
             raise ValueError(
                 "Please correct the MLIP name!"
                 "The current version ONLY supports the following models: GAP, J-ACE, P-ACE, NEQUIP, M3GNET, and MACE."
             )
 
-        if preprocessing_data:
+        if apply_data_preprocessing:
             jobs = []
             data_prep_job = DataPreprocessing(
                 split_ratio=split_ratio,
                 regularization=regularization,
                 separated=separated,
                 distillation=distillation,
-                f_max=f_max,
+                force_max=force_max,
             ).make(
                 fit_input=fit_input,
                 pre_xyz_files=pre_xyz_files,
                 pre_database_dir=pre_database_dir,
-                f_min=f_min,
+                force_min=force_min,
                 atomwise_regularization_parameter=atomwise_regularization_parameter,
                 atom_wise_regularization=atom_wise_regularization,
             )
@@ -165,13 +161,13 @@ class MLIPFitMaker(Maker):
 
             mlip_fit_job = machine_learning_fit(
                 database_dir=data_prep_job.output,
-                isolated_atoms_energies=isolated_atoms_energies,
+                isolated_atom_energies=isolated_atom_energies,
                 num_processes_fit=num_processes_fit,
                 auto_delta=auto_delta,
                 glue_xml=glue_xml,
                 glue_file_path=self.glue_file_path,
                 mlip_type=self.mlip_type,
-                hyper_param_optimization=self.hyper_param_optimization,
+                hyperpara_opt=self.hyperpara_opt,
                 ref_energy_name=self.ref_energy_name,
                 ref_force_name=self.ref_force_name,
                 ref_virial_name=self.ref_virial_name,
@@ -184,15 +180,19 @@ class MLIPFitMaker(Maker):
 
             return Flow(jobs=jobs, output=mlip_fit_job.output, name=self.name)
         # this will only run if train.extxyz and test.extxyz files are present in the database_dir
+
+        if isinstance(database_dir, str):
+            database_dir = Path(database_dir)
+
         mlip_fit_job = machine_learning_fit(
             database_dir=database_dir,
-            isolated_atoms_energies=isolated_atoms_energies,
+            isolated_atom_energies=isolated_atom_energies,
             num_processes_fit=num_processes_fit,
             auto_delta=auto_delta,
             glue_xml=glue_xml,
             glue_file_path=self.glue_file_path,
             mlip_type=self.mlip_type,
-            hyper_param_optimization=self.hyper_param_optimization,
+            hyperpara_opt=self.hyperpara_opt,
             ref_energy_name=self.ref_energy_name,
             ref_force_name=self.ref_force_name,
             ref_virial_name=self.ref_virial_name,
@@ -222,7 +222,7 @@ class DataPreprocessing(Maker):
         Repeat the fit for each data_type available in the (combined) database.
     distillation: bool
         For using data distillation.
-    f_max: float
+    force_max: float
         Maximally allowed force in the data set.
 
     """
@@ -232,7 +232,7 @@ class DataPreprocessing(Maker):
     regularization: bool = False
     separated: bool = False
     distillation: bool = False
-    f_max: float = 40.0
+    force_max: float = 40.0
 
     @job
     def make(
@@ -241,7 +241,7 @@ class DataPreprocessing(Maker):
         pre_database_dir: str | None = None,
         pre_xyz_files: list[str] | None = None,
         atomwise_regularization_parameter: float = 0.1,
-        f_min: float = 0.01,  # unit: eV Å-1
+        force_min: float = 0.01,  # unit: eV Å-1
         atom_wise_regularization: bool = True,
     ):
         """
@@ -257,7 +257,7 @@ class DataPreprocessing(Maker):
             names of the pre-database train xyz file and test xyz file labeled by VASP.
         atomwise_regularization_parameter: float
             regularization value for the atom-wise force components.
-        f_min: float
+        force_min: float
             minimal force cutoff value for atom-wise regularization.
         atom_wise_regularization: bool
             for including atom-wise regularization.
@@ -302,13 +302,13 @@ class DataPreprocessing(Maker):
             path_to_vasp_static_calcs=list_of_vasp_calc_dirs,
             config_types=config_types,
             data_types=data_types,
-            f_min=f_min,
+            f_min=force_min,
             regularization=atomwise_regularization_parameter,
             atom_wise_regularization=atom_wise_regularization,
         )
 
         write_after_distillation_data_split(
-            self.distillation, self.f_max, self.split_ratio
+            self.distillation, self.force_max, self.split_ratio
         )
 
         # Merging database
@@ -359,7 +359,7 @@ class DataPreprocessing(Maker):
 
                     write_after_distillation_data_split(
                         distillation=self.distillation,
-                        f_max=self.f_max,
+                        force_max=self.force_max,
                         split_ratio=self.split_ratio,
                         vasp_ref_name=f"vasp_ref_{data_type}.extxyz",
                         train_name=f"train_{data_type}.extxyz",
