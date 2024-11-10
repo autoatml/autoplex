@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import os
+from dataclasses import dataclass
 from pathlib import Path
 
-from dataclasses import dataclass
 from jobflow import Flow, Maker, Response, job
 from ruamel.yaml import YAML
 
