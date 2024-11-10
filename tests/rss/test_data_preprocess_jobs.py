@@ -3,8 +3,6 @@ os.environ["OMP_NUM_THREADS"] = "1"
 
 from jobflow import run_locally
 from ase.io import read
-import shutil
-from pathlib import Path
 import numpy as np
 
 def test_vasp_static(test_dir, memory_jobstore, clean_dir):

@@ -4,8 +4,6 @@ os.environ["OMP_NUM_THREADS"] = "1"
 from pymatgen.core.structure import Structure
 from jobflow import run_locally, Flow
 from ase.io import read
-import shutil
-from pathlib import Path
 
 def test_vasp_static(test_dir, mock_vasp, memory_jobstore, clean_dir):
     from autoplex.data.common.jobs import collect_dft_data

@@ -2,8 +2,6 @@ import os
 os.environ["OMP_NUM_THREADS"] = "1"
 
 from autoplex.data.rss.jobs import do_rss_single_node, do_rss_multi_node
-import shutil
-from pathlib import Path
 from jobflow import run_locally
 from ase.io import read
 from pymatgen.io.ase import AseAtomsAdaptor

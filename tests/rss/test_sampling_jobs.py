@@ -7,13 +7,11 @@ os.environ["OMP_NUM_THREADS"] = "1"
 from pymatgen.io.ase import AseAtomsAdaptor
 from autoplex.data.common.jobs import sample_data
 from jobflow import run_locally
-from pathlib import Path
 from ase.io import read
 from autoplex.data.common.utils import (cur_select, 
                                         boltzhist_cur_one_shot, 
                                         ElementCollection, 
                                         boltzhist_cur_dual_iter)
-import shutil
 
 
 def test_sampling_cur(test_dir):

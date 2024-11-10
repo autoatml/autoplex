@@ -7,11 +7,8 @@ from autoplex.data.rss.jobs import do_rss_single_node, do_rss_multi_node
 from autoplex.data.common.jobs import sample_data, collect_dft_data, preprocess_data
 from autoplex.data.common.flows import DFTStaticLabelling
 from autoplex.fitting.common.flows import MLIPFitMaker
-from typing import List, Optional, Dict, Any
-from ase.io import read
-from pymatgen.io.ase import AseAtomsAdaptor
+from typing import Optional, Dict, Any
 from pathlib import Path
-import shutil
 
 
 @job
