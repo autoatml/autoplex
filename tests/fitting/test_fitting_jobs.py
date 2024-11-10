@@ -32,7 +32,7 @@ def test_jace_fit_maker(test_dir, memory_jobstore, clean_dir):
     jacefit = MLIPFitMaker(
         mlip_type="J-ACE",
     ).make(
-        isolated_atoms_energies={14: -0.84696938},
+        isolated_atom_energies={14: -0.84696938},
         num_processes_fit=4,
         preprocessing_data=False,
         database_dir=database_dir,
@@ -54,7 +54,7 @@ def test_nqeuip_fit_maker(test_dir, memory_jobstore, clean_dir):
     nequipfit = MLIPFitMaker(
        mlip_type="NEQUIP",
     ).make(
-        isolated_atoms_energies={14: -0.84696938},
+        isolated_atom_energies={14: -0.84696938},
         num_processes_fit=1,
         preprocessing_data=False,
         database_dir=database_dir,
@@ -77,7 +77,7 @@ def test_m3gnet_fit_maker(test_dir, memory_jobstore, clean_dir):
     nequipfit = MLIPFitMaker(
             mlip_type="M3GNET",
     ).make(
-        isolated_atoms_energies={14: -0.84696938},
+        isolated_atom_energies={14: -0.84696938},
         num_processes_fit=1,
         preprocessing_data=False,
         database_dir=database_dir,
@@ -108,7 +108,7 @@ def test_mace_fit_maker(test_dir, memory_jobstore, clean_dir):
     nequipfit = MLIPFitMaker(
                 mlip_type="MACE",
     ).make(
-        isolated_atoms_energies={14: -0.84696938},
+        isolated_atom_energies={14: -0.84696938},
         num_processes_fit=1,
         preprocessing_data=False,
         database_dir=database_dir,
