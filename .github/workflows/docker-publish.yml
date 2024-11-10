@@ -35,14 +35,19 @@ jobs:
     - name: lowercase github.repository
       run: |
         echo "IMAGE_NAME=`echo ${{github.repository}} | tr '[:upper:]' '[:lower:]'`" >>${GITHUB_ENV}
+    
+    - name: Extract version from pyproject.toml
+      run: |
+          VERSION=$(grep '^version = ' pyproject.toml | sed -E 's/version = "(.*)"/\1/')
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
 
     # Build Docker image with a custom Python version
     - name: Build Docker image (Python ${{ matrix.python-version }})
       run: |
         docker build \
         --build-arg PYTHON_VERSION=${{ matrix.python-version }} \
-        -t ghcr.io/${{ env.IMAGE_NAME }}/autoplex:python-${{ matrix.python-version }} .
+        -t ghcr.io/${{ env.IMAGE_NAME }}/autoplex-python-${{ matrix.python-version }}:${{ env.VERSION }} .
    # Push Docker image to GHCR
     - name: Push Docker image to GHCR (Python ${{ matrix.python-version }})
       run: |
-        docker push ghcr.io/${{ env.IMAGE_NAME }}/autoplex:python-${{ matrix.python-version }}
+        docker push ghcr.io/${{ env.IMAGE_NAME }}/autoplex-python-${{ matrix.python-version }}:${{ env.VERSION }}
