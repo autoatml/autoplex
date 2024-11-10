@@ -721,7 +721,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_mace_finetuning_MP_settings(
         mp_ids=["test"],
         benchmark_mp_ids=["test"],
         benchmark_structures=[structure],
-        preprocessing_data=True,
+        apply_data_preprocessing=True,
         use_defaults_fitting=False,
         split_ratio=0.3,
         model="MACE",
