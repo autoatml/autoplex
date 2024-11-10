@@ -1,0 +1,60 @@
+name: Update devcontainer.json on Release
+
+on:
+  workflow_dispatch:
+  release:
+    types: [ created ] # Runs only when a new release is created
+
+permissions:
+  contents: write  # Allow the workflow to push changes to the repository
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checkout the repository
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    # Set up Python
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    # Run the script to update the version in devcontainer.json
+    - name: Update devcontainer.json with new version
+      run: |
+        #!/bin/bash
+
+        # Fetch the version from pyproject.toml
+        VERSION=$(grep 'version =' pyproject.toml | head -n 1 | sed -E 's/version = "([^\"]+)"/\1/')
+
+        # Debug the version extracted
+        echo "Extracted VERSION: $VERSION"
+
+        # Escape any special characters in VERSION that could cause issues with sed (like `/` or `:`)
+        VERSION_ESCAPED=$(echo "$VERSION" | sed 's/[&/\]/\\&/g')
+
+        # Update the version in devcontainer.json
+        # Using the escaped version to safely substitute in the JSON file
+        sed -i -E "s|ghcr.io/autoatml/autoplex/autoplex-python-3.10:[^\"]*|ghcr.io/autoatml/autoplex/autoplex-python-3.10:$VERSION_ESCAPED|" .devcontainer/devcontainer.json
+
+        echo "Updated devcontainer.json with version $VERSION"
+
+    # Commit and push the changes to devcontainer.json
+    - name: Commit and push changes
+      run: |
+        git config --global user.name "github-actions"
+        git config --global user.email "github-actions@github.com"
+
+        # Get the current branch name
+        CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+        echo "Current branch: $CURRENT_BRANCH"
+
+        git add .devcontainer/devcontainer.json
+        git commit -m "Update devcontainer.json with new version tag"
+        git push origin $CURRENT_BRANCH
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
