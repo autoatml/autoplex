@@ -241,7 +241,7 @@ def mock_do_rss_iterations_multi_jobs(input: Dict[str, Optional[Any]] = {'test_e
         return Response(detour=job_list, output=job4.output)
     
 
-def test_mock_workflow(test_dir, mock_vasp, memory_jobstore):
+def test_mock_workflow(test_dir, mock_vasp, memory_jobstore, clean_dir):
     test_files_dir = test_dir / "data/rss.extxyz"
     # atoms = read(test_files_dir, index=':')
     # structures = [AseAtomsAdaptor.get_structure(atom) for atom in atoms]
@@ -390,13 +390,8 @@ def test_mock_workflow(test_dir, mock_vasp, memory_jobstore):
 
     assert len(selected_atoms) == 3
 
-    dir = Path('.')
-    path_to_job_files = list(dir.glob("job*"))
-    for path in path_to_job_files:
-        shutil.rmtree(path)
 
-
-def test_mock_workflow_multi_node(test_dir, mock_vasp, memory_jobstore):
+def test_mock_workflow_multi_node(test_dir, mock_vasp, memory_jobstore, clean_dir):
     test_files_dir = test_dir / "data/rss.extxyz"
     # atoms = read(test_files_dir, index=':')
     # structures = [AseAtomsAdaptor.get_structure(atom) for atom in atoms]
@@ -546,8 +541,3 @@ def test_mock_workflow_multi_node(test_dir, mock_vasp, memory_jobstore):
     selected_atoms = job2.output.resolve(memory_jobstore)
 
     assert len(selected_atoms) == 3
-
-    dir = Path('.')
-    path_to_job_files = list(dir.glob("job*"))
-    for path in path_to_job_files:
-        shutil.rmtree(path)

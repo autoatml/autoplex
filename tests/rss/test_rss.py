@@ -10,7 +10,7 @@ from pymatgen.io.ase import AseAtomsAdaptor
 import numpy as np
 
 
-def test_gap_rss(test_dir, memory_jobstore):
+def test_gap_rss(test_dir, memory_jobstore, clean_dir):
     np.random.seed(42)
     test_files_dir = test_dir / "data/rss.extxyz"
     atoms = read(test_files_dir, index="0:5:1")
@@ -50,13 +50,8 @@ def test_gap_rss(test_dir, memory_jobstore):
    
     assert len(output_filter) == 2
 
-    dir = Path('.')
-    path_to_job_files = list(dir.glob("job*"))
-    for path in path_to_job_files:
-        shutil.rmtree(path)
 
-
-def test_gap_rss_multi_jobs(test_dir, memory_jobstore):
+def test_gap_rss_multi_jobs(test_dir, memory_jobstore, clean_dir):
     from ase.units import GPa
     np.random.seed(42)
     test_files_dir = test_dir / "data/rss.extxyz"
@@ -105,11 +100,6 @@ def test_gap_rss_multi_jobs(test_dir, memory_jobstore):
     
     assert round(enthalpy_pseudo,3) == round(enthalpy_cal,3)
 
-    dir = Path('.')
-    path_to_job_files = list(dir.glob("job*"))
-    for path in path_to_job_files:
-        shutil.rmtree(path)
-
 
 # def test_jace_rss(test_dir, memory_jobstore):
 #     np.random.seed(42)
@@ -157,7 +147,7 @@ def test_gap_rss_multi_jobs(test_dir, memory_jobstore):
 #         shutil.rmtree(path)
 
 
-def test_nequip_rss(test_dir, memory_jobstore):
+def test_nequip_rss(test_dir, memory_jobstore, clean_dir):
     np.random.seed(42)
     test_files_dir = test_dir / "data/rss.extxyz"
     atoms = read(test_files_dir, index="0:5:1")
@@ -197,13 +187,8 @@ def test_nequip_rss(test_dir, memory_jobstore):
    
     assert len(output_filter) == 1
 
-    dir = Path('.')
-    path_to_job_files = list(dir.glob("job*"))
-    for path in path_to_job_files:
-        shutil.rmtree(path)
 
-
-def test_m3gnet_rss(test_dir, memory_jobstore):
+def test_m3gnet_rss(test_dir, memory_jobstore, clean_dir):
     np.random.seed(42)
     test_files_dir = test_dir / "data/rss.extxyz"
     atoms = read(test_files_dir, index="0:5:1")
@@ -243,13 +228,8 @@ def test_m3gnet_rss(test_dir, memory_jobstore):
    
     assert len(output_filter) == 1
 
-    dir = Path('.')
-    path_to_job_files = list(dir.glob("job*"))
-    for path in path_to_job_files:
-        shutil.rmtree(path)
 
-
-def test_mace_rss(test_dir, memory_jobstore):
+def test_mace_rss(test_dir, memory_jobstore, clean_dir):
     np.random.seed(42)
     test_files_dir = test_dir / "data/rss.extxyz"
     atoms = read(test_files_dir, index="0:5:1")
@@ -288,10 +268,5 @@ def test_mace_rss(test_dir, memory_jobstore):
             output_filter.append(i)
    
     assert len(output_filter) == 1
-
-    dir = Path('.')
-    path_to_job_files = list(dir.glob("job*"))
-    for path in path_to_job_files:
-        shutil.rmtree(path)
 
         

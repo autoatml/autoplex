@@ -7,7 +7,7 @@ import shutil
 from pathlib import Path
 import numpy as np
 
-def test_vasp_static(test_dir, memory_jobstore):
+def test_vasp_static(test_dir, memory_jobstore, clean_dir):
     from autoplex.data.common.jobs import preprocess_data
     test_files_dir = test_dir / "data/rss.extxyz"
 
@@ -39,10 +39,3 @@ def test_vasp_static(test_dir, memory_jobstore):
     assert len(atom_test) == 2
     assert "energy_sigma" in atom_train[0].info
     assert max(f_component_max) < 0.7
-
-    dir = Path('.')
-    path_to_job_files = list(dir.glob("job*"))
-    for path in path_to_job_files:
-        shutil.rmtree(path)
-
-

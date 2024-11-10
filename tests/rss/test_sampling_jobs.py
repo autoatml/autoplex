@@ -58,7 +58,7 @@ def test_sampling_cur(test_dir):
     assert energies == pytest.approx(ref_energies)
 
 
-def test_sampling_cur_job(test_dir, memory_jobstore):
+def test_sampling_cur_job(test_dir, memory_jobstore, clean_dir):
     test_files_dir = test_dir / "data/rss.extxyz"
     atoms = read(test_files_dir, index=':')
     structures = [AseAtomsAdaptor.get_structure(atom) for atom in atoms]
@@ -93,13 +93,8 @@ def test_sampling_cur_job(test_dir, memory_jobstore):
     for atom in selected_atoms:
         assert isinstance(atom, type(structures[0]))
 
-    dir = Path('.')
-    path_to_job_files = list(dir.glob("job*"))
-    for path in path_to_job_files:
-        shutil.rmtree(path)
 
-
-def test_sampling_bcur1s(test_dir):
+def test_sampling_bcur1s(test_dir, clean_dir):
     test_files_dir = test_dir / "data/rss.extxyz"
     atoms = read(test_files_dir, index=':')
     num_of_selection=5
@@ -146,13 +141,8 @@ def test_sampling_bcur1s(test_dir):
 
     assert energies == pytest.approx(ref_energies)
 
-    dir = Path('.')
-    path_to_job_files = list(dir.glob("job*"))
-    for path in path_to_job_files:
-        shutil.rmtree(path)
 
-
-def test_sampling_bcur2i():
+def test_sampling_bcur2i(clean_dir):
     from ase import Atoms
     from ase.calculators.emt import EMT
     from ase.build import bulk
@@ -227,13 +217,8 @@ def test_sampling_bcur2i():
     
     assert energies == pytest.approx(ref_energies)
 
-    dir = Path('.')
-    path_to_job_files = list(dir.glob("job*"))
-    for path in path_to_job_files:
-        shutil.rmtree(path)
 
-
-def test_sampling_bcur1s_job(test_dir, memory_jobstore):
+def test_sampling_bcur1s_job(test_dir, memory_jobstore, clean_dir):
     test_files_dir = test_dir / "data/rss.extxyz"
     atoms = read(test_files_dir, index=':')
     structures = [AseAtomsAdaptor.get_structure(atom) for atom in atoms]
@@ -270,13 +255,8 @@ def test_sampling_bcur1s_job(test_dir, memory_jobstore):
     for atom in selected_atoms:
         assert isinstance(atom, type(structures[0]))
 
-    dir = Path('.')
-    path_to_job_files = list(dir.glob("job*"))
-    for path in path_to_job_files:
-        shutil.rmtree(path)
 
-
-def test_sampling_random_job(test_dir, memory_jobstore):
+def test_sampling_random_job(test_dir, memory_jobstore, clean_dir):
     test_files_dir = test_dir / "data/rss.extxyz"
     atoms = read(test_files_dir, index=':')
     structures = [AseAtomsAdaptor.get_structure(atom) for atom in atoms]
@@ -300,13 +280,8 @@ def test_sampling_random_job(test_dir, memory_jobstore):
     for atom in selected_atoms:
         assert isinstance(atom, type(structures[0]))
 
-    dir = Path('.')
-    path_to_job_files = list(dir.glob("job*"))
-    for path in path_to_job_files:
-        shutil.rmtree(path)
 
-
-def test_sampling_uniform_job(test_dir, memory_jobstore):
+def test_sampling_uniform_job(test_dir, memory_jobstore, clean_dir):
     test_files_dir = test_dir / "data/rss.extxyz"
     atoms = read(test_files_dir, index=':')
     structures = [AseAtomsAdaptor.get_structure(atom) for atom in atoms]
@@ -330,7 +305,3 @@ def test_sampling_uniform_job(test_dir, memory_jobstore):
     for atom in selected_atoms:
         assert isinstance(atom, type(structures[0]))
 
-    dir = Path('.')
-    path_to_job_files = list(dir.glob("job*"))
-    for path in path_to_job_files:
-        shutil.rmtree(path)

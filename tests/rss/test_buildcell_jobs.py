@@ -54,7 +54,7 @@ def test_update_buildcell_options():
     assert 'SPECIES=Si%NUM=1,O%NUM=2' in buildcell_update
 
 
-def test_output_from_scratch(memory_jobstore):
+def test_output_from_scratch(memory_jobstore, clean_dir):
     from jobflow import run_locally
     from ase.io import read
     from pathlib import Path
@@ -69,12 +69,8 @@ def test_output_from_scratch(memory_jobstore):
     responses = run_locally(job, ensure_success=True, create_folders=True, store=memory_jobstore)
     assert len(read(job.output.resolve(memory_jobstore), index=":")) == 3
 
-    dir = Path('.')
-    path_to_job_files = list(dir.glob("job*"))
-    for path in path_to_job_files:
-        shutil.rmtree(path)
         
-def test_fragment_buildcell(memory_jobstore):
+def test_fragment_buildcell(memory_jobstore, clean_dir):
     from jobflow import run_locally
     from ase.io import read
     from pathlib import Path
@@ -109,12 +105,8 @@ def test_fragment_buildcell(memory_jobstore):
     ats = read(job.output.resolve(memory_jobstore), index=":")
     assert len(ats) == 4 and np.all(ats[0].positions[0] != ats[0].positions[1])
 
-    dir = Path('.')
-    path_to_job_files = list(dir.glob("job*"))
-    for path in path_to_job_files:
-        shutil.rmtree(path)
 
-def test_output_from_cell_seed(test_dir, memory_jobstore):
+def test_output_from_cell_seed(test_dir, memory_jobstore, clean_dir):
     from jobflow import run_locally
     from ase.io import read
     from pathlib import Path
@@ -126,14 +118,9 @@ def test_output_from_cell_seed(test_dir, memory_jobstore):
     
     responses = run_locally(job, ensure_success=True, create_folders=True, store=memory_jobstore)
     assert len(read(job.output.resolve(memory_jobstore),index=":")) == 3
-    
-    dir = Path('.')
-    path_to_job_files = list(dir.glob("job*"))
-    for path in path_to_job_files:
-        shutil.rmtree(path)
 
 
-def test_build_multi_randomized_structure(memory_jobstore):
+def test_build_multi_randomized_structure(memory_jobstore, clean_dir):
     from autoplex.data.rss.flows import BuildMultiRandomizedStructure
     from jobflow import run_locally, Flow
     from autoplex.data.common.utils import flatten
@@ -181,8 +168,3 @@ def test_build_multi_randomized_structure(memory_jobstore):
 
     assert even_count == 8
     assert odd_count == 2
-
-    dir = Path('.')
-    path_to_job_files = list(dir.glob("job*"))
-    for path in path_to_job_files:
-        shutil.rmtree(path)

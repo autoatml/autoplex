@@ -7,7 +7,7 @@ from ase.io import read
 import shutil
 from pathlib import Path
 
-def test_vasp_static(test_dir, mock_vasp, memory_jobstore):
+def test_vasp_static(test_dir, mock_vasp, memory_jobstore, clean_dir):
     from autoplex.data.common.jobs import collect_dft_data
     from autoplex.data.common.flows import DFTStaticLabelling
 
@@ -97,11 +97,6 @@ def test_vasp_static(test_dir, mock_vasp, memory_jobstore):
     assert 'IsolatedAtom' in config_types
     assert config_types.count("dimer") == 3
     assert config_types.count("bulk") == 18
-
-    dir = Path('.')
-    path_to_job_files = list(dir.glob("job*"))
-    for path in path_to_job_files:
-        shutil.rmtree(path)
 
 
 def test_vasp_check_convergence(test_dir):
