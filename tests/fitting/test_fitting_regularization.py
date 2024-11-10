@@ -48,7 +48,7 @@ def test_set_sigma(test_dir):
                            reg_minmax,
                            scheme='linear-hull',
                            max_energy=0.05,
-                           isolated_atoms_energies=isol_es,
+                           isolated_atom_energies=isol_es,
                            element_order=[3, 17],
                            )
     assert len(atoms_modi) < len(test_atoms)
