@@ -55,6 +55,7 @@ current_dir = Path(__file__).absolute().parent
 MLIP_PHONON_DEFAULTS_FILE_PATH = current_dir / "mlip-phonon-defaults.json"
 MLIP_RSS_DEFAULTS_FILE_PATH = current_dir / "mlip-rss-defaults.json"
 
+
 def gap_fitting(
     db_dir: Path,
     species_list: list | None = None,
@@ -326,9 +327,7 @@ def jace_fitting(
     )
     formatted_species = (
         "["
-        + ", ".join(
-            [f":{key}" for key, value in isolated_atom_energies_update.items()]
-        )
+        + ", ".join([f":{key}" for key, value in isolated_atom_energies_update.items()])
         + "]"
     )
 

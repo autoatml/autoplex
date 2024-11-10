@@ -15,6 +15,7 @@ from autoplex.fitting.common.utils import (
     nequip_fitting,
 )
 
+
 @job
 def machine_learning_fit(
     database_dir: str | Path,
