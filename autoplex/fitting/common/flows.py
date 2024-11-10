@@ -80,8 +80,8 @@ class MLIPFitMaker(Maker):
         auto_delta: bool = False,  # This is only used for GAP.
         glue_xml: bool = False,  # This is only used for GAP.
         num_processes_fit: int | None = None,
-        apply_data_preprocessing: bool = False,
-        database_dir: Path | None = None,
+        apply_data_preprocessing: bool = True,
+        database_dir: Path | str | None = None,
         device: str = "cpu",
         **fit_kwargs,
     ):
@@ -125,7 +125,7 @@ class MLIPFitMaker(Maker):
             Number of processes for fitting.
         apply_data_preprocessing: bool
             Determine whether to preprocess the data.
-        database_dir: Path
+        database_dir: Path | str
             Path to the directory containing the database.
         device: str
             Device to be used for model fitting, either "cpu" or "cuda".
@@ -176,6 +176,9 @@ class MLIPFitMaker(Maker):
 
             return Flow(jobs=jobs, output=mlip_fit_job.output, name=self.name)
         # this will only run if train.extxyz and test.extxyz files are present in the database_dir
+
+        if isinstance(database_dir, str):
+            database_dir = Path(database_dir)
 
         mlip_fit_job = machine_learning_fit(
             database_dir=database_dir,

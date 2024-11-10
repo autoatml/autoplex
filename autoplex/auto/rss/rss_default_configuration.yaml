@@ -1,5 +1,5 @@
 # General Parameters
-tag: 'Si'
+tag:
 train_from_scratch: true
 resume_from_previous_state:
   test_error:
@@ -14,10 +14,10 @@ generated_struct_numbers:
 buildcell_options:
   - NFORM: '{2,4,6,8}'
     SYMMOPS: '1-4'
-    MINSEP: '1.5 Ti-Ti=2.5-2.8 Ti-O=1.3-1.6 O-O=1.9-2.2'
+    MINSEP: '1.5'
   - NFORM: '{3,5,7}'
     SYMMOPS: '1-4'
-    MINSEP: '1.5 Ti-Ti=2.5-2.8 Ti-O=1.3-1.6 O-O=1.9-2.2'
+    MINSEP: '1.5'
 fragment_file: null
 fragment_numbers: null
 num_processes_buildcell: 128
@@ -80,7 +80,7 @@ custom_incar:
   LSCALAPACK: '.FALSE.'
   LPLANE: '.FALSE.'
 custom_potcar:
-  Ti: 'Ti'
+#Ti: 'Ti'
 vasp_ref_file: 'vasp_ref.extxyz'
 
 # Data Preprocessing Parameters
@@ -91,7 +91,7 @@ config_types:
 rss_group:
   - 'traj'
 test_ratio: 0.1
-regularization: false
+regularization: true
 scheme: 'linear-hull'
 reg_minmax:
   - [0.1, 1]
@@ -132,7 +132,7 @@ scalar_pressure_method: 'uniform'
 scalar_exp_pressure: 100
 scalar_pressure_exponential_width: 0.2
 scalar_pressure_low: 0
-scalar_pressure_high: 50
+scalar_pressure_high: 25
 max_steps: 300
 force_tol: 0.01
 stress_tol: 0.01

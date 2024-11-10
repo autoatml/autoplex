@@ -15,6 +15,9 @@ from autoplex.fitting.common.utils import (
     nequip_fitting,
 )
 
+current_dir = Path(__file__).absolute().parent
+GAP_DEFAULTS_FILE_PATH = current_dir / "mlip-phonon-defaults.json"
+
 
 @job
 def machine_learning_fit(

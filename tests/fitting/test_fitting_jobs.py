@@ -13,7 +13,7 @@ def test_gap_fit_maker(test_dir, memory_jobstore, clean_dir):
         glue_xml=False,
         twob={"delta": 2.0, "cutoff": 4},
         threeb={"n_sparse": 10},
-        preprocessing_data=False,
+        apply_data_preprocessing=False,
         database_dir=database_dir    
         )
 
@@ -34,7 +34,7 @@ def test_jace_fit_maker(test_dir, memory_jobstore, clean_dir):
     ).make(
         isolated_atom_energies={14: -0.84696938},
         num_processes_fit=4,
-        preprocessing_data=False,
+        apply_data_preprocessing=False,
         database_dir=database_dir,
         order=2,
         totaldegree=4,
@@ -56,7 +56,7 @@ def test_nqeuip_fit_maker(test_dir, memory_jobstore, clean_dir):
     ).make(
         isolated_atom_energies={14: -0.84696938},
         num_processes_fit=1,
-        preprocessing_data=False,
+        apply_data_preprocessing=False,
         database_dir=database_dir,
         r_max=3.14,
         max_epochs=10,
@@ -79,7 +79,7 @@ def test_m3gnet_fit_maker(test_dir, memory_jobstore, clean_dir):
     ).make(
         isolated_atom_energies={14: -0.84696938},
         num_processes_fit=1,
-        preprocessing_data=False,
+        apply_data_preprocessing=False,
         database_dir=database_dir,
         cutoff=3.0,
         threebody_cutoff=2.0,
@@ -110,7 +110,7 @@ def test_mace_fit_maker(test_dir, memory_jobstore, clean_dir):
     ).make(
         isolated_atom_energies={14: -0.84696938},
         num_processes_fit=1,
-        preprocessing_data=False,
+        apply_data_preprocessing=False,
         database_dir=database_dir,
         model="MACE",
         config_type_weights='{"Default":1.0}',

@@ -113,9 +113,13 @@ def to_ase_trajectory(
 
     Parameters
     ----------
+    traj_obj:
+        trajectory object.
     filename : str | None
         Name of the file to write the ASE trajectory to.
         If None, no file is written.
+    store_magmoms:
+        bool to store magnetic moments.
     """
     for idx in range(len(traj_obj["atom_positions"])):
         atoms = Atoms(symbols=list(traj_obj["atomic_number"]))  # .atoms.copy()
@@ -179,7 +183,7 @@ def scale_cell(
             / (n_structures - 1),
         )
 
-        if 1 not in scale_factors_defined:
+        if not np.isclose(scale_factors_defined, 1.0).any():
             scale_factors_defined = np.append(scale_factors_defined, 1)
             scale_factors_defined = np.sort(scale_factors_defined)
 
@@ -598,7 +602,8 @@ def energy_plot(
     """
     Plot the distribution of energy per atom on the output vs the input.
 
-    Adapted and adjusted from libatoms GAP tutorial page https://libatoms.github.io/GAP/gap_fitting_tutorial.html.
+    Adapted and adjusted from libatoms GAP tutorial page
+    https://libatoms.github.io/GAP/gap_fitting_tutorial.html#make-simple-plots-of-the-energies-and-forces-on-the-EMT-and-GAP-datas
 
     Parameters
     ----------
@@ -684,6 +689,9 @@ def force_plot(
     Plot the distribution of force components per atom on the output vs the input.
 
     Only plots for the given atom type(s).
+
+    Adapted and adjusted from libatoms GAP tutorial page
+    https://libatoms.github.io/GAP/gap_fitting_tutorial.html#make-simple-plots-of-the-energies-and-forces-on-the-EMT-and-GAP-datas
 
     Parameters
     ----------
@@ -773,6 +781,9 @@ def plot_energy_forces(
     """
     Plot energy and forces of the data.
 
+    Adapted and adjusted from libatoms GAP tutorial page
+    https://libatoms.github.io/GAP/gap_fitting_tutorial.html#make-simple-plots-of-the-energies-and-forces-on-the-EMT-and-GAP-datas
+
     Parameters
     ----------
     title: str
@@ -793,8 +804,7 @@ def plot_energy_forces(
     fig, ax_list = plt.subplots(nrows=3, ncols=2, gridspec_kw={"hspace": 0.3})
     fig.set_size_inches(10, 15)
     ax_list = ax_list.flat[:]
-    rmse = []
-    rmse.append("Energy and forces and train and test data\n")
+    rmse = ["Energy and forces and train and test data\n"]
 
     pretty_species_list = (
         str(species_list).replace("['", "").replace("']", "").replace("'", "")
@@ -1405,7 +1415,7 @@ def convexhull_cur(
     elif scheme == "volume-stoichiometry":
         points = label_stoichiometry_volume(
             fatoms,
-            isolated_atoms_energies=isolated_atom_energies,
+            isolated_atom_energies=isolated_atom_energies,
             energy_name=energy_label,
             element_order=element_order,
         )
@@ -1416,7 +1426,7 @@ def convexhull_cur(
                 get_e_distance_to_hull_3D(
                     hull,
                     at,
-                    isolated_atoms_energies=isolated_atom_energies,
+                    isolated_atom_energies=isolated_atom_energies,
                     energy_name=energy_label,
                     element_order=element_order,
                 )

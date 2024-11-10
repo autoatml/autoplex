@@ -398,9 +398,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                                 pre_database_dir=pre_database_dir,
                                 atomwise_regularization_parameter=atomwise_reg_parameter,
                                 force_min=force_min,
-                                atom_wise_regularization=atom_wise_regularization,
                                 auto_delta=auto_delta,
-                                apply_data_preprocessing=apply_data_preprocessing,
                                 soap=soap_dict,
                             )
                             flows.append(loop_data_fit)

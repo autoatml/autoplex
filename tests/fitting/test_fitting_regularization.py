@@ -116,7 +116,7 @@ def test_auxiliary_functions(test_dir, memory_jobstore, clean_dir):
 
     label = label_stoichiometry_volume(
         atoms_list=atoms,
-        isolated_atoms_energies={3: -0.28649227, 17: -0.25638457},
+        isolated_atom_energies={3: -0.28649227, 17: -0.25638457},
         energy_name="REF_energy",
         element_order=[3, 17],
     )

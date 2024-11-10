@@ -5,7 +5,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-import yaml  # type: ignore
+from ruamel.yaml import YAML 
 from jobflow import Flow, Maker, Response, job
 
 from autoplex.auto.rss.jobs import do_rss_iterations, initial_rss
@@ -50,7 +50,7 @@ class RssMaker(Maker):
             For example, the tag of 'SiO2' will be recognized as a 1:2 ratio of Si to O and
             passed into the parameters of buildcell. However, note that this will be overwritten
             if the stoichiometric ratio of elements is defined in the 'buildcell_options'.
-        - train_from_scratch : bool
+        - train_from_scratch: bool
             If True, it starts the workflow from scratch.
             If False, it resumes from a previous state.
         - resume_from_previous_state: dict | None
@@ -233,27 +233,29 @@ class RssMaker(Maker):
         Output
         ------
         dict
-        a dictionary whose keys contains:
-        - test_error: float
-            The test error of the fitted MLIP.
-        - pre_database_dir: str
-            The directory of the latest RSS database.
-        - mlip_path: str
-            The path to the latest fitted MLIP.
-        - isolated_atom_energies: dict
-            The isolated energy values.
-        - current_iter: int
-            The current iteration index.
-        - kt: float
-            The temperature (in eV) for Boltzmann sampling.
+            A dictionary whose keys contains:
+            - test_error: float
+                The test error of the fitted MLIP.
+            - pre_database_dir: str
+                The directory of the latest RSS database.
+            - mlip_path: str
+                The path to the latest fitted MLIP.
+            - isolated_atom_energies: dict
+                The isolated energy values.
+            - current_iter: int
+                The current iteration index.
+            - kt: float
+                The temperature (in eV) for Boltzmann sampling.
         """
-        config_path = (
-            config_file
-            if config_file and os.path.exists(config_file)
-            else self.path_to_default_config_parameters
-        )
-        with open(config_path) as f:
-            config = yaml.safe_load(f)
+        yaml = YAML(typ='safe', pure=True)
+
+        with open(self.path_to_default_config_parameters) as f:
+            config = yaml.load(f)
+
+        if config_file and os.path.exists(config_file):
+            with open(config_file) as f:
+                new_config = yaml.load(f)
+                config.update(new_config)
 
         config.update(kwargs)
         self._process_hookean_paras(config)

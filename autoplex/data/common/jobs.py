@@ -183,7 +183,6 @@ def generate_randomized_structures(
     rattle_seed: int = 42,
     rattle_mc_n_iter: int = 10,
     w_angle: list[float] | None = None,
-    adaptive_rattled_supercell_settings: bool = True,
 ):
     """
     Take in a pymatgen Structure object and generates angle/volume distorted + rattled structures.
@@ -232,8 +231,6 @@ def generate_randomized_structures(
         Number of Monte Carlo iterations.
         Larger number of iterations will generate larger displacements.
         Default=10.
-    adaptive_rattled_supercell_settings: bool
-        prevent too big rattled supercells
 
     Returns
     -------
@@ -242,6 +239,9 @@ def generate_randomized_structures(
     """
     if supercell_matrix is None:
         supercell_matrix = [[2, 0, 0], [0, 2, 0], [0, 0, 2]]
+
+    if n_structures < 10:
+        n_structures = 10
 
     supercell = get_supercell(
         unitcell=get_phonopy_structure(structure),
@@ -697,6 +697,7 @@ def preprocess_data(
     vasp_ref_dir: str,
     test_ratio: float | None = None,
     regularization: bool = False,
+    retain_existing_sigma: bool = False,
     scheme: str = "linear-hull",
     distillation: bool = False,
     force_max: float = 40,
@@ -721,6 +722,9 @@ def preprocess_data(
         If None, no splitting will be performed.
     regularization: bool
         If true, apply regularization. This only works for GAP.
+    retain_existing_sigma: bool
+        Whether to keep the current sigma values for specific configuration types.
+        If set to True, existing sigma values for specific configurations will remain unchanged.
     scheme: str
         Scheme to use for regularization.
     distillation: bool
@@ -778,6 +782,7 @@ def preprocess_data(
             reg_minmax=reg_minmax,
             isolated_atom_energies=isolated_atom_energies,
             scheme=scheme,
+            retain_existing_sigma=retain_existing_sigma,
         )
 
         write("train.extxyz", atom_with_sigma, format="extxyz")

@@ -28,7 +28,7 @@ class BuildMultiRandomizedStructure(Maker):
         Expected number of generated randomized unit cells.
     buildcell_option: dict
         Customized parameters for buildcell.
-    fragment: Atoms | list[Atoms] (optional)
+    fragment_file: Atoms | list[Atoms] (optional)
         Fragment(s) for random structures, e.g. molecules, to be placed indivudally intact.
         atoms.arrays should have a 'fragment_id' key with unique identifiers for each fragment if in same Atoms.
         atoms.cell must be defined (e.g. Atoms.cell = np.eye(3)*20).

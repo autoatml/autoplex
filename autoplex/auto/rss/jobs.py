@@ -43,6 +43,7 @@ def initial_rss(
     rss_group: str = "initial",
     test_ratio: float = 0.1,
     regularization: bool = False,
+    retain_existing_sigma: bool = False,
     scheme: str | None = None,
     reg_minmax: list[tuple] | None = None,
     distillation: bool = False,
@@ -68,79 +69,82 @@ def initial_rss(
         For example, 'SiO2' will generate structures with a 2:1 ratio of Si to O.
     generated_struct_numbers: list[int]
         Expected number of generated randomized unit cells.
-    num_of_initial_selected_structs: list[int], optional
+    num_of_initial_selected_structs: list[int] | None
         Number of structures to be sampled. Default is None.
-    buildcell_options: list[dict], optional
+    buildcell_options: list[dict] | None
         Customized parameters for buildcell. Default is None.
-    fragment: Atoms | list[Atoms] (optional)
+    fragment_file: Atoms | list[Atoms] | None
         Fragment(s) for random structures, e.g. molecules, to be placed indivudally intact.
         atoms.arrays should have a 'fragment_id' key with unique identifiers for each fragment if in same Atoms.
         atoms.cell must be defined (e.g. Atoms.cell = np.eye(3)*20).
-    fragment_numbers: list[str] (optional)
+    fragment_numbers: list[str] | None
         Numbers of each fragment to be included in the random structures. Defaults to 1 for all specified.
-    num_processes_buildcell: int, optional
+    num_processes_buildcell: int
         Number of processes to use for parallel computation during buildcell generation. Default is 1.
-    initial_selection_enabled: bool, optional
+    initial_selection_enabled: bool
         If true, sample structures using CUR. Default is False.
-    bcur_params: dict, optional
+    bcur_params: dict | None
         Parameters for Boltzmann CUR selection. Default is None.
-    random_seed: int, optional
+    random_seed: int | None
         A seed to ensure reproducibility of CUR selection. Default is None.
-    include_isolated_atom: bool, optional
+    include_isolated_atom: bool
         If true, perform single-point calculations for isolated atoms. Default is False.
-    isolatedatom_box: list[float], optional
+    isolatedatom_box: list[float] | None
         List of the lattice constants for an isolated atom configuration. Default is None.
-    e0_spin: bool, optional
+    e0_spin: bool
         If true, include spin polarization in isolated atom and dimer calculations. Default is False.
-    include_dimer: bool, optional
+    include_dimer: bool
         If true, perform single-point calculations for dimers. Default is False.
-    dimer_box: list[float], optional
+    dimer_box: list[float] | None
         The lattice constants of a dimer box. Default is None.
-    dimer_range: list[float], optional
+    dimer_range: list[float] | None
         Range of distances for dimer calculations. Default is None.
-    dimer_num: int, optional
+    dimer_num: int
         Number of different distances to consider for dimer calculations. Default is 21.
-    custom_incar: dict, optional
+    custom_incar: dict | None
         Dictionary of custom VASP input parameters. If provided, will update the
         default parameters. Default is None.
-    custom_potcar: dict, optional
+    custom_potcar: dict | None
         Dictionary of POTCAR settings to update. Keys are element symbols, values are the desired POTCAR labels.
         Default is None.
-    config_type: str, optional
+    config_type: str | None
         Configuration type for the VASP calculations. Default is None.
-    vasp_ref_file: str, optional
+    vasp_ref_file: str
         Reference file for VASP data. Default is 'vasp_ref.extxyz'.
-    rss_group: str, optional
+    rss_group: str
         Group name for GAP RSS. Default is 'initial'.
-    test_ratio: float, optional
+    test_ratio: float
         The proportion of the test set after splitting the data.
         If None, no splitting will be performed. Default is 0.1.
-    regularization: bool, optional
+    regularization: bool
         If true, apply regularization. This only works for GAP. Default is False.
-    scheme: str, optional
+    retain_existing_sigma: bool
+        Whether to keep the current sigma values for specific configuration types.
+        If set to True, existing sigma values for specific configurations will remain unchanged.
+    scheme: str | None
         Scheme to use for regularization. Default is None.
-    reg_minmax: list[tuple]
+    reg_minmax: list[tuple] | None
         A list of tuples representing the minimum and maximum values for regularization.
-    distillation: bool, optional
+    distillation: bool
         If true, apply data distillation. Default is False.
-    force_max: float, optional
+    force_max: float | None
         Maximum force value to exclude structures. Default is None.
-    force_label: str, optional
+    force_label: str
         The label of force values to use for distillation. Default is 'REF_forces'.
-    pre_database_dir: str, optional
+    pre_database_dir: str | None
         Directory where the previous database was saved. Default is None.
-    mlip_type: str, optional
+    mlip_type: str
         Choose one specific MLIP type to be fitted: 'GAP' | 'J-ACE' | 'P-ACE' | 'NEQUIP' | 'M3GNET' | 'MACE'.
         Default is 'GAP'.
-    ref_energy_name: str, optional
+    ref_energy_name: str
         Reference energy name. Default is 'REF_energy'.
-    ref_force_name: str, optional
+    ref_force_name: str
         Reference force name. Default is 'REF_forces'.
-    ref_virial_name: str, optional
+    ref_virial_name: str
         Reference virial name. Default is 'REF_virial'.
-    auto_delta: bool, optional
+    auto_delta: bool
         If true, apply automatic determination of delta for GAP terms. Default is False.
-    num_processes_fit: int, optional
+    num_processes_fit: int
         Number of processes used for fitting. Default is 1.
     device_for_fitting: str
             Device to be used for model fitting, either "cpu" or "cuda".
@@ -198,6 +202,7 @@ def initial_rss(
     do_data_preprocessing = preprocess_data(
         test_ratio=test_ratio,
         regularization=regularization,
+        retain_existing_sigma=retain_existing_sigma,
         scheme=scheme,
         distillation=distillation,
         force_max=force_max,
@@ -273,6 +278,7 @@ def do_rss_iterations(
     rss_group: str = "rss",
     test_ratio: float = 0.1,
     regularization: bool = False,
+    retain_existing_sigma: bool = False,
     scheme: str | None = None,
     reg_minmax: list[tuple] | None = None,
     distillation: bool = True,
@@ -334,119 +340,122 @@ def do_rss_iterations(
         For example, 'SiO2' will generate structures with a 2:1 ratio of Si to O.
     generated_struct_numbers: list[int]
         Expected number of generated randomized unit cells.
-    num_of_initial_selected_structs: list[int], optional
+    num_of_initial_selected_structs: list[int] | None
         Number of structures to be sampled. Default is None.
-    buildcell_options: list[dict], optional
+    buildcell_options: list[dict] | None
         Customized parameters for buildcell. Default is None.
-    fragment: Atoms | list[Atoms] (optional)
+    fragment_file: Atoms | list[Atoms] | None
         Fragment(s) for random structures, e.g. molecules, to be placed indivudally intact.
         atoms.arrays should have a 'fragment_id' key with unique identifiers for each fragment if in same Atoms.
         atoms.cell must be defined (e.g. Atoms.cell = np.eye(3)*20).
-    fragment_numbers: list[str] (optional)
+    fragment_numbers: list[str] | None
         Numbers of each fragment to be included in the random structures. Defaults to 1 for all specified.
-    num_processes_buildcell: int, optional
+    num_processes_buildcell: int
         Number of processes to use for parallel computation during buildcell generation. Default is 1.
-    initial_selection_enabled: bool, optional
+    initial_selection_enabled: bool
         If true, sample structures using CUR. Default is False.
-    rss_selection_method: str, optional
+    rss_selection_method: str
         Method for selecting samples from the generated structures. Default is None.
     num_of_rss_selected_structs: int
         Number of structures to be selected.
-    bcur_params: dict, optional
+    bcur_params: dict | None
         Parameters for Boltzmann CUR selection. Default is None.
-    random_seed: int, optional
+    random_seed: int | None
         A seed to ensure reproducibility of CUR selection. Default is None.
-    include_isolated_atom: bool, optional
+    include_isolated_atom: bool
         If true, perform single-point calculations for isolated atoms. Default is False.
-    isolatedatom_box: list[float], optional
+    isolatedatom_box: list[float] | None
         List of the lattice constants for an isolated atom configuration. Default is None.
-    e0_spin: bool, optional
+    e0_spin: bool
         If true, include spin polarization in isolated atom and dimer calculations. Default is False.
-    include_dimer: bool, optional
+    include_dimer: bool
         If true, perform single-point calculations for dimers only once. Default is False.
-    dimer_box: list[float], optional
+    dimer_box: list[float] | None
         The lattice constants of a dimer box. Default is None.
-    dimer_range: list[float], optional
+    dimer_range: list[float] | None
         Range of distances for dimer calculations. Default is None.
-    dimer_num: int, optional
+    dimer_num: int
         Number of different distances to consider for dimer calculations. Default is 21.
-    custom_incar: dict, optional
+    custom_incar: dict | None
         Dictionary of custom VASP input parameters. If provided, will update the
         default parameters. Default is None.
-    custom_potcar: dict, optional
+    custom_potcar: dict | None
         Dictionary of POTCAR settings to update. Keys are element symbols, values are the desired POTCAR labels.
         Default is None.
-    config_types: list[str], optional
+    config_types: list[str] | None
         Configuration types for the VASP calculations. Default is None.
-    vasp_ref_file: str, optional
+    vasp_ref_file: str
         Reference file for VASP data. Default is 'vasp_ref.extxyz'.
-    rss_group: str, optional
+    rss_group: str
         Group name for GAP RSS. Default is 'rss'.
-    test_ratio: float, optional
+    test_ratio: float
         The proportion of the test set after splitting the data. Default is 0.1.
-    regularization: bool, optional
+    regularization: bool
         If true, apply regularization. This only works for GAP. Default is False.
-    scheme: str, optional
+    retain_existing_sigma: bool
+        Whether to keep the current sigma values for specific configuration types.
+        If set to True, existing sigma values for specific configurations will remain unchanged.
+    scheme: str | None
         Scheme to use for regularization. Default is None.
-    reg_minmax: list[tuple]
+    reg_minmax: list[tuple] | None
         A list of tuples representing the minimum and maximum values for regularization.
-    distillation: bool, optional
+    distillation: bool
         If true, apply data distillation. Default is True.
-    force_max: float, optional
+    force_max: float
         Maximum force value to exclude structures. Default is 200.
-    force_label: str, optional
+    force_label: str
         The label of force values to use for distillation. Default is 'REF_forces'.
-    mlip_type: str, optional
+    mlip_type: str
         Choose one specific MLIP type: 'GAP' | 'J-ACE' | 'P-ACE' | 'NequIP' | 'M3GNet' | 'MACE'. Default is 'GAP'.
-    ref_energy_name: str, optional
+    ref_energy_name: str
         Reference energy name. Default is 'REF_energy'.
-    ref_force_name: str, optional
+    ref_force_name: str
         Reference force name. Default is 'REF_forces'.
-    ref_virial_name: str, optional
+    ref_virial_name: str
         Reference virial name. Default is 'REF_virial'.
-    auto_delta: bool, optional
+    auto_delta: bool
         If true, apply automatic determination of delta for GAP terms. Default is False.
-    num_processes_fit: int, optional
+    num_processes_fit: int
         Number of processes used for fitting. Default is 1.
     device_for_fitting: str
             Device to be used for model fitting, either "cpu" or "cuda".
-    scalar_pressure_method: str, optional
+    scalar_pressure_method: str
         Method for adding external pressures. Default is 'exp'.
-    scalar_exp_pressure: float, optional
+    scalar_exp_pressure: float
         Scalar exponential pressure. Default is 100.
-    scalar_pressure_exponential_width: float, optional
+    scalar_pressure_exponential_width: float
         Width for scalar pressure exponential. Default is 0.2.
-    scalar_pressure_low: float, optional
+    scalar_pressure_low: float
         Low limit for scalar pressure. Default is 0.
-    scalar_pressure_high: float, optional
+    scalar_pressure_high: float
         High limit for scalar pressure. Default is 50.
-    max_steps: int, optional
+    max_steps: int
         Maximum number of steps for relaxation. Default is 200.
-    force_tol: float, optional
+    force_tol: float
         Force residual tolerance for relaxation. Default is 0.05.
-    stress_tol: float, optional
+    stress_tol: float
         Stress residual tolerance for relaxation. Default is 0.05.
-    hookean_repul: bool, optional
+    hookean_repul: bool
         If true, apply Hookean repulsion. Default is False.
-    hookean_paras: dict[tuple[int, int], tuple[float, float]], optional
+    hookean_paras: dict[tuple[int, int], tuple[float, float]] | None
         Parameters for Hookean repulsion as a dictionary of tuples. Default is None.
-    keep_symmetry: bool, optional
+    keep_symmetry: bool
         If true, preserve symmetry during relaxation. Default is False.
-    write_traj: bool, optional
+    write_traj: bool
         If true, write trajectory of RSS. Default is True.
-    num_processes_rss: int, optional
+    num_processes_rss: int
         Number of processes used for running RSS. Default is 1.
-    device_for_rss: str, optional
+    device_for_rss: str
         Specify device to use "cuda" or "cpu" for running RSS. Default is "cpu".
-    stop_criterion: float, optional
+    stop_criterion: float
         Convergence criterion for stopping RSS iterations. Default is 0.01.
-    max_iteration_number: int, optional
+    max_iteration_number: int
         Maximum number of RSS iterations to perform. Default is 5.
-    num_groups: int, optional
+    num_groups: int
         Number of structure groups, used for assigning tasks across multiple nodes. Default is 1.
-    initial_kt: float, optional
+    initial_kt: float
         Initial temperature (in eV) for Boltzmann sampling. Default is 0.3.
-    current_iter_index: int, optional
+    current_iter_index: int
         Index for the current RSS iteration. Default is 1.
     **fit_kwargs:
         Additional keyword arguments for the MLIP fitting process.
@@ -562,6 +571,7 @@ def do_rss_iterations(
         do_data_preprocessing = preprocess_data(
             test_ratio=test_ratio,
             regularization=regularization,
+            retain_existing_sigma=retain_existing_sigma,
             scheme=scheme,
             distillation=distillation,
             force_max=force_max,
@@ -629,6 +639,7 @@ def do_rss_iterations(
             rss_group=rss_group,
             test_ratio=test_ratio,
             regularization=regularization,
+            retain_existing_sigma=retain_existing_sigma,
             scheme=scheme,
             reg_minmax=reg_minmax,
             distillation=distillation,

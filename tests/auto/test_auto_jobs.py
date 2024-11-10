@@ -108,7 +108,7 @@ def test_complete_benchmark(clean_dir, test_dir, memory_jobstore):
         glue_xml=False,
         twob={"delta": 2.0, "cutoff": 4},
         threeb={"n_sparse": 10},
-        preprocessing_data=False,
+        apply_data_preprocessing=False,
         database_dir=database_dir,
         separated=True
     )
