@@ -141,11 +141,11 @@ def test_mace_finetuning_maker(test_dir, memory_jobstore, clean_dir):
         ref_energy_name=None,
         ref_force_name=None,
         ref_virial_name=None,
+        use_defaults=False,
     ).make(
         num_processes_fit=1,
-        preprocessing_data=False,
+        apply_data_preprocessing=False,
         database_dir=database_dir,
-        use_defaults=False,
         name="MACE_final",
         foundation_model="small",
         multiheads_finetuning=False,

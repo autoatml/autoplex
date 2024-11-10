@@ -654,7 +654,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_mace_finetuning(
         benchmark_structures=[structure],
         pre_xyz_files=["vasp_ref.extxyz"],
         pre_database_dir=test_dir / "fitting" / "ref_files",
-        preprocessing_data=True,
+        apply_data_preprocessing=True,
         use_defaults_fitting=False,
         model="MACE",
         name="MACE_final",
