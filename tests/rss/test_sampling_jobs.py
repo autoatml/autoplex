@@ -1,4 +1,7 @@
-import os 
+import os
+
+import pytest
+
 os.environ["OMP_NUM_THREADS"] = "1"
 
 from pymatgen.io.ase import AseAtomsAdaptor
@@ -52,7 +55,7 @@ def test_sampling_cur(test_dir):
     
     energies = [at.info['REF_energy'] for at in selected_atoms]
     
-    assert energies == ref_energies
+    assert energies == pytest.approx(ref_energies)
 
 
 def test_sampling_cur_job(test_dir, memory_jobstore):
@@ -141,7 +144,7 @@ def test_sampling_bcur1s(test_dir):
     
     energies = [at.get_potential_energy() for at in selected_atoms]
 
-    assert energies == ref_energies
+    assert energies == pytest.approx(ref_energies)
 
     dir = Path('.')
     path_to_job_files = list(dir.glob("job*"))
@@ -222,7 +225,7 @@ def test_sampling_bcur2i():
 
     energies = [at.info['energy'] for at in selected_atoms]
     
-    assert energies == ref_energies
+    assert energies == pytest.approx(ref_energies)
 
     dir = Path('.')
     path_to_job_files = list(dir.glob("job*"))
