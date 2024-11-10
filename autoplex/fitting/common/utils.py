@@ -1083,6 +1083,7 @@ def mace_fitting(
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",
+    use_defaults=True,
     fit_kwargs: dict | None = None,
 ) -> dict:
     """
@@ -1144,74 +1145,103 @@ def mace_fitting(
             atoms=atoms, ref_virial_name=ref_virial_name, out_file_name="train.extxyz"
         )
 
-    default_hyperparameters = load_mlip_hyperparameter_defaults(
-        mlip_fit_parameter_file_path=path_to_default_hyperparameters
-    )
+    if use_defaults:
+        default_hyperparameters = load_mlip_hyperparameter_defaults(
+            mlip_fit_parameter_file_path=path_to_default_hyperparameters
+        )
 
-    mace_hypers = default_hyperparameters["MACE"]
+        mace_hypers = default_hyperparameters["MACE"]
+    else:
+        mace_hypers = {}
 
-    if fit_kwargs:
-        for parameter in mace_hypers:
-            if parameter in fit_kwargs:
-                if isinstance(fit_kwargs[parameter], type(mace_hypers[parameter])):
-                    mace_hypers[parameter] = fit_kwargs[parameter]
-                else:
-                    raise TypeError(
-                        f"The type of {parameter} should be {type(mace_hypers[parameter])}!"
-                    )
+    # TODO: should we do a type check? not sure
+    #  as it will be a lot of work to keep it updated
+    mace_hypers.update(fit_kwargs)
 
-    model = mace_hypers["model"]
-    config_type_weights = mace_hypers["config_type_weights"]
-    hidden_irreps = mace_hypers["hidden_irreps"]
-    r_max = mace_hypers["r_max"]
-    batch_size = mace_hypers["batch_size"]
-    max_num_epochs = mace_hypers["max_num_epochs"]
-    start_swa = mace_hypers["start_swa"]
-    ema_decay = mace_hypers["ema_decay"]
-    correlation = mace_hypers["correlation"]
-    loss = mace_hypers["loss"]
-    default_dtype = mace_hypers["default_dtype"]
-
-    hypers = [
-        "--name=MACE_model",
-        f"--train_file={db_dir}/train.extxyz",
-        f"--valid_file={db_dir}/test.extxyz",
-        f"--config_type_weights={config_type_weights}",
-        f"--model={model}",
-        f"--hidden_irreps={hidden_irreps}",
-        f"--energy_key={ref_energy_name}",
-        f"--forces_key={ref_force_name}",
-        f"--r_max={r_max}",
-        f"--correlation={correlation}",
-        f"--batch_size={batch_size}",
-        f"--max_num_epochs={max_num_epochs}",
-        "--swa",
-        f"--start_swa={start_swa}",
-        "--ema",
-        f"--ema_decay={ema_decay}",
-        "--amsgrad",
-        f"--loss={loss}",
-        "--restart_latest",
-        "--seed=123",
-        f"--default_dtype={default_dtype}",
-        f"--device={device}",
+    boolean_hypers = [
+        "distributed",
+        "pair_repulsion",
+        "amsgrad",
+        "swa",
+        "stage_two",
+        "keep_checkpoint",
+        "save_all_checkpoints",
+        "restart_latest",
+        "save_cpu",
+        "wandb",
+        "compute_statistics",
+        "foundation_model_readout",
+        "ema",
     ]
+    boolean_str_hypers = [
+        "compute_avg_num_neighbors",
+        "compute_stress",
+        "compute_forces",
+        "multi_processed_test",
+        "pin_memory",
+        "foundation_filter_elements",
+        "multiheads_finetuning",
+        "keep_isolated_atoms",
+        "shuffle",
+    ]
+
+    hypers = []
+    for hyper in mace_hypers:
+        if hyper in boolean_hypers:
+            if mace_hypers[hyper] is True:
+                hypers.append(f"--{hyper}")
+        elif hyper in boolean_str_hypers:
+            hypers.append(f"--{hyper}={mace_hypers[hyper]}")
+        elif hyper in ["train_file", "test_file"]:
+            print("Train and test files have default names.")
+        elif hyper in ["energy_key", "virial_key", "forces_key", "device"]:
+            print("energy_key, virial_key and forces_key have default names.")
+        else:
+            hypers.append(f"--{hyper}={mace_hypers[hyper]}")
+
+    hypers.append(f"--train_file={db_dir}/train.extxyz")
+    hypers.append(f"--valid_file={db_dir}/test.extxyz")
+
+    if ref_energy_name is not None:
+        hypers.append(f"--energy_key={ref_energy_name}")
+    if ref_force_name is not None:
+        hypers.append(f"--forces_key={ref_force_name}")
+    if ref_virial_name is not None:
+        hypers.append(f"--virials_key={ref_virial_name}")
+    if device is not None:
+        hypers.append(f"--device={device}")
 
     run_mace(hypers)
 
-    with open("./logs/MACE_model_run-123.log") as file:
-        log_data = file.read()
-
+    try:
+        with open("./logs/MACE_model_run-123.log") as file:
+            log_data = file.read()
+    except FileNotFoundError:
+        # to cover finetuning
+        with open("./logs/MACE_final_run-3.log") as file:
+            log_data = file.read()
     tables = re.split(r"\+-+\+\n", log_data)
-    if tables:
-        last_table = tables[-2]
+    # if tables:
+    last_table = tables[-2]
+    try:
+        matches = re.findall(
+            r"\|\s*(train_default|valid_default)\s*\|\s*([\d\.]+)\s*\|", last_table
+        )
+
+        return {
+            "train_error": float(matches[0][1]),
+            "test_error": float(matches[1][1]),
+            "mlip_path": Path.cwd(),
+        }
+    except IndexError:
+        # to ensure backward compatibility to mace 0.3.4
         matches = re.findall(r"\|\s*(train|valid)\s*\|\s*([\d\.]+)\s*\|", last_table)
 
-    return {
-        "train_error": float(matches[0][1]),
-        "test_error": float(matches[1][1]),
-        "mlip_path": Path.cwd(),
-    }
+        return {
+            "train_error": float(matches[0][1]),
+            "test_error": float(matches[1][1]),
+            "mlip_path": Path.cwd(),
+        }
 
 
 def check_convergence(test_error: float) -> bool:

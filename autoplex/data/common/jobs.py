@@ -72,6 +72,7 @@ def convert_to_extxyz(job_output, pkl_file, config_type, factor):
     data[-1].write("tmp.xyz")
     file = read("tmp.xyz", index=":")
     for i in file:
+        # TODO: enable switching to stress
         virial_list = -voigt_6_to_full_3x3_stress(i.get_stress()) * i.get_volume()
         i.info["REF_virial"] = " ".join(map(str, virial_list.flatten()))
         del i.calc.results["stress"]
