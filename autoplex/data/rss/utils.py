@@ -403,21 +403,6 @@ def process_rss(
         gap_control = "Potential xml_label=" + extract_gap_label(gap_label)
         pot = CustomPotential(args_str=gap_control, param_filename=gap_label)
 
-    elif mlip_type == "J-ACE":
-        from ase.calculators.lammpslib import LAMMPSlib
-
-        ace_label = os.path.join(mlip_path, "acemodel.yace")
-        ace_json = os.path.join(mlip_path, "acemodel.json")
-        ace_table = os.path.join(mlip_path, "acemodel_pairpot.table")
-
-        atom_types, cmds = extract_pairstyle(ace_label, ace_json, ace_table)
-
-        pot = LAMMPSlib(
-            lmpcmds=cmds, atom_types=atom_types, log_file="test.log", keep_alive=True
-        )
-        # ace_label = os.path.join(mlip_path,'acemodel.json')
-        # pot = pyjulip.ACE1(ace_label)
-
     elif mlip_type == "NEQUIP":
         nequip_label = os.path.join(mlip_path, "deployed_nequip_model.pth")
         if isolated_atom_energies:

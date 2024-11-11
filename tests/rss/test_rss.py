@@ -99,52 +99,6 @@ def test_gap_rss_multi_jobs(test_dir, memory_jobstore, clean_dir):
     assert round(enthalpy_pseudo,3) == round(enthalpy_cal,3)
 
 
-# def test_jace_rss(test_dir, memory_jobstore):
-#     np.random.seed(42)
-#     test_files_dir = test_dir / "data/rss.extxyz"
-#     atoms = read(test_files_dir, index="0:1:1")
-#     structures = [AseAtomsAdaptor.get_structure(atom) for atom in atoms]
-#     mlip_path = test_dir / "fitting/JACE"
-
-#     job = do_rss_single_node(mlip_type='J-ACE',
-#                 iteration_index='0',
-#                 mlip_path=mlip_path,
-#                 structure=structures,
-#                 scalar_pressure_method='exp',
-#                 scalar_exp_pressure=100,
-#                 scalar_pressure_exponential_width=0.2,
-#                 scalar_pressure_low=0,
-#                 scalar_pressure_high=50,
-#                 max_steps=1000,
-#                 force_tol=0.01,
-#                 stress_tol=0.0001,
-#                 Hookean_repul=False,
-#                 write_traj=True,
-#                 num_processes_rss=4,
-#                 device="cpu",
-#                 isol_es={14: -0.84696938})
-    
-#     response = run_locally(
-#         job,
-#         create_folders=True,
-#         ensure_success=True,
-#         store=memory_jobstore
-#     )
-
-#     output = job.output.resolve(memory_jobstore)
-#     output_filter = []
-#     for i in output:
-#         if i is not None:
-#             output_filter.append(i)
-   
-#     assert len(output_filter) == 1
-
-#     dir = Path('.')
-#     path_to_job_files = list(dir.glob("job*"))
-#     for path in path_to_job_files:
-#         shutil.rmtree(path)
-
-
 def test_nequip_rss(test_dir, memory_jobstore, clean_dir):
     np.random.seed(42)
     test_files_dir = test_dir / "data/rss.extxyz"
