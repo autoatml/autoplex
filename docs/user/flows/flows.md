@@ -4,7 +4,7 @@
 
 # Before you start using `autoplex`
 
-We expect the general user of `autoplex` to be familiar with the Materials Project framework software tools and related 
+We expect the general user of `autoplex` to be familiar with the [Materials Project](https://github.com/materialsproject) framework software tools and related 
 packages for (high-throughput) workflow submission and management. 
 This involves the following software packages:
 - [pymatgen](https://github.com/materialsproject/pymatgen) for input and output handling of computational materials science software
