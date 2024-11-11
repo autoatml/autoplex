@@ -10,7 +10,7 @@ This involves the following software packages:
 - [pymatgen](https://github.com/materialsproject/pymatgen) for input and output handling of computational materials science software
 - [atomate2](https://github.com/materialsproject/atomate2) for providing a library of pre-defined computational materials science workflows
 - [jobflow](https://github.com/materialsproject/jobflow) for processes, job and workflow handling 
-- jobflow-remote or [FireWorks](https://github.com/materialsproject/fireworks) for workflow and database (MongoDB) management
+- [jobflow-remote](https://github.com/Matgenix/jobflow-remote) or [FireWorks](https://github.com/materialsproject/fireworks) for workflow and database (MongoDB) management
 - [MongoDB](https://www.mongodb.com/) as the database (we recommend installing the MongoDB community version)
 
 All of these software tools provide documentation and tutorials. Please take your time and check everything out!
