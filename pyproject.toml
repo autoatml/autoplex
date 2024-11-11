@@ -12,7 +12,7 @@ readme = "README.md"
 keywords = ["high-throughput", "automated", "mlpotential"]
 license = { text = "GPL-3.0 license" }
 authors = [{ name = "Janine George", email = "janine.george@bam.de" }]
-version = "0.2.9"
+version = "0.0.1"
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
