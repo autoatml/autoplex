@@ -73,5 +73,5 @@ A short guide to contributing to autoplex can be found [here](https://autoatml.g
 # Workflow overview
 
 We currently have two different types of workflows available.
-* Workflow to use random-structure searches for the systematic construction of interatomic potentials
-* Workflow to train accurate interatomic potentials for harmonic phonon properties
+* Workflow to use random-structure searches for the systematic construction of interatomic potentials ([[1]](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.120.156001), [[2]](https://www.nature.com/articles/s41524-019-0236-6))
+* Workflow to train accurate interatomic potentials for harmonic phonon properties ([[3]](https://pubs.aip.org/aip/jcp/article/153/4/044104/1056348/Combining-phonon-accuracy-with-high))
