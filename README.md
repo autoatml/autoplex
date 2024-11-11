@@ -37,6 +37,7 @@ Set a number that is a divisor of the number of tasks you use for the VASP calcu
 # Installation
 
 ### Python version
+
 Before the installation, please make sure that you are using one of the supported Python versions (see [pyproject.toml](https://github.com/autoatml/autoplex/blob/main/pyproject.toml))
 
 ### Standard installation
