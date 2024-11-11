@@ -50,6 +50,8 @@ class MLIPFitMaker(Maker):
         Reference virial name.
     glue_file_path: str
         Name of the glue.xml file path.
+    use_defaults: bool
+        if true, uses default fit parameters
     """
 
     name: str = "MLpotentialFit"
@@ -59,6 +61,7 @@ class MLIPFitMaker(Maker):
     ref_force_name: str = "REF_forces"
     ref_virial_name: str = "REF_virial"
     glue_file_path: str = "glue.xml"
+    use_defaults: bool = True
 
     # TO DO: Combine parameters used only for gap into one category (as noted below),
     # otherwise it will be too specific.
@@ -172,6 +175,7 @@ class MLIPFitMaker(Maker):
                 ref_energy_name=self.ref_energy_name,
                 ref_force_name=self.ref_force_name,
                 ref_virial_name=self.ref_virial_name,
+                use_defaults=self.use_defaults,
                 device=device,
                 species_list=species_list,
                 **fit_kwargs,

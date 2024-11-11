@@ -1,0 +1,21 @@
+name: Clean git container registry
+
+on:
+  workflow_dispatch:
+  release:
+    types: [ created ] # Runs only when a new release is created
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+    steps:
+      - name: ghcr.io cleanup action
+        uses: dataaxiom/ghcr-cleanup-action@v1
+        with:
+          packages: autoplex/autoplex-python-3.12,autoplex/autoplex-python-3.11,autoplex/autoplex-python-3.10
+          token: ${{ secrets.GITHUB_TOKEN }}

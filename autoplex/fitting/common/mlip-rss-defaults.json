@@ -39,6 +39,7 @@
   },
   "MACE": {
     "model": "MACE",
+    "name": "MACE_model",
     "config_type_weights": "{'Default':1.0}",
     "hidden_irreps": "128x0e + 128x1o",
     "r_max": 5.0,
@@ -48,6 +49,12 @@
     "ema_decay": 0.99,
     "correlation": 3,
     "loss": "huber",
-    "default_dtype": "float32"
+    "default_dtype": "float32",
+    "swa": true,
+    "ema": true,
+    "amsgrad": true,
+    "restart_latest": true,
+    "seed": 123,
+    "device": "cpu"
   }
 }

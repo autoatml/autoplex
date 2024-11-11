@@ -135,8 +135,12 @@ def complete_benchmark(  # this function was put here to prevent circular import
         elif ml_model in ["NEQUIP"]:
             ml_potential = Path(ml_path) / f"deployed_nequip_model{suffix}.pth"
         else:  # MACE
-            ml_potential = Path(ml_path) / f"MACE_model{suffix}.model"
-
+            # treat finetuned potentials
+            ml_potential_fine = Path(ml_path) / f"MACE_final{suffix}.model"
+            if ml_potential_fine.exists():
+                ml_potential = ml_potential_fine
+            else:
+                ml_potential = Path(ml_path) / f"MACE_model{suffix}.model"
         if Path(ml_potential).exists():
             add_data_ml_phonon = MLPhononMaker(
                 relax_maker_kwargs=relax_maker_kwargs,

@@ -32,6 +32,7 @@ def machine_learning_fit(
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",
+    use_defaults: bool = True,
     device: str = "cuda",
     hyper_param_optimization: bool = False,
     **fit_kwargs,
@@ -64,6 +65,8 @@ def machine_learning_fit(
         Reference force name.
     ref_virial_name : str, optional
         Reference virial name.
+    use_defaults: bool
+        If True, use default fitting parameters
     device: str
         specify device to use cuda or cpu.
     hyper_param_optimization: bool
@@ -145,8 +148,9 @@ def machine_learning_fit(
             ref_energy_name=ref_energy_name,
             ref_force_name=ref_force_name,
             ref_virial_name=ref_virial_name,
-            fit_kwargs=fit_kwargs,
+            use_defaults=use_defaults,
             device=device,
+            fit_kwargs=fit_kwargs,
         )
 
     check_conv = check_convergence(train_test_error["test_error"])

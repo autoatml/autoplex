@@ -19,6 +19,7 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     bash \
     bc \
+    ffmpeg \
     unzip \
     wget \
     gfortran \
@@ -58,6 +59,21 @@ RUN curl -fsSL https://www.mtg.msm.cam.ac.uk/files/airss-0.9.3.tgz -o /opt/airss
 
 # Add Buildcell to PATH
 ENV PATH="${PATH}:/opt/airss/bin"
+
+# Install LAMMPS (rss)
+RUN curl -fsSL https://download.lammps.org/tars/lammps.tar.gz -o /opt/lammps.tar.gz \
+    && tar -xf /opt/lammps.tar.gz -C /opt \
+    && rm /opt/lammps.tar.gz \
+    && cd /opt/lammps-* \
+    && mkdir build \
+    && cd build \
+    && cmake -D PKG_ML-PACE=yes -D PKG_PYTHON=on -D BUILD_LIB=on -D BUILD_SHARED_LIBS=on ../cmake \
+    && cmake --build . \
+    && make -j 4 install \
+    && make install-python
+
+# Add LAMMPS to PATH
+ENV PATH="${PATH}:/root/.local/bin"
 
 # Set the working directory
 WORKDIR /workspace
