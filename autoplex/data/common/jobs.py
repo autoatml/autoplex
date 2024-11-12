@@ -587,7 +587,6 @@ def collect_dft_data(
     if dirs is None:
         raise ValueError("dft_dir must be specified if collect_vasp is True")
 
-    failed_count = 0
     atoms = []
     isolated_atom_energies = {}
 
