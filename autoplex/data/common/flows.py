@@ -14,7 +14,6 @@ import traceback
 from atomate2.forcefields.jobs import (
     ForceFieldRelaxMaker,
     ForceFieldStaticMaker,
-    GAPRelaxMaker,
 )
 from atomate2.vasp.jobs.core import StaticMaker
 from atomate2.vasp.powerups import (
@@ -137,11 +136,12 @@ class GenerateTrainingDataForTesting(Maker):
             cell_factor_sequence = [0.975, 1.0, 1.025, 1.05]
         for structure in train_structure_list:
             if self.bulk_relax_maker is None:
-                self.bulk_relax_maker = GAPRelaxMaker(
+                self.bulk_relax_maker = ForceFieldRelaxMaker(
                     calculator_kwargs={
                         "args_str": "IP GAP",
                         "param_filename": str(potential_filename),
                     },
+                    force_field_name="GAP",
                     relax_cell=relax_cell,
                     steps=steps,
                 )
@@ -217,11 +217,12 @@ class GenerateTrainingDataForTesting(Maker):
                     + ".pkl",
                 }
             if self.static_energy_maker is None:
-                self.static_energy_maker = GAPRelaxMaker(
+                self.static_energy_maker = ForceFieldRelaxMaker(
                     calculator_kwargs={
                         "args_str": "IP GAP",
                         "param_filename": str(potential_filename),
                     },
+                    force_field_name="GAP",
                     relax_cell=False,
                     relax_kwargs=relax_kwargs,
                     steps=1,
