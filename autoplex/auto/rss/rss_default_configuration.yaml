@@ -111,21 +111,22 @@ ref_virial_name: 'REF_virial'
 auto_delta: true
 num_processes_fit: 32
 device_for_fitting: 'cpu'
-fit_kwargs:
-  twob:
-    cutoff: 5.0
-    n_sparse: 15
-    theta_uniform: 1.0
-  threeb:
-    cutoff: 3.0
-  soap:
-    l_max: 10
-    n_max: 10
-    atom_sigma: 0.5
-    n_sparse: 2500
-    cutoff: 5.0
-  general:
-    three_body: false
+##The following hyperparameters are only applicable to GAP.
+##If you want to use other models, please replace the corresponding hyperparameters.
+twob:
+  cutoff: 5.0
+  n_sparse: 15
+  theta_uniform: 1.0
+threeb:
+  cutoff: 3.0
+soap:
+  l_max: 10
+  n_max: 10
+  atom_sigma: 0.5
+  n_sparse: 2500
+  cutoff: 5.0
+general:
+  three_body: false
 
 # RSS Exploration Parameters
 scalar_pressure_method: 'uniform'
