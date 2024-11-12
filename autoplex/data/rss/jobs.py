@@ -18,8 +18,8 @@ import numpy as np
 from ase import Atoms
 from ase.data import atomic_numbers, covalent_radii
 from jobflow import Flow, Maker, Response, job
-from pymatgen.io.ase import AseAtomsAdaptor
 from pymatgen.core import Element
+from pymatgen.io.ase import AseAtomsAdaptor
 
 from autoplex.data.common.utils import flatten
 from autoplex.data.rss.utils import minimize_structures, split_structure_into_groups
@@ -123,7 +123,7 @@ class RandomizedStructure(Maker):
 
                 for ele in elements:
                     r0[ele] = covalent_radii[atomic_numbers[ele]]
-                    
+
                     if Element(ele).is_metal:
                         varvol[ele] = 5.5 * np.power(r0[ele], 3)
                     else:
@@ -281,7 +281,6 @@ class RandomizedStructure(Maker):
 
         with open(bc_file, "w") as f:
             f.writelines(contents)
-
 
     def _extract_elements(self, input_str: str) -> dict[str, int]:
         """

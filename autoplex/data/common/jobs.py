@@ -26,7 +26,6 @@ from phonopy.structure.cells import get_supercell
 from pymatgen.core.structure import Structure
 from pymatgen.io.ase import AseAtomsAdaptor
 from pymatgen.io.phonopy import get_phonopy_structure, get_pmg_structure
-from pymatgen.io.vasp.outputs import Vasprun
 
 from autoplex.data.common.utils import (
     ElementCollection,
@@ -597,12 +596,9 @@ def collect_dft_data(
             at = read(os.path.join(val, "vasprun.xml.gz"), index=":")
             for at_i in at:
                 virial_list = (
-                    -voigt_6_to_full_3x3_stress(at_i.get_stress())
-                    * at_i.get_volume()
+                    -voigt_6_to_full_3x3_stress(at_i.get_stress()) * at_i.get_volume()
                 )
-                at_i.info["REF_virial"] = " ".join(
-                    map(str, virial_list.flatten())
-                )
+                at_i.info["REF_virial"] = " ".join(map(str, virial_list.flatten()))
                 del at_i.calc.results["stress"]
                 at_i.arrays["REF_forces"] = at_i.calc.results["forces"]
                 del at_i.calc.results["forces"]
@@ -623,10 +619,7 @@ def collect_dft_data(
                 if at_i.info["config_type"] == "IsolatedAtom":
                     at_ids = at_i.get_atomic_numbers()
                     # array_key = at_ids.tostring()
-                    isolated_atom_energies[int(at_ids[0])] = at_i.info[
-                        "REF_energy"
-                    ]
-
+                    isolated_atom_energies[int(at_ids[0])] = at_i.info["REF_energy"]
 
     logging.info(f"Total {len(atoms)} structures from VASP are exactly collected.")
 

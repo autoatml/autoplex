@@ -1,5 +1,5 @@
 # General Parameters
-tag: 
+tag:
 train_from_scratch: true
 resume_from_previous_state:
   test_error:
