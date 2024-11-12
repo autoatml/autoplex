@@ -1007,7 +1007,8 @@ def cur_select(
     This function calculates the descriptor vector for each atom,
     then performs CUR selection on the resulting vectors.
 
-    Adapted from:
+    References
+    ----------
     *    Title: Research data supporting "De novo exploration and self-guided learning of potential-energy surfaces"
     *    Script: select_by_descriptor.py
     *    Author: Noam Bernstein, Gábor Csányi and Volker L. Deringer

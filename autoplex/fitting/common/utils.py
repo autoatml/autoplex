@@ -770,7 +770,8 @@ def m3gnet_fitting(
         A dictionary containing keys such as 'train_error', 'test_error', and 'path_to_fitted_model',
         representing the training error, test error, and the location of the saved model, respectively.
 
-    Adapted from:
+    References
+    ----------
     *    Title: Tutorials of Materials Graph Library (MatGL)
     *    Author: Tsz Wai Ko, Chi Chen and Shyue Ping Ong
     *    Version: 1.1.3
