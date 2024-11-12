@@ -24,6 +24,7 @@ By the end of these tutorials, you should be able to:
 :maxdepth: 2
 
 flows/flows
+rss/rss
 generation/data
 fitting/fitting
 benchmark/benchmark
