@@ -121,7 +121,7 @@ jobs:
         uses: mamba-org/setup-micromamba@main
       - name: Create mamba environment
         run: |
-            micromamba create -n autoplex_docs python=3.10 --yes
+            micromamba create -n autoplex_docs python=3.10 --yes --prerelease=allow
       - name: Install uv
         run: micromamba run -n autoplex_docs pip install uv
       - name: Install autoplex and dependencies
