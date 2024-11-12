@@ -1,5 +1,5 @@
 # Changelog
-## v0.2.9
+## v0.0.2
 ### What's Changed
 * First public release of autoplex
 * Added RSS workflow
