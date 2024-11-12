@@ -16,7 +16,7 @@ jobs:
     steps:
     # Checkout the repository
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     # Set up Python
     - name: Set up Python
@@ -44,47 +44,11 @@ jobs:
 
         echo "Updated devcontainer.json with version $VERSION"
 
-    # Check if there are changes in devcontainer.json
-    - name: Check for changes
-      run: |
-        if git diff --exit-code .devcontainer/devcontainer.json; then
-          echo "No changes to commit."
-          echo "commit_needed=false" >> $GITHUB_ENV
-        else
-          echo "Changes detected."
-          echo "commit_needed=true" >> $GITHUB_ENV
-        fi
-
-    # Commit and push the changes to a new branch
-    - name: Commit and push changes
-      if: env.commit_needed == 'true'
-      run: |
-        git config --global user.name "github-actions"
-        git config --global user.email "github-actions@github.com"
-
-        # Try to checkout the `update-devcontainer` branch, create if it doesn't exist
-        if git rev-parse --verify origin/update-devcontainer; then
-          git checkout update-devcontainer
-          git pull origin update-devcontainer
-        else
-          git checkout -b update-devcontainer
-        fi
-
-        git add .devcontainer/devcontainer.json
-        git commit -m "Update devcontainer.json with new version tag $VERSION"
-        git push origin $BRANCH_NAME
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    # Create a pull request
     - name: Create Pull Request
-      if: env.commit_needed == 'true'
-      uses: peter-evans/create-pull-request@v5
+      uses: peter-evans/create-pull-request@v7
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        commit-message: "Update devcontainer.json with new version tag $VERSION"
+        commit-message: update changelog
+        title: Update devcontainer.json version tag
+        body: Update devcontainer.json version tag to reflect release changes
         branch: update-devcontainer
         base: main
-        title: "Update devcontainer.json with new version tag $VERSION"
-        body: |
-          This PR updates the devcontainer.json file with the new version tag $VERSION.
