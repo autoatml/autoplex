@@ -19,6 +19,7 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     bash \
     bc \
+    ffmpeg \
     unzip \
     wget \
     gfortran \
@@ -35,8 +36,8 @@ RUN micromamba install -y -n base -c conda-forge \ python=${PYTHON_VERSION} && \
     micromamba clean --all --yes
 
 # Install testing dependencies
-RUN python -m pip install --upgrade pip \
-    && pip install uv \
+RUN python -m pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir uv \
     && uv pip install pre-commit pytest pytest-mock pytest-split pytest-cov types-setuptools
 
 # Install Julia
@@ -59,6 +60,23 @@ RUN curl -fsSL https://www.mtg.msm.cam.ac.uk/files/airss-0.9.3.tgz -o /opt/airss
 # Add Buildcell to PATH
 ENV PATH="${PATH}:/opt/airss/bin"
 
+# Install LAMMPS (rss)
+RUN curl -fsSL https://download.lammps.org/tars/lammps.tar.gz -o /opt/lammps.tar.gz \
+     && tar -xf /opt/lammps.tar.gz -C /opt \
+     && rm /opt/lammps.tar.gz \
+     && cd /opt/lammps-* \
+     && mkdir build \
+     && cd build \
+     && curl -fsSL https://github.com/wcwitt/lammps-user-pace/archive/main.tar.gz -o libpace.tar.gz \
+     && cmake -D PKG_PYTHON=on -D BUILD_SHARED_LIBS=on -DMLIAP_ENABLE_PYTHON=yes -D PKG_KOKKOS=yes -D Kokkos_ARCH_ZEN3=yes -D PKG_PHONON=yes -D PKG_MOLECULE=yes -D PKG_MANYBODY=yes -D Kokkos_ENABLE_OPENMP=yes -D BUILD_OMP=yes -D LAMMPS_EXCEPTIONS=yes -D PKG_ML-PACE=yes -D PACELIB_MD5=$(md5sum libpace.tar.gz | awk '{print $1}') -D CMAKE_EXE_LINKER_FLAGS:STRING="-lgfortran" ../cmake \
+     && cmake --build . \
+     && make -j 4 install \
+     && make install-python \
+     && cmake --build . --target clean
+
+# Add LAMMPS to PATH
+ENV PATH="${PATH}:/root/.local/bin"
+
 # Set the working directory
 WORKDIR /workspace
 
@@ -66,5 +84,4 @@ WORKDIR /workspace
 COPY . /workspace
 
 # Install autoplex and clear cache
-RUN uv pip install .[strict,docs]
-RUN uv cache clean
+RUN uv pip install .[strict,docs] && uv cache clean && rm -rf /tmp/*

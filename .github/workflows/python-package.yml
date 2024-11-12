@@ -1,4 +1,4 @@
-# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# This workflow will install Python dependencies, run tests and lint with Python 3.10 and 3.11
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
 name: Testing Linux
@@ -9,6 +9,9 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+
+permissions:
+  contents: write  # Allow the workflow to push changes to the repository
 
 jobs:
   build:
@@ -38,8 +41,17 @@ jobs:
           python -m pip install --upgrade pip && \
           python -m uv cache clean
           python -m uv pip install .[strict,tests] && \
-          OMP_NUM_THREADS=1 pytest --cache-clear --cov=autoplex --cov-report term-missing --cov-append --splits 5 --group ${{ matrix.split }} -vv --durations-path /workspace/tests/test_data/.pytest-split-durations
+          OMP_NUM_THREADS=1 pytest --cache-clear --cov=autoplex --cov-report term-missing --cov-append --splits 5 --group ${{ matrix.split }} -vv --durations-path /workspace/tests/test_data/.pytest-split-durations --store-durations 
         "
+        
+    - name: Upload test durations artifact
+      if: matrix.python-version == '3.10' && github.repository_owner == github.actor
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-durations-${{ matrix.python-version }}-${{ matrix.split }}
+        include-hidden-files: true
+        path: ./tests/test_data/.pytest-split-durations
+
     - name: Upload coverage
       uses: actions/upload-artifact@v3
       with:
@@ -47,6 +59,33 @@ jobs:
         include-hidden-files: true
         overwrite: false
         path: ./.coverage
+
+  commit-durations:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.repository_owner == github.actor
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Download test duration artifacts
+      uses: actions/download-artifact@v3
+
+    - name: Compute average of test durations
+      run: |
+        # Clear out any existing content in the consolidated file
+        > tests/test_data/.pytest-split-durations
+        # Run the Python script to average out test durations
+        python3 .github/scripts/average_test_durations.py
+
+    - name: Commit and push consolidated test durations
+      run: |
+        git config --global user.name "github-actions"
+        git config --global user.email "github-actions@github.com"
+        git add ./tests/test_data/.pytest-split-durations
+        git commit -m "Add averaged test durations"
+        git push origin ${{ github.ref_name }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   coverage:
       needs: build

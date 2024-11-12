@@ -1,8 +1,21 @@
 (flows)=
 
-*Tutorials written by Christina Ertural ([christina.ertural@bam.de](mailto:christina.ertural@bam.de)).*
+*Tutorials written by Christina Ertural ([christina.ertural@bam.de](mailto:christina.ertural@bam.de)) and Janine George ([janine.george@bam.de](mailto:christina.ertural@bam.de)).*
 
-# Out of the box workflow
+# Before you start using `autoplex`
+
+We expect the general user of `autoplex` to be familiar with the [Materials Project](https://github.com/materialsproject) framework software tools and related 
+packages for (high-throughput) workflow submission and management. 
+This involves the following software packages:
+- [pymatgen](https://github.com/materialsproject/pymatgen) for input and output handling of computational materials science software
+- [atomate2](https://github.com/materialsproject/atomate2) for providing a library of pre-defined computational materials science workflows
+- [jobflow](https://github.com/materialsproject/jobflow) for processes, job and workflow handling 
+- [jobflow-remote](https://github.com/Matgenix/jobflow-remote) or [FireWorks](https://github.com/materialsproject/fireworks) for workflow and database (MongoDB) management
+- [MongoDB](https://www.mongodb.com/) as the database (we recommend installing the MongoDB community version)
+
+All of these software tools provide documentation and tutorials. Please take your time and check everything out!
+
+# Out-of-the-box workflow
 
 This tutorial will demonstrate how to use `autoplex` with its default setup and settings.
 
@@ -125,44 +138,38 @@ you can combine the `autoplex` flow with other flows and jobs.
 The following workflow diagram will give you an overview of the flows and jobs in the default autoplex workflow:
 ```{mermaid}
 flowchart TD
-    f831581e-1d20-4fa8-aa7d-773ae45a78aa(external) -->|output| 25f1b412-6e80-4ea0-a669-126b1d2eefdc(data_preprocessing_for_fitting)
-    f831581e-1d20-4fa8-aa7d-773ae45a78aa(external) -->|output| 75cee155-2708-4dcf-b8b3-d184d450ed4f(complete_benchmark)
-    e99258a7-6717-4cc9-b629-709bee881cfa(external) -->|'dirs', 'data'| 25f1b412-6e80-4ea0-a669-126b1d2eefdc(data_preprocessing_for_fitting)
-    e99258a7-6717-4cc9-b629-709bee881cfa(external) -->|'dirs', 'data'| 75cee155-2708-4dcf-b8b3-d184d450ed4f(complete_benchmark)
-    38349844-bee1-4869-839f-74ccd753524e(external) -->|'dirs'| 25f1b412-6e80-4ea0-a669-126b1d2eefdc(data_preprocessing_for_fitting)
-    38349844-bee1-4869-839f-74ccd753524e(external) -->|'energies', 'species'| 0a11a48c-3d9b-454a-9959-f7732967b49f(machine_learning_fit)
-    38349844-bee1-4869-839f-74ccd753524e(external) -->|'dirs'| 75cee155-2708-4dcf-b8b3-d184d450ed4f(complete_benchmark)
-    25f1b412-6e80-4ea0-a669-126b1d2eefdc(data_preprocessing_for_fitting) -->|output| 0a11a48c-3d9b-454a-9959-f7732967b49f(machine_learning_fit)
-    0a11a48c-3d9b-454a-9959-f7732967b49f(machine_learning_fit) -->|'mlip_path'| 75cee155-2708-4dcf-b8b3-d184d450ed4f(complete_benchmark)
-    75cee155-2708-4dcf-b8b3-d184d450ed4f(complete_benchmark) -->|output| d5b02fd6-806d-43f4-9f3f-d9de5f0f28e3(write_benchmark_metrics)
-    subgraph 2bc86ca5-f4bd-47dc-aa9d-45f72d0ab527 [add_data]
-        subgraph 821b6198-a8c5-45c5-939f-8ff0edd9f5b0 [add_data]
-            f831581e-1d20-4fa8-aa7d-773ae45a78aa(dft_random_gen_data)
-        end
-        subgraph 75368ebe-fe58-48a9-aeba-6e81ca9169d6 [add_data]
-            e99258a7-6717-4cc9-b629-709bee881cfa(dft_phonopy_gen_data)
-        end
-        38349844-bee1-4869-839f-74ccd753524e(get_iso_atom)
-        subgraph cdcce0a3-83fe-4590-993c-0b6e3ff5adcb [MLpotentialFit]
-            25f1b412-6e80-4ea0-a669-126b1d2eefdc(data_preprocessing_for_fitting)
-            0a11a48c-3d9b-454a-9959-f7732967b49f(machine_learning_fit)
-        end
-        75cee155-2708-4dcf-b8b3-d184d450ed4f(complete_benchmark)
-        d5b02fd6-806d-43f4-9f3f-d9de5f0f28e3(write_benchmark_metrics)
+    becfe032-c5ca-4398-9691-0f16baacb237(external) -->|'rand_struc_dir'| 42331e94-129c-45ef-9116-770369f6eab1(data_preprocessing_for_fitting)
+    becfe032-c5ca-4398-9691-0f16baacb237(external) -->|'rand_struc_dir'| 56cb031a-0cd7-4aa5-b857-c2c4d17e86c4(complete_benchmark_mp-22905)
+    a0286b49-988f-4628-8da6-270caade44bc(external) -->|'phonon_dir', 'phonon_data'| 42331e94-129c-45ef-9116-770369f6eab1(data_preprocessing_for_fitting)
+    a0286b49-988f-4628-8da6-270caade44bc(external) -->|'phonon_dir', 'phonon_data'| 56cb031a-0cd7-4aa5-b857-c2c4d17e86c4(complete_benchmark_mp-22905)
+    3b147b9e-05ff-4823-9dbc-7f8855fa99b5(external) -->|'dirs'| 42331e94-129c-45ef-9116-770369f6eab1(data_preprocessing_for_fitting)
+    3b147b9e-05ff-4823-9dbc-7f8855fa99b5(external) -->|'species', 'energies'| e0655654-19da-4c19-9e4e-d2a4014084db(machine_learning_fit)
+    3b147b9e-05ff-4823-9dbc-7f8855fa99b5(external) -->|'dirs'| 56cb031a-0cd7-4aa5-b857-c2c4d17e86c4(complete_benchmark_mp-22905)
+    42331e94-129c-45ef-9116-770369f6eab1(data_preprocessing_for_fitting) -->|output| e0655654-19da-4c19-9e4e-d2a4014084db(machine_learning_fit)
+    e0655654-19da-4c19-9e4e-d2a4014084db(machine_learning_fit) -->|'mlip_path'| 56cb031a-0cd7-4aa5-b857-c2c4d17e86c4(complete_benchmark_mp-22905)
+    56cb031a-0cd7-4aa5-b857-c2c4d17e86c4(complete_benchmark_mp-22905) -->|output| 56e6d111-8da3-4ae6-a69c-33632121a3d7(write_benchmark_metrics)
+    becfe032-c5ca-4398-9691-0f16baacb237(rattled supercells_mp-22905)
+    a0286b49-988f-4628-8da6-270caade44bc(single-atom displaced supercells_mp-22905)
+    3b147b9e-05ff-4823-9dbc-7f8855fa99b5(get_iso_atom)
+    subgraph 5f9b5d90-8fe0-418b-a90a-6c39371b8e04 [MLpotentialFit]
+        42331e94-129c-45ef-9116-770369f6eab1(data_preprocessing_for_fitting)
+        e0655654-19da-4c19-9e4e-d2a4014084db(machine_learning_fit)
     end
+    56cb031a-0cd7-4aa5-b857-c2c4d17e86c4(complete_benchmark_mp-22905)
+    56e6d111-8da3-4ae6-a69c-33632121a3d7(write_benchmark_metrics)
 ```
 The workflow starts with three flows that are supposed to generate data for our database: 
 * The first flow is preparing the VASP calculation for the isolated atoms (`get_iso_atom`). 
-* A second flow is preparing the `phonopy` calculations to collect the VASP data from the single-atom displaced supercells (`dft_phonopy_gen_data`). 
-* The third flow is constructing randomized supercells by rattling the atoms, i.e. displacing all atoms' positions (in the default setup), preparing the VASP calculations and collecting the data for the MLIP fit (`dft_random_gen_data`).
+* A second flow is preparing the `phonopy` calculations to collect the VASP data from the single-atom displaced supercells (`single-atom displaced supercells_mp-22905`). 
+* The third flow is constructing rattled supercells by rattling the atoms, i.e. displacing all atoms' positions (in the default setup), preparing the VASP calculations and collecting the data for the MLIP fit (`rattled supercells_mp-22905`).
 
 After a few data preprocessing steps (`data_preprocessing_for_fitting`) to filter out data with too strong force values, 
 the MLIP fit (`machine_learning_fit`) is run and the resulting potential is used for the benchmark against DFT data 
-(`complete_benchmark`).
+(`complete_benchmark_mp-22905`).
 
 Finally, the result metrics are collected in form of output plots and files (`write_benchmark_metrics`). 
 The lines connecting two flows or jobs are showing what type of data is passed on to the next step, like "data", "dirs" or "output". 
-"Output" is a generic name for the several job outputs, e.g. the output of `dft_random_gen_data` contains where 
+"Output" is a generic name for the several job outputs, e.g. the output of `rattled supercells_mp-22905` contains where 
 `data_preprocessing_for_fitting` can find the files it needs for the MLIP fit. 
 "Data" contains the [phonon calculation task documents](https://materialsproject.github.io/atomate2/reference/atomate2.common.schemas.phonons.PhononBSDOSDoc.html#atomate2.common.schemas.phonons.PhononBSDOSDoc) and "dirs" contains the path to the directory where the jobs 
 were executed.

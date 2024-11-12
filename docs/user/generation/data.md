@@ -178,3 +178,41 @@ complete_flow = CompleteDFTvsMLBenchmarkWorkflow(
     rattled_bulk_relax_maker=rattled_bulk_relax_maker,
     isolated_atom_maker=static_isolated_atom_maker,).make(...)
 ```
+
+Note, that for consistency of job handling, `autoplex` internally will override the jobs names to the `autoplex` defaults:
+```
+INFO Started executing jobs locally
+INFO Starting job - rattled supercells_mp-22905 
+INFO Finished job - rattled supercells_mp-22905 
+INFO Starting job - tight relax_mp-22905 
+INFO Finished job - tight relax_mp-22905 
+INFO Starting job - reduce_supercell_size_job_mp-22905 
+INFO Finished job - reduce_supercell_size_job_mp-22905 
+INFO Starting job - generate_randomized_structures_mp-22905 
+INFO Finished job - generate_randomized_structures_mp-22905 
+INFO Starting job - run_phonon_displacements_mp-22905 
+INFO Finished job - run_phonon_displacements_mp-22905 
+INFO Starting job - dft rattle static 1/12_mp-22905 
+INFO Finished job - dft rattle static 1/12_mp-22905
+INFO Starting job - dft rattle static 2/12_mp-22905 
+INFO Finished job - dft rattle static 2/12_mp-22905 
+...
+INFO Starting job - single-atom displaced supercells_mp-22905 
+INFO Finished job - single-atom displaced supercells_mp-22905 
+INFO Starting job - tight relax_mp-22905
+INFO Finished job - tight relax_mp-22905 
+INFO Starting job - static_mp-22905 
+INFO Finished job - static_mp-22905 
+INFO Starting job - generate_phonon_displacements_mp-22905 
+INFO Finished job - generate_phonon_displacements_mp-22905 
+INFO Starting job - run_phonon_displacements_mp-22905 
+INFO Finished job - run_phonon_displacements_mp-22905 
+INFO Starting job - dft phonon static 1/2_mp-22905 
+INFO Finished job - dft phonon static 1/2_mp-22905 
+INFO Starting job - dft phonon static 2/2_mp-22905 
+INFO Finished job - dft phonon static 2/2_mp-22905
+...
+INFO Starting job - write_benchmark_metrics
+INFO Finished job - write_benchmark_metrics
+INFO Finished executing jobs locally
+```
