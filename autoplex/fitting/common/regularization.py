@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from ase import Atoms
 
 
-def set_sigma(
+def set_custom_sigma(
     atoms: list[Atoms],
     reg_minmax: list[tuple],
     isolated_atom_energies: dict | None = None,

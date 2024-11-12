@@ -501,13 +501,7 @@ def process_rss(
         def build_traj():
             atom_copy = atom.copy()
             atom_copy.info["energy"] = atom.atoms.get_potential_energy()
-            # atom_copy.info["energy"] = atom.info["energy"].copy() # Applicable to gap_fit, not others
             atom_copy.info["enthalpy"] = atom.get_potential_energy().copy()
-            # Note that the UnitCellFilter returns enthalpy using scalar_pressure_tmp!!
-            # virial = atom.info["virial"].copy()
-            # volume = atom.atoms.get_volume().copy()
-            # stress = voigt_6_to_full_3x3_stress(atom.atoms.info["stress"])
-            # atom_copy.info["RSS_applied_pressure"] = -stress.trace() / 3.0 / GPa  # unit: GPa
             traj.append(atom_copy)
 
         optimizer.attach(build_traj)

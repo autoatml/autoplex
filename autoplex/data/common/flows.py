@@ -411,7 +411,6 @@ class DFTStaticLabelling(Maker):
                     static_job = st_m.make(structure=isolated_atom_struct)
                     static_job.name = f"static_isolated_{idx}"
                     static_job = update_user_incar_settings(
-                        # static_job, {"KSPACING": 100.0, "ALGO": "All", "KPAR": 1, "NBANDS": 20}
                         static_job,
                         {"KSPACING": 100.0, "ALGO": "All", "KPAR": 1},
                     )
@@ -462,7 +461,6 @@ class DFTStaticLabelling(Maker):
                         static_job = st_m.make(structure=dimer_struct)
                         static_job.name = f"static_dimer_{dimer_i}"
                         static_job = update_user_incar_settings(
-                            # static_job, {"KSPACING": 100.0, "ALGO": "All", "KPAR": 1, "NBANDS": 20}
                             static_job,
                             {"KSPACING": 100.0, "ALGO": "All", "KPAR": 1},
                         )

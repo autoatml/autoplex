@@ -11,7 +11,7 @@ import ase.io
 from jobflow import Flow, Maker, job
 
 from autoplex.fitting.common.jobs import machine_learning_fit
-from autoplex.fitting.common.regularization import set_sigma
+from autoplex.fitting.common.regularization import set_custom_sigma
 from autoplex.fitting.common.utils import (
     get_list_of_vasp_calc_dirs,
     vaspoutput_2_extended_xyz,
@@ -38,7 +38,7 @@ class MLIPFitMaker(Maker):
         Name of the flows produced by this maker.
     mlip_type: str
         Choose one specific MLIP type to be fitted:
-        'GAP' | 'J-ACE' | 'P-ACE' | 'NEQUIP' | 'M3GNET' | 'MACE'
+        'GAP' | 'J-ACE' | 'NEQUIP' | 'M3GNET' | 'MACE'
     hyperpara_opt: bool
         Perform hyperparameter optimization using XPOT
         (XPOT: https://pubs.aip.org/aip/jcp/article/159/2/024803/2901815)
@@ -135,10 +135,10 @@ class MLIPFitMaker(Maker):
         fit_kwargs: dict
             Additional keyword arguments for MLIP fitting.
         """
-        if self.mlip_type not in ["GAP", "J-ACE", "P-ACE", "NEQUIP", "M3GNET", "MACE"]:
+        if self.mlip_type not in ["GAP", "J-ACE", "NEQUIP", "M3GNET", "MACE"]:
             raise ValueError(
                 "Please correct the MLIP name!"
-                "The current version ONLY supports the following models: GAP, J-ACE, P-ACE, NEQUIP, M3GNET, and MACE."
+                "The current version ONLY supports the following models: GAP, J-ACE, NEQUIP, M3GNET, and MACE."
             )
 
         if apply_data_preprocessing:
@@ -330,7 +330,7 @@ class DataPreprocessing(Maker):
         if self.regularization:
             atoms = ase.io.read("train.extxyz", index=":")
             ase.io.write("train_wo_sigma.extxyz", atoms, format="extxyz")
-            atoms_with_sigma = set_sigma(
+            atoms_with_sigma = set_custom_sigma(
                 atoms,
                 reg_minmax=[(0.1, 1), (0.001, 0.1), (0.0316, 0.316), (0.0632, 0.632)],
             )

@@ -41,7 +41,7 @@ class RssMaker(Maker):
         config_file: str | None
             Path to the configuration file that defines the setup parameters for the whole RSS workflow.
             If not provided, the default file 'rss_default_configuration.yaml' will be used.
-        **kwargs: dict, optional
+        kwargs: dict, optional
             Additional optional keyword arguments to customize the job execution.
 
         Keyword Arguments
@@ -112,7 +112,7 @@ class RssMaker(Maker):
                     Whether to average the SOAP vectors (default True).
                 - species: bool
                     Whether to consider species information (default True).
-            - kt: float
+            - kb_temp: float
                 Temperature in eV for Boltzmann weighting (default 0.3).
             - frac_of_bcur: float
                 Fraction of Boltzmann CUR selections (default 0.8).
@@ -170,7 +170,7 @@ class RssMaker(Maker):
         - pre_database_dir: str | None
             Directory where the previous database was saved.
         - mlip_type: str
-            Choose one specific MLIP type to be fitted: 'GAP' | 'J-ACE' | 'P-ACE' | 'NEQUIP' | 'M3GNET' | 'MACE'.
+            Choose one specific MLIP type to be fitted: 'GAP' | 'J-ACE' | 'NEQUIP' | 'M3GNET' | 'MACE'.
             Default is 'GAP'.
         - ref_energy_name: str
             Reference energy name. Default is 'REF_energy'.
@@ -226,7 +226,7 @@ class RssMaker(Maker):
             For example, if there are 10,000 trajectories to relax and 'num_groups=10',
             the trajectories will be divided into 10 groups and 10 independent jobs will be created,
             with each job handling 1,000 trajectories.
-        - initial_kt: float
+        - initial_kb_temp: float
             Initial temperature (in eV) for Boltzmann sampling. Default is 0.3.
         - current_iter_index: int
             Index for the current RSS iteration. Default is 1.
@@ -245,7 +245,7 @@ class RssMaker(Maker):
                 The isolated energy values.
             - current_iter: int
                 The current iteration index.
-            - kt: float
+            - kb_temp: float
                 The temperature (in eV) for Boltzmann sampling.
         """
         yaml = YAML(typ="safe", pure=True)
@@ -289,7 +289,7 @@ class RssMaker(Maker):
                 "stop_criterion",
                 "max_iteration_number",
                 "num_groups",
-                "initial_kt",
+                "initial_kb_temp",
                 "current_iter_index",
                 "hookean_repul",
                 "hookean_paras",

@@ -43,7 +43,7 @@ from autoplex.data.common.utils import (
     stratified_dataset_split,
     to_ase_trajectory,
 )
-from autoplex.fitting.common.regularization import set_sigma
+from autoplex.fitting.common.regularization import set_custom_sigma
 
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 
@@ -741,7 +741,7 @@ def preprocess_data(
         if reg_minmax is None:
             reg_minmax = [(0.1, 1), (0.001, 0.1), (0.0316, 0.316), (0.0632, 0.632)]
 
-        atom_with_sigma = set_sigma(
+        atom_with_sigma = set_custom_sigma(
             atoms=atoms_reg,
             reg_minmax=reg_minmax,
             isolated_atom_energies=isolated_atom_energies,

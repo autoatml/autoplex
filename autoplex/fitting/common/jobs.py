@@ -58,7 +58,7 @@ def machine_learning_fit(
         Name of the glue.xml file path.
     mlip_type: str
         Choose one specific MLIP type to be fitted:
-        'GAP' | 'J-ACE' | 'P-ACE' | 'NEQUIP' | 'M3GNET' | 'MACE'
+        'GAP' | 'J-ACE' | 'NEQUIP' | 'M3GNET' | 'MACE'
     ref_energy_name: str
         Reference energy name.
     ref_force_name: str

@@ -140,7 +140,7 @@ def initial_rss(
     pre_database_dir: str | None
         Directory where the previous database was saved. Default is None.
     mlip_type: str
-        Choose one specific MLIP type to be fitted: 'GAP' | 'J-ACE' | 'P-ACE' | 'NEQUIP' | 'M3GNET' | 'MACE'.
+        Choose one specific MLIP type to be fitted: 'GAP' | 'J-ACE' | 'NEQUIP' | 'M3GNET' | 'MACE'.
         Default is 'GAP'.
     ref_energy_name: str
         Reference energy name. Default is 'REF_energy'.
@@ -154,7 +154,7 @@ def initial_rss(
         Number of processes used for fitting. Default is 1.
     device_for_fitting: str
             Device to be used for model fitting, either "cpu" or "cuda".
-    **fit_kwargs:
+    fit_kwargs:
         Additional keyword arguments for the MLIP fitting process.
 
     Output
@@ -412,7 +412,7 @@ def do_rss_iterations(
     force_label: str
         The label of force values to use for distillation. Default is 'REF_forces'.
     mlip_type: str
-        Choose one specific MLIP type: 'GAP' | 'J-ACE' | 'P-ACE' | 'NequIP' | 'M3GNet' | 'MACE'. Default is 'GAP'.
+        Choose one specific MLIP type: 'GAP' | 'J-ACE' | 'NequIP' | 'M3GNet' | 'MACE'. Default is 'GAP'.
     ref_energy_name: str
         Reference energy name. Default is 'REF_energy'.
     ref_force_name: str
@@ -463,7 +463,7 @@ def do_rss_iterations(
         Initial temperature (in eV) for Boltzmann sampling. Default is 0.3.
     current_iter_index: int
         Index for the current RSS iteration. Default is 1.
-    **fit_kwargs:
+    fit_kwargs:
         Additional keyword arguments for the MLIP fitting process.
 
     Output
