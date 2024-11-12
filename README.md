@@ -1,4 +1,4 @@
-[![Testing Linux](https://github.com/JaGeo/autoplex/actions/workflows/python-package.yml/badge.svg)](https://github.com/JaGeo/autoplex/actions/workflows/python-package.yml)
+[![Testing Linux](https://github.com/JaGeo/autoplex/actions/workflows/python-package.yml/badge.svg)](https://github.com/JaGeo/autoplex/actions/workflows/python-package.yml) [![DOI](https://zenodo.org/badge/671124251.svg)](https://doi.org/10.5281/zenodo.14105049)
 
 <img src="docs/_static/autoplex_logo.png" width="66%">
 

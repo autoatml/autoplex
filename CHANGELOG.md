@@ -1,4 +1,7 @@
 # Changelog
+## v0.0.3
+Essentially, it is the same version as v0.0.2. The release has, however, been updated to work with stable atomate2 and mace-torch versions.
+
 ## v0.0.2
 ### What's Changed
 * fix m3gnet issue by @naik-aakash in https://github.com/autoatml/autoplex/pull/76
