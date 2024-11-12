@@ -426,15 +426,15 @@ def test_output_from_scratch(memory_jobstore, clean_dir):
     from ase.io import read
     from pathlib import Path
     import shutil
-    job = RandomizedStructure(struct_number=3,
+    job_rss = RandomizedStructure(struct_number=3,
                               tag='SiO2',
                               output_file_name='random_structs.extxyz',
                               buildcell_option={'VARVOL': 20,
                                                 'SYMMOPS':'1-2'},
                               num_processes=4).make()
     
-    responses = run_locally(job, ensure_success=True, create_folders=True, store=memory_jobstore)
-    assert len(read(job.output.resolve(memory_jobstore), index=":")) == 3
+    responses = run_locally(job_rss, ensure_success=True, create_folders=True, store=memory_jobstore)
+    assert len(read(job_rss.output.resolve(memory_jobstore), index=":")) == 3
 
         
 def test_fragment_buildcell(test_dir, memory_jobstore, clean_dir):
@@ -451,7 +451,7 @@ def test_fragment_buildcell(test_dir, memory_jobstore, clean_dir):
     h2o.cell = np.ones(3)*20
     write(f'{test_dir}/data/h2o.xyz', h2o)
     
-    job = RandomizedStructure(struct_number=4,
+    job_rss = RandomizedStructure(struct_number=4,
                               tag='water',
                               output_file_name='random_h20_structs.extxyz',
                               buildcell_option={'TARGVOL': f'{1/ice_density*0.8}-{1/ice_density*1.2}',
@@ -467,8 +467,8 @@ def test_fragment_buildcell(test_dir, memory_jobstore, clean_dir):
                               remove_tmp_files=True,
                               num_processes=4).make()
     
-    _ = run_locally(job, ensure_success=True, create_folders=True, store=memory_jobstore)
-    ats = read(job.output.resolve(memory_jobstore), index=":")
+    _ = run_locally(job_rss, ensure_success=True, create_folders=True, store=memory_jobstore)
+    ats = read(job_rss.output.resolve(memory_jobstore), index=":")
     assert len(ats) == 4 and np.all(ats[0].positions[0] != ats[0].positions[1])
 
 
@@ -477,12 +477,12 @@ def test_output_from_cell_seed(test_dir, memory_jobstore, clean_dir):
     from pathlib import Path
     import shutil
     test_files_dir = test_dir / "data/SiO2.cell"
-    job = RandomizedStructure(struct_number=3,
+    job_rss = RandomizedStructure(struct_number=3,
                               cell_seed_path=test_files_dir,
                               num_processes=3).make()
     
-    responses = run_locally(job, ensure_success=True, create_folders=True, store=memory_jobstore)
-    assert len(read(job.output.resolve(memory_jobstore),index=":")) == 3
+    responses = run_locally(job_rss, ensure_success=True, create_folders=True, store=memory_jobstore)
+    assert len(read(job_rss.output.resolve(memory_jobstore),index=":")) == 3
 
 
 def test_build_multi_randomized_structure(memory_jobstore, clean_dir):
@@ -515,13 +515,13 @@ def test_build_multi_randomized_structure(memory_jobstore, clean_dir):
         bcur_params=bcur_params,
         random_seed=None).make()
 
-    job = Flow(generate_structure, output=generate_structure.output) 
-    responses = run_locally(job, 
+    job_rss = Flow(generate_structure, output=generate_structure.output) 
+    responses = run_locally(job_rss, 
                             ensure_success=True, 
                             create_folders=True, 
                             store=memory_jobstore)
 
-    structures = job.output.resolve(memory_jobstore)
+    structures = job_rss.output.resolve(memory_jobstore)
 
     n_atoms = [struct.num_sites for struct in flatten(structures, recursive=False)]
 
@@ -538,7 +538,7 @@ def test_vasp_static(test_dir, memory_jobstore, clean_dir):
     from autoplex.data.common.jobs import preprocess_data
     test_files_dir = test_dir / "data/rss.extxyz"
 
-    job = preprocess_data(test_ratio=0.1,
+    job_rss = preprocess_data(test_ratio=0.1,
                              regularization=True,
                              distillation=True,
                              force_max=0.7,
@@ -546,13 +546,13 @@ def test_vasp_static(test_dir, memory_jobstore, clean_dir):
                              pre_database_dir=None,)
 
     response = run_locally(
-        job,
+        job_rss,
         create_folders=True,
         ensure_success=True,
         store=memory_jobstore
     )
 
-    path_to_training_data = job.output.resolve(memory_jobstore)
+    path_to_training_data = job_rss.output.resolve(memory_jobstore)
     atom_train = read(os.path.join(path_to_training_data, 'train.extxyz'), index=":")
     atom_test = read(os.path.join(path_to_training_data, 'test.extxyz'), index=":")
 
@@ -575,7 +575,7 @@ def test_gap_rss(test_dir, memory_jobstore, clean_dir):
     structures = [AseAtomsAdaptor.get_structure(atom) for atom in atoms]
     mlip_path = test_dir / "fitting/GAP"
 
-    job = do_rss_single_node(mlip_type='GAP',
+    job_rss = do_rss_single_node(mlip_type='GAP',
                 iteration_index='0',
                 mlip_path=mlip_path,
                 structures=structures,
@@ -594,13 +594,13 @@ def test_gap_rss(test_dir, memory_jobstore, clean_dir):
                 isolated_atom_energies={14: -0.84696938})
     
     response = run_locally(
-        job,
+        job_rss,
         create_folders=True,
         ensure_success=True,
         store=memory_jobstore
     )
 
-    output = job.output.resolve(memory_jobstore)
+    output = job_rss.output.resolve(memory_jobstore)
     output_filter = []
     for i in output:
         if i is not None:
@@ -617,7 +617,7 @@ def test_gap_rss_multi_jobs(test_dir, memory_jobstore, clean_dir):
     structures = [AseAtomsAdaptor.get_structure(atom) for atom in atoms]
     mlip_path = test_dir / "fitting/GAP"
 
-    job = do_rss_multi_node(mlip_type='GAP',
+    job_rss = do_rss_multi_node(mlip_type='GAP',
                 iteration_index='0',
                 mlip_path=mlip_path,
                 structure=structures,
@@ -637,13 +637,13 @@ def test_gap_rss_multi_jobs(test_dir, memory_jobstore, clean_dir):
                 num_groups=2,)
     
     response = run_locally(
-        job,
+        job_rss,
         create_folders=True,
         ensure_success=True,
         store=memory_jobstore
     )
 
-    output = job.output.resolve(memory_jobstore)
+    output = job_rss.output.resolve(memory_jobstore)
     output_filter = []
     for i in output:
         if i:
@@ -662,22 +662,22 @@ def test_gap_rss_multi_jobs(test_dir, memory_jobstore, clean_dir):
 def test_jace_rss(test_dir, memory_jobstore, clean_dir):
     np.random.seed(42)
     test_files_dir = test_dir / "data/rss.extxyz"
-    atoms = read(test_files_dir, index="0:1:1")
+    atoms = read(test_files_dir, index="0:5:1")
     structures = [AseAtomsAdaptor.get_structure(atom) for atom in atoms]
     mlip_path = test_dir / "fitting/JACE"
 
-    job = do_rss_single_node(mlip_type='J-ACE',
+    job_rss = do_rss_single_node(mlip_type='J-ACE',
                 iteration_index='0',
                 mlip_path=mlip_path,
                 structures=structures,
                 scalar_pressure_method='exp',
-                scalar_exp_pressure=100,
+                scalar_exp_pressure=1,
                 scalar_pressure_exponential_width=0.2,
                 scalar_pressure_low=0,
                 scalar_pressure_high=50,
-                max_steps=10,
-                force_tol=0.01,
-                stress_tol=0.0001,
+                max_steps=1000,
+                force_tol=0.1,
+                stress_tol=0.1,
                 hookean_repul=False,
                 write_traj=True,
                 num_processes_rss=4,
@@ -685,19 +685,19 @@ def test_jace_rss(test_dir, memory_jobstore, clean_dir):
                 isolated_atom_energies={14: -0.84696938})
     
     response = run_locally(
-        job,
+        job_rss,
         create_folders=True,
         ensure_success=True,
         store=memory_jobstore
     )
 
-    output = job.output.resolve(memory_jobstore)
+    output = job_rss.output.resolve(memory_jobstore)
     output_filter = []
     for i in output:
         if i is not None:
             output_filter.append(i)
    
-    assert len(output_filter) == 1
+    assert len(output_filter) == 5
 
 
 def test_nequip_rss(test_dir, memory_jobstore, clean_dir):
@@ -707,7 +707,7 @@ def test_nequip_rss(test_dir, memory_jobstore, clean_dir):
     structures = [AseAtomsAdaptor.get_structure(atom) for atom in atoms]
     mlip_path = test_dir / "fitting/NEQUIP"
 
-    job = do_rss_single_node(mlip_type='NEQUIP',
+    job_rss = do_rss_single_node(mlip_type='NEQUIP',
                 iteration_index='0',
                 mlip_path=mlip_path,
                 structures=structures,
@@ -726,13 +726,13 @@ def test_nequip_rss(test_dir, memory_jobstore, clean_dir):
                 isolated_atom_energies={14: -0.84696938})
     
     response = run_locally(
-        job,
+        job_rss,
         create_folders=True,
         ensure_success=True,
         store=memory_jobstore
     )
 
-    output = job.output.resolve(memory_jobstore)
+    output = job_rss.output.resolve(memory_jobstore)
     output_filter = []
     for i in output:
         if i is not None:
@@ -748,7 +748,7 @@ def test_m3gnet_rss(test_dir, memory_jobstore, clean_dir):
     structures = [AseAtomsAdaptor.get_structure(atom) for atom in atoms]
     mlip_path = test_dir / "fitting/M3GNET/m3gnet_results/training"
 
-    job = do_rss_single_node(mlip_type='M3GNET',
+    job_rss = do_rss_single_node(mlip_type='M3GNET',
                 iteration_index='0',
                 mlip_path=mlip_path,
                 structures=structures,
@@ -767,13 +767,13 @@ def test_m3gnet_rss(test_dir, memory_jobstore, clean_dir):
                 isolated_atom_energies={14: -0.84696938})
     
     response = run_locally(
-        job,
+        job_rss,
         create_folders=True,
         ensure_success=True,
         store=memory_jobstore
     )
 
-    output = job.output.resolve(memory_jobstore)
+    output = job_rss.output.resolve(memory_jobstore)
     output_filter = []
     for i in output:
         if i is not None:
@@ -789,7 +789,7 @@ def test_mace_rss(test_dir, memory_jobstore, clean_dir):
     structures = [AseAtomsAdaptor.get_structure(atom) for atom in atoms]
     mlip_path = test_dir / "fitting/MACE"
 
-    job = do_rss_single_node(mlip_type='MACE',
+    job_rss = do_rss_single_node(mlip_type='MACE',
                 iteration_index='0',
                 mlip_path=mlip_path,
                 structures=structures,
@@ -808,13 +808,13 @@ def test_mace_rss(test_dir, memory_jobstore, clean_dir):
                 isolated_atom_energies={14: -0.84696938})
     
     response = run_locally(
-        job,
+        job_rss,
         create_folders=True,
         ensure_success=True,
         store=memory_jobstore
     )
 
-    output = job.output.resolve(memory_jobstore)
+    output = job_rss.output.resolve(memory_jobstore)
     output_filter = []
     for i in output:
         if i is not None:
@@ -828,7 +828,7 @@ def test_sampling_cur_job(test_dir, memory_jobstore, clean_dir):
     atoms = read(test_files_dir, index=':')
     structures = [AseAtomsAdaptor.get_structure(atom) for atom in atoms]
 
-    job = sample_data(
+    job_sample = sample_data(
         selection_method='cur',
         num_of_selection=5,
         bcur_params={'soap_paras': {'l_max': 3,
@@ -845,13 +845,13 @@ def test_sampling_cur_job(test_dir, memory_jobstore, clean_dir):
     )
     
     response = run_locally(
-        job,
+        job_sample,
         create_folders=True,
         ensure_success=True,
         store=memory_jobstore
     )
 
-    selected_atoms = job.output.resolve(memory_jobstore)
+    selected_atoms = job_sample.output.resolve(memory_jobstore)
 
     assert len(selected_atoms) == 5
 
@@ -864,7 +864,7 @@ def test_sampling_bcur1s_job(test_dir, memory_jobstore, clean_dir):
     atoms = read(test_files_dir, index=':')
     structures = [AseAtomsAdaptor.get_structure(atom) for atom in atoms]
     
-    job = sample_data(selection_method='bcur1s',
+    job_sample = sample_data(selection_method='bcur1s',
                    num_of_selection=5,
                    bcur_params={'soap_paras': {'l_max': 3,
                                 'n_max': 3,
@@ -883,13 +883,13 @@ def test_sampling_bcur1s_job(test_dir, memory_jobstore, clean_dir):
                     random_seed=42)
 
     response = run_locally(
-        job,
+        job_sample,
         create_folders=True,
         ensure_success=True,
         store=memory_jobstore
     )
 
-    selected_atoms = job.output.resolve(memory_jobstore)
+    selected_atoms = job_sample.output.resolve(memory_jobstore)
 
     assert len(selected_atoms) == 5
 
@@ -902,19 +902,19 @@ def test_sampling_random_job(test_dir, memory_jobstore, clean_dir):
     atoms = read(test_files_dir, index=':')
     structures = [AseAtomsAdaptor.get_structure(atom) for atom in atoms]
     
-    job = sample_data(selection_method='random',
+    job_sample = sample_data(selection_method='random',
                    num_of_selection=5,
                    structure=structures,
                    random_seed=42)
 
     response = run_locally(
-        job,
+        job_sample,
         create_folders=True,
         ensure_success=True,
         store=memory_jobstore
     )
 
-    selected_atoms = job.output.resolve(memory_jobstore)
+    selected_atoms = job_sample.output.resolve(memory_jobstore)
 
     assert len(selected_atoms) == 5
 
@@ -927,19 +927,19 @@ def test_sampling_uniform_job(test_dir, memory_jobstore, clean_dir):
     atoms = read(test_files_dir, index=':')
     structures = [AseAtomsAdaptor.get_structure(atom) for atom in atoms]
     
-    job = sample_data(selection_method='uniform',
+    job_sample = sample_data(selection_method='uniform',
                    num_of_selection=5,
                    structure=structures,
                    random_seed=42)
 
     response = run_locally(
-        job,
+        job_sample,
         create_folders=True,
         ensure_success=True,
         store=memory_jobstore
     )
 
-    selected_atoms = job.output.resolve(memory_jobstore)
+    selected_atoms = job_sample.output.resolve(memory_jobstore)
 
     assert len(selected_atoms) == 5
 

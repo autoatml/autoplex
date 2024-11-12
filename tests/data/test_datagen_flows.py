@@ -389,7 +389,7 @@ def test_vasp_static(test_dir, mock_vasp, memory_jobstore, clean_dir):
 
     mock_vasp(ref_paths, fake_run_vasp_kwargs)
 
-    job1 = DFTStaticLabelling(isolated_atom=True, 
+    job_dft = DFTStaticLabelling(isolated_atom=True, 
                           e0_spin=True, 
                           isolatedatom_box=[20.0, 20.5, 21.0],
                           dimer=True, 
@@ -424,16 +424,16 @@ def test_vasp_static(test_dir, mock_vasp, memory_jobstore, clean_dir):
                     },
                     ).make(structures=test_structures)
     
-    job2 = collect_dft_data(vasp_dirs=job1.output)
+    job_collect_data = collect_dft_data(vasp_dirs=job_dft.output)
     
     response = run_locally(
-        Flow([job1,job2]),
+        Flow([job_dft,job_collect_data]),
         create_folders=True,
         ensure_success=True,
         store=memory_jobstore
     )
 
-    dict_vasp = job2.output.resolve(memory_jobstore)
+    dict_vasp = job_collect_data.output.resolve(memory_jobstore)
 
     path_to_vasp, isol_energy = dict_vasp['vasp_ref_dir'], dict_vasp['isolated_atom_energies']
 
