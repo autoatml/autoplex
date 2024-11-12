@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import logging
+
 from jobflow import Flow, Response, job
 
 from autoplex.data.common.flows import DFTStaticLabelling
@@ -15,6 +17,10 @@ from autoplex.data.rss.jobs import do_rss_multi_node
 from autoplex.fitting.common.flows import MLIPFitMaker
 
 __all__ = ["initial_rss", "do_rss_iterations"]
+
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 
 @job
@@ -492,7 +498,7 @@ def do_rss_iterations(
     if dimer_box is None:
         dimer_box = [20.0, 20.0, 20.0]
 
-    print(
+    logging.info(
         f"The configuration type of structures generated in the current iteration will be {config_type}!"
     )
 
@@ -502,9 +508,9 @@ def do_rss_iterations(
         and current_iter is not None
         and current_iter < max_iteration_number
     ):
-        print("Current kt:", current_kt)
-        print("Current iter index:", current_iter)
-        print(f"The error of {current_iter}th iteration:", test_error)
+        logging.info(f"Current kt: {current_kt}")
+        logging.info(f"Current iter index: {current_iter}")
+        logging.info(f"The error of {current_iter}th iteration: {test_error}")
 
         if bcur_params is None:
             bcur_params = {}

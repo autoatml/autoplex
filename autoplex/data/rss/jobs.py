@@ -19,6 +19,7 @@ from ase import Atoms
 from ase.data import atomic_numbers, covalent_radii
 from jobflow import Flow, Maker, Response, job
 from pymatgen.io.ase import AseAtomsAdaptor
+from pymatgen.core import Element
 
 from autoplex.data.common.utils import flatten
 from autoplex.data.rss.utils import minimize_structures, split_structure_into_groups
@@ -122,8 +123,8 @@ class RandomizedStructure(Maker):
 
                 for ele in elements:
                     r0[ele] = covalent_radii[atomic_numbers[ele]]
-
-                    if self._is_metal(ele):
+                    
+                    if Element(ele).is_metal:
                         varvol[ele] = 5.5 * np.power(r0[ele], 3)
                     else:
                         varvol[ele] = 14.5 * np.power(r0[ele], 3)
@@ -281,112 +282,6 @@ class RandomizedStructure(Maker):
         with open(bc_file, "w") as f:
             f.writelines(contents)
 
-    def _is_metal(self, element_symbol: str) -> bool:
-        """
-        Check if the given element symbol represents a metal.
-
-        Parameters
-        ----------
-        element_symbol: str
-            Chemical symbol of the element to check.
-        """
-        metals = [
-            "Li",
-            "Be",
-            "Na",
-            "Mg",
-            "Al",
-            "K",
-            "Ca",
-            "Sc",
-            "Ti",
-            "V",
-            "Cr",
-            "Mn",
-            "Fe",
-            "Co",
-            "Ni",
-            "Cu",
-            "Zn",
-            "Ga",
-            "Rb",
-            "Sr",
-            "Y",
-            "Zr",
-            "Nb",
-            "Mo",
-            "Tc",
-            "Ru",
-            "Rh",
-            "Pd",
-            "Ag",
-            "Cd",
-            "In",
-            "Sn",
-            "Cs",
-            "Ba",
-            "La",
-            "Ce",
-            "Pr",
-            "Nd",
-            "Pm",
-            "Sm",
-            "Eu",
-            "Gd",
-            "Tb",
-            "Dy",
-            "Ho",
-            "Er",
-            "Tm",
-            "Yb",
-            "Lu",
-            "Hf",
-            "Ta",
-            "W",
-            "Re",
-            "Os",
-            "Ir",
-            "Pt",
-            "Au",
-            "Hg",
-            "Tl",
-            "Pb",
-            "Bi",
-            "Fr",
-            "Ra",
-            "Ac",
-            "Th",
-            "Pa",
-            "U",
-            "Np",
-            "Pu",
-            "Am",
-            "Cm",
-            "Bk",
-            "Cf",
-            "Es",
-            "Fm",
-            "Md",
-            "No",
-            "Lr",
-            "Rf",
-            "Db",
-            "Sg",
-            "Bh",
-            "Hs",
-            "Mt",
-            "Ds",
-            "Rg",
-            "Cn",
-            "Nh",
-            "Fl",
-            "Mc",
-            "Lv",
-            "Ts",
-            "Og",
-        ]
-
-        return element_symbol in metals
 
     def _extract_elements(self, input_str: str) -> dict[str, int]:
         """
