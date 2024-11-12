@@ -30,7 +30,7 @@ jobs:
         TAG=$(curl -H "Accept: application/vnd.github.v3+json" \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             https://api.github.com/orgs/autoatml/packages/container/autoplex%2Fautoplex-python-3.10/versions \
-            | jq 'sort_by(.created_at) | reverse | .[0].metadata.container.tags[0]')
+            | jq -r 'sort_by(.created_at) | reverse | .[0].metadata.container.tags[0]')
         echo "VERSION=$TAG" >> $GITHUB_ENV
         
     - name: Run tests using Docker image for Python ${{ matrix.python-version }}
