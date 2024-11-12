@@ -22,7 +22,7 @@ lpad = LaunchPad.auto_load()
 lpad.add_wf(wf)
 ```
 
-The above code is based on `FireWorks`](https://materialsproject.github.io/fireworks/) for job submission and management. You could also use [`jobflow-remote`](https://matgenix.github.io/jobflow-remote/), in which case the code snippet would change as follows.
+The above code is based on [`FireWorks`](https://materialsproject.github.io/fireworks/) for job submission and management. You could also use [`jobflow-remote`](https://matgenix.github.io/jobflow-remote/), in which case the code snippet would change as follows.
 
 ```python
 from jobflow_remote import submit_flow
