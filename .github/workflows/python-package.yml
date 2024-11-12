@@ -24,12 +24,15 @@ jobs:
         split: [1, 2, 3, 4, 5]  # Number of splits
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Extract version from pyproject.toml
+    - name: Fetch Most Recent Docker Image Tag
+      id: fetch_tag
       run: |
-          VERSION=$(grep '^version = ' pyproject.toml | sed -E 's/version = "(.*)"/\1/')
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-    - uses: actions/checkout@v3
+        TAG=$(curl -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/orgs/autoatml/packages/container/autoplex%2Fautoplex-python-3.10/versions \
+            | jq 'sort_by(.created_at) | reverse | .[0].metadata.container.tags[0]')
+        echo "VERSION=$TAG" >> $GITHUB_ENV
+        
     - name: Run tests using Docker image for Python ${{ matrix.python-version }}
       run: |
         docker pull ghcr.io/autoatml/autoplex/autoplex-python-${{ matrix.python-version }}:${{ env.VERSION }}
