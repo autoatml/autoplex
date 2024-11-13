@@ -97,7 +97,7 @@ comp_bm = write_benchmark_metrics(
 run_locally([phojob, bm, comp_bm], create_folders=True, store=store)
 ```
 If you use another [`ForceFieldRelaxMaker` and `ForceFieldStaticMaker`](https://github.com/materialsproject/atomate2/blob/main/src/atomate2/forcefields/jobs.py), you can switch from GAP to one of the other 
-[MLIP potentials](../fitting/fitting.md#fitting-potentials).
+[MLIP potentials](../fitting/fitting.md#fitting-phonon-accurate-potentials).
 
 You can extract a JSON file containing your pre-existing VASP DFT run from your MongoDB with the following script:
 ```python
