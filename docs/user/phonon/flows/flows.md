@@ -2,19 +2,6 @@
 
 *Tutorials written by Christina Ertural ([christina.ertural@bam.de](mailto:christina.ertural@bam.de)) and Janine George ([janine.george@bam.de](mailto:christina.ertural@bam.de)).*
 
-# Before you start using `autoplex`
-
-We expect the general user of `autoplex` to be familiar with the [Materials Project](https://github.com/materialsproject) framework software tools and related 
-packages for (high-throughput) workflow submission and management. 
-This involves the following software packages:
-- [pymatgen](https://github.com/materialsproject/pymatgen) for input and output handling of computational materials science software
-- [atomate2](https://github.com/materialsproject/atomate2) for providing a library of pre-defined computational materials science workflows
-- [jobflow](https://github.com/materialsproject/jobflow) for processes, job and workflow handling 
-- [jobflow-remote](https://github.com/Matgenix/jobflow-remote) or [FireWorks](https://github.com/materialsproject/fireworks) for workflow and database (MongoDB) management
-- [MongoDB](https://www.mongodb.com/) as the database (we recommend installing the MongoDB community version)
-
-All of these software tools provide documentation and tutorials. Please take your time and check everything out!
-
 # Out-of-the-box workflow
 
 This tutorial will demonstrate how to use `autoplex` with its default setup and settings.
@@ -201,7 +188,7 @@ Please follow the installation and setup instructions on the respective guide we
 Both packages rely on the [MongoDB](https://www.mongodb.com/) database manager for data storage.
 
 We recommend using `jobflow-remote` as it is more flexible to use, especially on clusters where users cannot store their
-own MongoDB. You can find a more comprehensive `jobflow-remote` tutorial [here](../jobflowremote.md).
+own MongoDB. You can find a more comprehensive `jobflow-remote` tutorial [here](../../jobflowremote.md).
 
 Submission using `FireWorks`:
 ```python
