@@ -4,6 +4,40 @@
 
 # Quick-start guide
 
+This guide assumes that you have all the [Materials Project](https://github.com/materialsproject) framework software tools as well as a working [MongoDB](https://www.mongodb.com/) 
+database setup and have experience using [atomate2](https://github.com/materialsproject/atomate2).
+
+You can install `autoplex` simply by:
+
+``` 
+pip install autoplex
+```
+This will install all the Python packages and dependencies needed for MLIP fits. 
+
+Additionally, to fit and validate `ACEpotentials`, one also needs to install Julia, as `autoplex` relies on [ACEpotentials](https://acesuit.github.io/ACEpotentials.jl/dev/gettingstarted/installation/), which supports fitting of linear ACE. Currently, no Python package exists for the same.
+Please run the following commands to enable the `ACEpotentials` fitting options and further functionality.
+
+Install Julia v1.9.2
+
+```bash
+curl -fsSL https://install.julialang.org | sh -s -- default-channel 1.9.2
+```
+
+Once installed in the terminal, run the following commands to get Julia ACEpotentials dependencies.
+
+```bash
+julia -e 'using Pkg; Pkg.Registry.add("General"); Pkg.Registry.add(Pkg.Registry.RegistrySpec(url="https://github.com/ACEsuit/ACEregistry")); Pkg.add(Pkg.PackageSpec(;name="ACEpotentials", version="0.6.7")); Pkg.add("DataFrames"); Pkg.add("CSV")'
+```
+
+### Enabling RSS workflows
+
+Additionally, `buildcell` as a part of `AIRSS` needs to be installed if one wants to use the RSS functionality:
+
+```bash
+curl -O https://www.mtg.msm.cam.ac.uk/files/airss-0.9.3.tgz; tar -xf airss-0.9.3.tgz; rm airss-0.9.3.tgz; cd airss; make ; make install ; make neat; cd ..
+```
+
+
 ## Workflow management
 
 You can manage your `autoplex` workflow using [`FireWorks`](https://materialsproject.github.io/fireworks/) or [`jobflow-remote`](https://matgenix.github.io/jobflow-remote/). 
