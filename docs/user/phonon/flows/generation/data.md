@@ -2,7 +2,7 @@
 
 *Tutorials written by Christina Ertural ([christina.ertural@bam.de](mailto:christina.ertural@bam.de)).*
 
-# Generating reference data
+# Generating reference data from DFT-based phonon structures
 
 This tutorial will explain how the reference data for the MLIP fit can be generated.
 The idea behind the VASP reference data generation stems from [J. Chem. Phys. 153, 044104 (2020)](https://pubs.aip.org/aip/jcp/article/153/4/044104/1056348/Combining-phonon-accuracy-with-high) 
