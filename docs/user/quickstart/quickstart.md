@@ -38,6 +38,9 @@ curl -O https://www.mtg.msm.cam.ac.uk/files/airss-0.9.3.tgz; tar -xf airss-0.9.3
 ```
 
 
+For a more advanced installation, you can also follow the [developer installation guide](../../dev/dev_install.md).
+
+
 ## Workflow management
 
 You can manage your `autoplex` workflow using [`FireWorks`](https://materialsproject.github.io/fireworks/) or [`jobflow-remote`](https://matgenix.github.io/jobflow-remote/). 
