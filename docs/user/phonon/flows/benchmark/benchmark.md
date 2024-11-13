@@ -39,7 +39,7 @@ In case you have pre-existing DFT calculations, you can pass them as a list via 
 It is important to provide the pre-existing DFT data in form of a `PhononBSDOSDoc` task document object (from `atomate2`). Without any DFT reference calculations given, `autoplex` will automatically execute the VASP calculations. A mix of pre-existing and missing DFT references is not supported.
 
 ## Error metrics
-`autoplex` automatically provides you with a phonon bandstructure comparison plot, a q-point wise RMSE plot and an overall RMSE value (`results_XY.txt` file). For examples see [here](../flows/flows.md#output-and-results).
+`autoplex` automatically provides you with a phonon bandstructure comparison plot, a q-point wise RMSE plot and an overall RMSE value (`results_XY.txt` file). For examples see [here](../flows.md#output-and-results).
 
 ## Run a benchmark with a pre-existing DFT calculation and GAP potential
 
