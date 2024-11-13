@@ -45,7 +45,7 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 "autoplex.fitting.common" = ["*.json"]
-"autoplex.auto.rss" = ["*.yaml]
+"autoplex.auto.rss" = ["*.yaml"]
 
 [project.optional-dependencies]
 docs = [
