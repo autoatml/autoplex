@@ -22,22 +22,22 @@ By the end of these tutorials, you should be able to:
 
 ```{toctree}
 :maxdepth: 2
-:caption: Quick-Start
 quickstart/quickstart
+quickstart/installation
 ```
 
-### Random structure searching (RSS) workflow
 ```{toctree}
+:caption: Random structure searching (RSS) workflow
 :maxdepth: 3
 rss/rss
 ```
 
-### Phonon-accurate machine-learned potentials workflow
 ```{toctree}
+:caption: Phonon-accurate machine-learned potentials workflow
 :maxdepth: 3
 phonon/flows/flows
-phonon/generation/data
-phonon/fitting/fitting
-phonon/benchmark/benchmark
+phonon/flows/generation/data
+phonon/flows/fitting/fitting
+phonon/flows/benchmark/benchmark
 ```
 
