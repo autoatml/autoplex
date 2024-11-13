@@ -1,7 +1,7 @@
 [![Testing Linux](https://github.com/JaGeo/autoplex/actions/workflows/python-package.yml/badge.svg)](https://github.com/JaGeo/autoplex/actions/workflows/python-package.yml) [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/autoatml/autoplex/main.svg)](https://results.pre-commit.ci/latest/github/autoatml/autoplex/main) [![DOI](https://zenodo.org/badge/671124251.svg)](https://doi.org/10.5281/zenodo.14105049) ![supported python versions](https://img.shields.io/pypi/pyversions/autoplex) [![PyPI version](https://badge.fury.io/py/autoplex.svg)](https://badge.fury.io/py/autoplex)
 
 <img src="docs/_static/autoplex_logo.png" width="66%">
-
+**`autoplex` is still under very active development and is only suitable for expert users as not all of the documentation is in place. This will change in the next two weeks.**
 
 `autoplex` is a software for generating and benchmarking machine learning (ML)-based interatomic potentials. The aim of `autoplex` is to provide a fully automated solution for creating high-quality ML potentials. The software is interfaced to multiple different ML potential fitting frameworks and to the atomate2 and ase environments for efficient high-throughput computations. The vision of this project is to allow a wide community of researchers to create accurate and reliable ML potentials for materials simulations.
 
