@@ -2,7 +2,7 @@
 
 *Tutorials written by Christina Ertural ([christina.ertural@bam.de](mailto:christina.ertural@bam.de)) and Janine George ([janine.george@bam.de](mailto:christina.ertural@bam.de)).*
 
-# Out-of-the-box workflow
+# Out-of-the-box phonon workflow
 
 This tutorial will demonstrate how to use `autoplex` with its default setup and settings.
 
@@ -181,68 +181,10 @@ Then you can paste the printed text to the [Mermaid Live Online FlowChart & Diag
 The `autoplex` workflow is easy to customize and every aspect of the workflow (data generation, MLIP fit, benchmark) is 
 in the control of the user as demonstrated in the subsequent tutorial pages.
 
-## Workflow management
-
-You can manage your `autoplex` workflow using [`FireWorks`](https://materialsproject.github.io/fireworks/) or [`jobflow-remote`](https://matgenix.github.io/jobflow-remote/). 
-Please follow the installation and setup instructions on the respective guide website.
-Both packages rely on the [MongoDB](https://www.mongodb.com/) database manager for data storage.
-
-We recommend using `jobflow-remote` as it is more flexible to use, especially on clusters where users cannot store their
-own MongoDB. You can find a more comprehensive `jobflow-remote` tutorial [here](../../jobflowremote.md).
-
-Submission using `FireWorks`:
-```python
-from fireworks import LaunchPad
-from jobflow.managers.fireworks import flow_to_workflow
-
-...
-
-autoplex_flow = ...
-
-wf = flow_to_workflow(autoplex_flow)
-
-# submit the workflow to the FireWorks launchpad
-lpad = LaunchPad.auto_load()
-lpad.add_wf(wf)
-```
-
-Submission using `jobflow-remote`:
-```python
-from jobflow_remote import submit_flow, set_run_config
-
-...
-
-autoplex_flow = ...
-
-# setting different job setups in the submission script directly:
-resources = {"nodes": N, "partition": "name", "time": "01:00:00", "ntasks": ntasks, "qverbatim": "#SBATCH --get-user-env",
-             "mail_user": "your_email@adress", "mail_type": "ALL"}
-            # put your slurm submission keywords as needed
-            # you can add "qverbatim": "#SBATCH --get-user-env" in case your conda env is not activated automatically
-
-resources_phon = {"nodes": N, "partition": "name", "time": "05:00:00", "ntasks": ntasks, "qverbatim": "#SBATCH --get-user-env",
-             "mail_user": "your_email@adress", "mail_type": "ALL"}
-
-resources_ratt = {"nodes": N, "partition": "micro", "time": "03:00:00", "ntasks": ntasks, "qverbatim": "#SBATCH --get-user-env",
-             "mail_user": "your_email@adress", "mail_type": "ALL"}
-
-resources_mlip = {"nodes": N, "partition": "name", "time": "02:00:00", "ntasks": ntasks, "qverbatim": "#SBATCH --get-user-env",
-             "mail_user": "your_email@adress", "mail_type": "ALL"}
-
-autoplex_flow = set_run_config(autoplex_flow, name_filter="dft phonon static", resources=resources_phon)
-
-autoplex_flow = set_run_config(autoplex_flow, name_filter="dft rattle static", resources=resources_ratt)
-
-autoplex_flow = set_run_config(autoplex_flow, name_filter="machine_learning_fit", resources=resources_mlip)
-
-# submit the workflow to jobflow-remote
-print(submit_flow(autoplex_flow, worker="autoplex_worker", resources=resources, project="autoplex"))
-```
-
 
 ## Output and results
 
-The default `autoplex` workflow provides you with diagnostic and benchmark output plots and results. 
+The default `autoplex` phonon workflow provides you with diagnostic and benchmark output plots and results. 
 Please note that the current shown results are the autoplex unit test examples and have not been produced by the tutorial settings.
 
 After the MLIP fit is finished, `autoplex` outputs the training and the testing error of the current potential that is fitted.
@@ -254,18 +196,18 @@ Testing error of MLIP (eV/at.): 0.0023569
 
 "MLIP vs. DFT" plots for the energy and force values will be automatically saved which provides you with information 
 about the quality of your fit.
-![autoplex diagnostic](../../_static/energy_forces.png)
+![autoplex diagnostic](../../../_static/energy_forces.png)
 The plot is divided into three sections. First, the energies and forces for the training data, and then for the test data is plotted. `autoplex` also automatically filters the data according to a certain energy threshold (eV) `energy_limit=0.005` as well as a certain force threshold (ev/Å) `force_limit=0.1` to catch outliers resulting from inconsistencies in the data.
 Finally, the energy and force filtered data is plotted in the third section. This can help you to figure out if there is 
 a problem with your data in case the MLIP fit quality does not turn out as expected.
 
 At the end of each workflow run, `autoplex` also provides you with the benchmark plots for the phonon bandstructure 
 comparison between the ML-based (here GAP) and the DFT-based result.  
-![autoplex default](../../_static/LiCl_band_comparison.png)
+![autoplex default](../../../_static/LiCl_band_comparison.png)
 
 
 as well as the q-point wise phonon RMSE plot.
-![autoplex default](../../_static/LiCl_rmse_phonons.png)
+![autoplex default](../../../_static/LiCl_rmse_phonons.png)
 This will give you feedback of the overall quality of the generated ML potential.
 
 `autoplex` also prints the file `results_LiCl.txt` (here for the example of LiCl) with a summary of the essential 

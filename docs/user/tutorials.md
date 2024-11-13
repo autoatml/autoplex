@@ -1,7 +1,7 @@
 Tutorials
 ==========
 
-*`autoplex` tutorials written by Christina Ertural ([christina.ertural@bam.de](mailto:christina.ertural@bam.de)).*
+*`autoplex` tutorials written by [autoplex](https://github.com/autoatml/autoplex) developers.*
 
 The user is advised to have a general familiarity with the following software packages and tools:
  * VASP
@@ -22,10 +22,22 @@ By the end of these tutorials, you should be able to:
 
 ```{toctree}
 :maxdepth: 2
-
-flows/flows
-rss/rss
-generation/data
-fitting/fitting
-benchmark/benchmark
+:caption: Quick-Start
+quickstart/quickstart
 ```
+
+### Random structure searching (RSS) workflow
+```{toctree}
+:maxdepth: 3
+rss/rss
+```
+
+### Phonon-accurate machine-learned potentials workflow
+```{toctree}
+:maxdepth: 3
+phonon/flows/flows
+phonon/generation/data
+phonon/fitting/fitting
+phonon/benchmark/benchmark
+```
+
