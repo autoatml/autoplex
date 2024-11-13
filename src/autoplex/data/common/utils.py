@@ -1128,7 +1128,8 @@ def boltzhist_cur_one_shot(
     The algorithm uses a combination of CUR selection and Boltzmann weighting
     to select the atoms with diversity and low energy.
 
-    Adapted from:
+    References
+    ----------
     *    Title: Research data supporting "De novo exploration and self-guided learning of potential-energy surfaces"
     *    Script: select_enthalpy_flat_histogram.py
     *    Author: Noam Bernstein, Gábor Csányi and Volker L. Deringer
