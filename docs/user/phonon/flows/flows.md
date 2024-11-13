@@ -2,13 +2,13 @@
 
 *Tutorials written by Christina Ertural ([christina.ertural@bam.de](mailto:christina.ertural@bam.de)) and Janine George ([janine.george@bam.de](mailto:christina.ertural@bam.de)).*
 
-# Out-of-the-box phonon workflow
+# Phonon-accurate machine-learned potentials workflow
 
 This tutorial will demonstrate how to use `autoplex` with its default setup and settings.
 
 > ℹ️ The default setting might not be sufficient or not suitable in any other way for your calculations. Carefully check your results with the default setup and adjust the settings when needed.
 
-## General workflow
+## General out-of-the-box workflow
 
 The complete workflow of `autoplex` involves the data generation 
 (including the execution of VASP calculations), 
