@@ -49,7 +49,7 @@ specific VASP input adjustments to guarantee high quality fit data. It can be us
 
 There are several ways available in `autoplex` to rattle supercell structures,
 that are collected in the `dft_random_gen_data` flow 
-(see diagram in the [general tutorial](../flows.md#general-workflow).
+(see diagram in the [general tutorial](../flows.md#general-out-of-the-box-workflow).
 The size of the supercell is determined by the `supercell_matrix`,
 and there is the option of volume distortion, angle distortion or a combination of both provided by `distort_type`.
 The displacement of all atomic positions ("rattling") is controlled by the parameter `rattle_type`,
