@@ -115,7 +115,8 @@ class HookeanRepulsion(FixConstraint):
     that the constraint will be either soft enough (e.g. non-exploding in MD) or
     strong enough (to avoid overlaps) for all spring constants and distances.
 
-    Adapted from:
+    References
+    ----------
     *    Title: ASE constraints package at  at ase/ase/constraints.py
     *    Author: Ask Hjorth Larsen
     *    Date 07/10/2024
