@@ -3,7 +3,7 @@
 Install autoplex from source, by cloning the repository via [github](https://github.com/JaGeo/autoplex.git)
 
 ```bash
-git clone https://github.com/JaGeo/autoplex.git
+git clone https://github.com/autoatml/autoplex.git
 cd autoplex
 pip install -e .[strict,dev,tests,docs]
 ```
