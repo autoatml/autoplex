@@ -7,7 +7,7 @@ There might be cases, where this is not feasible and then you need to run a mong
 This guide will walk you through the steps that you to do for running a mongodb in front-end.
 
   * Get mongodb from here: https://www.mongodb.com/try/download/community
-  * You can e.g. donwload "Platform: SUSE 15" and "Package: tgz" and put it on your remote cluster. Check the platform-dependency of your cluster!!!
+  * You can e.g. download "Platform: SUSE 15" and "Package: tgz" and put it on your remote cluster. Check the platform-dependency of your cluster!!!
   * Extract the files from the downloaded archive and add the executables within to your PATH environment variable i.e open the  `~/.bashrc` file and add following line to it.
     ```bash
     export PATH="/path/to/the/mongodb-directory/bin:$PATH"
@@ -51,7 +51,9 @@ This guide will walk you through the steps that you to do for running a mongodb 
     ```
   * *Note* down the remote cluster login node where you started your mongodb instance.
   * Open another terminal, login to your remote cluster again and ssh to same login node on which your mongodb instance is running.
-Note that the next steps of creating databses have also be done by your IT admin for running MongoDB in the background:
+
+Note that the next steps of creating databases also have to be done by your IT admin for running MongoDB in the background:
+
   * For this, open the mongo shell there 
     ```bash
     mongo
