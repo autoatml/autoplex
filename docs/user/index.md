@@ -1,4 +1,4 @@
-Getting started
+Overview
 ================
 ```{include} ../../README.md
 ---
