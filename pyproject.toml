@@ -12,7 +12,7 @@ readme = "README.md"
 keywords = ["high-throughput", "automated", "mlpotential"]
 license = { text = "GPL-3.0 license" }
 authors = [{ name = "Janine George", email = "janine.george@bam.de" }]
-version = "0.0.3"
+version = "0.0.5"
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
@@ -24,11 +24,11 @@ classifiers = [
 requires-python = ">=3.10,<3.12"
 dependencies = [
      "pymatgen>=2024.9.17.1",
-     "atomate2[strict]@git+https://github.com/materialsproject/atomate2.git@main",
+     "atomate2[strict]>=0.0.18",
      "ase==3.23.0",
      "matgl==1.1.3",
      "numpy==1.26.4",
-     "mace-torch@git+https://github.com/ACEsuit/mace.git@main",
+     "mace-torch==0.3.7",
      "lightning-utilities==0.11.2",
      "typing",
      "nequip",
@@ -45,6 +45,7 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 "autoplex.fitting.common" = ["*.json"]
+"autoplex.auto.rss" = ["*.yaml"]
 
 [project.optional-dependencies]
 docs = [
@@ -62,18 +63,20 @@ docs = [
 
 ]
 strict = [
-     "pymatgen>=2024.8.9",
-     "atomate2[strict]@git+https://github.com/materialsproject/atomate2.git@main",
+     "pymatgen==2024.10.3", #?
+     "atomate2[strict]==0.0.18",
      "matgl==1.1.3",
      "quippy-ase==0.9.14; python_version < '3.12'",
      "torch==2.2.1",
      "ase==3.23.0",
-     "mace-torch@git+https://github.com/ACEsuit/mace.git@main",
+     "mace-torch==0.3.7",
      "lightning-utilities==0.11.2",
      "numpy==1.26.4",
      "typing",
      "dgl==2.1.0",
      "torchdata==0.7.1",
+     "nequip==0.6.1",
+     "hiphive==1.3.1",
 ]
 dev = ["pre-commit>=2.12.1"]
 tests = ["pytest", "pytest-mock", "pytest-split", "pytest-cov", "types-setuptools"]
@@ -168,8 +171,10 @@ exclude_lines = [
 
 [tool.coverage.paths]
 source = [
-    "autoplex/",
-    "/workspace/autoplex/",
+    "src/autoplex/",
+    "/workspace/src/autoplex",
+    "/opt/conda/lib/python3.10/site-packages/autoplex/",
+    "/opt/conda/lib/python3.11/site-packages/autoplex/",
 ]
 
 [tool.coverage.run]

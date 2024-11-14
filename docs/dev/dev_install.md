@@ -12,7 +12,9 @@ However, note that non-python programs like `buildcell` and `julia` needed for A
 seperately.
 
 Alternatively, one can use the `devcontainer` provided to have your developer environment setup automatically in your IDE. It has been tested to work in [VSCode](https://code.visualstudio.com/docs/devcontainers/containers#_quick-start-open-an-existing-folder-in-a-container) and [PyCharm](https://blog.jetbrains.com/pycharm/2023/06/2023-2-eap-4/). 
-Only prerequisite is one has [docker](https://docs.docker.com/get-started/get-docker/) installed on the system as it uses the published docker images to create this developer env. 
+Only prerequisite is one has [docker](https://docs.docker.com/get-started/get-docker/) installed on the system as it uses the published docker images to create this developer env.
+One can also simply use [GitHub Codespaces](https://github.com/features/codespaces) to use the devcontainer.
+The codespaces environment will have all the required dependencies installed.
 
 
 ## Running unit tests

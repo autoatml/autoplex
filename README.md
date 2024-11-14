@@ -1,7 +1,17 @@
-[![Testing Linux](https://github.com/JaGeo/autoplex/actions/workflows/python-package.yml/badge.svg)](https://github.com/JaGeo/autoplex/actions/workflows/python-package.yml) [![DOI](https://zenodo.org/badge/671124251.svg)](https://doi.org/10.5281/zenodo.14105049)
+[![Testing Linux](https://github.com/JaGeo/autoplex/actions/workflows/python-package.yml/badge.svg)](https://github.com/JaGeo/autoplex/actions/workflows/python-package.yml) [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/autoatml/autoplex/main.svg)](https://results.pre-commit.ci/latest/github/autoatml/autoplex/main) [![DOI](https://zenodo.org/badge/671124251.svg)](https://doi.org/10.5281/zenodo.14105049) ![supported python versions](https://img.shields.io/pypi/pyversions/autoplex) [![PyPI version](https://badge.fury.io/py/autoplex.svg)](https://badge.fury.io/py/autoplex)
 
 <img src="docs/_static/autoplex_logo.png" width="66%">
 
+<div style="border: 1px solid #2e3191; padding: 5px; position: relative;">
+    <div style="background-color: #2e3191; color: #ffffff; padding: 0px; position: absolute; top: 0; left: 0; right: 0; text-align: center;">
+        <strong>Disclaimer</strong>
+    </div>
+<br>
+
+`autoplex` is still under very active development and is only suitable for expert users as not all of the documentation is in place. This will change until end of November 2024.
+</div>
+
+<br>
 
 `autoplex` is a software for generating and benchmarking machine learning (ML)-based interatomic potentials. The aim of `autoplex` is to provide a fully automated solution for creating high-quality ML potentials. The software is interfaced to multiple different ML potential fitting frameworks and to the atomate2 and ase environments for efficient high-throughput computations. The vision of this project is to allow a wide community of researchers to create accurate and reliable ML potentials for materials simulations.
 
@@ -31,7 +41,7 @@ All of these software tools provide documentation and tutorials. Please take you
 
 To set up the mandatory prerequisites for using `autoplex,` please follow the [installation guide of atomate2](https://materialsproject.github.io/atomate2/user/install.html).
 
-After setting up `atomate2`, make sure to add `VASP_INCAR_UPDATES: {"NPAR": number}` in your ~/atomate2/config/atomate2.yaml file.
+After setting up `atomate2`, make sure to add `VASP_INCAR_UPDATES: {"NPAR": number}` in your `~/atomate2/config/atomate2.yaml` file.
 Set a number that is a divisor of the number of tasks you use for the VASP calculations.
 
 # Installation

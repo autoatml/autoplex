@@ -36,7 +36,7 @@ jobs:
         run: |
             micromamba activate autoplex_docs
             uv pip install --upgrade pip
-            uv pip install .[docs,strict]
+            uv pip install --prerelease=allow .[docs,strict]
       - name: Build
         run: micromamba run -n autoplex_docs sphinx-build -W docs _build
       - name: Deploy to GitHub Pages

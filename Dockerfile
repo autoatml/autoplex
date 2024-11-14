@@ -84,4 +84,4 @@ WORKDIR /workspace
 COPY . /workspace
 
 # Install autoplex and clear cache
-RUN uv pip install .[strict,docs] && uv cache clean && rm -rf /tmp/*
+RUN uv pip install --prerelease=allow .[strict,docs] && uv cache clean && rm -rf /tmp/*
