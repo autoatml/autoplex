@@ -52,7 +52,7 @@ This guide will walk you through the steps that you to do for running a mongodb 
   * *Note* down the remote cluster login node where you started your mongodb instance.
   * Open another terminal, login to your remote cluster again and ssh to same login node on which your mongodb instance is running.
 
-Note that the next steps of creating databases also have to be done by your IT admin for running MongoDB in the background:
+Note that the next steps of creating databases also have to be done by your IT admin for running MongoDB in backend:
 
   * For this, open the mongo shell there 
     ```bash
