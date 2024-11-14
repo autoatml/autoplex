@@ -22,8 +22,7 @@ By the end of these tutorials, you should be able to:
 
 ```{toctree}
 :maxdepth: 2
-quickstart/quickstart
-quickstart/installation
+installation/installation
 ```
 
 ```{toctree}
@@ -41,15 +40,26 @@ phonon/flows/fitting/fitting
 phonon/flows/benchmark/benchmark
 ```
 
-## Contributions
+## Contributors and Their Contributions
 
-- [Christina Ertural (christina.ertural@bam.de)](quickstart/quickstart.md)
-- [Christina Ertural (christina.ertural@bam.de) and Aakash Naik (aakash.naik@bam.de)](quickstart/installation.md)
-- [Yuanbin Liu (lyb122502@126.com)](rss/rss.md)
-- [Christina Ertural (christina.ertural@bam.de) and Janine George (janine.george@bam.de)](phonon/flows/flows.md)
-- [Christina Ertural (christina.ertural@bam.de)](phonon/flows/generation/data.md)
-- [Christina Ertural (christina.ertural@bam.de)](phonon/flows/fitting/fitting.md)
-- [Christina Ertural (christina.ertural@bam.de)](phonon/flows/benchmark/benchmark.md)
-- [Aakash Naik (aakash.naik@bam.de) and Christina Ertural (christina.ertural@bam.de)](jobflowremote.md)
-- [Aakash Naik (aakash.naik@bam.de) and Christina Ertural (christina.ertural@bam.de)](mongodb.md)
+- **[Christina Ertural](mailto:christina.ertural@bam.de)**  
+  - Initial setup documentation
+  - Phonon flows:
+    - Flows documentation
+    - Data generation guide
+    - Fitting documentation
+    - Benchmarking documentation
+  - Contributed to installation guide (with Aakash Naik)
+  - Contributed to jobflow-remote and MongoDB setup (with Aakash Naik)
+
+- **[Aakash Naik](mailto:aakash.naik@bam.de)**  
+  - Contributed to installation guide (with Christina Ertural)
+  - Jobflow-remote and MongoDB setup documentation (with Christina Ertural)
+
+- **[Yuanbin Liu](mailto:lyb122502@126.com)**  
+  - RSS documentation
+
+- **[Janine George](mailto:janine.george@bam.de)**  
+  - Phonon flows documentation (with Christina Ertural)
+
 
