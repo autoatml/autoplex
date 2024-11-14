@@ -36,7 +36,7 @@ curl -O https://www.mtg.msm.cam.ac.uk/files/airss-0.9.3.tgz; tar -xf airss-0.9.3
 
 
 A more comprehensive installation guide can be found [here](installation/installation.md) and for a even more advanced 
-installation, you can also follow the [developer installation guide](../../dev/dev_install.md).
+installation, you can also follow the [developer installation guide](../dev/dev_install.md).
 
 
 ## Workflow management
@@ -46,7 +46,7 @@ Please follow the installation and setup instructions on the respective guide we
 Both packages rely on the [MongoDB](https://www.mongodb.com/) database manager for data storage.
 
 We recommend using `jobflow-remote` as it is more flexible to use, especially on clusters where users cannot store their
-own MongoDB. You can find a more comprehensive `jobflow-remote` tutorial [here](../jobflowremote.md).
+own MongoDB. You can find a more comprehensive `jobflow-remote` tutorial [here](jobflowremote.md).
 
 Submission using `FireWorks`:
 ```python
