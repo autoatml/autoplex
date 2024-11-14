@@ -26,7 +26,7 @@ Set a number that is a divisor of the number of tasks you use for the VASP calcu
 The first step you need to do is to set up a [MongoDB](https://www.mongodb.com/) database. Help and tips regarding the MongoDB installation 
 can be found [here](https://materialsproject.github.io/fireworks/installation.html#install-mongodb). 
 We recommend installing the [MongoDB community edition](https://www.mongodb.com/docs/manual/administration/install-community/).
-MongoDB also provides lots of [tutorials](https://www.mongodb.com/docs/manual/administration/self-managed-configuration-and-maintenance/)
+MongoDB also provides lots of [installation guides](https://www.mongodb.com/docs/manual/administration/install-on-linux/#std-label-install-mdb-community-edition-linux) and [tutorials](https://www.mongodb.com/docs/manual/administration/self-managed-configuration-and-maintenance/)
 to setup and manage your database. For a Kick-start with MongoDB, we also provide a [MongoDB tutorial](../mongodb.md). 
 Also consider asking your IT administration for help.
 
