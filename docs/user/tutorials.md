@@ -41,3 +41,15 @@ phonon/flows/fitting/fitting
 phonon/flows/benchmark/benchmark
 ```
 
+## Contributions
+
+- [Christina Ertural (christina.ertural@bam.de)](quickstart/quickstart.md)
+- [Christina Ertural (christina.ertural@bam.de) and Aakash Naik (aakash.naik@bam.de)](quickstart/installation.md)
+- [Yuanbin Liu (lyb122502@126.com)](rss/rss.md)
+- [Christina Ertural (christina.ertural@bam.de) and Janine George (janine.george@bam.de)](phonon/flows/flows.md)
+- [Christina Ertural (christina.ertural@bam.de)](phonon/flows/generation/data.md)
+- [Christina Ertural (christina.ertural@bam.de)](phonon/flows/fitting/fitting.md)
+- [Christina Ertural (christina.ertural@bam.de)](phonon/flows/benchmark/benchmark.md)
+- [Aakash Naik (aakash.naik@bam.de) and Christina Ertural (christina.ertural@bam.de)](jobflowremote.md)
+- [Aakash Naik (aakash.naik@bam.de) and Christina Ertural (christina.ertural@bam.de)](mongodb.md)
+
