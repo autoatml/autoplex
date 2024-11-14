@@ -26,18 +26,13 @@ installation/installation
 ```
 
 ```{toctree}
-:caption: Random structure searching (RSS) workflow
 :maxdepth: 3
-rss/rss
+rss/index
 ```
 
 ```{toctree}
-:caption: Phonon-accurate machine-learned potentials workflow
 :maxdepth: 3
-phonon/flows/flows
-phonon/flows/generation/data
-phonon/flows/fitting/fitting
-phonon/flows/benchmark/benchmark
+phonon/index
 ```
 
 ## Contributors and Their Contributions
