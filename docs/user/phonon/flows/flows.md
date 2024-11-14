@@ -1,7 +1,5 @@
 (flows)=
 
-*Tutorials written by Christina Ertural ([christina.ertural@bam.de](mailto:christina.ertural@bam.de)) and Janine George ([janine.george@bam.de](mailto:christina.ertural@bam.de)).*
-
 # Phonon-accurate machine-learned potentials workflow
 
 This tutorial will demonstrate how to use `autoplex` with its default setup and settings.

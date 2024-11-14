@@ -1,7 +1,5 @@
 (benchmark)=
 
-*Tutorials written by Christina Ertural ([christina.ertural@bam.de](mailto:christina.ertural@bam.de)).*
-
 # Benchmark of ML-based phonon structure
 
 This tutorial will help you understand all the `autoplex` benchmark specifications.

@@ -1,7 +1,5 @@
 (fitting)=
 
-*Tutorials written by Christina Ertural ([christina.ertural@bam.de](mailto:christina.ertural@bam.de)).*
-
 # Fitting phonon-accurate potentials
 
 This tutorial will show you how to control the MLIP fit settings with the `autoplex` workflow. 

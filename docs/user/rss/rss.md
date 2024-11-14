@@ -1,7 +1,5 @@
 (rss)=
 
-*Written by Yuanbin Liu. For inquiries, please contact [lyb122502@126.com](mailto:lyb122502@126.com).*
-
 # Random structure searching (RSS) workflow
 
 The random structure searching (RSS) approach was initially proposed for predicting crystal structures by generating randomised, sensible structures and optimising them via first-principles calculations ([Phys. Rev. Lett. 97, 045504 (2006)](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.97.045504) and [J. Phys.: Condens. Matter 23, 053201 (2011)](https://iopscience.iop.org/article/10.1088/0953-8984/23/5/053201)). Recently, RSS was expanded into a methodology for exploring and learning potential-energy surfaces from scratch ([Phys. Rev. Lett. 120, 156001 (2018)](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.120.156001) and [npj Comput. Mater. 5, 99 (2019)](https://www.nature.com/articles/s41524-019-0236-6)). Enhanced with physics-inspired sampling methods, such as Boltzmann-probability biased histograms and CUR, this approach ensures both the significance (low-energy) and diversity of the structures being searched.

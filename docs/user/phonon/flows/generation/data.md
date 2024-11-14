@@ -1,7 +1,5 @@
 (generation)=
 
-*Tutorials written by Christina Ertural ([christina.ertural@bam.de](mailto:christina.ertural@bam.de)).*
-
 # Generating reference data from DFT-based phonon structures
 
 This tutorial will explain how the reference data for the MLIP fit can be generated.

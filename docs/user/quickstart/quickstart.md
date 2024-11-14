@@ -1,7 +1,5 @@
 (quickstart)=
 
-*Tutorials written by Christina Ertural ([christina.ertural@bam.de](mailto:christina.ertural@bam.de)).*
-
 # Quick-start guide
 
 This guide assumes that you have all the [Materials Project](https://github.com/materialsproject) framework software tools as well as a working [MongoDB](https://www.mongodb.com/) 
