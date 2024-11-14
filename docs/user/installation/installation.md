@@ -13,7 +13,15 @@ This involves the following software packages:
 - [jobflow-remote](https://github.com/Matgenix/jobflow-remote) or [FireWorks](https://github.com/materialsproject/fireworks) for workflow and database (MongoDB) management,
 - [MongoDB](https://www.mongodb.com/) as the database (we recommend installing the MongoDB community edition). 
 
-## Installation Documentation and Guids of the Dependencies
+
+We are also referring the user to the [installation guide of atomate2](https://materialsproject.github.io/atomate2/user/install.html) in order to setup the mandatory prerequisites to 
+be able to use `autoplex`.
+
+After setting up `atomate2`, make sure to add `VASP_INCAR_UPDATES: {"NPAR": number}` in your ~/atomate2/config/atomate2.yaml file. 
+Set a number that is a divisor of the number of tasks you use for the VASP calculations.
+
+
+## Installation Documentation and Guides of the Dependencies
 
 The first step you need to do is to set up a [MongoDB](https://www.mongodb.com/) database. Help and tips regarding the MongoDB installation 
 can be found [here](https://materialsproject.github.io/fireworks/installation.html#install-mongodb). 
