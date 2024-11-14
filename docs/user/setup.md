@@ -35,7 +35,8 @@ curl -O https://www.mtg.msm.cam.ac.uk/files/airss-0.9.3.tgz; tar -xf airss-0.9.3
 ```
 
 
-For a more advanced installation, you can also follow the [developer installation guide](../../dev/dev_install.md).
+A more comprehensive installation guide can be found [here](installation/installation.md) and for a even more advanced 
+installation, you can also follow the [developer installation guide](../../dev/dev_install.md).
 
 
 ## Workflow management
