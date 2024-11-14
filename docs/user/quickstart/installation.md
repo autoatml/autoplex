@@ -1,7 +1,5 @@
 (installation)=
 
-*Tutorials written by Christina Ertural ([christina.ertural@bam.de](mailto:christina.ertural@bam.de)).*
-
 # Installation guide
 
 ## Before you start using `autoplex`
@@ -21,7 +19,8 @@ The first step you need to do is to set up a [MongoDB](https://www.mongodb.com/)
 can be found [here](https://materialsproject.github.io/fireworks/installation.html#install-mongodb). 
 We recommend installing the [MongoDB community edition](https://www.mongodb.com/docs/manual/administration/install-community/).
 MongoDB also provides lots of [tutorials](https://www.mongodb.com/docs/manual/administration/self-managed-configuration-and-maintenance/)
-to setup and manage your database. Also consider asking your IT administration for help.
+to setup and manage your database. For a Kick-start with MongoDB, we also provide a [MongoDB tutorial](../mongodb.md). 
+Also consider asking your IT administration for help.
 
 The next step you need do is to install a workflow manager. There are currently two options: [jobflow-remote](https://github.com/Matgenix/jobflow-remote) or [FireWorks](https://github.com/materialsproject/fireworks).
 There are also documentation and tutorials available for [FireWorks](https://materialsproject.github.io/fireworks/) and [jobflow-remote](https://matgenix.github.io/jobflow-remote/).
