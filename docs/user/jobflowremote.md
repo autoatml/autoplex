@@ -225,7 +225,11 @@ print(jc.get_jobs_doc(db_ids='214')[0].job.maker.input_set_generator.user_incar_
 2. `jf flow list` (list of flows in the DB)
 3. `jf job info jobid` (provides some info of job like workdir, error info if it failed)
 4. `jf flow delete -did db_id` (deletes flow from DB)
-5. `jf flow -h` or `jf job -h` for checking other options
+5. `jf job list -s STATE`, e.g. `jf job list -s FAILED`
+6. `jf job rerun -s STATE`, e.g. `jf job rerun -s FAILED`
+7. `jf job retry -s STATE`, e.g. `jf job retry -s REMOTE_ERROR`
+8. `jf flow info flow_id` (shows the jobs of a certain flow)
+9. `jf flow -h` or `jf job -h` for checking other options
 
 # Some useful links
 
