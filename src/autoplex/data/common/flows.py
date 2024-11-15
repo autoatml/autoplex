@@ -21,17 +21,6 @@ from atomate2.vasp.powerups import (
     update_user_potcar_settings,
 )
 from atomate2.vasp.sets.core import StaticSetGenerator
-from custodian.vasp.handlers import (
-    FrozenJobErrorHandler,
-    IncorrectSmearingHandler,
-    LargeSigmaHandler,
-    MeshSymmetryErrorHandler,
-    NonConvergingErrorHandler,
-    PotimErrorHandler,
-    StdErrHandler,
-    UnconvergedErrorHandler,
-    VaspErrorHandler,
-)
 from jobflow import Flow, Maker, Response, job
 from pymatgen.core import Lattice
 from pymatgen.core.structure import Structure
@@ -360,21 +349,9 @@ class DFTStaticLabelling(Maker):
 
         custom_set = default_custom_set
 
-        custom_handlers = (
-            VaspErrorHandler(),
-            MeshSymmetryErrorHandler(),
-            UnconvergedErrorHandler(),
-            NonConvergingErrorHandler(),
-            PotimErrorHandler(),
-            FrozenJobErrorHandler(),
-            StdErrHandler(),
-            LargeSigmaHandler(),
-            IncorrectSmearingHandler(),
-        )
-
         st_m = StaticMaker(
             input_set_generator=StaticSetGenerator(user_incar_settings=custom_set),
-            run_vasp_kwargs={"handlers": custom_handlers},
+            run_vasp_kwargs={"handlers": ()},
         )
 
         if self.custom_potcar is not None:
