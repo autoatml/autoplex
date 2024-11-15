@@ -10,7 +10,7 @@
 
 **Full Changelog**: https://github.com/autoatml/autoplex/compare/v0.0.5...v0.0.6
 
-## v0.0.6 
+## v0.0.6
  * does not exist due to a release error
 
 ## v0.0.5
