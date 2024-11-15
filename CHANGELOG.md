@@ -1,5 +1,5 @@
 # Changelog
-## v0.0.6
+## v0.0.7
 ### What's Changed
 * Clean up pyproject.toml to enable a strict/non-strict installation procedure by @JaGeo in https://github.com/autoatml/autoplex/pull/242
 * Misc CI workflow improvements by @naik-aakash in https://github.com/autoatml/autoplex/pull/238
@@ -10,6 +10,8 @@
 
 **Full Changelog**: https://github.com/autoatml/autoplex/compare/v0.0.5...v0.0.6
 
+## v0.0.6 
+ * does not exist due to a release error
 
 ## v0.0.5
 Bug fix for a missing file export in v0.0.4 (RSS functionality)
