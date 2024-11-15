@@ -11,7 +11,8 @@ on:
     branches: [ main ]
 
 permissions:
-  contents: write  # Allow the workflow to push changes to the repository
+  contents: write
+  pull-requests: write
 
 jobs:
   build:
@@ -24,11 +25,14 @@ jobs:
         split: [1, 2, 3, 4, 5]  # Number of splits
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Extract version from pyproject.toml
+    - name: Fetch Most Recent Docker Image Tag
       run: |
-          VERSION=$(grep '^version = ' pyproject.toml | sed -E 's/version = "(.*)"/\1/')
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
+        TAG=$(curl -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/orgs/autoatml/packages/container/autoplex%2Fautoplex-python-3.10/versions \
+            | jq -r 'sort_by(.created_at) | reverse | .[0].metadata.container.tags[0]')
+        echo "VERSION=$TAG" >> $GITHUB_ENV
+
     - uses: actions/checkout@v3
     - name: Run tests using Docker image for Python ${{ matrix.python-version }}
       run: |
@@ -40,12 +44,12 @@ jobs:
           bash -c "
           python -m pip install --upgrade pip && \
           python -m uv cache clean
-          python -m uv pip install .[strict,tests] && \
+          python -m uv pip install --prerelease=allow .[strict,tests] && \
           OMP_NUM_THREADS=1 pytest --cache-clear --cov=autoplex --cov-report term-missing --cov-append --splits 5 --group ${{ matrix.split }} -vv --durations-path /workspace/tests/test_data/.pytest-split-durations --store-durations 
         "
         
     - name: Upload test durations artifact
-      if: matrix.python-version == '3.10' && github.repository_owner == github.actor
+      if: matrix.python-version == '3.10'
       uses: actions/upload-artifact@v3
       with:
         name: test-durations-${{ matrix.python-version }}-${{ matrix.split }}
@@ -53,17 +57,17 @@ jobs:
         path: ./tests/test_data/.pytest-split-durations
 
     - name: Upload coverage
+      if: matrix.python-version == '3.10'
       uses: actions/upload-artifact@v3
       with:
         name: coverage-${{ matrix.python-version }}-${{ matrix.split }}
         include-hidden-files: true
-        overwrite: false
         path: ./.coverage
 
   commit-durations:
+    if: github.repository_owner == 'autoatml' && github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
-    if: github.repository_owner == github.actor
     steps:
     - uses: actions/checkout@v3
 
@@ -76,16 +80,18 @@ jobs:
         > tests/test_data/.pytest-split-durations
         # Run the Python script to average out test durations
         python3 .github/scripts/average_test_durations.py
+        rm -rf test-durations-*
 
-    - name: Commit and push consolidated test durations
-      run: |
-        git config --global user.name "github-actions"
-        git config --global user.email "github-actions@github.com"
-        git add ./tests/test_data/.pytest-split-durations
-        git commit -m "Add averaged test durations"
-        git push origin ${{ github.ref_name }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Create Pull Request to push consolidated test durations
+      uses: peter-evans/create-pull-request@v7
+      with:
+        token: ${{ secrets.ACTION_SECRET }}
+        commit-message: update test durations
+        title: Update test durations file
+        body: Auto update test durations file
+        branch: update-test-durations
+        delete-branch: true
+        base: main
 
   coverage:
       needs: build
@@ -128,6 +134,6 @@ jobs:
         run: |
             micromamba activate autoplex_docs
             uv pip install --upgrade pip
-            uv pip install .[docs,strict]
+            uv pip install --prerelease=allow .[docs,strict]
       - name: Build
         run: micromamba run -n autoplex_docs sphinx-build -W docs _build

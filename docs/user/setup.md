@@ -7,7 +7,7 @@ database setup and have experience using [atomate2](https://github.com/materials
 You can install `autoplex` simply by:
 
 ``` 
-pip install autoplex
+pip install autoplex[strict]
 ```
 This will install all the Python packages and dependencies needed for MLIP fits. 
 

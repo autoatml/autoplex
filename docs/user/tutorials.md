@@ -51,7 +51,7 @@ phonon/index
   - Contributed to installation guide (with Christina Ertural)
   - Jobflow-remote and MongoDB setup documentation (with Christina Ertural)
 
-- **[Yuanbin Liu](mailto:lyb122502@126.com)**  
+- **[Yuanbin Liu](mailto:yuanbin.liu@chem.ox.ac.uk)**  
   - RSS documentation
 
 - **[Janine George](mailto:janine.george@bam.de)**  

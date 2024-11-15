@@ -42,7 +42,7 @@ When you have completed all these preparation steps, it's time to install `autop
 You can install `autoplex` simply by:
 
 ``` 
-pip install autoplex
+pip install autoplex[strict]
 ```
 This will install all the Python packages and dependencies needed for MLIP fits. 
 
