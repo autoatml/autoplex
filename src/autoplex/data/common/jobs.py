@@ -593,7 +593,7 @@ def collect_dft_data(
 
     for i, val in enumerate(dirs):
         if os.path.exists(os.path.join(val, "vasprun.xml.gz")):
-                
+
             converged = check_convergence_vasp(os.path.join(val, "vasprun.xml.gz"))
 
             if converged:
@@ -603,9 +603,7 @@ def collect_dft_data(
                         -voigt_6_to_full_3x3_stress(at_i.get_stress())
                         * at_i.get_volume()
                     )
-                    at_i.info["REF_virial"] = " ".join(
-                        map(str, virial_list.flatten())
-                    )
+                    at_i.info["REF_virial"] = " ".join(map(str, virial_list.flatten()))
                     del at_i.calc.results["stress"]
                     at_i.arrays["REF_forces"] = at_i.calc.results["forces"]
                     del at_i.calc.results["forces"]
@@ -626,12 +624,12 @@ def collect_dft_data(
                     if at_i.info["config_type"] == "IsolatedAtom":
                         at_ids = at_i.get_atomic_numbers()
                         # array_key = at_ids.tostring()
-                        isolated_atom_energies[int(at_ids[0])] = at_i.info[
-                            "REF_energy"
-                        ]
+                        isolated_atom_energies[int(at_ids[0])] = at_i.info["REF_energy"]
 
-            else: 
-                logging.warning(f"Calculation did not converge for path: {os.path.join(val, 'vasprun.xml.gz')}")
+            else:
+                logging.warning(
+                    f"Calculation did not converge for path: {os.path.join(val, 'vasprun.xml.gz')}"
+                )
 
     logging.info(f"Total {len(atoms)} structures from VASP are exactly collected.")
 

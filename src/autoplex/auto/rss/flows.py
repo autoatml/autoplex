@@ -341,7 +341,7 @@ class RssMaker(Maker):
         if config_params["train_from_scratch"]:
             rss_params.update({"include_isolated_atom": False})
             rss_params.update({"include_dimer": False})
-            
+
             do_rss_job = do_rss_iterations(
                 input=initial_rss_job.output,
                 **rss_params,
