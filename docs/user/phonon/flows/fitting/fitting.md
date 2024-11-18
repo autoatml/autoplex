@@ -373,7 +373,6 @@ fit_input_dict = {
     
 mlip_fit = MLIPFitMaker(mlip_type="GAP", ...,).make(
         species_list=["Li", "Cl"],
-        isolated_atoms_energy=[-0.28649227, -0.25638457],
         fit_input=fit_input_dict,
         pre_xyz_files=["vasp_ref.extxyz"],
         pre_database_dir="/path/to/pre_database",
