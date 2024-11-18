@@ -160,6 +160,7 @@ exclude_lines = [
   "pragma: no cover",
   "def __repr__",
   "if self.debug:",
+  "if TYPE_CHECKING:",
   "if settings.DEBUG",
   "raise AssertionError",
   "raise NotImplementedError",
