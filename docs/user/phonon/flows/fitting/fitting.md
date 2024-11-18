@@ -362,7 +362,7 @@ fit_input_dict = {
             ]],
             "phonon_data": [],
         },
-        "isolated_atom": {"iso_atoms_dir": [[
+        "IsolatedAtom": {"iso_atoms_dir": [[
                 (
                     "/path/to/isolated/atom/calculation"
                 ),
