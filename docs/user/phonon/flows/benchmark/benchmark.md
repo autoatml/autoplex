@@ -49,7 +49,7 @@ It is important to provide the pre-existing DFT data in form of a `PhononBSDOSDo
 
 import os
 from atomate2.common.schemas.phonons import PhononBSDOSDoc
-from atomate2.forcefields.jobs import GAPRelaxMaker, GAPStaticMaker
+from atomate2.forcefields.jobs import ForceFieldRelaxMaker, ForceFieldStaticMaker
 from mp_api.client import MPRester
 from autoplex.benchmark.phonons.flows import PhononBenchmarkMaker
 from atomate2.forcefields.flows.phonons import PhononMaker
@@ -73,17 +73,22 @@ dft_reference: PhononBSDOSDoc = dft_data["output"]
 potential_filename = "/path/to/GAP/file/gap_file.xml"
 
 phojob = PhononMaker(
-        bulk_relax_maker=GAPRelaxMaker(calculator_kwargs={"args_str": "IP GAP", "param_filename": potential_filename}, 
-        relax_cell=True, relax_kwargs={"interval": 500, "fmax": 0.00001}, steps=10000),
-        phonon_displacement_maker=GAPStaticMaker(calculator_kwargs={"args_str": "IP GAP", "param_filename": potential_filename}),
-        static_energy_maker=GAPStaticMaker(calculator_kwargs={"args_str": "IP GAP", "param_filename": potential_filename}),
+        bulk_relax_maker=ForceFieldRelaxMaker(calculator_kwargs={"args_str": "IP GAP", "param_filename": potential_filename}, 
+        relax_cell=True, relax_kwargs={"interval": 500, "fmax": 0.00001}, steps=10000,
+        force_field_name="GAP",
+),
+        phonon_displacement_maker=ForceFieldStaticMaker(calculator_kwargs={"args_str": "IP GAP", "param_filename": potential_filename},
+        force_field_name="GAP",
+),
+        static_energy_maker=ForceFieldStaticMaker(calculator_kwargs={"args_str": "IP GAP", "param_filename": potential_filename}),
         store_force_constants=False, min_length=18,
-        generate_frequencies_eigenvectors_kwargs={"units": "THz"}).make(structure=structure)
+        generate_frequencies_eigenvectors_kwargs={"units": "THz"}, force_field_name="GAP",
+).make(structure=structure)
         
 bm = PhononBenchmarkMaker(name="Benchmark").make(
     structure=structure, benchmark_mp_id = "mp-22905",
     displacement=0.01, atomwise_regularization_parameter=0.1,
-    soap_dict={'n_sparse': 6000, 'delta': 0.5}, suffix="",
+    soap_dict={'n_sparse': 6000, 'delta': 0.5}, suffix="",  # exemplary values
     ml_phonon_task_doc = phojob.output, dft_phonon_task_doc = dft_reference)
 
 comp_bm = write_benchmark_metrics(
