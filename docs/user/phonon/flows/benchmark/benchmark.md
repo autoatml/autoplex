@@ -81,21 +81,20 @@ phojob = PhononMaker(
         generate_frequencies_eigenvectors_kwargs={"units": "THz"}).make(structure=structure)
         
 bm = PhononBenchmarkMaker(name="Benchmark").make(
-    structure=structure, benchmark_mp_id = "mp-22905", 
+    structure=structure, benchmark_mp_id = "mp-22905",
+    displacement=0.01, atomwise_regularization_parameter=0.1,
+    soap_dict={'n_sparse': 6000, 'delta': 0.5}, suffix="",
     ml_phonon_task_doc = phojob.output, dft_phonon_task_doc = dft_reference)
 
 comp_bm = write_benchmark_metrics(
-            ml_models=["GAP"],
             benchmark_structures=[structure],
-            benchmark_mp_ids=["mp-22905"],
-            metrics=bm.output,
-            displacements=[0.01],
+            metrics=[[bm.output]],
         )
 
 run_locally([phojob, bm, comp_bm], create_folders=True, store=store)
 ```
 If you use another [`ForceFieldRelaxMaker` and `ForceFieldStaticMaker`](https://github.com/materialsproject/atomate2/blob/main/src/atomate2/forcefields/jobs.py), you can switch from GAP to one of the other 
-[MLIP potentials](../fitting/fitting.md#fitting-phonon-accurate-potentials).
+[MLIP potentials](../fitting/fitting.md#fitting-phonon-accurate-potentials). 
 
 You can extract a JSON file containing your pre-existing VASP DFT run from your MongoDB with the following script:
 ```python
