@@ -102,9 +102,9 @@ class GenerateTrainingDataForTesting(Maker):
         train_structure_list: list[Structure].
             List of pymatgen structures object.
         cell_factor_sequence: list[float]
-            list of factor to resize cell parameters.
+            List of factor to resize cell parameters.
         potential_filename: str
-            param_file_name for :obj:`quippy.potential.Potential()'`.
+            The param_file_name for :obj:`quippy.potential.Potential()'`.
         n_structures : int.
             Total number of randomly displaced structures to be generated.
         rattle_std: float.
@@ -117,19 +117,19 @@ class GenerateTrainingDataForTesting(Maker):
         supercell_matrix: Matrix3D | None
             The matrix to generate the supercell.
         config_type: str
-            configuration type of the data.
+            Configuration type of the data.
         x_min: int
-            minimum value for the plot x-axis.
+            Minimum value for the plot x-axis.
         x_max: int
-            maximum value for the plot x-axis.
+            Maximum value for the plot x-axis.
         bin_width: float
-            width of the plot bins.
+            Width of the plot bins.
         relax_kwargs : dict
             Keyword arguments that will get passed to :obj:`Relaxer.relax`.
 
         Returns
         -------
-        matplotlib plots "count vs. forces".
+        Matplotlib plots "count vs. forces".
         """
         jobs = []
         if cell_factor_sequence is None:
@@ -196,11 +196,11 @@ class GenerateTrainingDataForTesting(Maker):
         structure_list: list[Structure].
             List of pymatgen structures object.
         cell_factor: float
-            factor to resize cell parameters.
+            Factor to resize cell parameters.
         config_type: str
-            configuration type of the data.
+            Configuration type of the data.
         potential_filename: str
-            param_file_name for :obj:`quippy.potential.Potential()'`.
+            The param_file_name for :obj:`quippy.potential.Potential()'`.
         relax_kwargs : dict
             Keyword arguments that will get passed to :obj:`Relaxer.relax`.
 
