@@ -150,7 +150,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
     supercell_settings: dict
         Settings for supercell generation
     benchmark_kwargs: dict
-        The kwargs for the benchmark flows
+        Keyword arguments for the benchmark flows
     summary_filename_prefix: str
         Prefix of the result summary file.
     glue_file_path: str
