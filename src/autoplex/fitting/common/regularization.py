@@ -115,8 +115,8 @@ def set_custom_sigma(
         points = label_stoichiometry_volume(
             atoms, isolated_atom_energies, energy_name, element_order=element_order
         )  # label atoms with volume and mole fraction
-        hull = calculate_hull_3D(points)  # calculate 3D convex hull
-        get_e_distance_func = get_e_distance_to_hull_3D  # type: ignore
+        hull = calculate_hull_3d(points)  # calculate 3D convex hull
+        get_e_distance_func = get_e_distance_to_hull_3d  # type: ignore
 
     points = {}
     for group in sorted(
@@ -309,11 +309,11 @@ def get_e_distance_to_hull(
     Parameters
     ----------
     hull: (np.array)
-        points in the convex hull
+        Points in the convex hull
     atoms: (Atoms)
-        structure to calculate distance to hull
+        Structure to calculate distance to hull
     energy_name: (str)
-        name of energy key in atoms.info (typically a DFT energy)
+        Name of energy key in atoms.info (typically a DFT energy)
 
     """
     volume = atoms.get_volume() / len(atoms)
@@ -346,13 +346,13 @@ def get_intersect(a1, a2, b1, b2) -> tuple[float, float] | tuple:
     Return the point of intersection of the lines passing through a2,a1 and b2,b1.
 
     a1: [x, y]
-        a point on the first line
+        A point on the first line
     a2: [x, y]
-        another point on the first line
+        Another point on the first line
     b1: [x, y]
-        a point on the second line
+        A point on the second line
     b2: [x, y]
-        another point on the second line
+        Another point on the second line
 
     """
     s = np.vstack([a1, a2, b1, b2])  # s for stacked
@@ -372,14 +372,14 @@ def get_mole_frac(atoms, element_order=None) -> float | int:
     Parameters
     ----------
     atoms: (Atoms)
-        structure to calculate mole-fraction of
+        Structure to calculate mole-fraction of
     element_order: (list)
-        list of atomic numbers in order of choice (e.g. [42, 16] for MoS2)
+        List of atomic numbers in order of choice (e.g. [42, 16] for MoS2)
 
     Returns
     -------
     (x2, x3...): (array of float)
-        reduced mole-fraction of structure - first element n = 1-sum(others)
+        Reduced mole-fraction of structure - first element n = 1-sum(others)
 
     """
     element, cts = np.unique(atoms.get_atomic_numbers(), return_counts=True)
@@ -419,13 +419,13 @@ def label_stoichiometry_volume(
     Parameters
     ----------
     atoms_list: (list[Atoms])
-        list of atoms objects
+        List of atoms objects
     isolated_atom_energies: (dict)
-        dictionary of isolated atom energies {atomic_number: energy}
+        Dictionary of isolated atom energies {atomic_number: energy}
     energy_name: (str)
-        name of energy key in atoms.info (typically a DFT energy)
+        Name of energy key in atoms.info (typically a DFT energy)
     element_order: (list | None)
-        list of atomic numbers in order of choice (e.g. [42, 16] for MoS2)
+        List of atomic numbers in order of choice (e.g. [42, 16] for MoS2)
 
     """
     isolated_atom_energies = {
@@ -456,13 +456,13 @@ def point_in_triangle_2D(p1, p2, p3, pn) -> bool:
     Parameters
     ----------
     p1: (tuple)
-        coordinates of first point
+        Coordinates of first point
     p2: (tuple)
-        coordinates of second point
+        Coordinates of second point
     p3: (tuple)
-        coordinates of third point
+        Coordinates of third point
     pn: (tuple)
-        coordinates of point to check
+        Coordinates of point to check
 
     """
     ep = 1e-4
@@ -486,7 +486,7 @@ def point_in_triangle_2D(p1, p2, p3, pn) -> bool:
     )
 
 
-def point_in_triangle_ND(pn, *preg) -> bool:
+def point_in_triangle_nd(pn, *preg) -> bool:
     """
     Check if a point is inside a region of hyperplanes in N dimensions.
 
@@ -495,22 +495,22 @@ def point_in_triangle_ND(pn, *preg) -> bool:
     Parameters
     ----------
     pn:
-        point to check (in ND)
+        Point to check (in ND)
     *preg:
-        list of points defining (in ND) to check against
+        List of points defining (in ND) to check against
 
     """
     hull = Delaunay(preg)
     return hull.find_simplex(pn) >= 0
 
 
-def calculate_hull_3D(points_3D) -> ConvexHull:
+def calculate_hull_3d(points_3d) -> ConvexHull:
     """
     Calculate the convex hull in 3D.
 
     Parameters
     ----------
-    points_3D:
+    points_3d:
         point in 3D
 
     Returns
@@ -520,12 +520,12 @@ def calculate_hull_3D(points_3D) -> ConvexHull:
     """
     p0 = np.array(
         [
-            (points_3D[:, i].max() - points_3D[:, i].min()) / 2 + points_3D[:, i].min()
+            (points_3d[:, i].max() - points_3d[:, i].min()) / 2 + points_3d[:, i].min()
             for i in range(2)
         ]
         + [-1e6]
     )  # test point to get the visible facets from below
-    pn = np.vstack((p0, points_3D))
+    pn = np.vstack((p0, points_3d))
 
     hull = ConvexHull(pn, qhull_options="QG0")
     hull.remove_dim = []
@@ -533,32 +533,32 @@ def calculate_hull_3D(points_3D) -> ConvexHull:
     return hull
 
 
-def calculate_hull_ND(points_ND) -> ConvexHull:
+def calculate_hull_nd(points_nd) -> ConvexHull:
     """
     Calculate the convex hull in ND (N>=3).
 
     Parameters
     ----------
-    points_ND:
-        point in ND.
+    points_nd:
+        Point in ND.
 
     Returns
     -------
-    convex hull in ND.
+    Convex hull in ND.
 
     """
     p0 = np.array(
         [
-            (points_ND[:, i].max() - points_ND[:, i].min()) / 2 + points_ND[:, i].min()
-            for i in range(points_ND.shape[1] - 1)
+            (points_nd[:, i].max() - points_nd[:, i].min()) / 2 + points_nd[:, i].min()
+            for i in range(points_nd.shape[1] - 1)
         ]
         + [-1e6]
     )  # test point to get the visible facets from below
-    pn = np.vstack((p0, points_ND))
+    pn = np.vstack((p0, points_nd))
     remove_dim = []
 
-    for i in range(points_ND.shape[1]):
-        if np.all(points_ND.T[i, 0] == points_ND.T[i, :]):
+    for i in range(points_nd.shape[1]):
+        if np.all(points_nd.T[i, 0] == points_nd.T[i, :]):
             pn = np.delete(pn, i, axis=1)
             print(f"Convex hull lower dimensional - removing dimension {i}")
             remove_dim.append(i)
@@ -570,7 +570,7 @@ def calculate_hull_ND(points_ND) -> ConvexHull:
     return hull
 
 
-def get_e_distance_to_hull_3D(
+def get_e_distance_to_hull_3d(
     hull, atoms, isolated_atom_energies=None, energy_name="energy", element_order=None
 ) -> float:
     """
@@ -579,15 +579,15 @@ def get_e_distance_to_hull_3D(
     Parameters
     ----------
     hull:
-        convex hull.
+        Convex hull.
     atoms: (ase.Atoms)
-        structure to calculate mole-fraction of
+        Structure to calculate mole-fraction of
     isolated_atom_energies: (dict)
-        dictionary of isolated atom energies
+        Dictionary of isolated atom energies
     energy_name: (str)
-        name of energy key in atoms.info (typically a DFT energy)
+        Name of energy key in atoms.info (typically a DFT energy)
     element_order: (list)
-        list of atomic numbers in order of choice (e.g. [42, 16] for MoS2)
+        List of atomic numbers in order of choice (e.g. [42, 16] for MoS2)
 
     """
     isolated_atom_energies = {
@@ -610,7 +610,7 @@ def get_e_distance_to_hull_3D(
         return get_e_distance_to_hull(hull, atoms, energy_name=energy_name)
 
     for _ct, visible_facet in enumerate(hull.simplices[hull.good]):
-        if point_in_triangle_ND(sp[:-1], *hull.points[visible_facet][:, :-1]):
+        if point_in_triangle_nd(sp[:-1], *hull.points[visible_facet][:, :-1]):
             n_3 = hull.points[visible_facet]
             energy = sp[-1]
 
@@ -635,9 +635,9 @@ def piecewise_linear(x, vals) -> np.ndarray:
     Parameters
     ----------
     x:
-        x value.
+        The x value.
     vals:
-        values
+        The values
 
     """
     i = np.searchsorted([v[0] for v in vals], x)
