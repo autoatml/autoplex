@@ -85,15 +85,15 @@ def rms_dict(x_ref: np.ndarray | list, x_pred: np.ndarray | list) -> dict:
     Parameters
     ----------
     x_ref: np.ndarray.
-        list of reference data.
+        List of reference data.
     x_pred: np.ndarray.
-        list of prediction.
+        List of prediction.
     Note that x_ref and x_pred should be of same shape.
 
     Returns
     -------
     dict
-        Dict with RMSE and std deviation of predictions.
+        A dict with RMSE and std deviation of predictions.
     """
     x_ref = np.array(x_ref)
     x_pred = np.array(x_pred)
@@ -114,12 +114,12 @@ def to_ase_trajectory(
     Parameters
     ----------
     traj_obj:
-        trajectory object.
+        Trajectory object.
     filename : str | None
         Name of the file to write the ASE trajectory to.
         If None, no file is written.
     store_magmoms:
-        bool to store magnetic moments.
+        The bool to store magnetic moments.
     """
     for idx in range(len(traj_obj["atom_positions"])):
         atoms = Atoms(symbols=list(traj_obj["atomic_number"]))  # .atoms.copy()
@@ -358,7 +358,7 @@ def std_rattle(
     Parameters
     ----------
     structure : Structure.
-        Pymatgen structures object.
+        The pymatgen structures object.
     n_structures: int.
         Number of rattled structures to generate.
     rattle_std: float.
@@ -406,7 +406,7 @@ def mc_rattle(
     Parameters
     ----------
     structure : Structure.
-        Pymatgen structures object.
+        The pymatgen structures object.
     n_structures: int.
         Number of rattled structures to generate.
     rattle_std: float.
@@ -467,7 +467,7 @@ def filter_outlier_energy(
     in_file: str, out_file: str, criteria: float = 0.0005
 ) -> None:
     """
-    Filter data outliers per energy criteria and write them into files.
+    Filter data outliers via energy criteria and write them into files.
 
     Parameters
     ----------
@@ -525,7 +525,7 @@ def filter_outlier_forces(
     in_file: str, out_file: str, symbol="Si", criteria: float = 0.1
 ) -> None:
     """
-    Filter data outliers per force criteria and write them into files.
+    Filter data outliers via force criteria and write them into files.
 
     Parameters
     ----------
@@ -534,7 +534,7 @@ def filter_outlier_forces(
     out_file:
         MLIP generated data file.
     symbol:
-        Atomi symbol.
+        Chemical symbol.
     criteria:
         Force filter threshold.
 
@@ -795,9 +795,9 @@ def plot_energy_forces(
     species_list: str
         List of species.
     train_name: str
-        name of the training data file.
+        Name of the training data file.
     test_name: str
-        name of the test data file.
+        Name of the test data file.
     """
     if species_list is None:
         species_list = ["Si"]
@@ -914,6 +914,12 @@ class ElementCollection:
 
         It can operate on an optional list of symbols or default to
         using the species extracted from the atoms.
+
+        Parameters
+        ----------
+        symb_list:
+            List of chemical symbols.
+
         """
         species_list = self.get_species() if symb_list is None else symb_list
 
@@ -1499,14 +1505,14 @@ def data_distillation(
     vasp_ref_dir: str
         VASP reference data directory.
     force_max: float
-        maximally allowed force.
+        Maximally allowed force.
     force_label: str
         The label for the force property in the atoms.
 
     Returns
     -------
     atoms_distilled:
-        list of distilled atoms.
+        List of distilled atoms.
 
     """
     atoms = ase.io.read(vasp_ref_dir, index=":")
@@ -1537,14 +1543,14 @@ def stratified_dataset_split(atoms: Atoms, split_ratio: float) -> tuple[
     Parameters
     ----------
     atoms: Atoms
-        ase Atoms object
+        ASE Atoms object
     split_ratio: float
         Parameter to divide the training set and the test set.
 
     Returns
     -------
     train_structures, test_structures:
-        split-up datasets of train structures and test structures.
+        Split-up datasets of train structures and test structures.
 
     """
     atom_bulk = []
@@ -1636,7 +1642,7 @@ def handle_rss_trajectory(
     Parameters
     ----------
     traj_path: list | None
-        A list of dictionaries containing trajectory information.
+        List of dictionaries containing trajectory information.
         Each dictionary should have keys 'traj_path' and 'pressure'.
         If None, an empty list will be used.
     remove_traj_files: bool
@@ -1647,9 +1653,9 @@ def handle_rss_trajectory(
     -------
     tuple:
         atoms: list
-            A list of ASE Atoms objects read from the trajectory files.
+            List of ASE Atoms objects read from the trajectory files.
         pressures: list
-            A list of pressure values corresponding to the atoms.
+            List of pressure values corresponding to the atoms.
     """
     atoms = []
     pressures = []
