@@ -231,8 +231,8 @@ class RssMaker(Maker):
         - current_iter_index: int
             Index for the current RSS iteration. Default is 1.
 
-        Output
-        ------
+        Returns
+        -------
         dict
             A dictionary whose keys contains:
             - test_error: float
