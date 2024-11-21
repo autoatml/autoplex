@@ -351,7 +351,7 @@ def process_rss(
         ASE Atoms object representing the atomic configuration.
     mlip_type: str
         Choose one specific MLIP type:
-        'GAP' | 'J-ACE' | 'P-ACE' | 'NequIP' | 'M3GNet' | 'MACE'.
+        'GAP' | 'J-ACE' | 'NequIP' | 'M3GNet' | 'MACE'.
     mlip_path: str
         Path to the MLIP model.
     output_file_name: str
