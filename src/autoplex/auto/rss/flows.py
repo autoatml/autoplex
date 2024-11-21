@@ -25,7 +25,7 @@ class RssMaker(Maker):
     name: str
         Name of the flow.
     path_to_default_config_parameters: Path | str
-        Path to the default RSS configuration file 'rss_default_configuration.yaml'
+        Path to the default RSS configuration file 'rss_default_configuration.yaml'.
     """
 
     name: str = "ml-driven rss"
