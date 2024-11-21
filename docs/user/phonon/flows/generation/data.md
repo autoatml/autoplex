@@ -107,7 +107,10 @@ supercell_settings = {
     },
     "min_length": 11,  
     "max_length": 25,
+    "fallback_min_length": 9,
+    "min_atoms": 100,
     "max_atoms": 200,
+    "step_size": 1,
 }
 
 complete_flow = CompleteDFTvsMLBenchmarkWorkflow(
