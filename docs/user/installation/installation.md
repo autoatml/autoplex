@@ -104,6 +104,8 @@ OMP_NUM_THREADS environment is not set. Defaulting to 1 thread. (src/comm.cpp:98
   using 1 OpenMP thread(s) per MPI task
 Total wall time: 0:02:22
 ```
+It is very important to have it compiled with Python (`-D PKG_PYTHON=on`) and 
+LIB PACE flags (`-D PACELIB_MD5=$(md5sum libpace.tar.gz | awk '{print $1}')`).
 
 As `autoplex` heavily relies on `atomate2`, it is strongly recommended to also make yourself familiar with the [atomate2 documentation](https://materialsproject.github.io/atomate2/).
 
