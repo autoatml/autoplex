@@ -24,7 +24,7 @@ University of Oxford
 
 ## Core code developers and maintainers
 
-**Dr Christina Ertural** [![gh]][QuantumChemist] [![orc]][0000-0002-7696-5824] \
+**Dr. Christina Ertural** [![gh]][QuantumChemist] [![orc]][0000-0002-7696-5824] \
 BAM Berlin
 
 [QuantumChemist]: https://github.com/QuantumChemist
@@ -37,9 +37,6 @@ University of Oxford
 
 **Prof. Janine George** [![gh]][JaGeo] [![orc]][0000-0001-8907-0336] [[website](https://jageo.github.io/)]\
 BAM Berlin and Friedrich Schiller University Jena
-
-[JaGeo]: https://github.com/JaGeo
-[0000-0001-8907-0336]: https://orcid.org/0000-0001-8907-0336
 
 **Dr Yuanbin Liu** [![gh]][YuanbinLiu] [![orc]][0000-0002-5948-7031] \
 University of Oxford
