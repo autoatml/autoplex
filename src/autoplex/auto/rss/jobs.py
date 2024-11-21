@@ -153,14 +153,14 @@ def initial_rss(
     num_processes_fit: int
         Number of processes used for fitting. Default is 1.
     device_for_fitting: str
-            Device to be used for model fitting, either "cpu" or "cuda".
+        Device to be used for model fitting, either "cpu" or "cuda".
     fit_kwargs:
         Additional keyword arguments for the MLIP fitting process.
 
-    Output
-    ------
+    Returns
+    -------
     dict
-        a dictionary whose keys contains:
+        A dictionary whose keys contains:
         - test_error: float
             The test error of the fitted MLIP.
         - pre_database_dir: str
@@ -424,7 +424,7 @@ def do_rss_iterations(
     num_processes_fit: int
         Number of processes used for fitting. Default is 1.
     device_for_fitting: str
-            Device to be used for model fitting, either "cpu" or "cuda".
+        Device to be used for model fitting, either "cpu" or "cuda".
     scalar_pressure_method: str
         Method for adding external pressures. Default is 'exp'.
     scalar_exp_pressure: float
@@ -466,10 +466,10 @@ def do_rss_iterations(
     fit_kwargs:
         Additional keyword arguments for the MLIP fitting process.
 
-    Output
-    ------
+    Returns
+    -------
     dict
-        a dictionary whose keys contains:
+        A dictionary whose keys contains:
         - test_error: float
             The test error of the fitted MLIP.
         - pre_database_dir: str
