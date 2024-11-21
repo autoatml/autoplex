@@ -119,6 +119,7 @@ Of course, you can change and adjust the settings to your own needs, e.g. by set
 You can find more details on the subsequent tutorial pages.
 With additional flows or jobs in the `[complete_flow]` list, 
 you can combine the `autoplex` flow with other flows and jobs.
+As the `mp_id` parameter is a string, you can also use any other *unique* structure object identifier instead.
 
 The following workflow diagram will give you an overview of the flows and jobs in the default autoplex workflow:
 ```{mermaid}
