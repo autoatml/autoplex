@@ -39,21 +39,21 @@ def compute_bandstructure_benchmark_metrics(
     mp_id:
         Materials Project ID.
     ml_phonon_bs: PhononBandStructureSymmLine.
-       ML generated pymatgen phonon band-structure object.
+        ML generated pymatgen phonon band-structure object.
     dft_phonon_bs: PhononBandStructureSymmLine.
-       DFT generated pymatgen phonon band-structure object.
+        DFT generated pymatgen phonon band-structure object.
     ml_imag_modes: bool
         Whether the ML-based phonon band structure shows imaginary modes.
     dft_imag_modes: bool
         Whether the DFT-based phonon band structure shows imaginary modes.
     displacement: float
-        displacement distance for phonons
+        Displacement distance for phonons
     atomwise_regularization_parameter: float
-        regularization value for the atom-wise force components.
+        Regularization value for the atom-wise force components.
     suffix: str
         GAP potential file suffix.
     soap_dict: dict
-        dictionary containing SOAP parameters.
+        Dictionary containing SOAP parameters.
 
 
     Returns
@@ -116,7 +116,7 @@ def get_rmse(
     Returns
     -------
     float or list[float]
-      root mean squared error between DFT and ML phonon band-structure
+      Root mean squared error between DFT and ML phonon band-structure
     """
     diff = np.sort(ml_bs.bands, axis=0) - np.sort(dft_bs.bands, axis=0)
 
