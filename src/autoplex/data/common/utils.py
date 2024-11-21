@@ -35,10 +35,10 @@ from pymatgen.io.ase import AseAtomsAdaptor
 from sklearn.model_selection import StratifiedShuffleSplit
 
 from autoplex.fitting.common.regularization import (
-    calculate_hull_3D,
+    calculate_hull_3d,
     get_convex_hull,
     get_e_distance_to_hull,
-    get_e_distance_to_hull_3D,
+    get_e_distance_to_hull_3d,
     label_stoichiometry_volume,
 )
 
@@ -1427,11 +1427,11 @@ def convexhull_cur(
             energy_name=energy_label,
             element_order=element_order,
         )
-        hull = calculate_hull_3D(points)
+        hull = calculate_hull_3d(points)
 
         des = np.array(
             [
-                get_e_distance_to_hull_3D(
+                get_e_distance_to_hull_3d(
                     hull,
                     at,
                     isolated_atom_energies=isolated_atom_energies,
