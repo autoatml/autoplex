@@ -52,7 +52,7 @@ class TightDFTStaticMaker(PhononDisplacementMaker):
     name : str
         The job name.
     input_set_generator : .VaspInputGenerator
-        A generator used to make the input set.
+        Generator used to make the input set.
     write_input_set_kwargs : dict
         Keyword arguments that will get passed to :obj:`.write_vasp_input_set`.
     copy_vasp_kwargs : dict
@@ -124,16 +124,16 @@ class DFTPhononMaker(PhononMaker):
         (use_primitive_standard_structure, use_conventional_standard_structure)
         and to handle all symmetry-related tasks in phonopy
     displacement: float = 0.01
-        displacement distance for phonons
+        Displacement distance for phonons
     min_length: float = 20.0
-        min length of the supercell that will be built
+        Minimum length of the supercell that will be built
     prefer_90_degrees: bool = True
-        if set to True, supercell algorithm will first try to find a supercell
+        If set to True, supercell algorithm will first try to find a supercell
         with 3 90 degree angles
     get_supercell_size_kwargs: dict = {}
-        kwargs that will be passed to get_supercell_size to determine supercell size
+        Keyword arguments that will be passed to get_supercell_size to determine supercell size
     use_symmetrized_structure: str or None = None
-        allowed strings: "primitive", "conventional", None
+        Allowed strings: "primitive", "conventional", None
 
         - "primitive" will enforce to start the phonon computation
           from the primitive standard structure
@@ -152,11 +152,11 @@ class DFTPhononMaker(PhononMaker):
           We will however use seekpath and primitive structures
           as determined by from phonopy to compute the phonon band structure
     bulk_relax_maker : .BaseVaspMaker or None
-        A maker to perform a tight relaxation on the bulk.
+        Maker to perform a tight relaxation on the bulk.
         Set to ``None`` to skip the
         bulk relaxation
     static_energy_maker : .BaseVaspMaker or None
-        A maker to perform the computation of the DFT energy on the bulk.
+        Maker to perform the computation of the DFT energy on the bulk.
         Set to ``None`` to skip the
         static energy computation
     born_maker: .BaseVaspMaker or None
@@ -168,7 +168,7 @@ class DFTPhononMaker(PhononMaker):
     create_thermal_displacements: bool
         Arg that determines if thermal_displacement_matrices are computed
     kpath_scheme: str = "seekpath"
-        scheme to generate kpoints. Please be aware that
+        Scheme to generate kpoints. Please be aware that
         you can only use seekpath with any kind of cell
         Otherwise, please use the standard primitive structure
         Available schemes are:
@@ -178,11 +178,11 @@ class DFTPhononMaker(PhononMaker):
         it relies on phonopy to handle the relationship
         to the primitive cell and not pymatgen
     code: str = "vasp"
-        determines the DFT code. currently only vasp is implemented.
+        Determines the DFT code. currently only vasp is implemented.
         This keyword might enable the implementation of other codes
         in the future
     store_force_constants: bool
-        if True, force constants will be stored
+        If True, force constants will be stored
     """
 
     name: str = "dft phonon"
@@ -272,7 +272,7 @@ class RandomStructuresDataGenerator(Maker):
     displacement_maker: .BaseVaspMaker or None
         Maker used for a static calculation for a supercell.
     code: str
-        determines the dft code. currently only vasp is implemented.
+        Determines the dft code. currently only vasp is implemented.
         This keyword might enable the implementation of other codes
         in the future
     n_structures : int.
@@ -311,7 +311,7 @@ class RandomStructuresDataGenerator(Maker):
         Larger number of iterations will generate larger displacements.
         Default=10.
     supercell_settings: dict
-        settings for supercells
+        Settings for supercells.
     """
 
     name: str = "RandomStruturesDataGeneratorForML"
@@ -367,7 +367,7 @@ class RandomStructuresDataGenerator(Maker):
         Parameters
         ----------
         structure :
-            Pymatgen structures drawn from the Materials Project.
+            The pymatgen structures drawn from the Materials Project.
         mp_id: str
             Materials Project IDs
         volume_scale_factor_range : list[float]
@@ -480,7 +480,8 @@ class MLPhononMaker(FFPhononMaker):
     Finally, phonon densities of states, phonon band structures
     and thermodynamic properties are computed.
 
-    .. Note::
+    Notes
+    -----
         It is heavily recommended to symmetrize the structure before passing it to
         this flow. Otherwise, a different space group might be detected and too
         many displacement calculations will be generated.
@@ -500,16 +501,16 @@ class MLPhononMaker(FFPhononMaker):
         (use_primitive_standard_structure, use_conventional_standard_structure)
         and to handle all symmetry-related tasks in phonopy
     displacement: float
-        displacement distance for phonons
+        Displacement distance for phonons
     min_length: float
-        min length of the supercell that will be built
+        Minimum length of the supercell that will be built
     prefer_90_degrees: bool
-        if set to True, supercell algorithm will first try to find a supercell
+        If set to True, supercell algorithm will first try to find a supercell
         with 3 90 degree angles
     get_supercell_size_kwargs: dict
-        kwargs that will be passed to get_supercell_size to determine supercell size
+        Keyword arguments that will be passed to get_supercell_size to determine supercell size
     use_symmetrized_structure: str
-        allowed strings: "primitive", "conventional", None
+        Allowed strings: "primitive", "conventional", None
 
         - "primitive" will enforce to start the phonon computation
           from the primitive standard structure
@@ -528,11 +529,11 @@ class MLPhononMaker(FFPhononMaker):
           We will, however, use seekpath and primitive structures
           as determined by from phonopy to compute the phonon band structure
     bulk_relax_maker: .ForceFieldRelaxMaker or None
-        A maker to perform a tight relaxation on the bulk.
+        Maker to perform a tight relaxation on the bulk.
         Set to ``None`` to skip the
         bulk relaxation
     static_energy_maker: .ForceFieldStaticMaker or None
-        A maker to perform the computation of the DFT energy on the bulk.
+        Maker to perform the computation of the DFT energy on the bulk.
         Set to ``None`` to skip the
         static energy computation
     phonon_displacement_maker: .ForceFieldStaticMaker or None
@@ -542,7 +543,7 @@ class MLPhononMaker(FFPhononMaker):
     create_thermal_displacements: bool
         Arg that determines if thermal_displacement_matrices are computed
     kpath_scheme: str
-        scheme to generate kpoints. Please be aware that
+        Scheme to generate kpoints. Please be aware that
         you can only use seekpath with any kind of cell
         Otherwise, please use the standard primitive structure
         Available schemes are:
@@ -552,11 +553,11 @@ class MLPhononMaker(FFPhononMaker):
         it relies on phonopy to handle the relationship
         to the primitive cell and not pymatgen
     code: str
-        determines the DFT code. currently only vasp is implemented.
+        Determines the DFT code. currently only vasp is implemented.
         This keyword might enable the implementation of other codes
         in the future
     store_force_constants: bool
-        if True, force constants will be stored
+        If True, force constants will be stored
     relax_maker_kwargs: dict
         Keyword arguments that can be passed to the RelaxMaker.
     static_maker_kwargs: dict
@@ -608,7 +609,7 @@ class MLPhononMaker(FFPhononMaker):
         Parameters
         ----------
         structure : .Structure
-            A pymatgen structure. Please start with a structure
+            The pymatgen structure. Please start with a structure
             that is nearly fully optimized as the internal optimizers
             have very strict settings!
         ml_model: str
@@ -619,7 +620,7 @@ class MLPhononMaker(FFPhononMaker):
         calculator_kwargs :
             Keyword arguments for the ASE Calculator.
         supercell_settings:
-            dict with supercell settings.
+            Dict with supercell settings.
         make_kwargs :
             Keyword arguments for the PhononMaker.
 
@@ -752,7 +753,7 @@ class IsoAtomStaticMaker(StaticMaker):
     name : str
         The job name.
     input_set_generator : .VaspInputGenerator
-        A generator used to make the input set.
+        Generator used to make the input set.
     write_input_set_kwargs : dict
         Keyword arguments that will get passed to :obj:`.write_vasp_input_set`.
     copy_vasp_kwargs : dict
@@ -815,8 +816,8 @@ class IsoAtomMaker(Maker):
 
         Parameters
         ----------
-        all_species : List of Species
-            list of pymatgen specie object.
+        all_species : list[Species]
+            List of pymatgen specie object.
         isolated_atom_maker: IsoAtomMaker
             VASP input set for the isolated atom calculation.
         """
