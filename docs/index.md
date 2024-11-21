@@ -48,10 +48,10 @@ The vision of this project is to allow a wide community of researchers to create
 :gutter: 3
 
 :::{grid-item-card}
-:link: user/index
+:link: user/setup
 :link-type: doc
 :class-header: bg-light
-**User Guide**
+**Quick Start**
 ^^^
 The user guide provides information for getting started with *autoplex*.
 :::
@@ -66,13 +66,12 @@ Tutorials for using autoplex.
 :::
 
 :::{grid-item-card}
-:link: reference/index
+:link: user/mongodb
 :link-type: doc
 :class-header: bg-light
-**API reference**
+**Automation Setup**
 ^^^
-The reference guide contains a detailed description of the *autoplex* API. It
-assumes that you have a broad understanding of the key concepts.
+Here you can find the setup guides for using `autoplex` with [MongoDB](user/mongodb.md) and [jobflow-remote](user/jobflowremote.md).
 :::
 
 :::{grid-item-card}
