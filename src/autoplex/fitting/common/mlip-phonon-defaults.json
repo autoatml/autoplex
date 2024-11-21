@@ -10,7 +10,8 @@
       "do_copy_at_file": "F",
       "openmp_chunk_size": 10000,
       "gp_file": "gap_file.xml",
-      "two_body": true,
+      "e0_offset": 0.0,
+      "two_body": false,
       "three_body": false,
       "soap": true
     },
@@ -45,10 +46,10 @@
       "atom_sigma": 0.5,
       "zeta": 4,
       "cutoff": 5.0,
-      "cutoff_transition_width": 0.5,
+      "cutoff_transition_width": 1.0,
       "central_weight": 1.0,
       "n_sparse": 6000,
-      "delta": 0.50,
+      "delta": 1.00,
       "f0": 0.0,
       "covariance_type": "dot_product",
       "sparse_method": "cur_points"

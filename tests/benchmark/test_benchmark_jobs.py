@@ -47,7 +47,6 @@ def test_compute_bandstructure_benchmark_metrics_dummy(test_dir, clean_dir):
 def test_compute_bandstructure_benchmark_metrics(test_dir, clean_dir):
     import os
     from pathlib import Path
-    from jobflow import run_locally
 
     # test wih two different band-structures
     dft_bs_file_path = test_dir / "benchmark" / "DFT_phonon_band_structure.yaml"
@@ -104,12 +103,14 @@ def test_write_benchmark_metrics(test_dir, clean_dir):
     ]
 
     soap_dict = [  # unit tests for checking correct default soap_dict in tests/auto/test_auto_flows.py
-        None,
-        None,
-        None,
-        None,
+        {'n_sparse': 3000, 'delta': 1.0},
+        {'n_sparse': 4000, 'delta': 1.0},
+        {'n_sparse': 5000, 'delta': 1.0},
+        {'n_sparse': 6000, 'delta': 1.0},
+        {'n_sparse': 6000, 'delta': 1.0},
         {'n_sparse': 3000, 'delta': 1.0},
         {'n_sparse': 5000, 'delta': 1.0},
+        {'n_sparse': 6000, 'delta': 1.0},
     ]
 
     suffixes = ["", '_wo_sigma', '_phonon', '_rand_struc']
@@ -118,8 +119,8 @@ def test_write_benchmark_metrics(test_dir, clean_dir):
 
     suffix_index = 0
 
-    for i, metric_group in enumerate(metric_vals):
-        for metric in metric_group:
+    for metric_group in metric_vals:
+        for metric, soap in zip(metric_group, soap_dict):
             fused_dict = {
                 'benchmark_phonon_rmse': metric['benchmark_phonon_rmse'],
                 'dft_imaginary_modes': metric['dft_imaginary_modes'],
@@ -129,7 +130,7 @@ def test_write_benchmark_metrics(test_dir, clean_dir):
                 'structure': structure,
                 'displacement': 0.01,
                 'atomwise_regularization_parameter': 0.1,
-                'soap_dict': soap_dict[i],
+                'soap_dict': soap,
                 'suffix': suffixes[suffix_index]
             }
             metrics.append(fused_dict)
@@ -140,7 +141,7 @@ def test_write_benchmark_metrics(test_dir, clean_dir):
         metrics=[metrics],
     )
 
-    _ = run_locally(write_metrics_job, create_folders=False, ensure_success=True)
+    run_locally(write_metrics_job, create_folders=False, ensure_success=True)
 
     # get list of generated txt file
     path_to_ref_txt_file = test_dir / "benchmark" / "results_LiCl_ref.txt"

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
@@ -41,6 +42,7 @@ from autoplex.auto.phonons.jobs import (
     run_supercells,
 )
 from autoplex.benchmark.phonons.jobs import write_benchmark_metrics
+from autoplex.data.phonons.jobs import reduce_supercell_size_job
 from autoplex.fitting.common.flows import MLIPFitMaker
 
 __all__ = [
@@ -186,7 +188,9 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
     atomwise_regularization_list: list | None = None
     soap_delta_list: list | None = None
     n_sparse_list: list | None = None
-    supercell_settings: dict = field(default_factory=lambda: {"min_length": 15})
+    supercell_settings: dict = field(
+        default_factory=lambda: {"min_length": 15, "max_length": 20}
+    )
     benchmark_kwargs: dict = field(default_factory=dict)
     path_to_default_hyperparameters: Path | str = MLIP_PHONON_DEFAULTS_FILE_PATH
     summary_filename_prefix: str = "results_"
@@ -245,6 +249,8 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
             The pymatgen structure for benchmarking.
         benchmark_mp_ids: list[str] | None
             Materials Project ID of the benchmarking structure.
+        use_defaults_fitting: bool
+            Use the fit defaults.
         fit_kwargs : dict.
             Dict including MLIP fit keyword args.
 
@@ -266,6 +272,27 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         }
 
         for structure, mp_id in zip(structure_list, mp_ids):
+            self.supercell_settings.setdefault(mp_id, {})
+            logging.info(
+                "Currently, "
+                "the same supercell settings for single-atom displaced and rattled supercells are used."
+            )
+            supercell_matrix_job = reduce_supercell_size_job(
+                structure=structure,
+                min_length=self.supercell_settings.get("min_length", 15),
+                max_length=self.supercell_settings.get("max_length", 20),
+                fallback_min_length=self.supercell_settings.get(
+                    "fallback_min_length", 12
+                ),
+                max_atoms=self.supercell_settings.get("max_atoms", 500),
+                min_atoms=self.supercell_settings.get("min_atoms", 50),
+                step_size=self.supercell_settings.get("step_size", 1.0),
+            )
+            flows.append(supercell_matrix_job)
+            self.supercell_settings[mp_id][
+                "supercell_matrix"
+            ] = supercell_matrix_job.output
+
             if self.add_dft_random_struct:
                 add_dft_rand = self.add_dft_random(
                     structure=structure,
@@ -442,7 +469,6 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                                             dft_references=dft_references,
                                             supercell_settings=self.supercell_settings,
                                             displacement=displacement,
-                                            # TODO add a hyper parameter here for the benchmark
                                             atomwise_regularization_parameter=atomwise_reg_parameter,
                                             soap_dict=soap_dict,
                                             **self.benchmark_kwargs,

@@ -352,7 +352,9 @@ class RandomStructuresDataGenerator(Maker):
     rattle_seed: int = 42
     rattle_mc_n_iter: int = 10
     w_angle: list[float] | None = None
-    supercell_settings: dict | None = field(default_factory=lambda: {"min_length": 15})
+    supercell_settings: dict | None = field(
+        default_factory=lambda: {"min_length": 15, "max_length": 20}
+    )
 
     def make(
         self,
@@ -378,7 +380,9 @@ class RandomStructuresDataGenerator(Maker):
             If None, will default to [0.90, 0.95, 0.98, 0.99, 1.01, 1.02, 1.05, 1.10].
         """
         if self.supercell_settings is None:
-            self.supercell_settings = field(default_factory=lambda: {"min_length": 15})
+            self.supercell_settings = field(
+                default_factory=lambda: {"min_length": 15, "max_length": 20}
+            )
         jobs = []  # initializing empty job list
         outputs = []
 
@@ -393,7 +397,7 @@ class RandomStructuresDataGenerator(Maker):
             supercell_matrix_job = reduce_supercell_size_job(
                 structure=structure,
                 min_length=self.supercell_settings.get("min_length", 12),
-                max_length=self.supercell_settings.get("max_length", 25),
+                max_length=self.supercell_settings.get("max_length", 20),
                 fallback_min_length=self.supercell_settings.get(
                     "fallback_min_length", 10
                 ),
@@ -734,9 +738,23 @@ class MLPhononMaker(FFPhononMaker):
             self.phonon_displacement_maker,
             self.static_energy_maker,
         ) = ml_prep
+        filtered_settings = {
+            key: value
+            for key, value in supercell_settings.items()
+            if key
+            in [
+                "min_length",
+                "max_length",
+                "fallback_min_length",
+                "max_atoms",
+                "min_atoms",
+                "step_size",
+            ]
+        }
         supercell_matrix = reduce_supercell_size(
-            structure=structure, **supercell_settings
+            structure=structure, **filtered_settings
         )
+
         flow = self.make(
             structure=structure, supercell_matrix=supercell_matrix, **make_kwargs
         )

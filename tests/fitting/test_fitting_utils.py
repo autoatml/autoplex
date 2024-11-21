@@ -36,13 +36,14 @@ def test_gap_hyperparameter_constructor():
         "do_copy_at_file=F",
         "openmp_chunk_size=10000",
         "gp_file=gap_file.xml",
+        "e0_offset=0.0",
         "gap={distance_Nb order=2 f0=0.0 add_species=T cutoff=5.0 "
         "n_sparse=15 covariance_type=ard_se delta=2.0 theta_uniform=0.5 "
         "sparse_method=uniform compact_clusters=T :distance_Nb order=3 f0=0.0 add_species=T "
         "cutoff=3.25 n_sparse=100 covariance_type=ard_se "
         "delta=2.0 theta_uniform=1.0 sparse_method=uniform compact_clusters=T :soap add_species=T "
         "l_max=10 n_max=12 atom_sigma=0.5 zeta=4 cutoff=5.0 "
-        "cutoff_transition_width=0.5 central_weight=1.0 n_sparse=6000 delta=0.5 "
+        "cutoff_transition_width=1.0 central_weight=1.0 n_sparse=6000 delta=1.0 "
         "f0=0.0 covariance_type=dot_product sparse_method=cur_points}",
     ]
 
@@ -71,6 +72,7 @@ def test_gap_hyperparameter_constructor():
         "do_copy_at_file=F",
         "openmp_chunk_size=10000",
         "gp_file=gap_file.xml",
+        "e0_offset=0.0",
         "gap={distance_Nb order=2 f0=0.0 add_species=T cutoff=5.0 "
         "n_sparse=15 covariance_type=ard_se delta=2.0 theta_uniform=0.5 "
         "sparse_method=uniform compact_clusters=T :distance_Nb order=3 f0=0.0 add_species=T "
@@ -102,13 +104,14 @@ def test_gap_hyperparameter_constructor():
         "do_copy_at_file=F",
         "openmp_chunk_size=10000",
         "gp_file=gap_file.xml",
+        "e0_offset=0.0",
         "gap={distance_Nb order=2 f0=0.0 add_species=T cutoff=8 "
         "n_sparse=15 covariance_type=ard_se delta=2.0 theta_uniform=0.5 "
         "sparse_method=uniform compact_clusters=T :distance_Nb order=3 f0=0.0 add_species=T "
         "cutoff=8 n_sparse=100 covariance_type=ard_se "
         "delta=2.0 theta_uniform=1.0 sparse_method=uniform compact_clusters=T :soap "
         "add_species=T l_max=10 n_max=12 atom_sigma=0.5 zeta=2 cutoff=5.0 "
-        "cutoff_transition_width=0.5 central_weight=1.0 n_sparse=6000 delta=1.5 "
+        "cutoff_transition_width=1.0 central_weight=1.0 n_sparse=6000 delta=1.5 "
         "f0=0.0 covariance_type=dot_product sparse_method=cur_points}",
     ]
 
@@ -141,11 +144,12 @@ def test_gap_hyperparameter_constructor():
         "do_copy_at_file=F",
         "openmp_chunk_size=10000",
         "gp_file=gap_file.xml",
+        "e0_offset=0.0",
         "gap={distance_Nb order=2 f0=0.0 add_species=T cutoff=5.0 "
         "n_sparse=15 covariance_type=ard_se delta=2.0 theta_uniform=0.5 "
         "sparse_method=uniform compact_clusters=T :soap "
         "add_species=T l_max=10 n_max=12 atom_sigma=0.5 zeta=4 cutoff=5.0 "
-        "cutoff_transition_width=0.5 central_weight=1.0 n_sparse=6000 delta=0.5 "
+        "cutoff_transition_width=1.0 central_weight=1.0 n_sparse=6000 delta=1.0 "
         "f0=0.0 covariance_type=dot_product sparse_method=cur_points}",
     ]
 
@@ -170,11 +174,12 @@ def test_gap_hyperparameter_constructor():
         "do_copy_at_file=F",
         "openmp_chunk_size=10000",
         "gp_file=gap_file.xml",
+        "e0_offset=0.0",
         "gap={distance_Nb order=3 f0=0.0 add_species=T "
         "cutoff=3.25 n_sparse=100 covariance_type=ard_se "
         "delta=2.0 theta_uniform=1.0 sparse_method=uniform compact_clusters=T :soap "
         "add_species=T l_max=10 n_max=12 atom_sigma=0.5 zeta=4 cutoff=5.0 "
-        "cutoff_transition_width=0.5 central_weight=1.0 n_sparse=6000 delta=0.5 "
+        "cutoff_transition_width=1.0 central_weight=1.0 n_sparse=6000 delta=1.0 "
         "f0=0.0 covariance_type=dot_product sparse_method=cur_points}",
     ]
 
@@ -205,9 +210,10 @@ def test_gap_hyperparameter_constructor():
         "do_copy_at_file=F",
         "openmp_chunk_size=10000",
         "gp_file=gap_file.xml",
+        "e0_offset=0.0",
         "gap={soap "
         "add_species=T l_max=10 n_max=12 atom_sigma=0.5 zeta=4 cutoff=5.0 "
-        "cutoff_transition_width=0.5 central_weight=1.0 n_sparse=6000 delta=0.5 "
+        "cutoff_transition_width=1.0 central_weight=1.0 n_sparse=6000 delta=1.0 "
         "f0=0.0 covariance_type=dot_product sparse_method=cur_points}",
     ]
 

@@ -11,9 +11,6 @@ from ruamel.yaml import YAML
 
 from autoplex.auto.rss.jobs import do_rss_iterations, initial_rss
 
-current_dir = Path(__file__).absolute().parent
-RSS_CONFIGURATION_DEFAULTS_FILE_PATH = current_dir / "rss_default_configuration.yaml"
-
 
 @dataclass
 class RssMaker(Maker):
@@ -24,12 +21,13 @@ class RssMaker(Maker):
     ----------
     name: str
         Name of the flow.
-    path_to_default_config_parameters: Path | str
+    path_to_default_config_parameters: Path | str | None
         Path to the default RSS configuration file 'rss_default_configuration.yaml'.
+        If None, the default path will be used.
     """
 
     name: str = "ml-driven rss"
-    path_to_default_config_parameters: Path | str = RSS_CONFIGURATION_DEFAULTS_FILE_PATH
+    path_to_default_config_parameters: Path | str | None = None
 
     @job
     def make(self, config_file: str | None = None, **kwargs):
@@ -248,9 +246,14 @@ class RssMaker(Maker):
             - kb_temp: float
                 The temperature (in eV) for Boltzmann sampling.
         """
+        rss_default_config_path = (
+            self.path_to_default_config_parameters
+            or Path(__file__).absolute().parent / "rss_default_configuration.yaml"
+        )
+
         yaml = YAML(typ="safe", pure=True)
 
-        with open(self.path_to_default_config_parameters) as f:
+        with open(rss_default_config_path) as f:
             config = yaml.load(f)
 
         if config_file and os.path.exists(config_file):
@@ -336,6 +339,9 @@ class RssMaker(Maker):
         )
 
         if config_params["train_from_scratch"]:
+            rss_params.update({"include_isolated_atom": False})
+            rss_params.update({"include_dimer": False})
+
             do_rss_job = do_rss_iterations(
                 input=initial_rss_job.output,
                 **rss_params,
