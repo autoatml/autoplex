@@ -58,8 +58,6 @@ University of Oxford
 [MorrowChem]: https://github.com/morrowchem
 [0000-0002-3441-8646]: https://orcid.org/0000-0002-3441-8646
 
-(...)
-
 
 We welcome contributions from other researchers! If you would like to contribute, please see the `How to contribute` guidelines.
 
