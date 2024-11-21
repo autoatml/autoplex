@@ -81,6 +81,42 @@ Additionally, `buildcell` as a part of `AIRSS` needs to be installed if one want
 curl -O https://www.mtg.msm.cam.ac.uk/files/airss-0.9.3.tgz; tar -xf airss-0.9.3.tgz; rm airss-0.9.3.tgz; cd airss; make ; make install ; make neat; cd ..
 ```
 
+### LAMMPS installation
+
+Recipe for compiling lammps-ace including the download of the `libpace.tar.gz` file:
+
+```
+git clone -b release https://github.com/lammps/lammps
+cd lammps
+mkdir build
+cd build
+wget -O libpace.tar.gz https://github.com/wcwitt/lammps-user-pace/archive/main.tar.gz
+
+cmake  -C ../cmake/presets/clang.cmake -D BUILD_SHARED_LIBS=on -D BUILD_MPI=yes \
+-DMLIAP_ENABLE_PYTHON=yes -D PKG_PYTHON=on -D PKG_KOKKOS=yes -D Kokkos_ARCH_ZEN3=yes \
+-D PKG_PHONON=yes -D PKG_MOLECULE=yes -D PKG_MANYBODY=yes \
+-D Kokkos_ENABLE_OPENMP=yes -D BUILD_OMP=yes -D LAMMPS_EXCEPTIONS=yes \
+-D PKG_ML-PACE=yes -D PACELIB_MD5=$(md5sum libpace.tar.gz | awk '{print $1}') \
+-D CMAKE_INSTALL_PREFIX=$LAMMPS_INSTALL -D CMAKE_EXE_LINKER_FLAGS:STRING="-lgfortran" \
+../cmake
+
+make -j 16
+make install-python
+```
+
+$LAMMPS_INSTALL is the conda environment for installing the lammps-python interface.
+
+After the installation is completed, enter the following commands in the Python environment.
+If you get the same output, it means the installation was successful.
+
+```
+from lammps import lammps; lmp = lammps()
+LAMMPS (27 Jun 2024)
+OMP_NUM_THREADS environment is not set. Defaulting to 1 thread. (src/comm.cpp:98)
+  using 1 OpenMP thread(s) per MPI task
+Total wall time: 0:02:22
+```
+
 ### Contributing guidelines / Developer's installation
 
 A short guide to contributing to autoplex can be found [here](https://autoatml.github.io/autoplex/dev/contributing.html). Additional information for developers can be found [here](https://autoatml.github.io/autoplex/dev/dev_install.html).
