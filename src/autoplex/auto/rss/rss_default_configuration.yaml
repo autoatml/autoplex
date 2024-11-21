@@ -12,12 +12,6 @@ generated_struct_numbers:
   - 8000
   - 2000
 buildcell_options:
-  - NFORM: '{2,4,6,8}'
-    SYMMOPS: '1-4'
-    MINSEP: '1.5'
-  - NFORM: '{3,5,7}'
-    SYMMOPS: '1-4'
-    MINSEP: '1.5'
 fragment_file: null
 fragment_numbers: null
 num_processes_buildcell: 128
@@ -58,7 +52,7 @@ dimer_box:
 dimer_range:
   - 1.0
   - 5.0
-dimer_num: 41
+dimer_num: 21
 custom_incar:
   ISMEAR: 0
   SIGMA: 0.05
@@ -74,13 +68,12 @@ custom_incar:
   ISYM: 0
   ENCUT: 520.0
   KSPACING: 0.20
-  GGA: 'PS'
+  GGA: null
   KPAR: 8
   NCORE: 16
   LSCALAPACK: '.FALSE.'
   LPLANE: '.FALSE.'
 custom_potcar:
-#Ti: 'Ti'
 vasp_ref_file: 'vasp_ref.extxyz'
 
 # Data Preprocessing Parameters
@@ -130,7 +123,7 @@ general:
 
 # RSS Exploration Parameters
 scalar_pressure_method: 'uniform'
-scalar_exp_pressure: 100
+scalar_exp_pressure: 1
 scalar_pressure_exponential_width: 0.2
 scalar_pressure_low: 0
 scalar_pressure_high: 25
@@ -142,11 +135,8 @@ max_iteration_number: 25
 num_groups: 6
 initial_kt: 0.3
 current_iter_index: 1
-hookean_repul: true
+hookean_repul: false
 hookean_paras:
-  '(8, 8)': [1000, 1.3]
-  '(8, 22)': [1000, 0.9]
-  '(22, 22)': [1000, 1.7]
 keep_symmetry: false
 write_traj: true
 num_processes_rss: 128

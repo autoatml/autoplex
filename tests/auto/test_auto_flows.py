@@ -1,5 +1,6 @@
 from __future__ import annotations
-import os 
+import os
+
 os.environ["OMP_NUM_THREADS"] = "1"
 import pytest
 from monty.serialization import loadfn
@@ -275,6 +276,7 @@ def ref_paths4():
         "dft rattle static 4/4_test": "dft_ml_data_generation/rand_static_10/",
     }
 
+
 @pytest.fixture(scope="class")
 def fake_run_vasp_kwargs5():
     return {
@@ -301,8 +303,6 @@ def fake_run_vasp_kwargs5():
             "check_inputs": ["incar", "potcar"],
         },
     }
-
-
 
 
 @pytest.fixture(scope="class")
@@ -393,6 +393,7 @@ def ref_paths5_mpid():
         "dft rattle static 2/3_test": "MP_finetuning/rand_static_2/",
         "dft rattle static 3/3_test": "MP_finetuning/rand_static_3/",
     }
+
 
 @pytest.fixture(scope="class")
 def fake_run_vasp_kwargs5_mpid():
@@ -489,8 +490,6 @@ def fake_run_vasp_kwargs4_mpid():
     }
 
 
-
-
 def test_complete_dft_vs_ml_benchmark_workflow_gap(
         vasp_test_dir, mock_vasp, test_dir, memory_jobstore, ref_paths4_mpid, fake_run_vasp_kwargs4_mpid, clean_dir
 ):
@@ -521,16 +520,14 @@ def test_complete_dft_vs_ml_benchmark_workflow_gap(
         store=memory_jobstore,
     )
 
-    print("RMSE: ", responses[complete_workflow.jobs[-1].output.uuid][1].output[0][0]["benchmark_phonon_rmse"])
-
-    assert complete_workflow.jobs[4].name == "complete_benchmark_mp-22905"
+    assert complete_workflow.jobs[5].name == "complete_benchmark_mp-22905"
     assert responses[complete_workflow.jobs[-1].output.uuid][1].output[0][0]["benchmark_phonon_rmse"] == pytest.approx(
         2.502641337594289, abs=1.5  # it's kinda fluctuating because of the little data
     )
 
     # check if soap_default_dict is correctly constructed from
     # n_sparse and delta values in mlip_phonon_default json file
-    expected_soap_dict = "{'f=0.1': {'n_sparse': 6000, 'delta': 0.5}}"
+    expected_soap_dict = "atom-wise f=0.1: n_sparse = 6000, SOAP delta = 1.0"
     results_files = glob.glob('job*/results_LiCl.txt')
 
     for file_path in results_files:
@@ -542,7 +539,6 @@ def test_complete_dft_vs_ml_benchmark_workflow_gap(
 def test_complete_dft_vs_ml_benchmark_workflow_m3gnet(
         vasp_test_dir, mock_vasp, test_dir, memory_jobstore, ref_paths4_mpid, fake_run_vasp_kwargs4_mpid, clean_dir
 ):
-
     path_to_struct = vasp_test_dir / "dft_ml_data_generation" / "POSCAR"
     structure = Structure.from_file(path_to_struct)
 
@@ -581,17 +577,16 @@ def test_complete_dft_vs_ml_benchmark_workflow_m3gnet(
         ensure_success=True,
         store=memory_jobstore,
     )
-    assert complete_workflow_m3gnet.jobs[4].name == "complete_benchmark_mp-22905"
+    assert complete_workflow_m3gnet.jobs[5].name == "complete_benchmark_mp-22905"
     assert responses[complete_workflow_m3gnet.jobs[-1].output.uuid][1].output[0][0][
                "benchmark_phonon_rmse"] == pytest.approx(
-        5.2622804443539355, abs=1.0  # bad fit data
+        5.2622804443539355, abs=3.0  # bad fit data, fluctuates between 4 and 7
     )
 
 
 def test_complete_dft_vs_ml_benchmark_workflow_mace(
         vasp_test_dir, mock_vasp, test_dir, memory_jobstore, ref_paths4_mpid, fake_run_vasp_kwargs4_mpid, clean_dir
 ):
-
     path_to_struct = vasp_test_dir / "dft_ml_data_generation" / "POSCAR"
     structure = Structure.from_file(path_to_struct)
 
@@ -633,7 +628,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_mace(
         store=memory_jobstore,
     )
 
-    assert complete_workflow_mace.jobs[4].name == "complete_benchmark_mp-22905"
+    assert complete_workflow_mace.jobs[5].name == "complete_benchmark_mp-22905"
     assert responses[complete_workflow_mace.jobs[-1].output.uuid][1].output[0][0][
                "benchmark_phonon_rmse"] == pytest.approx(
         5.391879137001022, abs=3.0
@@ -641,10 +636,10 @@ def test_complete_dft_vs_ml_benchmark_workflow_mace(
         # and too little data
     )
 
+
 def test_complete_dft_vs_ml_benchmark_workflow_mace_finetuning(
         vasp_test_dir, mock_vasp, test_dir, memory_jobstore, ref_paths4_mpid, fake_run_vasp_kwargs4_mpid, clean_dir
 ):
-
     path_to_struct = vasp_test_dir / "dft_ml_data_generation" / "POSCAR"
     structure = Structure.from_file(path_to_struct)
 
@@ -699,7 +694,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_mace_finetuning(
         store=memory_jobstore,
     )
 
-    assert complete_workflow_mace.jobs[4].name == "complete_benchmark_mp-22905"
+    assert complete_workflow_mace.jobs[5].name == "complete_benchmark_mp-22905"
     assert responses[complete_workflow_mace.jobs[-1].output.uuid][1].output[0][0][
                "benchmark_phonon_rmse"] == pytest.approx(
         0.45, abs=0.4
@@ -708,17 +703,17 @@ def test_complete_dft_vs_ml_benchmark_workflow_mace_finetuning(
     )
 
 
-def test_complete_dft_vs_ml_benchmark_workflow_mace_finetuning_MP_settings(
+def test_complete_dft_vs_ml_benchmark_workflow_mace_finetuning_mp_settings(
         vasp_test_dir, mock_vasp, test_dir, memory_jobstore, ref_paths5_mpid, fake_run_vasp_kwargs5_mpid, clean_dir
 ):
-
     path_to_struct = vasp_test_dir / "MP_finetuning" / "POSCAR"
     structure = Structure.from_file(path_to_struct)
 
     complete_workflow_mace = CompleteDFTvsMLBenchmarkWorkflowMPSettings(
         ml_models=["MACE"],
-        volume_custom_scale_factors=[0.95,1.00,1.05], rattle_type=0, distort_type=0,
-        symprec=1e-3, supercell_settings={"min_length": 6, "max_length":10, "min_atoms":10, "max_atoms":300,}, displacements=[0.01],
+        volume_custom_scale_factors=[0.95, 1.00, 1.05], rattle_type=0, distort_type=0,
+        symprec=1e-3, supercell_settings={"min_length": 6, "max_length": 10, "min_atoms": 10, "max_atoms": 300, },
+        displacements=[0.01],
         benchmark_kwargs={"calculator_kwargs": {"device": "cpu"}},
         add_dft_random_struct=True,
     ).make(
@@ -765,7 +760,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_mace_finetuning_MP_settings(
         store=memory_jobstore,
     )
 
-    assert complete_workflow_mace.jobs[4].name == "complete_benchmark_test"
+    assert complete_workflow_mace.jobs[5].name == "complete_benchmark_test"
     assert responses[complete_workflow_mace.jobs[-1].output.uuid][1].output[0][0][
                "benchmark_phonon_rmse"] == pytest.approx(
         0.45, abs=0.4
@@ -777,7 +772,6 @@ def test_complete_dft_vs_ml_benchmark_workflow_mace_finetuning_MP_settings(
 def test_complete_dft_vs_ml_benchmark_workflow_nequip(
         vasp_test_dir, mock_vasp, test_dir, memory_jobstore, ref_paths4_mpid, fake_run_vasp_kwargs4_mpid, clean_dir
 ):
-
     path_to_struct = vasp_test_dir / "dft_ml_data_generation" / "POSCAR"
     structure = Structure.from_file(path_to_struct)
 
@@ -819,7 +813,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_nequip(
         store=memory_jobstore,
     )
 
-    assert complete_workflow_nequip.jobs[4].name == "complete_benchmark_mp-22905"
+    assert complete_workflow_nequip.jobs[5].name == "complete_benchmark_mp-22905"
     assert responses[complete_workflow_nequip.jobs[-1].output.uuid][1].output[0][0][
                "benchmark_phonon_rmse"] == pytest.approx(
         5.633069137001022, abs=3.0
@@ -831,7 +825,6 @@ def test_complete_dft_vs_ml_benchmark_workflow_nequip(
 def test_complete_dft_vs_ml_benchmark_workflow_two_mpids(
         vasp_test_dir, mock_vasp, test_dir, memory_jobstore, ref_paths4_mpid, fake_run_vasp_kwargs4_mpid, clean_dir
 ):
-
     path_to_struct = vasp_test_dir / "dft_ml_data_generation" / "POSCAR"
     structure = Structure.from_file(path_to_struct)
 
@@ -858,7 +851,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_two_mpids(
         store=memory_jobstore,
     )
 
-    assert complete_workflow_two_mpid.jobs[6].name == "complete_benchmark_mp-22905"
+    assert complete_workflow_two_mpid.jobs[8].name == "complete_benchmark_mp-22905"
     assert responses[complete_workflow_two_mpid.jobs[-1].output.uuid][1].output[0][0][
                "benchmark_phonon_rmse"] == pytest.approx(
         0.7126017685370398, abs=0.5
@@ -868,7 +861,6 @@ def test_complete_dft_vs_ml_benchmark_workflow_two_mpids(
 def test_complete_dft_vs_ml_benchmark_workflow_with_hploop(
         vasp_test_dir, mock_vasp, test_dir, memory_jobstore, ref_paths4_mpid, fake_run_vasp_kwargs4_mpid, clean_dir
 ):
-
     path_to_struct = vasp_test_dir / "dft_ml_data_generation" / "POSCAR"
     structure = Structure.from_file(path_to_struct)
 
@@ -898,7 +890,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_with_hploop(
         store=memory_jobstore,
     )
 
-    assert complete_workflow_hploop.jobs[4].name == "complete_benchmark_mp-22905"
+    assert complete_workflow_hploop.jobs[5].name == "complete_benchmark_mp-22905"
     assert responses[complete_workflow_hploop.jobs[-1].output.uuid][1].output[0][0][
                "benchmark_phonon_rmse"] == pytest.approx(
         2.002641337594289, abs=1.0  # it's kinda fluctuating because of the little data
@@ -941,7 +933,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_with_sigma_regularization_hploop(
         store=memory_jobstore,
     )
 
-    assert complete_workflow_sigma_hploop.jobs[4].name == "complete_benchmark_mp-22905"
+    assert complete_workflow_sigma_hploop.jobs[5].name == "complete_benchmark_mp-22905"
     assert responses[complete_workflow_sigma_hploop.jobs[-1].output.uuid][1].output[0][0][
                "benchmark_phonon_rmse"] == pytest.approx(
         1.511743561686686, abs=1.0  # it's kinda fluctuating because of the little data
@@ -963,8 +955,8 @@ def test_complete_dft_vs_ml_benchmark_workflow_with_sigma_regularization(
     complete_workflow_sigma = CompleteDFTvsMLBenchmarkWorkflow(symprec=1e-2,
                                                                supercell_settings={"min_length": 8, "min_atoms": 20},
                                                                displacements=[0.01],
-                                                               volume_custom_scale_factors=[0.975, 1.0, 1.025,1.05],
-                                                               summary_filename_prefix="test_results_",).make(
+                                                               volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
+                                                               summary_filename_prefix="test_results_", ).make(
         structure_list=[structure],
         mp_ids=["test"],
         benchmark_mp_ids=["mp-22905"],
@@ -985,7 +977,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_with_sigma_regularization(
         store=memory_jobstore,
     )
 
-    assert complete_workflow_sigma.jobs[4].name == "complete_benchmark_mp-22905"
+    assert complete_workflow_sigma.jobs[5].name == "complete_benchmark_mp-22905"
     assert responses[complete_workflow_sigma.jobs[-1].output.uuid][1].output[0][0][
                "benchmark_phonon_rmse"] == pytest.approx(
         0.6205293987404107, abs=0.3
@@ -996,7 +988,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_with_sigma_regularization(
     assert reg_specific_file_exists
 
     # check if soap_default_dict is correctly constructed from n_sparse and delta values in user fit parameter input
-    expected_soap_dict = "{'f=0.1': {'delta': 3.0, 'n_sparse': 8000}}"
+    expected_soap_dict = "atom-wise f=0.1: n_sparse = 8000, SOAP delta = 3.0"
 
     results_files = glob.glob('job*/test_results_LiCl.txt')
     for file_path in results_files:
@@ -1008,7 +1000,6 @@ def test_complete_dft_vs_ml_benchmark_workflow_with_sigma_regularization(
 def test_complete_dft_vs_ml_benchmark_workflow_separated(
         vasp_test_dir, mock_vasp, test_dir, memory_jobstore, ref_paths4_mpid, fake_run_vasp_kwargs4_mpid, clean_dir
 ):
-
     path_to_struct = vasp_test_dir / "dft_ml_data_generation" / "POSCAR"
     structure = Structure.from_file(path_to_struct)
 
@@ -1038,7 +1029,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_separated(
         store=memory_jobstore,
     )
 
-    assert complete_workflow_sep.jobs[4].name == "complete_benchmark_mp-22905"
+    assert complete_workflow_sep.jobs[5].name == "complete_benchmark_mp-22905"
     assert responses[complete_workflow_sep.jobs[-1].output.uuid][1].output[0][0][
                "benchmark_phonon_rmse"] == pytest.approx(
         0.8709764794814768, abs=0.5
@@ -1127,7 +1118,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_separated_sigma_reg_hploop(
         store=memory_jobstore,
     )
 
-    assert complete_workflow_sep.jobs[4].name == "complete_benchmark_mp-22905"
+    assert complete_workflow_sep.jobs[5].name == "complete_benchmark_mp-22905"
     assert responses[complete_workflow_sep.jobs[-1].output.uuid][1].output[0][0][
                "benchmark_phonon_rmse"] == pytest.approx(
         0.8709764794814768, abs=0.5
@@ -1417,19 +1408,19 @@ class TestCompleteDFTvsMLBenchmarkWorkflow:
             input_set_generator=test_iso_atom_static_input_set,
         )
         test_displacement_maker = TightDFTStaticMaker(
-            name="test_displacement_maker", # overwritten by autoplex default
+            name="test_displacement_maker",  # overwritten by autoplex default
             input_set_generator=test_iso_atom_static_input_set
         )
         test_rattled_bulk_relax_maker = TightRelaxMaker(
-            name="test_bulk_rattled_maker", # overwritten by autoplex default
+            name="test_bulk_rattled_maker",  # overwritten by autoplex default
             input_set_generator=test_iso_atom_static_input_set,
         )
         test_phonon_bulk_relax_maker = TightRelaxMaker(
-            name="test_bulk_phonon_maker", # overwritten by autoplex default
+            name="test_bulk_phonon_maker",  # overwritten by autoplex default
             input_set_generator=test_iso_atom_static_input_set,
         )
         test_phonon_static_energy_maker = StaticMaker(
-            name="test_phonon_static_energy_maker", # overwritten by autoplex default
+            name="test_phonon_static_energy_maker",  # overwritten by autoplex default
             input_set_generator=test_iso_atom_static_input_set,
         )
         test_different_makers_wf = CompleteDFTvsMLBenchmarkWorkflow(
@@ -1456,7 +1447,6 @@ class TestCompleteDFTvsMLBenchmarkWorkflow:
         )
         mock_vasp(ref_paths, fake_run_vasp_kwargs)
 
-
         responses = run_locally(
             test_different_makers_wf,
             create_folders=True,
@@ -1472,7 +1462,6 @@ class TestCompleteDFTvsMLBenchmarkWorkflow:
 def test_phonon_dft_ml_data_generation_flow(
         vasp_test_dir, mock_vasp, clean_dir, memory_jobstore, ref_paths4_mpid, fake_run_vasp_kwargs4_mpid, test_dir
 ):
-
     path_to_struct = vasp_test_dir / "dft_ml_data_generation" / "POSCAR"
     structure = Structure.from_file(path_to_struct)
     structure_list = [structure]
@@ -1527,8 +1516,8 @@ def test_phonon_dft_ml_data_generation_flow(
         counter += 1
     for job, uuid in flow_data_generation_without_rattled_structures.iterflow():
         counter_wor += 1
-    assert counter == 7
-    assert counter_wor == 6
+    assert counter == 8
+    assert counter_wor == 7
 
 
 # TODO testing cell_factor_sequence
@@ -1578,33 +1567,32 @@ def mock_rss(input_dir: str = None,
              ref_virial_name: str = "REF_virial",
              num_processes_fit: int = None,
              kt: float = None,
-             **fit_kwargs,):
-    
-    job2 = sample_data(selection_method=selection_method, 
-                    num_of_selection=num_of_selection, 
-                    bcur_params=bcur_params,
-                    dir=input_dir,
-                    random_seed=random_seed)
-    job3 = DFTStaticLabelling(e0_spin=e0_spin, 
-                       isolated_atom=isolated_atom, 
-                       dimer=dimer,
-                       dimer_range=dimer_range,
-                       dimer_num=dimer_num,
-                       custom_incar=custom_incar, 
-                       ).make(structures=job2.output)
-    job4 = collect_dft_data(vasp_ref_file=vasp_ref_file, 
-                             rss_group=rss_group, 
-                             vasp_dirs=job3.output)
-    job5 = preprocess_data(test_ratio=test_ratio, 
-                              regularization=regularization, 
-                              distillation=distillation, 
-                              force_max=f_max, 
-                              vasp_ref_dir=job4.output['vasp_ref_dir'], pre_database_dir=pre_database_dir)
-    job6 = MLIPFitMaker(mlip_type=mlip_type, 
+             **fit_kwargs, ):
+    job2 = sample_data(selection_method=selection_method,
+                       num_of_selection=num_of_selection,
+                       bcur_params=bcur_params,
+                       dir=input_dir,
+                       random_seed=random_seed)
+    job3 = DFTStaticLabelling(e0_spin=e0_spin,
+                              isolated_atom=isolated_atom,
+                              dimer=dimer,
+                              dimer_range=dimer_range,
+                              dimer_num=dimer_num,
+                              custom_incar=custom_incar,
+                              ).make(structures=job2.output)
+    job4 = collect_dft_data(vasp_ref_file=vasp_ref_file,
+                            rss_group=rss_group,
+                            vasp_dirs=job3.output)
+    job5 = preprocess_data(test_ratio=test_ratio,
+                           regularization=regularization,
+                           distillation=distillation,
+                           force_max=f_max,
+                           vasp_ref_dir=job4.output['vasp_ref_dir'], pre_database_dir=pre_database_dir)
+    job6 = MLIPFitMaker(mlip_type=mlip_type,
                         ref_energy_name=ref_energy_name,
                         ref_force_name=ref_force_name,
                         ref_virial_name=ref_virial_name,
-                        ).make(database_dir=job5.output, 
+                        ).make(database_dir=job5.output,
                                isolated_atom_energies=job4.output['isolated_atom_energies'],
                                num_processes_fit=num_processes_fit,
                                apply_data_preprocessing=False,
@@ -1626,36 +1614,36 @@ def mock_rss(input_dir: str = None,
 
 @job
 def mock_do_rss_iterations(input: Dict[str, Optional[Any]] = {'test_error': None,
-                                                         'pre_database_dir': None,
-                                                         'mlip_path': None,
-                                                         'isolated_atom_energies': None,
-                                                         'current_iter': None,
-                                                         'kt': 0.6},
-                      input_dir: str = None,
-                      selection_method1: str = 'cur',
-                      selection_method2: str = 'bcur1s',
-                      num_of_selection1: int = 3,
-                      num_of_selection2: int = 5,
-                      bcur_params: Optional[str] = None,
-                      random_seed: int = None,
-                      mlip_type: str = 'GAP',
-                      scalar_pressure_method: str ='exp',
-                      scalar_exp_pressure: float = 100,
-                      scalar_pressure_exponential_width: float = 0.2,
-                      scalar_pressure_low: float = 0,
-                      scalar_pressure_high: float = 50,
-                      max_steps: int = 10,
-                      force_tol: float = 0.1,
-                      stress_tol: float = 0.1,
-                      Hookean_repul: bool = False,
-                      write_traj: bool = True,
-                      num_processes_rss: int = 4,
-                      device: str = "cpu",
-                      stop_criterion: float = 0.01,
-                      max_iteration_number: int = 9,
-                      **fit_kwargs,):
-
-    if input['test_error'] is not None and input['test_error'] > stop_criterion and input['current_iter'] < max_iteration_number:
+                                                              'pre_database_dir': None,
+                                                              'mlip_path': None,
+                                                              'isolated_atom_energies': None,
+                                                              'current_iter': None,
+                                                              'kt': 0.6},
+                           input_dir: str = None,
+                           selection_method1: str = 'cur',
+                           selection_method2: str = 'bcur1s',
+                           num_of_selection1: int = 3,
+                           num_of_selection2: int = 5,
+                           bcur_params: Optional[str] = None,
+                           random_seed: int = None,
+                           mlip_type: str = 'GAP',
+                           scalar_pressure_method: str = 'exp',
+                           scalar_exp_pressure: float = 100,
+                           scalar_pressure_exponential_width: float = 0.2,
+                           scalar_pressure_low: float = 0,
+                           scalar_pressure_high: float = 50,
+                           max_steps: int = 10,
+                           force_tol: float = 0.1,
+                           stress_tol: float = 0.1,
+                           Hookean_repul: bool = False,
+                           write_traj: bool = True,
+                           num_processes_rss: int = 4,
+                           device: str = "cpu",
+                           stop_criterion: float = 0.01,
+                           max_iteration_number: int = 9,
+                           **fit_kwargs, ):
+    if input['test_error'] is not None and input['test_error'] > stop_criterion and input[
+        'current_iter'] < max_iteration_number:
         if input['kt'] > 0.15:
             kt = input['kt'] - 0.1
         else:
@@ -1667,73 +1655,73 @@ def mock_do_rss_iterations(input: Dict[str, Optional[Any]] = {'test_error': None
 
         bcur_params['kt'] = kt
 
-        job2 = sample_data(selection_method=selection_method1, 
-                        num_of_selection=num_of_selection1, 
-                        bcur_params=bcur_params,
-                        dir=input_dir,
-                        random_seed=random_seed)
-        job3 = do_rss_single_node(mlip_type=mlip_type, 
-                      iteration_index=f'{current_iter}th', 
-                      mlip_path=input['mlip_path'], 
-                      structures=job2.output,
-                      scalar_pressure_method=scalar_pressure_method,
-                      scalar_exp_pressure=scalar_exp_pressure,
-                      scalar_pressure_exponential_width=scalar_pressure_exponential_width,
-                      scalar_pressure_low=scalar_pressure_low,
-                      scalar_pressure_high=scalar_pressure_high,
-                      max_steps=max_steps,
-                      force_tol=force_tol,
-                      stress_tol=stress_tol,
-                      hookean_repul=Hookean_repul,
-                      write_traj=write_traj,
-                      num_processes_rss=num_processes_rss,
-                      device=device)
-        job4 = sample_data(selection_method=selection_method2, 
-                        num_of_selection=num_of_selection2, 
-                        bcur_params=bcur_params,
-                        traj_path=job3.output,
-                        random_seed=random_seed,
-                        isolated_atom_energies=input["isolated_atom_energies"])
-        
+        job2 = sample_data(selection_method=selection_method1,
+                           num_of_selection=num_of_selection1,
+                           bcur_params=bcur_params,
+                           dir=input_dir,
+                           random_seed=random_seed)
+        job3 = do_rss_single_node(mlip_type=mlip_type,
+                                  iteration_index=f'{current_iter}th',
+                                  mlip_path=input['mlip_path'],
+                                  structures=job2.output,
+                                  scalar_pressure_method=scalar_pressure_method,
+                                  scalar_exp_pressure=scalar_exp_pressure,
+                                  scalar_pressure_exponential_width=scalar_pressure_exponential_width,
+                                  scalar_pressure_low=scalar_pressure_low,
+                                  scalar_pressure_high=scalar_pressure_high,
+                                  max_steps=max_steps,
+                                  force_tol=force_tol,
+                                  stress_tol=stress_tol,
+                                  hookean_repul=Hookean_repul,
+                                  write_traj=write_traj,
+                                  num_processes_rss=num_processes_rss,
+                                  device=device)
+        job4 = sample_data(selection_method=selection_method2,
+                           num_of_selection=num_of_selection2,
+                           bcur_params=bcur_params,
+                           traj_path=job3.output,
+                           random_seed=random_seed,
+                           isolated_atom_energies=input["isolated_atom_energies"])
+
         job_list = [job2, job3, job4]
 
         return Response(detour=job_list, output=job4.output)
-    
+
 
 @job
 def mock_do_rss_iterations_multi_jobs(input: Dict[str, Optional[Any]] = {'test_error': None,
-                                                         'pre_database_dir': None,
-                                                         'mlip_path': None,
-                                                         'isolated_atom_energies': None,
-                                                         'current_iter': None,
-                                                         'kt': 0.6},
-                      input_dir: str = None,
-                      selection_method1: str = 'cur',
-                      selection_method2: str = 'bcur1s',
-                      num_of_selection1: int = 3,
-                      num_of_selection2: int = 5,
-                      bcur_params: Optional[str] = None,
-                      random_seed: int = None,
-                      mlip_type: str = 'GAP',
-                      scalar_pressure_method: str ='exp',
-                      scalar_exp_pressure: float = 100,
-                      scalar_pressure_exponential_width: float = 0.2,
-                      scalar_pressure_low: float = 0,
-                      scalar_pressure_high: float = 50,
-                      max_steps: int = 10,
-                      force_tol: float = 0.1,
-                      stress_tol: float = 0.1,
-                      Hookean_repul: bool = False,
-                      write_traj: bool = True,
-                      num_processes_rss: int = 4,
-                      device: str = "cpu",
-                      stop_criterion: float = 0.01,
-                      max_iteration_number: int = 9,
-                      num_groups: int = 2,
-                      remove_traj_files: bool = True,
-                      **fit_kwargs,):
-
-    if input['test_error'] is not None and input['test_error'] > stop_criterion and input['current_iter'] < max_iteration_number:
+                                                                         'pre_database_dir': None,
+                                                                         'mlip_path': None,
+                                                                         'isolated_atom_energies': None,
+                                                                         'current_iter': None,
+                                                                         'kt': 0.6},
+                                      input_dir: str = None,
+                                      selection_method1: str = 'cur',
+                                      selection_method2: str = 'bcur1s',
+                                      num_of_selection1: int = 3,
+                                      num_of_selection2: int = 5,
+                                      bcur_params: Optional[str] = None,
+                                      random_seed: int = None,
+                                      mlip_type: str = 'GAP',
+                                      scalar_pressure_method: str = 'exp',
+                                      scalar_exp_pressure: float = 100,
+                                      scalar_pressure_exponential_width: float = 0.2,
+                                      scalar_pressure_low: float = 0,
+                                      scalar_pressure_high: float = 50,
+                                      max_steps: int = 10,
+                                      force_tol: float = 0.1,
+                                      stress_tol: float = 0.1,
+                                      Hookean_repul: bool = False,
+                                      write_traj: bool = True,
+                                      num_processes_rss: int = 4,
+                                      device: str = "cpu",
+                                      stop_criterion: float = 0.01,
+                                      max_iteration_number: int = 9,
+                                      num_groups: int = 2,
+                                      remove_traj_files: bool = True,
+                                      **fit_kwargs, ):
+    if input['test_error'] is not None and input['test_error'] > stop_criterion and input[
+        'current_iter'] < max_iteration_number:
         if input['kt'] > 0.15:
             kt = input['kt'] - 0.1
         else:
@@ -1745,40 +1733,40 @@ def mock_do_rss_iterations_multi_jobs(input: Dict[str, Optional[Any]] = {'test_e
 
         bcur_params['kT'] = kt
 
-        job2 = sample_data(selection_method=selection_method1, 
-                        num_of_selection=num_of_selection1, 
-                        bcur_params=bcur_params,
-                        dir=input_dir,
-                        random_seed=random_seed)
-        job3 = do_rss_multi_node(mlip_type=mlip_type, 
-                      iteration_index=f'{current_iter}th', 
-                      mlip_path=input['mlip_path'], 
-                      structure=job2.output,
-                      scalar_pressure_method=scalar_pressure_method,
-                      scalar_exp_pressure=scalar_exp_pressure,
-                      scalar_pressure_exponential_width=scalar_pressure_exponential_width,
-                      scalar_pressure_low=scalar_pressure_low,
-                      scalar_pressure_high=scalar_pressure_high,
-                      max_steps=max_steps,
-                      force_tol=force_tol,
-                      stress_tol=stress_tol,
-                      hookean_repul=Hookean_repul,
-                      write_traj=write_traj,
-                      num_processes_rss=num_processes_rss,
-                      device=device,
-                      num_groups=num_groups,)
-        job4 = sample_data(selection_method=selection_method2, 
-                        num_of_selection=num_of_selection2, 
-                        bcur_params=bcur_params,
-                        traj_path=job3.output,
-                        random_seed=random_seed,
-                        isolated_atom_energies=input["isolated_atom_energies"],
-                        remove_traj_files=remove_traj_files)
-        
+        job2 = sample_data(selection_method=selection_method1,
+                           num_of_selection=num_of_selection1,
+                           bcur_params=bcur_params,
+                           dir=input_dir,
+                           random_seed=random_seed)
+        job3 = do_rss_multi_node(mlip_type=mlip_type,
+                                 iteration_index=f'{current_iter}th',
+                                 mlip_path=input['mlip_path'],
+                                 structure=job2.output,
+                                 scalar_pressure_method=scalar_pressure_method,
+                                 scalar_exp_pressure=scalar_exp_pressure,
+                                 scalar_pressure_exponential_width=scalar_pressure_exponential_width,
+                                 scalar_pressure_low=scalar_pressure_low,
+                                 scalar_pressure_high=scalar_pressure_high,
+                                 max_steps=max_steps,
+                                 force_tol=force_tol,
+                                 stress_tol=stress_tol,
+                                 hookean_repul=Hookean_repul,
+                                 write_traj=write_traj,
+                                 num_processes_rss=num_processes_rss,
+                                 device=device,
+                                 num_groups=num_groups, )
+        job4 = sample_data(selection_method=selection_method2,
+                           num_of_selection=num_of_selection2,
+                           bcur_params=bcur_params,
+                           traj_path=job3.output,
+                           random_seed=random_seed,
+                           isolated_atom_energies=input["isolated_atom_energies"],
+                           remove_traj_files=remove_traj_files)
+
         job_list = [job2, job3, job4]
 
         return Response(detour=job_list, output=job4.output)
-    
+
 
 def test_mock_workflow(test_dir, mock_vasp, memory_jobstore, clean_dir):
     test_files_dir = test_dir / "data/rss.extxyz"
@@ -1786,7 +1774,7 @@ def test_mock_workflow(test_dir, mock_vasp, memory_jobstore, clean_dir):
     # structures = [AseAtomsAdaptor.get_structure(atom) for atom in atoms]
 
     ref_paths = {
-        **{f"static_bulk_{i}": f"rss/Si_bulk_{i+1}/" for i in range(18)},
+        **{f"static_bulk_{i}": f"rss/Si_bulk_{i + 1}/" for i in range(18)},
         "static_isolated_0": "rss/Si_isolated_1/",
         "static_dimer_0": "rss/Si_dimer_1/",
         "static_dimer_1": "rss/Si_dimer_2/",
@@ -1794,35 +1782,35 @@ def test_mock_workflow(test_dir, mock_vasp, memory_jobstore, clean_dir):
     }
 
     fake_run_vasp_kwargs = {
-        "static_isolated_0": {"incar_settings": {"ISPIN": 2, "KSPACINGS": 2.0}}, 
-        "static_dimer_0": {"incar_settings": {"ISPIN": 2, "KSPACINGS": 2.0}}, 
-        "static_dimer_1": {"incar_settings": {"ISPIN": 2, "KSPACINGS": 2.0}}, 
-        "static_dimer_2": {"incar_settings": {"ISPIN": 2, "KSPACINGS": 2.0}}, 
+        "static_isolated_0": {"incar_settings": {"ISPIN": 2, "KSPACINGS": 2.0}},
+        "static_dimer_0": {"incar_settings": {"ISPIN": 2, "KSPACINGS": 2.0}},
+        "static_dimer_1": {"incar_settings": {"ISPIN": 2, "KSPACINGS": 2.0}},
+        "static_dimer_2": {"incar_settings": {"ISPIN": 2, "KSPACINGS": 2.0}},
     }
 
     mock_vasp(ref_paths, fake_run_vasp_kwargs)
 
-    job1=mock_rss(input_dir=test_files_dir,
-                  selection_method='cur',
-                  num_of_selection=18,
-                  bcur_params={'soap_paras': {'l_max': 3,
-                                    'n_max': 3,
-                                    'atom_sigma': 0.5,
-                                    'cutoff': 4.0,
-                                    'cutoff_transition_width': 1.0,
-                                    'zeta': 4.0,
-                                    'average': True,
-                                    'species': True,
-                                    },
-                 },
-                 random_seed=42,
-                 e0_spin=True,
-                 isolated_atom=True,
-                 dimer=False,
-                 dimer_range=None,
-                 dimer_num=None,
-                 custom_incar={
-                        "ADDGRID": None, 
+    job1 = mock_rss(input_dir=test_files_dir,
+                    selection_method='cur',
+                    num_of_selection=18,
+                    bcur_params={'soap_paras': {'l_max': 3,
+                                                'n_max': 3,
+                                                'atom_sigma': 0.5,
+                                                'cutoff': 4.0,
+                                                'cutoff_transition_width': 1.0,
+                                                'zeta': 4.0,
+                                                'average': True,
+                                                'species': True,
+                                                },
+                                 },
+                    random_seed=42,
+                    e0_spin=True,
+                    isolated_atom=True,
+                    dimer=False,
+                    dimer_range=None,
+                    dimer_num=None,
+                    custom_incar={
+                        "ADDGRID": None,
                         "ENCUT": 200,
                         "EDIFF": 1E-04,
                         "ISMEAR": 0,
@@ -1847,81 +1835,81 @@ def test_mock_workflow(test_dir, mock_vasp, memory_jobstore, clean_dir):
                         "LASPH": None,
                         "AMIN": None,
                     },
-                 vasp_ref_file='vasp_ref.extxyz',
-                 gap_rss_group='initial',
-                 test_ratio=0.1,
-                 regularization=True,
-                 distillation=True,
-                 f_max=0.7,
-                 pre_database_dir=None,
-                 mlip_type='GAP',
-                 ref_energy_name="REF_energy",
-                 ref_force_name="REF_forces",
-                 ref_virial_name="REF_virial",
-                 num_processes_fit=4,
-                 kt=0.6
-                )
+                    vasp_ref_file='vasp_ref.extxyz',
+                    gap_rss_group='initial',
+                    test_ratio=0.1,
+                    regularization=True,
+                    distillation=True,
+                    f_max=0.7,
+                    pre_database_dir=None,
+                    mlip_type='GAP',
+                    ref_energy_name="REF_energy",
+                    ref_force_name="REF_forces",
+                    ref_virial_name="REF_virial",
+                    num_processes_fit=4,
+                    kt=0.6
+                    )
 
     job2 = mock_do_rss_iterations(input=job1.output,
-                      input_dir=test_files_dir,
-                      selection_method1='cur',
-                      selection_method2='bcur1s',
-                      num_of_selection1=5,
-                      num_of_selection2=3,
-                      bcur_params={'soap_paras': {'l_max': 3,
-                                   'n_max': 3,
-                                   'atom_sigma': 0.5,
-                                   'cutoff': 4.0,
-                                   'cutoff_transition_width': 1.0,
-                                   'zeta': 4.0,
-                                   'average': True,
-                                   'species': True,
-                                   },
-                                   'frac_of_bcur': 0.8,
-                                   'bolt_max_num': 3000,
-                                   'kernel_exp': 4.0, 
-                                   'energy_label': 'energy'},
-                      random_seed=None,
-                      e0_spin=False,
-                      isolated_atom=False,
-                      dimer=False,
-                      dimer_range=None,
-                      dimer_num=None,
-                      custom_incar=None,
-                      vasp_ref_file='vasp_ref.extxyz',
-                      rss_group='initial',
-                      test_ratio=0.1,
-                      regularization=True,
-                      distillation=True,
-                      f_max=200,
-                      pre_database_dir=None,
-                      mlip_type='GAP',
-                      ref_energy_name="REF_energy",
-                      ref_force_name="REF_forces",
-                      ref_virial_name="REF_virial",
-                      num_processes_fit=None,
-                      scalar_pressure_method='exp',
-                      scalar_exp_pressure=100,
-                      scalar_pressure_exponential_width=0.2,
-                      scalar_pressure_low=0,
-                      scalar_pressure_high=50,
-                      max_steps=100,
-                      force_tol=0.6,
-                      stress_tol=0.6,
-                      Hookean_repul=False,
-                      write_traj=True,
-                      num_processes_rss=4,
-                      device="cpu",
-                      stop_criterion=0.01,
-                      max_iteration_number=9
-                      )
+                                  input_dir=test_files_dir,
+                                  selection_method1='cur',
+                                  selection_method2='bcur1s',
+                                  num_of_selection1=5,
+                                  num_of_selection2=3,
+                                  bcur_params={'soap_paras': {'l_max': 3,
+                                                              'n_max': 3,
+                                                              'atom_sigma': 0.5,
+                                                              'cutoff': 4.0,
+                                                              'cutoff_transition_width': 1.0,
+                                                              'zeta': 4.0,
+                                                              'average': True,
+                                                              'species': True,
+                                                              },
+                                               'frac_of_bcur': 0.8,
+                                               'bolt_max_num': 3000,
+                                               'kernel_exp': 4.0,
+                                               'energy_label': 'energy'},
+                                  random_seed=None,
+                                  e0_spin=False,
+                                  isolated_atom=False,
+                                  dimer=False,
+                                  dimer_range=None,
+                                  dimer_num=None,
+                                  custom_incar=None,
+                                  vasp_ref_file='vasp_ref.extxyz',
+                                  rss_group='initial',
+                                  test_ratio=0.1,
+                                  regularization=True,
+                                  distillation=True,
+                                  f_max=200,
+                                  pre_database_dir=None,
+                                  mlip_type='GAP',
+                                  ref_energy_name="REF_energy",
+                                  ref_force_name="REF_forces",
+                                  ref_virial_name="REF_virial",
+                                  num_processes_fit=None,
+                                  scalar_pressure_method='exp',
+                                  scalar_exp_pressure=100,
+                                  scalar_pressure_exponential_width=0.2,
+                                  scalar_pressure_low=0,
+                                  scalar_pressure_high=50,
+                                  max_steps=100,
+                                  force_tol=0.6,
+                                  stress_tol=0.6,
+                                  Hookean_repul=False,
+                                  write_traj=True,
+                                  num_processes_rss=4,
+                                  device="cpu",
+                                  stop_criterion=0.01,
+                                  max_iteration_number=9
+                                  )
 
     response = run_locally(
         Flow([job1, job2]),
         create_folders=True,
         ensure_success=True,
         store=memory_jobstore
-    ) 
+    )
 
     assert Path(job1.output["mlip_path"].resolve(memory_jobstore)).exists()
 
@@ -1936,7 +1924,7 @@ def test_mock_workflow_multi_node(test_dir, mock_vasp, memory_jobstore, clean_di
     # structures = [AseAtomsAdaptor.get_structure(atom) for atom in atoms]
 
     ref_paths = {
-        **{f"static_bulk_{i}": f"rss/Si_bulk_{i+1}/" for i in range(18)},
+        **{f"static_bulk_{i}": f"rss/Si_bulk_{i + 1}/" for i in range(18)},
         "static_isolated_0": "rss/Si_isolated_1/",
         "static_dimer_0": "rss/Si_dimer_1/",
         "static_dimer_1": "rss/Si_dimer_2/",
@@ -1944,35 +1932,35 @@ def test_mock_workflow_multi_node(test_dir, mock_vasp, memory_jobstore, clean_di
     }
 
     fake_run_vasp_kwargs = {
-        "static_isolated_0": {"incar_settings": {"ISPIN": 2, "KSPACINGS": 2.0}}, 
-        "static_dimer_0": {"incar_settings": {"ISPIN": 2, "KSPACINGS": 2.0}}, 
-        "static_dimer_1": {"incar_settings": {"ISPIN": 2, "KSPACINGS": 2.0}}, 
-        "static_dimer_2": {"incar_settings": {"ISPIN": 2, "KSPACINGS": 2.0}}, 
+        "static_isolated_0": {"incar_settings": {"ISPIN": 2, "KSPACINGS": 2.0}},
+        "static_dimer_0": {"incar_settings": {"ISPIN": 2, "KSPACINGS": 2.0}},
+        "static_dimer_1": {"incar_settings": {"ISPIN": 2, "KSPACINGS": 2.0}},
+        "static_dimer_2": {"incar_settings": {"ISPIN": 2, "KSPACINGS": 2.0}},
     }
 
     mock_vasp(ref_paths, fake_run_vasp_kwargs)
 
-    job1=mock_rss(input_dir=test_files_dir,
-                  selection_method='cur',
-                  num_of_selection=18,
-                  bcur_params={'soap_paras': {'l_max': 3,
-                                    'n_max': 3,
-                                    'atom_sigma': 0.5,
-                                    'cutoff': 4.0,
-                                    'cutoff_transition_width': 1.0,
-                                    'zeta': 4.0,
-                                    'average': True,
-                                    'species': True,
-                                    },
-                 },
-                 random_seed=42,
-                 e0_spin=True,
-                 isolated_atom=True,
-                 dimer=False,
-                 dimer_range=None,
-                 dimer_num=None,
-                 custom_incar={
-                        "ADDGRID": None, 
+    job1 = mock_rss(input_dir=test_files_dir,
+                    selection_method='cur',
+                    num_of_selection=18,
+                    bcur_params={'soap_paras': {'l_max': 3,
+                                                'n_max': 3,
+                                                'atom_sigma': 0.5,
+                                                'cutoff': 4.0,
+                                                'cutoff_transition_width': 1.0,
+                                                'zeta': 4.0,
+                                                'average': True,
+                                                'species': True,
+                                                },
+                                 },
+                    random_seed=42,
+                    e0_spin=True,
+                    isolated_atom=True,
+                    dimer=False,
+                    dimer_range=None,
+                    dimer_num=None,
+                    custom_incar={
+                        "ADDGRID": None,
                         "ENCUT": 200,
                         "EDIFF": 1E-04,
                         "ISMEAR": 0,
@@ -1997,83 +1985,83 @@ def test_mock_workflow_multi_node(test_dir, mock_vasp, memory_jobstore, clean_di
                         "LASPH": None,
                         "AMIN": None,
                     },
-                 vasp_ref_file='vasp_ref.extxyz',
-                 gap_rss_group='initial',
-                 test_ratio=0.1,
-                 regularization=True,
-                 distillation=True,
-                 f_max=0.7,
-                 pre_database_dir=None,
-                 mlip_type='GAP',
-                 ref_energy_name="REF_energy",
-                 ref_force_name="REF_forces",
-                 ref_virial_name="REF_virial",
-                 num_processes_fit=4,
-                 kt=0.6
-                )
+                    vasp_ref_file='vasp_ref.extxyz',
+                    gap_rss_group='initial',
+                    test_ratio=0.1,
+                    regularization=True,
+                    distillation=True,
+                    f_max=0.7,
+                    pre_database_dir=None,
+                    mlip_type='GAP',
+                    ref_energy_name="REF_energy",
+                    ref_force_name="REF_forces",
+                    ref_virial_name="REF_virial",
+                    num_processes_fit=4,
+                    kt=0.6
+                    )
 
     job2 = mock_do_rss_iterations_multi_jobs(input=job1.output,
-                      input_dir=test_files_dir,
-                      selection_method1='cur',
-                      selection_method2='bcur1s',
-                      num_of_selection1=5,
-                      num_of_selection2=3,
-                      bcur_params={'soap_paras': {'l_max': 3,
-                                   'n_max': 3,
-                                   'atom_sigma': 0.5,
-                                   'cutoff': 4.0,
-                                   'cutoff_transition_width': 1.0,
-                                   'zeta': 4.0,
-                                   'average': True,
-                                   'species': True,
-                                   },
-                                   'frac_of_bcur': 0.8,
-                                   'bolt_max_num': 3000,
-                                   'kernel_exp': 4.0, 
-                                   'energy_label': 'energy'},
-                      random_seed=None,
-                      e0_spin=False,
-                      isolated_atom=True,
-                      dimer=False,
-                      dimer_range=None,
-                      dimer_num=None,
-                      custom_incar=None,
-                      vasp_ref_file='vasp_ref.extxyz',
-                      rss_group='initial',
-                      test_ratio=0.1,
-                      regularization=True,
-                      distillation=True,
-                      f_max=200,
-                      pre_database_dir=None,
-                      mlip_type='GAP',
-                      ref_energy_name="REF_energy",
-                      ref_force_name="REF_forces",
-                      ref_virial_name="REF_virial",
-                      num_processes_fit=None,
-                      scalar_pressure_method='exp',
-                      scalar_exp_pressure=100,
-                      scalar_pressure_exponential_width=0.2,
-                      scalar_pressure_low=0,
-                      scalar_pressure_high=50,
-                      max_steps=100,
-                      force_tol=0.6,
-                      stress_tol=0.6,
-                      Hookean_repul=False,
-                      write_traj=True,
-                      num_processes_rss=4,
-                      device="cpu",
-                      stop_criterion=0.01,
-                      max_iteration_number=9,
-                      num_groups=2,
-                      remove_traj_files=True,
-                      )
+                                             input_dir=test_files_dir,
+                                             selection_method1='cur',
+                                             selection_method2='bcur1s',
+                                             num_of_selection1=5,
+                                             num_of_selection2=3,
+                                             bcur_params={'soap_paras': {'l_max': 3,
+                                                                         'n_max': 3,
+                                                                         'atom_sigma': 0.5,
+                                                                         'cutoff': 4.0,
+                                                                         'cutoff_transition_width': 1.0,
+                                                                         'zeta': 4.0,
+                                                                         'average': True,
+                                                                         'species': True,
+                                                                         },
+                                                          'frac_of_bcur': 0.8,
+                                                          'bolt_max_num': 3000,
+                                                          'kernel_exp': 4.0,
+                                                          'energy_label': 'energy'},
+                                             random_seed=None,
+                                             e0_spin=False,
+                                             isolated_atom=True,
+                                             dimer=False,
+                                             dimer_range=None,
+                                             dimer_num=None,
+                                             custom_incar=None,
+                                             vasp_ref_file='vasp_ref.extxyz',
+                                             rss_group='initial',
+                                             test_ratio=0.1,
+                                             regularization=True,
+                                             distillation=True,
+                                             f_max=200,
+                                             pre_database_dir=None,
+                                             mlip_type='GAP',
+                                             ref_energy_name="REF_energy",
+                                             ref_force_name="REF_forces",
+                                             ref_virial_name="REF_virial",
+                                             num_processes_fit=None,
+                                             scalar_pressure_method='exp',
+                                             scalar_exp_pressure=100,
+                                             scalar_pressure_exponential_width=0.2,
+                                             scalar_pressure_low=0,
+                                             scalar_pressure_high=50,
+                                             max_steps=100,
+                                             force_tol=0.6,
+                                             stress_tol=0.6,
+                                             Hookean_repul=False,
+                                             write_traj=True,
+                                             num_processes_rss=4,
+                                             device="cpu",
+                                             stop_criterion=0.01,
+                                             max_iteration_number=9,
+                                             num_groups=2,
+                                             remove_traj_files=True,
+                                             )
 
     response = run_locally(
         Flow([job1, job2]),
         create_folders=True,
         ensure_success=True,
         store=memory_jobstore
-    ) 
+    )
 
     assert Path(job1.output["mlip_path"].resolve(memory_jobstore)).exists()
 

@@ -1,6 +1,6 @@
 {
   "name": "DeveloperEnv",
-  "image": "ghcr.io/autoatml/autoplex/autoplex-python-3.10:0.0.5",
+  "image": "ghcr.io/autoatml/autoplex/autoplex-python-3.10:0.0.7",
   "hostRequirements": {
    "cpus": 4,
    "memory": "16gb",

@@ -16,7 +16,7 @@ from autoplex.data.phonons.utils import reduce_supercell_size
 def reduce_supercell_size_job(
     structure: Structure,
     min_length: float = 18,
-    max_length: float = 22,
+    max_length: float = 20,
     fallback_min_length: float = 12,
     min_atoms: int = 100,
     max_atoms: int = 500,

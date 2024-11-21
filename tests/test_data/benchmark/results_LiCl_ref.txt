@@ -1,9 +1,9 @@
-Potential  Structure  MPID        Displacement (Å)  RMSE (THz)  Hyperparameters (atom-wise f, n_sparse, SOAP delta)    Database type   imagmodes(pot)  imagmodes(dft)
-GAP        LiCl       mp-22905    0.01              0.87425     {'f=0.1': None}                                                        False           False
-GAP        LiCl       mp-22905    0.01              0.63839     {'f=0.1': None}                                                        False           False
-GAP        LiCl       mp-22905    0.01              0.55506     {'f=0.1': None}                                        _wo_sigma       False           False
-GAP        LiCl       mp-22905    0.01              0.43216     {'f=0.1': None}                                        _phonon         False           False
-GAP        LiCl       mp-22905    0.01              0.54584     {'f=0.1': None}                                        _rand_struc     False           False
-GAP        LiCl       mp-22905    0.01              0.43216     {'f=0.1': {'n_sparse': 3000, 'delta': 1.0}}            _rand_struc     False           False
-GAP        LiCl       mp-22905    0.01              0.36478     {'f=0.1': {'n_sparse': 5000, 'delta': 1.0}}            _rand_struc     False           False
-GAP        LiCl       mp-22905    0.01              0.38100     {'f=0.1': {'n_sparse': 5000, 'delta': 1.0}}            _rand_struc     False           False
+Potential  Structure  MPID        Displacement (Å)  RMSE (THz)  imagmodes(pot)  imagmodes(dft)  Database type   (Hyper-)Parameters
+GAP        LiCl       mp-22905    0.01              0.87425     False           False           full            atom-wise f=0.1: n_sparse = 3000, SOAP delta = 1.0
+GAP        LiCl       mp-22905    0.01              0.63839     False           False           full            atom-wise f=0.1: n_sparse = 4000, SOAP delta = 1.0
+GAP        LiCl       mp-22905    0.01              0.55506     False           False           _wo_sigma       atom-wise f=0.1: n_sparse = 3000, SOAP delta = 1.0
+GAP        LiCl       mp-22905    0.01              0.43216     False           False           _phonon         atom-wise f=0.1: n_sparse = 3000, SOAP delta = 1.0
+GAP        LiCl       mp-22905    0.01              0.54584     False           False           _rand_struc     atom-wise f=0.1: n_sparse = 3000, SOAP delta = 1.0
+GAP        LiCl       mp-22905    0.01              0.43216     False           False           _rand_struc     atom-wise f=0.1: n_sparse = 3000, SOAP delta = 1.0
+GAP        LiCl       mp-22905    0.01              0.36478     False           False           _rand_struc     atom-wise f=0.1: n_sparse = 3000, SOAP delta = 1.0
+GAP        LiCl       mp-22905    0.01              0.38100     False           False           _rand_struc     atom-wise f=0.1: n_sparse = 4000, SOAP delta = 1.0

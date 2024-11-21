@@ -33,7 +33,7 @@ jobs:
             | jq -r 'sort_by(.created_at) | reverse | .[0].metadata.container.tags[0]')
         echo "VERSION=$TAG" >> $GITHUB_ENV
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Run tests using Docker image for Python ${{ matrix.python-version }}
       run: |
         docker pull ghcr.io/autoatml/autoplex/autoplex-python-${{ matrix.python-version }}:${{ env.VERSION }}
@@ -68,17 +68,33 @@ jobs:
     if: github.repository_owner == 'autoatml' && github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
+    defaults:
+      run:
+        shell: bash -l {0} # enables conda/mamba env activation by reading bash profile
 
+    steps:
+
+    - name: Check out repo
+      uses: actions/checkout@v4
+    - name: Set up micromamba
+      uses: mamba-org/setup-micromamba@main
+    - name: Create mamba environment
+      run: |
+          micromamba create -n autoplex_tests python=3.10 --yes
+    - name: Install uv
+      run: micromamba run -n autoplex_tests pip install uv
+    - name: Install autoplex and dependencies
+      run: |
+          micromamba activate autoplex_tests
+          uv pip install --upgrade pip
+          uv pip install --prerelease=allow .[tests,strict]
+          
     - name: Download test duration artifacts
       uses: actions/download-artifact@v3
 
     - name: Compute average of test durations
       run: |
-        # Clear out any existing content in the consolidated file
-        > tests/test_data/.pytest-split-durations
-        # Run the Python script to average out test durations
+        micromamba activate autoplex_tests
         python3 .github/scripts/average_test_durations.py
         rm -rf test-durations-*
 
