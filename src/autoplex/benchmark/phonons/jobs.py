@@ -17,9 +17,9 @@ def write_benchmark_metrics(
     Parameters
     ----------
     benchmark_structures: List[Structure].
-        list of benchmark Structure used for benchmarking.
+        List of benchmark Structure used for benchmarking.
     metrics: List[float]
-        root mean squared error between band structures, imagmodesdft-bool and imagmodesml-bool.
+        Root mean squared error between band structures, imagmodesdft-bool and imagmodesml-bool.
     filename_prefix: str
         Prefix of the result summary file.
 
