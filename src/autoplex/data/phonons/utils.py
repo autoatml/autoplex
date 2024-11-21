@@ -39,11 +39,11 @@ def ml_phonon_maker_preparation(
     Prepare the MLPhononMaker for the respective MLIP model.
 
     bulk_relax_maker: .ForceFieldRelaxMaker or None
-        A maker to perform a tight relaxation on the bulk.
+        Maker to perform a tight relaxation on the bulk.
         Set to ``None`` to skip the
         bulk relaxation
     static_energy_maker: .ForceFieldStaticMaker or None
-        A maker to perform the computation of the DFT energy on the bulk.
+        Maker to perform the computation of the DFT energy on the bulk.
         Set to ``None`` to skip the
         static energy computation
     phonon_displacement_maker: .ForceFieldStaticMaker or None
@@ -128,21 +128,21 @@ def check_supercells(
     Parameters
     ----------
     structure_list: list[Structure]
-        list of pymatgen Structure object.
+        List of pymatgen Structure object.
     structure_names: list[str]
-        list of structure names.
+        List of structure names.
     min_length: float
-        min length of the supercell that will be built.
+        Minimum length of the supercell that will be built.
     max_length: float
-        max length of the supercell that will be built.
+        Maximum length of the supercell that will be built.
     max_atoms: int
-        maximally allowed number of atoms in the supercell.
+        Maximally allowed number of atoms in the supercell.
     min_atoms: int
-        minimum number of atoms in the supercell that shall be reached.
+        Minimum number of atoms in the supercell that shall be reached.
     fallback_min_length: float
-        fallback option for minimum length for exceptional cases
+        Fallback option for minimum length for exceptional cases
     tolerance: float
-        tolerance for min_atoms and max_atoms
+        Tolerance for min_atoms and max_atoms
 
     """
     structure_names = (
@@ -222,19 +222,19 @@ def reduce_supercell_size(
     Parameters
     ----------
     structure: Structure
-        pymatgen Structure object.
+        The pymatgen Structure object.
     min_length: float
-        min length of the supercell that will be built.
+        Minimum length of the supercell that will be built.
     max_length: float
-        max length of the supercell that will be built.
+        Maximum length of the supercell that will be built.
     max_atoms: int
-        maximally allowed number of atoms in the supercell.
+        Maximally allowed number of atoms in the supercell.
     min_atoms: int
-        minimum number of atoms in the supercell that shall be reached.
+        Minimum number of atoms in the supercell that shall be reached.
     fallback_min_length: float
-        fallback option for minimum length for exceptional cases.
+        Fallback option for minimum length for exceptional cases.
     step_size: float
-        step_size which is used to increase the supercell.
+        The step_size which is used to increase the supercell.
         If allow_orthorhombic and force_90_degrees are both set to True,
         the chosen step_size will be automatically multiplied by 5 to
         prevent a too long search for the possible supercell.
@@ -242,7 +242,7 @@ def reduce_supercell_size(
     Returns
     -------
     list
-        supercell matrix.
+        The supercell matrix as a list object.
     """
     if fallback_min_length >= min_length:
         fallback_min_length = min_length - 1
