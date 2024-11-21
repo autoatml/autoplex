@@ -56,13 +56,13 @@ def convert_to_extxyz(job_output, pkl_file, config_type, factor):
     Parameters
     ----------
     job_output:
-        the (static) job output object.
+        The (static) job output object.
     pkl_file: str
-        a pickle file.
+        A pickle file.
     config_type: str
-            configuration type of the data.
+        Configuration type of the data.
     factor: str
-            string of factor to resize cell parameters.
+        String of a factor to resize cell parameters.
 
     """
     with open(Path(job_output.dir_name) / Path(pkl_file), "rb") as file:
@@ -100,15 +100,15 @@ def plot_force_distribution(
     Parameters
     ----------
     cell_factor: float
-        factor to resize cell parameters.
+        Factor to resize cell parameters.
     path:
         Path to the ref_XYZ.extxyz file.
     x_min: int
-        minimum value for the plot x-axis.
+        Minimum value for the plot x-axis.
     x_max: int
-        maximum value for the plot x-axis.
+        Maximum value for the plot x-axis.
     bin_width: float
-        width of the plot bins.
+        Width of the plot bins.
 
     """
     plt.xlabel("Forces")
@@ -151,14 +151,14 @@ def get_supercell_job(structure: Structure, supercell_matrix: Matrix3D):
     Parameters
     ----------
     structure: Structure
-        pymatgen structure object.
+        The pymatgen structure object.
     supercell_matrix: Matrix3D
         The matrix to generate the supercell.
 
     Returns
     -------
     supercell: Structure
-        pymatgen structure object.
+        A pymatgen structure object.
 
     """
     supercell = get_supercell(
