@@ -75,13 +75,13 @@ def complete_benchmark(  # this function was put here to prevent circular import
         ML model to be used.
         Default is GAP.
     ibenchmark_structure: int
-        ith benchmark structure.
+        The ith benchmark structure.
     benchmark_structure: Structure
-        pymatgen structure for benchmarking.
+        The pymatgen structure for benchmarking.
     benchmark_mp_ids: list[str]
         Materials Project ID of the benchmarking structure.
     mp_ids:
-        materials project IDs.
+        Materials Project IDs.
     add_dft_phonon_struct: bool.
         If True, will add displaced supercells via phonopy for DFT calculation.
     fit_input : dict.
@@ -98,10 +98,10 @@ def complete_benchmark(  # this function was put here to prevent circular import
     phonon_displacement_maker: BaseVaspMaker
         Maker used to compute the forces for a supercell.
     dft_references:
-        a list of DFT reference files containing the PhononBSDOCDoc object.
+        List of DFT reference files containing the PhononBSDOCDoc object.
         Default None.
     supercell_settings: dict
-        settings for supercell generation
+        Settings for supercell generation
     relax_maker_kwargs: dict
         Keyword arguments that can be passed to the RelaxMaker.
     static_maker_kwargs: dict
@@ -109,11 +109,11 @@ def complete_benchmark(  # this function was put here to prevent circular import
     ml_phonon_maker_kwargs: dict
         Keyword arguments that can be passed to the MLPhononMaker.
     displacement: float
-        displacement used in the finite displacement method.
+        Displacement used in the finite displacement method.
     atomwise_regularization_parameter: float
-        regularization value for the atom-wise force components.
+        Regularization value for the atom-wise force components.
     soap_dict: dict
-        dictionary containing SOAP parameters.
+        Dictionary containing SOAP parameters.
 
     """
     jobs = []
@@ -240,8 +240,9 @@ def generate_supercells(
     Parameters
     ----------
     structures : list[Structure]
+        List of supercells.
     supercell_settings: dict
-        settings for supercells
+        Settings for supercells.
 
     """
     return [
@@ -265,13 +266,13 @@ def run_supercells(
     Parameters
     ----------
     structures: list[Structure]
-        list of supercells
+        List of supercells.
     supercell_matrices: list[int]
-        list of supercell matrices
+        List of supercell matrices.
     mp_ids: list[str]
-        list of material ids
+        List of Materials Project IDs.
     dft_maker : .BaseVaspMaker or .ForceFieldStaticMaker or .BaseAimsMaker
-        A maker to use to generate dispacement calculations
+        Maker to use to generate dispacement calculations
     """
     if dft_maker is None:
         dft_maker = field(default_factory=TightDFTStaticMaker)
@@ -313,9 +314,9 @@ def dft_phonopy_gen_data(
     Parameters
     ----------
     structure: Structure
-        pymatgen Structure object.
+        The pymatgen Structure object.
     mp_id: str
-        materials project id
+        Materials Project ID.
     phonon_displacement_maker : .BaseVaspMaker or None
         Maker used to compute the forces for a supercell.
     phonon_bulk_relax_maker: BaseVaspMaker
@@ -323,14 +324,14 @@ def dft_phonopy_gen_data(
     phonon_static_energy_maker: BaseVaspMaker
         Maker used for the static energy unit cell calculation.
     displacements: list[float]
-        list of phonon displacement.
+        List of phonon displacement.
     symprec : float
         Symmetry precision to use in the
         reduction of symmetry to find the primitive/conventional cell
         (use_primitive_standard_structure, use_conventional_standard_structure)
         and to handle all symmetry-related tasks in phonopy.
     supercell_settings:
-        settings for supercell generation
+        Settings for supercell generation.
     """
     jobs = []
     dft_phonons_output = {}
@@ -445,13 +446,13 @@ def dft_random_gen_data(
     Parameters
     ----------
     structure: Structure
-        pymatgen Structure object
+        The pymatgen Structure object
     displacement_maker : .BaseVaspMaker or None
         Maker used for a static calculation for a supercell.
     rattled_bulk_relax_maker: BaseVaspMaker
         Maker used for the bulk relax unit cell calculation.
     mp_id:
-        materials project id
+        Materials Project ID.
     uc: bool.
         If True, will generate randomly distorted structures (unitcells)
         and add static computation jobs to the flow.
@@ -496,7 +497,7 @@ def dft_random_gen_data(
         Larger number of iterations will generate larger displacements.
         Default=10.
     supercell_settings: dict
-        settings for supercells
+        Settings for supercells.
     """
     jobs = []
 
@@ -571,7 +572,7 @@ def get_iso_atom(
     Parameters
     ----------
     structure_list: list[Structure]
-        list of pymatgen Structure objects
+        List of pymatgen Structure objects
     isolated_atom_maker: IsoAtomStaticMaker
         VASP maker for the isolated atom calculation.
     """
