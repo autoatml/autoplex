@@ -43,13 +43,7 @@ Once installed, you can now use multiple processors to run your tests. For examp
 pytest -n 8
 ```
 
-We rely on pytest-split to run tests in parallel on github workflow, thus it is necessary to update the test-durations files in the repository, incase you add new tests. To generate this file, use
-
-```bash
-pytest --cov=autoplex --cov-append --splits 1 --group 1 --durations-path ./tests/test_data/.pytest-split-durations --store-durations
-```
-
-## Trouble shooting stuck tests
+## Troubleshooting stuck tests
 
 Incase your test execution get stuck, try adding the prefix `OMP_NUM_THREADS=1` before pytest. Below is an example snippet
 
