@@ -36,6 +36,7 @@ curl -O https://www.mtg.msm.cam.ac.uk/files/airss-0.9.3.tgz; tar -xf airss-0.9.3
 
 ### LAMMPS installation
 
+You only need to install LAMMPS, if you want to use J-ACE as your MLIP.
 Recipe for compiling lammps-ace including the download of the `libpace.tar.gz` file:
 
 ```
