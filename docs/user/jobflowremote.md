@@ -1,7 +1,3 @@
-*Tutorial written by [Aakash Naik](mailto:aakash.naik@bam.de) and 
-[Christina Ertural](mailto:christina.ertural@bam.de) with feedback from 
-[Jonas Grandel](mailto:jonas.grandel@bam.de).*
-
 # Jobflow-remote setup
 
 This will result in a setup for automation where 
