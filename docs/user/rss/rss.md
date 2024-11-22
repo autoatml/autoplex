@@ -6,7 +6,7 @@ The random structure searching (RSS) approach was initially proposed for predict
 
 ## Quick start workflow for immediate use
 
-In `autoplex`, you can only use the `RssMaker` module to build a complete ML-RSS potential model from scratch. `RssMaker` accepts customizable parameters either through a YAML configuration file or by directly specifying arguments in the `make` method. These [parameters](#rssmaker-parameters) control various aspects of the RSS workflow, including randomized structure generation, sampling methods, DFT labeling, data preprocessing (e.g., regularization), potential fitting hyperparameters, and iterative settings for RSS. The minimal input required is simply specifying the chemical formula of the target system by the argument `tag`.
+In `autoplex`, you can use the `RssMaker` module to build a complete ML-RSS potential model from scratch. `RssMaker` accepts customizable parameters either through a YAML configuration file or by directly specifying arguments in the `make` method. These [parameters](#rssmaker-parameters) control various aspects of the RSS workflow, including randomized structure generation, sampling methods, DFT labeling, data preprocessing (e.g., regularization), potential fitting hyperparameters, and iterative settings for RSS. The minimal input required is simply specifying the chemical formula of the target system by the argument `tag`.
 
 ```python
 from autoplex.auto.rss.flows import RssMaker
