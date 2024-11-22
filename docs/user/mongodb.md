@@ -1,5 +1,8 @@
 # MongoDB setup tutorial
 
+`autoplex` and `atomate2` use the MongoDB database framework to store the data output from the calculations. 
+The data is stored in a JSON-like format which makes it easier to access through Python for further post-processing.
+
 ## MongoDB setup
 
 MongoDB is best run on the back-end. For this, please ask your IT department to install [MongoDB](https://www.mongodb.com/) for you!
@@ -107,7 +110,65 @@ Note that the next steps of creating databases also have to be done by your IT a
     )
     ```
   * Close the mongo shell
+
+  ## Alternative MongoDB installation through Homebrew
+
+To install MongoDB through Homebrew, run the following commands in the terminal:
+```bash
+brew tap mongodb/brew
+brew update
+brew install mongodb-community
+```
+Then you can start the server with:
+```bash
+brew services start mongodb-community
+```
+Check if the server is running with `brew services list` and it should display something like 
+`mongodb-community started uthpala ~/Library/LaunchAgents/homebrew.mxcl.mongodb-community`.
+
+
+  ## atomate2 configuration
+
+* Create a directory scaffold for atomate2 use `mkdir -p atomate2/{config,logs}`
+* Create a new conda environment called atomate2 with Python 3.11 using `conda create -n atomate2 python==3.11`
+* Activate your environment : `conda activate atomate2`
+* Install atomate2 using : `pip install atomate2`
+* Create `atomate2.yaml` file with following content, use `vi ~/atomate2/config/atomate2.yaml`
+  ```yaml
+  VASP_CMD:  mpirun -np ${SLURM_NTASKS}  /path/to/vasp_std > vasp.out
+  VASP_GAMMA_CMD: mpirun -np ${SLURM_NTASKS}  /path/to/vasp_gam > vasp.out
+  LOBSTER_CMD: /path/to/your/lobster/binary
+  ```
+
+* Create `jobflow.yaml` file with following content, use `vi ~/atomate2/config/jobflow.yaml`
+  ```yaml
+  JOB_STORE:
+    docs_store:
+      type: MongoStore
+      database: autoplex
+      host: local host name
+      port: 27017
+      username: xxx_admin
+      password: xxx
+      collection_name: outputs
+    additional_stores:
+      data:
+        type: GridFSStore
+        database: autoplex
+        host: local host name
+        port: 27017
+        username: xxx_admin
+        password: xxxx
+        collection_name: outputs_blobs
   
+  ```
+* You have to export the location of your files in your ~/.bashrc or ~/.bash_profile
+  ```bash
+  export ATOMATE2_CONFIG_FILE="/home/username/atomate2/config/atomate2.yaml"
+  export JOBFLOW_CONFIG_FILE="/home/username/atomate2/config/jobflow.yaml"
+  ```
+  
+
   ## FireWorks configuration
 
 We will give you a short introduction how to setup [FireWorks](https://github.com/materialsproject/fireworks) to be used with the MongoDB. For [jobflow-remote](https://github.com/Matgenix/jobflow-remote), please have a look [here](jobflowremote.md).
