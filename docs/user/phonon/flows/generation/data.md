@@ -183,12 +183,12 @@ complete_flow = CompleteDFTvsMLBenchmarkWorkflow(
 Note, that for consistency of job handling, `autoplex` internally will override the jobs names to the `autoplex` defaults:
 ```
 INFO Started executing jobs locally
+INFO Starting job - reduce_supercell_size_job_mp-22905 
+INFO Finished job - reduce_supercell_size_job_mp-22905 
 INFO Starting job - rattled supercells_mp-22905 
 INFO Finished job - rattled supercells_mp-22905 
 INFO Starting job - tight relax_mp-22905 
 INFO Finished job - tight relax_mp-22905 
-INFO Starting job - reduce_supercell_size_job_mp-22905 
-INFO Finished job - reduce_supercell_size_job_mp-22905 
 INFO Starting job - generate_randomized_structures_mp-22905 
 INFO Finished job - generate_randomized_structures_mp-22905 
 INFO Starting job - run_phonon_displacements_mp-22905 
