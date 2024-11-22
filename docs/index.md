@@ -66,8 +66,6 @@ Tutorials for using autoplex.
 :::
 
 :::{grid-item-card}
-:link: user/mongodb
-:link-type: doc
 :class-header: bg-light
 **Automation Setup**
 ^^^
