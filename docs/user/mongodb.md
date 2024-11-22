@@ -169,7 +169,7 @@ Check if the server is running with `brew services list` and it should display s
   ```
   
 
-  ## FireWorks configuration
+## FireWorks configuration
 
 We will give you a short introduction how to setup [FireWorks](https://github.com/materialsproject/fireworks) to be used with the MongoDB. For [jobflow-remote](https://github.com/Matgenix/jobflow-remote), please have a look [here](jobflowremote.md).
 
