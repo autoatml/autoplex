@@ -173,7 +173,11 @@ Check if the server is running with `brew services list` and it should display s
 
 We will give you a short introduction how to setup [FireWorks](https://github.com/materialsproject/fireworks) to be used with the MongoDB. For [jobflow-remote](https://github.com/Matgenix/jobflow-remote), please have a look [here](jobflowremote.md).
 
-  * Now, you need to add "my_launchpad.yaml" to your current folder to add information for testing. You need to find out on which login-server you are. ```echo $(hostname)``` and then adapt the following script.
+FireWorks can be installed via `pip install fireworks`.
+
+Then follow the next steps:
+
+  * You need to add "my_launchpad.yaml" to your current folder to add information for testing. You need to find out on which login-server you are. ```echo $(hostname)``` and then adapt the following script.
     ```yaml
     host: login_node_name
     port: 27017
