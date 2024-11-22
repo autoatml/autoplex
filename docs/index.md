@@ -69,7 +69,7 @@ Tutorials for using autoplex.
 :class-header: bg-light
 **Automation Setup**
 ^^^
-Here you can find the setup guides for using `autoplex` with [MongoDB](user/mongodb.md) and [jobflow-remote](user/jobflowremote.md).
+Here you can find the setup guides for using `autoplex` with [MongoDB, FireWorks](user/mongodb.md) and [jobflow-remote](user/jobflowremote.md).
 :::
 
 :::{grid-item-card}
