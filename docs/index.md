@@ -79,6 +79,6 @@ Here you can find the setup guides for using `autoplex` with [MongoDB](user/mong
 **Contributing Guide**
 ^^^
 Do you want to develop your own workflows or improve existing functionalities?
-Check out the contributing Guide.
+Check out the Contributing Guide.
 :::
 ::::
