@@ -1,4 +1,4 @@
-"""RSS Jobs."""
+"""RSS Jobs include the generation of the initial potential model as well as iterative RSS exploration."""
 
 from __future__ import annotations
 
@@ -161,16 +161,16 @@ def initial_rss(
     -------
     dict
         A dictionary whose keys contains:
-        - test_error: float
-            The test error of the fitted MLIP.
-        - pre_database_dir: str
-            The directory of the preprocessed database.
-        - mlip_path: str
-            The path to the fitted MLIP.
-        - isolated_atom_energies: dict
-            The isolated energy values.
-        - current_iter: int
-            The current iteration index, set to 0.
+            test_error: float
+                The test error of the fitted MLIP.
+            pre_database_dir: str
+                The directory of the preprocessed database.
+            mlip_path: str
+                The path to the fitted MLIP.
+            isolated_atom_energies: dict
+                The isolated energy values.
+            current_iter: int
+                The current iteration index, set to 0.
     """
     if isolatedatom_box is None:
         isolatedatom_box = [20.0, 20.0, 20.0]
@@ -329,17 +329,17 @@ def do_rss_iterations(
     input : dict
         A dictionary parameter used to pass specific input data required during the RSS iterations.
         The keys in this dictionary should be one of the following valid keys:
-            - test_error: float
+            test_error: float
                 The test error of the fitted MLIP.
-            - pre_database_dir: str
+            pre_database_dir: str
                 The directory of the preprocessed database.
-            - mlip_path: str
+            mlip_path: str
                 The path to the fitted MLIP.
-            - isolated_atom_energies: dict
+            isolated_atom_energies: dict
                 The isolated energy values.
-            - current_iter: int
+            current_iter: int
                 The current iteration index.
-            - kt: float
+            kt: float
                 The value of kt.
     tag: str
         Tag of systems. It can also be used for setting up elements and stoichiometry.
@@ -470,18 +470,18 @@ def do_rss_iterations(
     -------
     dict
         A dictionary whose keys contains:
-        - test_error: float
-            The test error of the fitted MLIP.
-        - pre_database_dir: str
-            The directory of the preprocessed database.
-        - mlip_path: str
-            The path to the fitted MLIP.
-        - isolated_atom_energies: dict
-            The isolated energy values.
-        - current_iter: int
-            The current iteration index.
-        - kt: float
-            The temperature (in eV) for Boltzmann sampling.
+            test_error: float
+                The test error of the fitted MLIP.
+            pre_database_dir: str
+                The directory of the preprocessed database.
+            mlip_path: str
+                The path to the fitted MLIP.
+            isolated_atom_energies: dict
+                The isolated energy values.
+            current_iter: int
+                The current iteration index.
+            kt: float
+                The temperature (in eV) for Boltzmann sampling.
     """
     test_error = input.get("test_error")
     current_iter = input.get("current_iter", current_iter_index)

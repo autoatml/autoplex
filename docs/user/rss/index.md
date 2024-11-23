@@ -2,9 +2,12 @@
 
 # RSS workflow
 
-The section gives the instructions for the phonon-related workflow.
+This section provides tutorials for the random structure searching (RSS) workflow.
 
 ```{toctree}
 :maxdepth: 3
-rss
+flow/introduction/intro
+flow/quick_start/start
+flow/input/input
+flow/example/example
 ```
