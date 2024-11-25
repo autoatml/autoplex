@@ -229,7 +229,7 @@ print(jc.get_jobs_doc(db_ids='214')[0].job.maker.input_set_generator.user_incar_
 
 In case your remote cluster connection is broken or lost, it is crucial to restart the 
 jobflow-remote runner [(first stop/kill, then start)](#getting-started). Job states that are `REMOTE_ERROR`, `FAILED` or
-inconsistent because of this, can be fixed be force.rerunning the respective jobs by `jf job rerun -f -s STATE`.
+inconsistent because of this, can be fixed be force-rerunning the respective jobs by `jf job rerun -f -s STATE`.
 
 # Some useful links
 
