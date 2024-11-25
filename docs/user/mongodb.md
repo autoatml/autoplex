@@ -57,10 +57,12 @@ This guide will walk you through the steps that you to do for running a mongodb 
 
 Note that the next steps of creating databases also have to be done by your IT admin for running MongoDB in backend:
 
-  * For this, open the mongo shell there 
+  * For this, open the mongo shell there
     ```bash
-    mongo
+    mongosh
     ```
+> ℹ️ Note that the [`mongo` shell](https://www.mongodb.com/docs/manual/reference/mongo/) has been deprecated in MongoDB v5.0. The replacement is `mongosh`!
+
   * You need to add a db called "database_name" (you can choose any name) and also add an admin and a readonly user to this database
   * switch to ```admin``` database and create a user
     ```bash
