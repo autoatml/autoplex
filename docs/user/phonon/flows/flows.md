@@ -1,12 +1,14 @@
 (flows)=
 
-# Phonon-accurate machine-learned potentials workflow
+# Out-of-the-box workflow
+
+## Phonon-accurate machine-learned potentials workflow
 
 This tutorial will demonstrate how to use `autoplex` with its default setup and settings.
 
 > ℹ️ The default setting might not be sufficient or not suitable in any other way for your calculations. Carefully check your results with the default setup and adjust the settings when needed.
 
-## General out-of-the-box workflow
+## General workflow
 
 The complete workflow of `autoplex` involves the data generation 
 (including the execution of VASP calculations), 
