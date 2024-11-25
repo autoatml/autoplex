@@ -227,6 +227,10 @@ print(jc.get_jobs_doc(db_ids='214')[0].job.maker.input_set_generator.user_incar_
 8. `jf flow info flow_id` (shows the jobs of a certain flow)
 9. `jf flow -h` or `jf job -h` for checking other options
 
+In case your remote cluster connection is broken or lost, it is crucial to restart the 
+jobflow-remote runner [(fist stop/kill, then start)](#getting-started). Job states that are `REMOTE_ERROR`, `FAILED` or
+inconsistent because of this, can be fixed be force.rerunning the respective jobs by `jf job rerun -f -s STATE`.
+
 # Some useful links
 
 1. Check slurm.py for finding different available options you can set for resources dict [here](https://github.com/Matgenix/qtoolkit/tree/develop/src/qtoolkit/io)
