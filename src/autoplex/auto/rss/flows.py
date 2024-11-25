@@ -1,4 +1,4 @@
-"""This flow implements RSS (random structure searching) for exploring and learning potential energy surfaces from scratch."""
+"""RSS (random structure searching) flow for exploring and learning potential energy surfaces from scratch."""
 
 from __future__ import annotations
 
