@@ -54,7 +54,7 @@ resources = {"nodes": N, "partition": "name", "qos": "name", "time": "8:00:00", 
 print(submit_flow(rss_job, worker="your worker", resources=resources, project="your project name"))
 ```
 
-For details on setting up `jobflow-remote`, see [Jobflow-remote setup](../../../jobflowremote.md).
+For details on setting up `FireWorks`, see [FireWorks setup](../../../mongodb.md#fireworks-configuration) and for `jobflow-remote`, see [jobflow-remote setup](../../../jobflowremote.md).
 
 ### Running the workflow with direct parameter specification
 
@@ -81,7 +81,7 @@ If you choose to use the direct parameter specification method, at a minimum, yo
 
 ### Building RSS models with various ML potentials
 
-Currently, `RssMaker` supports GAP (Gaussian Approximation Potential), ACE (Atomic Cluster Expansion), and three graph-based network models including NequIP, M3GNet, and MACE. You can specify the desired model using the `mlip_type` argument and adjust relevant hyperparameters within the `make` method. Default and adjustable hyperparameters are available in `autoplex/autoplex/fitting/common/mlip-rss-defaults.json`.
+Currently, `RssMaker` supports GAP (Gaussian Approximation Potential), ACE (Atomic Cluster Expansion), and three graph-based network models including NequIP, M3GNet, and MACE. You can specify the desired model using the `mlip_type` argument and adjust relevant hyperparameters within the `make` method. Default and adjustable hyperparameters are available in `autoplex/fitting/common/mlip-rss-defaults.json`.
 
 ```python
 rss_job = RssMaker(name="your workflow name").make(tag='SiO2',
