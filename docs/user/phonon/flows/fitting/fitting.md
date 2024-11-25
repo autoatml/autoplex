@@ -83,11 +83,11 @@ complete_flow = CompleteDFTvsMLBenchmarkWorkflow(
 )
 ```
 `autoplex` provides a JSON dict file containing default GAP fit settings in 
-*autoplex/fitting/common/gap-defaults.json*, 
+`autoplex/fitting/common/mlip-phonon-defaults.json`, 
 that can be overwritten using the fit keyword arguments as demonstrated in the code snippet.
 
 `autoplex` follows a certain convention for naming files and labelling the data 
-(see *autoplex/fitting/common/gap-defaults.json*).
+(see `autoplex/fitting/common/mlip-phonon-defaults.json`).
 ```json
   "general": {
     "at_file": "train.extxyz",
