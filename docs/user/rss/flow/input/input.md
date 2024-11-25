@@ -46,7 +46,14 @@ fragment_numbers: null
 num_processes_buildcell: 128
 ```
 
-The `buildcell_options` parameter is one of the most critical settings, as it determines the scope of the RSS search and directly influences the diversity of the generated structures. We provide multiple sets of `buildcell` input parameters. In the configuration above, 8000 even-numbered structures and 2000 odd-numbered structures will be generated, with symmetry operations ranging from 1 to 4. You can supply a single set or multiple sets as needed. This flexibility ensures that the initial structures have sufficient diversity. In principle, any parameter supported by [buildcell](https://airss-docs.github.io/technical-reference/buildcell-manual) can be used in the `buildcell_options` section.
+The `buildcell_options` parameter is one of the most critical settings, 
+as it determines the scope of the RSS search and directly influences the diversity of the generated structures. 
+We provide multiple sets of `buildcell` input parameters. 
+Using the configuration file above, a total of 8000 structures will be generated, each containing an even number of atoms. 
+Additionally, 2000 structures will be created with an odd number of atoms. The symmetry operations will vary from 1 to 4. 
+You can supply a single set or multiple sets as needed. 
+This flexibility ensures that the initial structures have sufficient diversity. 
+In principle, any parameter supported by [buildcell](https://airss-docs.github.io/technical-reference/buildcell-manual) can be used in the `buildcell_options` section.
 
 The `fragment_file` and `fragment_numbers` parameters are used during random structure generation to define specific fragments as the smallest building blocks. For example, you can define an H<sub>2</sub>O molecule as a fragment and use it as the basic unit for generating random structures. This allows for more customized and realistic initial configurations when working with molecular or other complex systems. The `num_processes_buildcell` parameter specifies the number of CPU cores to be used in parallel during random structure generation. Note that this parameter is limited to a single node.
 
