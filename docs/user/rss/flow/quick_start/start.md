@@ -2,7 +2,7 @@
 
 # Quick start
 
-The `RssMaker` module in `autoplex` is the core interface for creating ML-RSS potential models from scratch. It accepts customizable parameters that control key aspects of the RSS process, including:
+The `RssMaker` class in `autoplex` is the core interface for creating ML-RSS potential models from scratch. It accepts customizable parameters that control key aspects of the RSS process, including:
 
 - **Randomized structure generation**  
   Generate diverse initial structures for broader configurational space exploration.
