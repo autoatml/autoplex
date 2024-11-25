@@ -4,7 +4,7 @@
 
 This section demonstrates various YAML configurations beyond Si and explores use cases for the RSS workflow.
 
-##  SiO2
+##  SiO<sub>2</sub>
 
 This section provides guidance on exploring silica models at different functional levels.
 
