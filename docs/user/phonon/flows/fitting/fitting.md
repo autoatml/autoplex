@@ -1,8 +1,6 @@
 (fitting)=
 
-*Tutorials written by Christina Ertural ([christina.ertural@bam.de](mailto:christina.ertural@bam.de)).*
-
-# Fitting potentials
+# Fitting phonon-accurate potentials
 
 This tutorial will show you how to control the MLIP fit settings with the `autoplex` workflow. 
 The choice of the correct fit setup and hyperparameter settings has a significant influence on the final result.
@@ -85,11 +83,11 @@ complete_flow = CompleteDFTvsMLBenchmarkWorkflow(
 )
 ```
 `autoplex` provides a JSON dict file containing default GAP fit settings in 
-*autoplex/fitting/common/gap-defaults.json*, 
+`autoplex/fitting/common/mlip-phonon-defaults.json`, 
 that can be overwritten using the fit keyword arguments as demonstrated in the code snippet.
 
 `autoplex` follows a certain convention for naming files and labelling the data 
-(see *autoplex/fitting/common/gap-defaults.json*).
+(see `autoplex/fitting/common/mlip-phonon-defaults.json`).
 ```json
   "general": {
     "at_file": "train.extxyz",
@@ -364,7 +362,7 @@ fit_input_dict = {
             ]],
             "phonon_data": [],
         },
-        "isolated_atom": {"iso_atoms_dir": [[
+        "IsolatedAtom": {"iso_atoms_dir": [[
                 (
                     "/path/to/isolated/atom/calculation"
                 ),
@@ -375,7 +373,6 @@ fit_input_dict = {
     
 mlip_fit = MLIPFitMaker(mlip_type="GAP", ...,).make(
         species_list=["Li", "Cl"],
-        isolated_atoms_energy=[-0.28649227, -0.25638457],
         fit_input=fit_input_dict,
         pre_xyz_files=["vasp_ref.extxyz"],
         pre_database_dir="/path/to/pre_database",

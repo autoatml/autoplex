@@ -28,19 +28,19 @@ def reduce_supercell_size_job(
     Parameters
     ----------
     structure: Structure
-        pymatgen Structure object.
+        The pymatgen Structure object.
     min_length: float
-        min length of the supercell that will be built.
+        Minimum length of the supercell that will be built.
     max_length: float
-        max length of the supercell that will be built.
+        Maximum length of the supercell that will be built.
     max_atoms: int
-        maximally allowed number of atoms in the supercell.
+        Maximally allowed number of atoms in the supercell.
     min_atoms: int
-        minimum number of atoms in the supercell that shall be reached.
+        Minimum number of atoms in the supercell that shall be reached.
     fallback_min_length: float
-        fallback option for minimum length for exceptional cases.
+        Fallback option for minimum length for exceptional cases.
     step_size: float
-        step_size which is used to increase the supercell.
+        The step_size which is used to increase the supercell.
         If allow_orthorhombic and force_90_degrees are both set to True,
         the chosen step_size will be automatically multiplied by 5 to
         prevent a too long search for the possible supercell.

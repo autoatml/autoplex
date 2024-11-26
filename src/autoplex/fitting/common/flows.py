@@ -51,7 +51,7 @@ class MLIPFitMaker(Maker):
     glue_file_path: str
         Name of the glue.xml file path.
     use_defaults: bool
-        if true, uses default fit parameters
+        If true, uses default fit parameters
     """
 
     name: str = "MLpotentialFit"
@@ -252,15 +252,15 @@ class DataPreprocessing(Maker):
         fit_input:
             Mixed list of dictionary and lists of the fit input data.
         pre_database_dir: str or None
-            the pre-database directory.
+            The pre-database directory.
         pre_xyz_files: list[str] or None
-            names of the pre-database train xyz file and test xyz file labeled by VASP.
+            Names of the pre-database train xyz file and test xyz file labelled by VASP.
         atomwise_regularization_parameter: float
-            regularization value for the atom-wise force components.
+            Regularization value for the atom-wise force components.
         force_min: float
-            minimal force cutoff value for atom-wise regularization.
+            Minimal force cutoff value for atom-wise regularization.
         atom_wise_regularization: bool
-            for including atom-wise regularization.
+            If True, includes atom-wise regularization.
 
         """
         if pre_xyz_files is None:

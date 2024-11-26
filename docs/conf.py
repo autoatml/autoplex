@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.abspath("../../"))
 
 project = "autoplex"
 copyright = "2024, autoplex development team"  # noqa: A001
-author = "Christina Ertural, Janine George, Aakash A. Naik (alphabetical order)"
+#author = "autoplex development team"
 
 # The short X.Y version
 version = __version__
@@ -101,7 +101,6 @@ latex_elements = {
 """
 }
 language = "en"
-html_extra_path = ["images/badge.svg"]
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]
 suppress_warnings = "etoc.toctree"

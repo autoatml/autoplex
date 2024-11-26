@@ -1,4 +1,4 @@
-"""RSS Jobs."""
+"""RSS Jobs include the generation of the initial potential model as well as iterative RSS exploration."""
 
 from __future__ import annotations
 
@@ -153,24 +153,24 @@ def initial_rss(
     num_processes_fit: int
         Number of processes used for fitting. Default is 1.
     device_for_fitting: str
-            Device to be used for model fitting, either "cpu" or "cuda".
+        Device to be used for model fitting, either "cpu" or "cuda".
     fit_kwargs:
         Additional keyword arguments for the MLIP fitting process.
 
-    Output
-    ------
+    Returns
+    -------
     dict
-        a dictionary whose keys contains:
-        - test_error: float
-            The test error of the fitted MLIP.
-        - pre_database_dir: str
-            The directory of the preprocessed database.
-        - mlip_path: str
-            The path to the fitted MLIP.
-        - isolated_atom_energies: dict
-            The isolated energy values.
-        - current_iter: int
-            The current iteration index, set to 0.
+        A dictionary whose keys contains:
+            test_error: float
+                The test error of the fitted MLIP.
+            pre_database_dir: str
+                The directory of the preprocessed database.
+            mlip_path: str
+                The path to the fitted MLIP.
+            isolated_atom_energies: dict
+                The isolated energy values.
+            current_iter: int
+                The current iteration index, set to 0.
     """
     if isolatedatom_box is None:
         isolatedatom_box = [20.0, 20.0, 20.0]
@@ -329,17 +329,17 @@ def do_rss_iterations(
     input : dict
         A dictionary parameter used to pass specific input data required during the RSS iterations.
         The keys in this dictionary should be one of the following valid keys:
-            - test_error: float
+            test_error: float
                 The test error of the fitted MLIP.
-            - pre_database_dir: str
+            pre_database_dir: str
                 The directory of the preprocessed database.
-            - mlip_path: str
+            mlip_path: str
                 The path to the fitted MLIP.
-            - isolated_atom_energies: dict
+            isolated_atom_energies: dict
                 The isolated energy values.
-            - current_iter: int
+            current_iter: int
                 The current iteration index.
-            - kt: float
+            kt: float
                 The value of kt.
     tag: str
         Tag of systems. It can also be used for setting up elements and stoichiometry.
@@ -424,7 +424,7 @@ def do_rss_iterations(
     num_processes_fit: int
         Number of processes used for fitting. Default is 1.
     device_for_fitting: str
-            Device to be used for model fitting, either "cpu" or "cuda".
+        Device to be used for model fitting, either "cpu" or "cuda".
     scalar_pressure_method: str
         Method for adding external pressures. Default is 'exp'.
     scalar_exp_pressure: float
@@ -466,22 +466,22 @@ def do_rss_iterations(
     fit_kwargs:
         Additional keyword arguments for the MLIP fitting process.
 
-    Output
-    ------
+    Returns
+    -------
     dict
-        a dictionary whose keys contains:
-        - test_error: float
-            The test error of the fitted MLIP.
-        - pre_database_dir: str
-            The directory of the preprocessed database.
-        - mlip_path: str
-            The path to the fitted MLIP.
-        - isolated_atom_energies: dict
-            The isolated energy values.
-        - current_iter: int
-            The current iteration index.
-        - kt: float
-            The temperature (in eV) for Boltzmann sampling.
+        A dictionary whose keys contains:
+            test_error: float
+                The test error of the fitted MLIP.
+            pre_database_dir: str
+                The directory of the preprocessed database.
+            mlip_path: str
+                The path to the fitted MLIP.
+            isolated_atom_energies: dict
+                The isolated energy values.
+            current_iter: int
+                The current iteration index.
+            kt: float
+                The temperature (in eV) for Boltzmann sampling.
     """
     test_error = input.get("test_error")
     current_iter = input.get("current_iter", current_iter_index)

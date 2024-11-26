@@ -8,11 +8,11 @@ from autoplex.fitting.common.regularization import (
     get_intersect,
     get_mole_frac,
     label_stoichiometry_volume,
-    point_in_triangle_ND,
+    point_in_triangle_nd,
     point_in_triangle_2D,
-    calculate_hull_ND,
-    calculate_hull_3D,
-    get_e_distance_to_hull_3D,
+    calculate_hull_nd,
+    calculate_hull_3d,
+    get_e_distance_to_hull_3d,
     piecewise_linear,
 )
 
@@ -122,14 +122,14 @@ def test_auxiliary_functions(test_dir, memory_jobstore, clean_dir):
     )
     assert arrays_allclose(label, array3)
 
-    calc_hull = calculate_hull_ND(points)
-    calc_hull_3D = calculate_hull_3D(label)
+    calc_hull = calculate_hull_nd(points)
+    calc_hull_3D = calculate_hull_3d(label)
     fraction_list = [[1.0]] + [[0.0]] + [[0.5]] * 8
 
     for atom, fraction in zip(atoms, fraction_list):
         get_e_dist_hull = get_e_distance_to_hull(calc_hull, atom, energy_name="REF_energy")
         assert get_e_dist_hull == 0
-        get_e_dist_hull_3D = get_e_distance_to_hull_3D(calc_hull_3D, atom, {3: -0.28649227, 17: -0.25638457},
+        get_e_dist_hull_3D = get_e_distance_to_hull_3d(calc_hull_3D, atom, {3: -0.28649227, 17: -0.25638457},
                                                        "REF_energy")
         assert round(get_e_dist_hull_3D) == 0
         getmole_frac = get_mole_frac(atom, element_order=[3, 17])
@@ -167,8 +167,8 @@ def test_auxiliary_functions(test_dir, memory_jobstore, clean_dir):
     point_2D_outside = np.array([1.5, 1.5])
 
     # Test 2D case
-    inside_result_2D = point_in_triangle_ND(point_2D_inside, *region_2D)
-    outside_result_2D = point_in_triangle_ND(point_2D_outside, *region_2D)
+    inside_result_2D = point_in_triangle_nd(point_2D_inside, *region_2D)
+    outside_result_2D = point_in_triangle_nd(point_2D_outside, *region_2D)
 
     # Point point_2D_inside inside region:
     assert inside_result_2D
@@ -187,8 +187,8 @@ def test_auxiliary_functions(test_dir, memory_jobstore, clean_dir):
     point_3D_outside = np.array([1.0, 1.0, 1.0])
 
     # Test 3D case
-    inside_result_3D = point_in_triangle_ND(point_3D_inside, *region_3D)
-    outside_result_3D = point_in_triangle_ND(point_3D_outside, *region_3D)
+    inside_result_3D = point_in_triangle_nd(point_3D_inside, *region_3D)
+    outside_result_3D = point_in_triangle_nd(point_3D_outside, *region_3D)
 
     # Point point_3D_inside inside region:
     assert inside_result_3D

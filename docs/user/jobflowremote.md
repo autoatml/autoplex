@@ -1,7 +1,3 @@
-*Tutorial written by [Aakash Naik](mailto:aakash.naik@bam.de) and 
-[Christina Ertural](mailto:christina.ertural@bam.de) with feedback from 
-[Jonas Grandel](mailto:jonas.grandel@bam.de).*
-
 # Jobflow-remote setup
 
 This will result in a setup for automation where 
@@ -13,7 +9,7 @@ This will result in a setup for automation where
 ## on your local machine
 1. Create a new env > `conda create -n autoplex python=3.10`. (You can choose any other env name.)
 2. Activate your env > `conda activate autoplex` 
-3. Install jobflow-remote by `pip install git+https://github.com/Matgenix/jobflow-remote@v0.1.2`.
+3. Install jobflow-remote by `pip install git+https://github.com/Matgenix/jobflow-remote@v0.1.4`.
 4. You can check for the latest release of [jobflow-remote](https://github.com/Matgenix/jobflow-remote/releases).
 5. Install autoplex > In your local autoplex directory: `pip install -e .[strict]`. 
 6. Run `jf project generate --full YOUR_PROJECT_NAME`. 
@@ -225,7 +221,15 @@ print(jc.get_jobs_doc(db_ids='214')[0].job.maker.input_set_generator.user_incar_
 2. `jf flow list` (list of flows in the DB)
 3. `jf job info jobid` (provides some info of job like workdir, error info if it failed)
 4. `jf flow delete -did db_id` (deletes flow from DB)
-5. `jf flow -h` or `jf job -h` for checking other options
+5. `jf job list -s STATE`, e.g. `jf job list -s FAILED`
+6. `jf job rerun -s STATE`, e.g. `jf job rerun -s FAILED`
+7. `jf job retry -s STATE`, e.g. `jf job retry -s REMOTE_ERROR`
+8. `jf flow info flow_id` (shows the jobs of a certain flow)
+9. `jf flow -h` or `jf job -h` for checking other options
+
+In case your remote cluster connection is broken or lost, it is crucial to restart the 
+jobflow-remote runner [(first stop/kill, then start)](#getting-started). Job states that are `REMOTE_ERROR`, `FAILED` or
+inconsistent because of this, can be fixed be force-rerunning the respective jobs by `jf job rerun -f -s STATE`.
 
 # Some useful links
 

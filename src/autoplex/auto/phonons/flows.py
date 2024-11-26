@@ -96,7 +96,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         Must be provided if distorting volume without specifying a range, or if distorting angles.
         Default=10.
     displacements: list[float]
-        displacement distances for phonons
+        Displacement distances for phonons
     symprec: float
         Symmetry precision to use in the
         reduction of symmetry to find the primitive/conventional cell
@@ -140,9 +140,9 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         Larger number of iterations will generate larger displacements.
         Default=10.
     ml_models: list[str]
-        list of the ML models to be used. Default is GAP.
+        List of the ML models to be used. Default is GAP.
     hyper_para_loop: bool
-        making it easier to loop through several hyperparameter sets.
+        Making it easier to loop through several hyperparameter sets.
     atomwise_regularization_list: list
         List of atom-wise regularization parameters that are checked.
     soap_delta_list: list
@@ -150,9 +150,9 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
     n_sparse_list: list
         List of GAP n_sparse values that are checked.
     supercell_settings: dict
-        settings for supercell generation
+        Settings for supercell generation
     benchmark_kwargs: dict
-        kwargs for the benchmark flows
+        Keyword arguments for the benchmark flows
     summary_filename_prefix: str
         Prefix of the result summary file.
     glue_file_path: str
@@ -221,38 +221,38 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         Parameters
         ----------
         structure_list:
-            list of pymatgen structures.
+            List of pymatgen structures.
         mp_ids:
-            materials project IDs.
+            Materials Project IDs.
         split_ratio: float.
             Parameter to divide the training set and the test set.
             A value of 0.1 means that the ratio of the training set to the test set is 9:1.
         force_max: float
             Maximum allowed force in the dataset.
         pre_xyz_files: list[str] or None
-            names of the pre-database train xyz file and test xyz file.
+            Names of the pre-database train xyz file and test xyz file.
         pre_database_dir: str or None
-            the pre-database directory.
+            The pre-database directory.
         apply_data_preprocessing: bool
             Apply data preprocessing.
         atomwise_regularization_parameter: float
-            regularization value for the atom-wise force components.
+            Regularization value for the atom-wise force components.
         force_min: float
-            minimal force cutoff value for atom-wise regularization.
+            Minimal force cutoff value for atom-wise regularization.
         atom_wise_regularization: bool
-            for including atom-wise regularization.
+            For including atom-wise regularization.
         auto_delta: bool
-            automatically determine delta for 2b, 3b and soap terms.
+            Automatically determines delta for 2b, 3b and soap terms.
         dft_references: list[PhononBSDOSDoc] | None
-            a list of DFT reference files containing the PhononBSDOCDoc object.
+            List of DFT reference files containing the PhononBSDOCDoc object.
         benchmark_structures: list[Structure] | None
-            pymatgen structure for benchmarking.
+            The pymatgen structure for benchmarking.
         benchmark_mp_ids: list[str] | None
             Materials Project ID of the benchmarking structure.
         use_defaults_fitting: bool
             Use the fit defaults.
         fit_kwargs : dict.
-            dict including MLIP fit keyword args.
+            Dict including MLIP fit keyword args.
 
         """
         flows = []
@@ -503,11 +503,11 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         Parameters
         ----------
         structure: Structure
-            pymatgen Structure object
+            The pymatgen Structure object
         mp_id: str
-            materials project id
+            Materials Project ID
         displacements: list[float]
-           displacement distance for phonons
+           Displacement distance for phonons
         symprec: float
             Symmetry precision to use in the
             reduction of symmetry to find the primitive/conventional cell
@@ -519,9 +519,8 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
             Maker used for the bulk relax unit cell calculation.
         phonon_static_energy_maker: BaseVaspMaker
             Maker used for the static energy unit cell calculation.
-
         supercell_settings: dict
-            supercell settings
+            Supercell settings
 
         """
         dft_phonons = dft_phonopy_gen_data(
@@ -564,9 +563,9 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         Parameters
         ----------
         structure: Structure
-            pymatgen Structure object
+            The pymatgen Structure object
         mp_id: str
-            materials project id
+            Materials Project ID
         displacement_maker: BaseVaspMaker
             Maker used for a static calculation for a supercell.
         rattled_bulk_relax_maker: BaseVaspMaker
@@ -613,7 +612,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
             Larger number of iterations will generate larger displacements.
             Default=10.
         supercell_settings: dict
-            settings for supercells
+            Settings for supercells
         """
         additonal_dft_random = dft_random_gen_data(
             structure=structure,
@@ -680,7 +679,7 @@ class CompleteDFTvsMLBenchmarkWorkflowMPSettings(CompleteDFTvsMLBenchmarkWorkflo
         Must be provided if distorting volume without specifying a range, or if distorting angles.
         Default=10.
     displacements: list[float]
-        displacement distances for phonons
+        Displacement distances for phonons
     symprec: float
         Symmetry precision to use in the
         reduction of symmetry to find the primitive/conventional cell
@@ -724,7 +723,7 @@ class CompleteDFTvsMLBenchmarkWorkflowMPSettings(CompleteDFTvsMLBenchmarkWorkflo
         Larger number of iterations will generate larger displacements.
         Default=10.
     ml_models: list[str]
-        list of the ML models to be used. Default is GAP.
+        List of the ML models to be used. Default is GAP.
     hyper_para_loop: bool
         making it easier to loop through several hyperparameter sets.
     atomwise_regularization_list: list
@@ -734,9 +733,9 @@ class CompleteDFTvsMLBenchmarkWorkflowMPSettings(CompleteDFTvsMLBenchmarkWorkflo
     n_sparse_list: list
         List of GAP n_sparse values that are checked.
     supercell_settings: dict
-        settings for supercell generation
+        Settings for supercell generation
     benchmark_kwargs: dict
-        kwargs for the benchmark flows
+        The kwargs for the benchmark flows
     summary_filename_prefix: str
         Prefix of the result summary file.
     glue_file_path: str

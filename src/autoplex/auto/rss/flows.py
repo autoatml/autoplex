@@ -1,4 +1,4 @@
-"""RSS workflows."""
+"""RSS (random structure searching) flow for exploring and learning potential energy surfaces from scratch."""
 
 from __future__ import annotations
 
@@ -44,207 +44,207 @@ class RssMaker(Maker):
 
         Keyword Arguments
         -----------------
-        - tag: str
+        tag: str
             Tag of systems. It can also be used for setting up elements and stoichiometry.
             For example, the tag of 'SiO2' will be recognized as a 1:2 ratio of Si to O and
             passed into the parameters of buildcell. However, note that this will be overwritten
             if the stoichiometric ratio of elements is defined in the 'buildcell_options'.
-        - train_from_scratch: bool
+        train_from_scratch: bool
             If True, it starts the workflow from scratch.
             If False, it resumes from a previous state.
-        - resume_from_previous_state: dict | None
+        resume_from_previous_state: dict | None
             A dictionary containing the state information required to resume a previously interrupted
             or saved RSS workflow. When 'train_from_scratch' is set to False, this parameter is mandatory
             for the workflow to pick up from a saved state.
             Expected keys within this dictionary:
-            - test_error: float
-                The test error from the last completed training step.
-            - pre_database_dir: str
-                Path to the directory containing the pre-existing database for resuming.
-            - mlip_path: str
-                Path to the file of a previous MLIP model.
-            - isolated_atom_energies: dict
-                A dictionary of isolated atom energy values, with atomic numbers as keys
-                and their energies as valuables.
-        - generated_struct_numbers: list[int]
+                test_error: float
+                    The test error from the last completed training step.
+                pre_database_dir: str
+                    Path to the directory containing the pre-existing database for resuming.
+                mlip_path: str
+                    Path to the file of a previous MLIP model.
+                isolated_atom_energies: dict
+                    A dictionary of isolated atom energy values, with atomic numbers as keys
+                    and their energies as valuables.
+        generated_struct_numbers: list[int]
             Expected number of generated randomized unit cells by buildcell.
-        - buildcell_options: list[dict] | None
+        buildcell_options: list[dict] | None
             Customized parameters for buildcell. Default is None.
-        - fragment: Atoms | list[Atoms] | None
+        fragment: Atoms | list[Atoms] | None
             Fragment(s) for random structures, e.g., molecules, to be placed indivudally intact.
             atoms.arrays should have a 'fragment_id' key with unique identifiers for each fragment if in same Atoms.
             atoms.cell must be defined (e.g., Atoms.cell = np.eye(3)*20).
-        - fragment_numbers: list[str] | None
+        fragment_numbers: list[str] | None
             Numbers of each fragment to be included in the random structures. Defaults to 1 for all specified.
-        - num_processes_buildcell: int
+        num_processes_buildcell: int
             Number of processes to use for parallel computation during buildcell generation.
-        - num_of_initial_selected_structs: list[int] | None
+        num_of_initial_selected_structs: list[int] | None
             Number of structures to be sampled directly from the buildcell-generated randomized cells.
-        - num_of_rss_selected_structs: int
+        num_of_rss_selected_structs: int
             Number of structures to be selected from each RSS iteration.
-        - initial_selection_enabled: bool
+        initial_selection_enabled: bool
             If true, sample structures from initially generated randomized cells using CUR.
-        - rss_selection_method: str
+        rss_selection_method: str
             Method for selecting samples from the RSS trajectories:
             Boltzmann flat histogram in enthalpy first, then CUR.
             Options include:
-            - 'bcur1s': Execute bcur with one shot (1s)
-            - 'bcur2i': Execute bcur with two iterations (2i)
-        - bcur_params: dict | None
+                bcur1s: Execute bcur with one shot (1s)
+                bcur2i: Execute bcur with two iterations (2i)
+        bcur_params: dict | None
             Parameters for Boltzmann CUR selection. The default dictionary includes:
-            - soap_paras: dict
-                SOAP descriptor parameters:
-                - l_max: int
+                soap_paras: dict
+                   SOAP descriptor parameters:
+                l_max: int
                     Maximum degree of spherical harmonics (default 12).
-                - n_max: int
+                n_max: int
                     Maximum number of radial basis functions (default 12).
-                - atom_sigma: float
+                atom_sigma: float
                     Width of Gaussian smearing (default 0.0875).
-                - cutoff: float
+                cutoff: float
                     Radial cutoff distance (default 10.5).
-                - cutoff_transition_width: float
+                cutoff_transition_width: float
                     Width of the transition region (default 1.0).
-                - zeta: float
+                zeta: float
                     Exponent for dot-product SOAP kernel (default 4.0).
-                - average: bool
+                average: bool
                     Whether to average the SOAP vectors (default True).
-                - species: bool
+                species: bool
                     Whether to consider species information (default True).
-            - kb_temp: float
+            kb_temp: float
                 Temperature in eV for Boltzmann weighting (default 0.3).
-            - frac_of_bcur: float
+            frac_of_bcur: float
                 Fraction of Boltzmann CUR selections (default 0.8).
-            - bolt_max_num: int
+            bolt_max_num: int
                 Maximum number of Boltzmann selections (default 3000).
-            - kernel_exp: float
+            kernel_exp: float
                 Exponent for the kernel (default 4.0).
-            - energy_label: str
+            energy_label: str
                 Label for the energy data (default 'energy').
-        - random_seed: int | None
+        random_seed: int | None
             A seed to ensure reproducibility of CUR selection. Default is None.
-        - include_isolated_atom: bool
+        include_isolated_atom: bool
             If true, perform single-point calculations for isolated atoms.
-        - isolatedatom_box: list[float]
+        isolatedatom_box: list[float]
             List of the lattice constants for an isolated atom configuration.
-        - e0_spin: bool
+        e0_spin: bool
             If true, include spin polarization in isolated atom and dimer calculations. Default is False.
-        - include_dimer: bool
+        include_dimer: bool
             If true, perform single-point calculations for dimers only once. Default is False.
-        - dimer_box: list[float]
+        dimer_box: list[float]
             The lattice constants of a dimer box.
-        - dimer_range: list[float]
+        dimer_range: list[float]
             Range of distances for dimer calculations.
-        - dimer_num: int
+        dimer_num: int
             Number of different distances to consider for dimer calculations. Default is 21.
-        - custom_incar: dict | None
+        custom_incar: dict | None
             Dictionary of custom VASP input parameters. If provided, will update the
             default parameters. Default is None.
-        - custom_potcar: dict | None
+        custom_potcar: dict | None
             Dictionary of POTCAR settings to update. Keys are element symbols, values are the desired POTCAR labels.
             Default is None.
-        - vasp_ref_file: str
+        vasp_ref_file: str
             Reference file for VASP data. Default is 'vasp_ref.extxyz'.
-        - config_types: list[str]
+        config_types: list[str]
             Configuration types for the VASP calculations. Default is None.
-        - rss_group: list[str]
+        rss_group: list[str]
             Group name for RSS to setting up regularization.
-        - test_ratio: float
+        test_ratio: float
             The proportion of the test set after splitting the data. The value is allowed to be set to 0;
             in this case, the testing error would not be meaningful anymore.
-        - regularization: bool
+        regularization: bool
             If True, apply regularization. This only works for GAP to date. Default is False.
-        - scheme: str
+        scheme: str
             Method to use for regularization. Options are:
-            - 'linear_hull': for single-composition system, use 2D convex hull (E, V)
-            - 'volume-stoichiometry': for multi-composition system, use 3D convex hull of (E, V, mole-fraction)
-        - reg_minmax: list[tuple]
-            list of tuples of (min, max) values for energy, force, virial sigmas for regularization.
-        - distillation: bool
+                linear_hull: for single-composition system, use 2D convex hull (E, V)
+                volume-stoichiometry: for multi-composition system, use 3D convex hull of (E, V, mole-fraction)
+        reg_minmax: list[tuple]
+            List of tuples of (min, max) values for energy, force, virial sigmas for regularization.
+        distillation: bool
             If true, apply data distillation. Default is True.
-        - force_max: float | None
+        force_max: float | None
             Maximum force value to exclude structures. Default is 50.
-        - force_label: str | None
+        force_label: str | None
             The label of force values to use for distillation. Default is 'REF_forces'.
-        - pre_database_dir: str | None
+        pre_database_dir: str | None
             Directory where the previous database was saved.
-        - mlip_type: str
+        mlip_type: str
             Choose one specific MLIP type to be fitted: 'GAP' | 'J-ACE' | 'NEQUIP' | 'M3GNET' | 'MACE'.
             Default is 'GAP'.
-        - ref_energy_name: str
+        ref_energy_name: str
             Reference energy name. Default is 'REF_energy'.
-        - ref_force_name: str
+        ref_force_name: str
             Reference force name. Default is 'REF_forces'.
-        - ref_virial_name: str
+        ref_virial_name: str
             Reference virial name. Default is 'REF_virial'.
-        - auto_delta: bool
+        auto_delta: bool
             If true, apply automatic determination of delta for GAP terms. Default is False.
-        - num_processes_fit: int
+        num_processes_fit: int
             Number of processes used for fitting. Default is 1.
-        - device_for_fitting: str
+        device_for_fitting: str
             Device to be used for model fitting, either "cpu" or "cuda".
-        - **fit_kwargs:
+        **fit_kwargs:
             Additional keyword arguments for the MLIP fitting process.
-        - scalar_pressure_method: str
+        scalar_pressure_method: str
             Method for adding external pressures.
             Acceptable options are:
-            - 'exp': Applies pressure using an exponential distribution.
-            - 'uniform': Applies pressure using a uniform distribution.
-        - scalar_exp_pressure: float
+                exp: Applies pressure using an exponential distribution.
+                uniform: Applies pressure using a uniform distribution.
+        scalar_exp_pressure: float
             Scalar exponential pressure. Default is 100.
-        - scalar_pressure_exponential_width: float
+        scalar_pressure_exponential_width: float
             Width for scalar pressure exponential. Default is 0.2.
-        - scalar_pressure_low: float
+        scalar_pressure_low: float
             Low limit for scalar pressure. Default is 0.
-        - scalar_pressure_high: float
+        scalar_pressure_high: float
             High limit for scalar pressure. Default is 50.
-        - max_steps: int
+        max_steps: int
             Maximum number of steps for relaxation. Default is 200.
-        - force_tol: float
+        force_tol: float
             Force residual tolerance for relaxation. Default is 0.05.
-        - stress_tol: float
+        stress_tol: float
             Stress residual tolerance for relaxation. Default is 0.05.
-        - hookean_repul: bool
+        hookean_repul: bool
             If true, apply Hookean repulsion. Default is False.
-        - hookean_paras: dict[tuple[int, int], tuple[float, float]] | None
+        hookean_paras: dict[tuple[int, int], tuple[float, float]] | None
             Parameters for Hookean repulsion as a dictionary of tuples. Default is None.
-        - keep_symmetry: bool
+        keep_symmetry: bool
             If true, preserve symmetry during relaxation. Default is False.
-        - write_traj: bool
+        write_traj: bool
             If true, write trajectory of RSS. Default is True.
-        - num_processes_rss: int
+        num_processes_rss: int
             Number of processes used for running RSS. Default is 1.
-        - device_for_rss: str
+        device_for_rss: str
             Specify device to use "cuda" or "cpu" for running RSS. Default is "cpu".
-        - stop_criterion: float
+        stop_criterion: float
             Convergence criterion for stopping RSS iterations. Default is 0.01.
-        - max_iteration_number: int
+        max_iteration_number: int
             Maximum number of RSS iterations to perform. Default is 25.
-        - num_groups: int
+        num_groups: int
             Number of structure groups, used for assigning tasks across multiple nodes.
             For example, if there are 10,000 trajectories to relax and 'num_groups=10',
             the trajectories will be divided into 10 groups and 10 independent jobs will be created,
             with each job handling 1,000 trajectories.
-        - initial_kb_temp: float
+        initial_kb_temp: float
             Initial temperature (in eV) for Boltzmann sampling. Default is 0.3.
-        - current_iter_index: int
+        current_iter_index: int
             Index for the current RSS iteration. Default is 1.
 
-        Output
-        ------
+        Returns
+        -------
         dict
             A dictionary whose keys contains:
-            - test_error: float
-                The test error of the fitted MLIP.
-            - pre_database_dir: str
-                The directory of the latest RSS database.
-            - mlip_path: str
-                The path to the latest fitted MLIP.
-            - isolated_atom_energies: dict
-                The isolated energy values.
-            - current_iter: int
-                The current iteration index.
-            - kb_temp: float
-                The temperature (in eV) for Boltzmann sampling.
+                test_error: float
+                    The test error of the fitted MLIP.
+                pre_database_dir: str
+                    The directory of the latest RSS database.
+                mlip_path: str
+                    The path to the latest fitted MLIP.
+                isolated_atom_energies: dict
+                    The isolated energy values.
+                current_iter: int
+                    The current iteration index.
+                kb_temp: float
+                    The temperature (in eV) for Boltzmann sampling.
         """
         rss_default_config_path = (
             self.path_to_default_config_parameters

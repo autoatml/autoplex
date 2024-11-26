@@ -115,7 +115,8 @@ class HookeanRepulsion(FixConstraint):
     that the constraint will be either soft enough (e.g. non-exploding in MD) or
     strong enough (to avoid overlaps) for all spring constants and distances.
 
-    Adapted from:
+    References
+    ----------
     *    Title: ASE constraints package at  at ase/ase/constraints.py
     *    Author: Ask Hjorth Larsen
     *    Date 07/10/2024
@@ -350,7 +351,7 @@ def process_rss(
         ASE Atoms object representing the atomic configuration.
     mlip_type: str
         Choose one specific MLIP type:
-        'GAP' | 'J-ACE' | 'P-ACE' | 'NequIP' | 'M3GNet' | 'MACE'.
+        'GAP' | 'J-ACE' | 'NequIP' | 'M3GNet' | 'MACE'.
     mlip_path: str
         Path to the MLIP model.
     output_file_name: str
@@ -379,7 +380,7 @@ def process_rss(
     write_traj: bool
         If true, write trajectory of RSS. Default is True.
     device: str
-        Specify device to use "cuda" or "cpu".
+        Specify the device to use: "cuda" or "cpu".
     isolated_atom_energies: dict
         Dictionary of isolated atoms energies.
     config_type: str
@@ -564,12 +565,12 @@ def minimize_structures(
     ----------
     mlip_type: str
         Choose one specific MLIP type:
-        'GAP' | 'J-ACE' | 'P-ACE' | 'NequIP' | 'M3GNet' | 'MACE'.
+        'GAP' | 'J-ACE' | 'NequIP' | 'M3GNet' | 'MACE'.
     mlip_path: str
         Path to the MLIP model.
     iteration_index: str
         Index for the current iteration.
-    structures: list of Structure
+    structures: list[Structure]
         List of structures to be relaxed.
     output_file_name: str
         Prefix for the trajectory/log file name. The actual output file name

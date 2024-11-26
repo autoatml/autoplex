@@ -440,12 +440,12 @@ def do_rss_single_node(
     ----------
     mlip_type: str
         Choose one specific MLIP type:
-        'GAP' | 'J-ACE' | 'P-ACE' | 'NequIP' | 'M3GNet' | 'MACE'.
+        'GAP' | 'J-ACE' | 'NequIP' | 'M3GNet' | 'MACE'.
     mlip_path: str
         Path to the MLIP model.
     iteration_index: str
         Index for the current iteration.
-    structures: list of Structure
+    structures: list[Structure]
         List of structures to be relaxed.
     output_file_name: str
         Prefix for the trajectory/log file name. The actual output file name
@@ -549,12 +549,12 @@ def do_rss_multi_node(
     ----------
     mlip_type: str
         Choose one specific MLIP type:
-        'GAP' | 'J-ACE' | 'P-ACE' | 'NequIP' | 'M3GNet' | 'MACE'.
+        'GAP' | 'J-ACE' | 'NequIP' | 'M3GNet' | 'MACE'.
     mlip_path: str
         Path to the MLIP model.
     iteration_index: str
         Index for the current iteration.
-    structures: list of Structure
+    structure: list[Structure]
         List of structures to be relaxed.
     structure_paths: str | list[str]
         Path(s) to structures to be used in the RSS process.
@@ -589,8 +589,6 @@ def do_rss_multi_node(
         Specify device to use "cuda" or "cpu".
     isolated_atom_energies: dict
         Dictionary of isolated atoms energies.
-    struct_start_index: int
-        Specify the starting index within a list
     num_groups: int
         Number of structure groups, used for assigning tasks across multiple nodes,
         with each node handling one group.

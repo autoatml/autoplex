@@ -1,8 +1,6 @@
 (benchmark)=
 
-*Tutorials written by Christina Ertural ([christina.ertural@bam.de](mailto:christina.ertural@bam.de)).*
-
-# Benchmark
+# Benchmark of ML-based phonon structure
 
 This tutorial will help you understand all the `autoplex` benchmark specifications.
 
@@ -39,7 +37,7 @@ In case you have pre-existing DFT calculations, you can pass them as a list via 
 It is important to provide the pre-existing DFT data in form of a `PhononBSDOSDoc` task document object (from `atomate2`). Without any DFT reference calculations given, `autoplex` will automatically execute the VASP calculations. A mix of pre-existing and missing DFT references is not supported.
 
 ## Error metrics
-`autoplex` automatically provides you with a phonon bandstructure comparison plot, a q-point wise RMSE plot and an overall RMSE value (`results_XY.txt` file). For examples see [here](../flows/flows.md#output-and-results).
+`autoplex` automatically provides you with a phonon bandstructure comparison plot, a q-point wise RMSE plot and an overall RMSE value (`results_XY.txt` file). For examples see [here](../flows.md#output-and-results).
 
 ## Run a benchmark with a pre-existing DFT calculation and GAP potential
 
@@ -51,7 +49,7 @@ It is important to provide the pre-existing DFT data in form of a `PhononBSDOSDo
 
 import os
 from atomate2.common.schemas.phonons import PhononBSDOSDoc
-from atomate2.forcefields.jobs import GAPRelaxMaker, GAPStaticMaker
+from atomate2.forcefields.jobs import ForceFieldRelaxMaker, ForceFieldStaticMaker
 from mp_api.client import MPRester
 from autoplex.benchmark.phonons.flows import PhononBenchmarkMaker
 from atomate2.forcefields.flows.phonons import PhononMaker
@@ -75,29 +73,33 @@ dft_reference: PhononBSDOSDoc = dft_data["output"]
 potential_filename = "/path/to/GAP/file/gap_file.xml"
 
 phojob = PhononMaker(
-        bulk_relax_maker=GAPRelaxMaker(calculator_kwargs={"args_str": "IP GAP", "param_filename": potential_filename}, 
-        relax_cell=True, relax_kwargs={"interval": 500, "fmax": 0.00001}, steps=10000),
-        phonon_displacement_maker=GAPStaticMaker(calculator_kwargs={"args_str": "IP GAP", "param_filename": potential_filename}),
-        static_energy_maker=GAPStaticMaker(calculator_kwargs={"args_str": "IP GAP", "param_filename": potential_filename}),
+        bulk_relax_maker=ForceFieldRelaxMaker(calculator_kwargs={"args_str": "IP GAP", "param_filename": potential_filename}, 
+        relax_cell=True, relax_kwargs={"interval": 500, "fmax": 0.00001}, steps=10000,
+        force_field_name="GAP",
+),
+        phonon_displacement_maker=ForceFieldStaticMaker(calculator_kwargs={"args_str": "IP GAP", "param_filename": potential_filename},
+        force_field_name="GAP",
+),
+        static_energy_maker=ForceFieldStaticMaker(calculator_kwargs={"args_str": "IP GAP", "param_filename": potential_filename}),
         store_force_constants=False, min_length=18,
-        generate_frequencies_eigenvectors_kwargs={"units": "THz"}).make(structure=structure)
+        generate_frequencies_eigenvectors_kwargs={"units": "THz"}, force_field_name="GAP",
+).make(structure=structure)
         
 bm = PhononBenchmarkMaker(name="Benchmark").make(
-    structure=structure, benchmark_mp_id = "mp-22905", 
+    structure=structure, benchmark_mp_id = "mp-22905",
+    displacement=0.01, atomwise_regularization_parameter=0.1,
+    soap_dict={'n_sparse': 6000, 'delta': 0.5}, suffix="",  # exemplary values
     ml_phonon_task_doc = phojob.output, dft_phonon_task_doc = dft_reference)
 
 comp_bm = write_benchmark_metrics(
-            ml_models=["GAP"],
             benchmark_structures=[structure],
-            benchmark_mp_ids=["mp-22905"],
-            metrics=bm.output,
-            displacements=[0.01],
+            metrics=[[bm.output]],
         )
 
 run_locally([phojob, bm, comp_bm], create_folders=True, store=store)
 ```
 If you use another [`ForceFieldRelaxMaker` and `ForceFieldStaticMaker`](https://github.com/materialsproject/atomate2/blob/main/src/atomate2/forcefields/jobs.py), you can switch from GAP to one of the other 
-[MLIP potentials](../fitting/fitting.md#fitting-potentials).
+[MLIP potentials](../fitting/fitting.md#fitting-phonon-accurate-potentials). 
 
 You can extract a JSON file containing your pre-existing VASP DFT run from your MongoDB with the following script:
 ```python

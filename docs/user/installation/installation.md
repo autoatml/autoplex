@@ -1,8 +1,43 @@
-Quick-start
-================
+(installation)=
 
-This guide assumes that you have all the [Materials Project](https://github.com/materialsproject) framework software tools as well as a working [MongoDB](https://www.mongodb.com/) 
-database setup and have experience using [atomate2](https://github.com/materialsproject/atomate2).
+# Installation guide
+
+## Before you start using `autoplex`
+
+We expect the general user of `autoplex` to be familiar with the [Materials Project](https://github.com/materialsproject) framework software tools and related 
+packages for (high-throughput) workflow submission and management. 
+This involves the following software packages:
+- [pymatgen](https://github.com/materialsproject/pymatgen) for input and output handling of computational materials science software,
+- [atomate2](https://github.com/materialsproject/atomate2) for providing a library of pre-defined computational materials science workflows,
+- [jobflow](https://github.com/materialsproject/jobflow) for processes, job and workflow handling, 
+- [jobflow-remote](https://github.com/Matgenix/jobflow-remote) or [FireWorks](https://github.com/materialsproject/fireworks) for workflow and database (MongoDB) management,
+- [MongoDB](https://www.mongodb.com/) as the database (we recommend installing the MongoDB community edition). 
+
+
+We are also referring the user to the [installation guide of atomate2](https://materialsproject.github.io/atomate2/user/install.html) in order to setup the mandatory prerequisites to 
+be able to use `autoplex`.
+
+After setting up `atomate2`, make sure to add `VASP_INCAR_UPDATES: {"NPAR": number}` in your ~/atomate2/config/atomate2.yaml file. 
+Set a number that is a divisor of the number of tasks you use for the VASP calculations.
+
+
+## Installation Documentation and Guides of the Dependencies
+
+The first step you need to do is to set up a [MongoDB](https://www.mongodb.com/) database. Help and tips regarding the MongoDB installation 
+can be found [here](https://materialsproject.github.io/fireworks/installation.html#install-mongodb). 
+We recommend installing the [MongoDB community edition](https://www.mongodb.com/docs/manual/administration/install-community/).
+MongoDB also provides lots of [installation guides](https://www.mongodb.com/docs/manual/administration/install-on-linux/#std-label-install-mdb-community-edition-linux) 
+and [tutorials](https://www.mongodb.com/docs/manual/administration/self-managed-configuration-and-maintenance/)
+to setup and manage your database. For a Kick-start with MongoDB, we also provide a [MongoDB tutorial](../mongodb.md). 
+Also consider asking your IT administration for help.
+
+The next step you need do is to install a workflow manager. There are currently two options: [jobflow-remote](https://github.com/Matgenix/jobflow-remote) or [FireWorks](https://github.com/materialsproject/fireworks).
+There are also documentation and tutorials available for [FireWorks](https://materialsproject.github.io/fireworks/) and [jobflow-remote](https://matgenix.github.io/jobflow-remote/).
+We recommend using `jobflow-remote` and provide a more comprehensive `jobflow-remote` tutorial [here](../jobflowremote.md).
+
+Please take your time and check out all the documentation and tutorials!
+
+When you have completed all these preparation steps, it's time to install `autoplex`!
 
 You can install `autoplex` simply by:
 
@@ -74,10 +109,10 @@ Total wall time: 0:02:22
 It is very important to have it compiled with Python (`-D PKG_PYTHON=on`) and 
 LIB PACE flags (`-D PACELIB_MD5=$(md5sum libpace.tar.gz | awk '{print $1}')`).
 
+As `autoplex` heavily relies on `atomate2`, it is strongly recommended to also make yourself familiar with the [atomate2 documentation](https://materialsproject.github.io/atomate2/).
 
-A more comprehensive `autoplex` installation guide can be found [here](installation/installation.md) and for a even more advanced 
-installation, you can also follow the [developer installation guide](../dev/dev_install.md).
 
+For a more advanced installation, you can also follow the [developer installation guide](../../dev/dev_install.md).
 
 ## Workflow management
 
@@ -86,7 +121,7 @@ Please follow the installation and setup instructions on the respective guide we
 Both packages rely on the [MongoDB](https://www.mongodb.com/) database manager for data storage.
 
 We recommend using `jobflow-remote` as it is more flexible to use, especially on clusters where users cannot store their
-own MongoDB. You can find a more comprehensive `jobflow-remote` tutorial [here](jobflowremote.md).
+own MongoDB. You can find a more comprehensive `jobflow-remote` tutorial [here](../jobflowremote.md).
 
 Submission using `FireWorks`:
 ```python

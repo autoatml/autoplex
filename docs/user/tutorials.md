@@ -1,7 +1,7 @@
 Tutorials
 ==========
 
-*`autoplex` tutorials written by Christina Ertural ([christina.ertural@bam.de](mailto:christina.ertural@bam.de)).*
+*`autoplex` tutorials written by [autoplex](https://github.com/autoatml/autoplex) developers.*
 
 The user is advised to have a general familiarity with the following software packages and tools:
  * VASP
@@ -22,9 +22,39 @@ By the end of these tutorials, you should be able to:
 
 ```{toctree}
 :maxdepth: 2
-
-flows/flows
-generation/data
-fitting/fitting
-benchmark/benchmark
+installation/installation
 ```
+
+```{toctree}
+:maxdepth: 3
+rss/index
+```
+
+```{toctree}
+:maxdepth: 3
+phonon/index
+```
+
+## Contributors and Their Contributions
+
+- **[Christina Ertural](mailto:christina.ertural@bam.de)**  
+  - Initial setup documentation
+  - Phonon flows:
+    - Flows documentation
+    - Data generation guide
+    - Fitting documentation
+    - Benchmarking documentation
+  - Contributed to installation guide (with Aakash Naik)
+  - Contributed to jobflow-remote and MongoDB setup (with Aakash Naik)
+
+- **[Aakash Naik](mailto:aakash.naik@bam.de)**  
+  - Contributed to installation guide (with Christina Ertural)
+  - Jobflow-remote and MongoDB setup documentation (with Christina Ertural)
+
+- **[Yuanbin Liu](mailto:yuanbin.liu@chem.ox.ac.uk)**  
+  - RSS documentation
+
+- **[Janine George](mailto:janine.george@bam.de)**  
+  - Phonon flows documentation (with Christina Ertural)
+
+

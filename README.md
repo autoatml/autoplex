@@ -29,11 +29,11 @@ The documentation also contains tutorials that teach you how to use `autoplex` f
 We expect the general user of `autoplex` to be familiar with the [Materials Project](https://github.com/materialsproject) framework software tools and related
 packages for (high-throughput) workflow submission and management.
 This involves the following software packages:
-- [pymatgen](https://github.com/materialsproject/pymatgen) for input and output handling of computational materials science software
-- [atomate2](https://github.com/materialsproject/atomate2) for providing a library of pre-defined computational materials science workflows
-- [jobflow](https://github.com/materialsproject/jobflow) for processes, job and workflow handling
-- [jobflow-remote](https://github.com/Matgenix/jobflow-remote) or [FireWorks](https://github.com/materialsproject/fireworks) for workflow and database (MongoDB) management
-- [MongoDB](https://www.mongodb.com/) as the database (we recommend installing the MongoDB community version)
+- [pymatgen](https://github.com/materialsproject/pymatgen) for input and output handling of computational materials science software,
+- [atomate2](https://github.com/materialsproject/atomate2) for providing a library of pre-defined computational materials science workflows,
+- [jobflow](https://github.com/materialsproject/jobflow) for processes, job and workflow handling,
+- [jobflow-remote](https://github.com/Matgenix/jobflow-remote) or [FireWorks](https://github.com/materialsproject/fireworks) for workflow and database (MongoDB) management,
+- [MongoDB](https://www.mongodb.com/) as the database (we recommend installing the MongoDB community edition). More help regarding the MongoDB installation can be found [here](https://materialsproject.github.io/fireworks/installation.html#install-mongodb).
 
 All of these software tools provide documentation and tutorials. Please take your time and check everything out!
 
@@ -52,9 +52,13 @@ Before the installation, please make sure that you are using one of the supporte
 
 ### Standard installation
 
-Please install `autoplex` using ``pip install git+https://github.com/autoatml/autoplex.git``. This will install all the Python packages and dependencies needed for MLIP fits. We will release a version of `autoplex` to PyPI in the next few weeks.
+Please install `autoplex` using
+```
+pip install autoplex[strict]
+```
+This will install all the Python packages and dependencies needed for MLIP fits.
 
-Additionally, to fit and validate `ACEpotentials`, one also needs to install Julia, as Autoplex relies on [ACEpotentials](https://acesuit.github.io/ACEpotentials.jl/dev/gettingstarted/installation/), which supports fitting of linear ACE. Currently, no Python package exists for the same.
+Additionally, to fit and validate `ACEpotentials`, one also needs to install Julia, as `autoplex` relies on [ACEpotentials](https://acesuit.github.io/ACEpotentials.jl/dev/gettingstarted/installation/), which supports fitting of linear ACE. Currently, no Python package exists for the same.
 Please run the following commands to enable the `ACEpotentials` fitting options and further functionality.
 
 Install Julia v1.9.2
@@ -76,6 +80,46 @@ Additionally, `buildcell` as a part of `AIRSS` needs to be installed if one want
 ```bash
 curl -O https://www.mtg.msm.cam.ac.uk/files/airss-0.9.3.tgz; tar -xf airss-0.9.3.tgz; rm airss-0.9.3.tgz; cd airss; make ; make install ; make neat; cd ..
 ```
+
+### LAMMPS installation
+
+You only need to install LAMMPS, if you want to use J-ACE as your MLIP.
+Recipe for compiling lammps-ace including the download of the `libpace.tar.gz` file:
+
+```
+git clone -b release https://github.com/lammps/lammps
+cd lammps
+mkdir build
+cd build
+wget -O libpace.tar.gz https://github.com/wcwitt/lammps-user-pace/archive/main.tar.gz
+
+cmake  -C ../cmake/presets/clang.cmake -D BUILD_SHARED_LIBS=on -D BUILD_MPI=yes \
+-DMLIAP_ENABLE_PYTHON=yes -D PKG_PYTHON=on -D PKG_KOKKOS=yes -D Kokkos_ARCH_ZEN3=yes \
+-D PKG_PHONON=yes -D PKG_MOLECULE=yes -D PKG_MANYBODY=yes \
+-D Kokkos_ENABLE_OPENMP=yes -D BUILD_OMP=yes -D LAMMPS_EXCEPTIONS=yes \
+-D PKG_ML-PACE=yes -D PACELIB_MD5=$(md5sum libpace.tar.gz | awk '{print $1}') \
+-D CMAKE_INSTALL_PREFIX=$LAMMPS_INSTALL -D CMAKE_EXE_LINKER_FLAGS:STRING="-lgfortran" \
+../cmake
+
+make -j 16
+make install-python
+```
+
+$LAMMPS_INSTALL is the conda environment for installing the lammps-python interface.
+Use `BUILD_MPI=yes` to enable MPI for parallelization.
+
+After the installation is completed, enter the following commands in the Python environment.
+If you get the same output, it means the installation was successful.
+
+```
+from lammps import lammps; lmp = lammps()
+LAMMPS (27 Jun 2024)
+OMP_NUM_THREADS environment is not set. Defaulting to 1 thread. (src/comm.cpp:98)
+  using 1 OpenMP thread(s) per MPI task
+Total wall time: 0:02:22
+```
+It is very important to have it compiled with Python (`-D PKG_PYTHON=on`) and
+LIB PACE flags (`-D PACELIB_MD5=$(md5sum libpace.tar.gz | awk '{print $1}')`).
 
 ### Contributing guidelines / Developer's installation
 

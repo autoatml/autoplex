@@ -55,21 +55,21 @@ class PhononBenchmarkMaker(Maker):
         ml_model: str
             ML model to be used. Default is GAP.
         structure:
-            Pymatgen structures drawn from the Materials Project.
+            The pymatgen structures drawn from the Materials Project.
         benchmark_mp_id: str.
-            Materials project IDs for the structure.
+            Materials Project IDs for the structure.
         ml_phonon_task_doc: PhononBSDOSDoc
             Phonon task doc from ML potential consisting of pymatgen band-structure object.
         dft_phonon_task_doc: PhononBSDOSDoc
             Phonon task doc from DFT runs consisting of pymatgen band-structure object.
         displacement: float
-            displacement for finite displacement method.
+            Displacement for finite displacement method.
         atomwise_regularization_parameter: float
-        regularization value for the atom-wise force components.
+            Regularization value for the atom-wise force components.
         suffix: str
             GAP potential file suffix.
         soap_dict: dict
-            dictionary containing SOAP parameters.
+            Dictionary containing SOAP parameters.
 
         """
         return compute_bandstructure_benchmark_metrics(
