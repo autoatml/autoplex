@@ -1,4 +1,23 @@
 # Changelog
+## v0.0.8
+### What's Changed
+* Update devcontainer.json version tag by @JaGeo in https://github.com/autoatml/autoplex/pull/253
+* Fix recursive autoupdate durations by @naik-aakash in https://github.com/autoatml/autoplex/pull/255
+* Fix MLIP related issues with the benchmark results file by @QuantumChemist in https://github.com/autoatml/autoplex/pull/243
+* ignore type checking block by @naik-aakash in https://github.com/autoatml/autoplex/pull/256
+* Bump autodoc-pydantic from 2.0.1 to 2.2.0 by @dependabot in https://github.com/autoatml/autoplex/pull/260
+* Make sure that supercell_matrices of single-atom-displaced and rattled supercells are the same per default by @QuantumChemist in https://github.com/autoatml/autoplex/pull/258
+* Update test durations file by @JaGeo in https://github.com/autoatml/autoplex/pull/265
+* remove redundant else case by @naik-aakash in https://github.com/autoatml/autoplex/pull/266
+* Updated Documentation for Autoplex, Including RSS Features by @YuanbinLiu in https://github.com/autoatml/autoplex/pull/226
+* Bump mace-torch from 0.3.7 to 0.3.8 by @dependabot in https://github.com/autoatml/autoplex/pull/261
+* Bump numpydoc from 1.6.0 to 1.8.0 by @dependabot in https://github.com/autoatml/autoplex/pull/268
+* Bump lightning-utilities from 0.11.2 to 0.11.9 by @dependabot in https://github.com/autoatml/autoplex/pull/269
+* Implement error handling for fit error metrics plots by @QuantumChemist in https://github.com/autoatml/autoplex/pull/272
+* Raise informative errors on missing non-python dependencies when invoked by @naik-aakash in https://github.com/autoatml/autoplex/pull/273
+
+**Full Changelog**: https://github.com/autoatml/autoplex/compare/v0.0.7...v0.0.8
+
 ## v0.0.7
 ### What's Changed
 * Clean up pyproject.toml to enable a strict/non-strict installation procedure by @JaGeo in https://github.com/autoatml/autoplex/pull/242
