@@ -316,10 +316,10 @@ class HookeanRepulsion(FixConstraint):
     def __repr__(self):
         """Return a representation of the constraint."""
         if self._type == "two atoms":
-            return "Hookean(%d, %d)" % tuple(self.indices)
+            return f"Hookean({self.indices[0]}, {self.indices[1]})"
         if self._type == "point":
-            return "Hookean(%d) to cartesian" % self.index
-        return "Hookean(%d) to plane" % self.index
+            return f"Hookean({self.index}) to cartesian"
+        return f"Hookean({self.index}) to plane"
 
 
 def process_rss(
