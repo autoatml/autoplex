@@ -38,19 +38,10 @@ def write_benchmark_metrics(
         encoding="utf-8",
     ) as file:
         file.write(
-            "%-11s%-11s%-12s%-18s%-12s%-16s%-16s%-16s%-18s"
-            % (
-                "Potential",
-                "Structure",
-                "MPID",
-                "Displacement (Å)",
-                "RMSE (THz)",
-                "imagmodes(pot)",
-                "imagmodes(dft)",
-                "Database type",
-                "(Hyper-)Parameters",
-            )
-        )
+            f"{'Potential':<11}{'Structure':<11}{'MPID':<12}{'Displacement (Å)':<18}"
+            f"{'RMSE (THz)':<12}{'imagmodes(pot)':<16}{'imagmodes(dft)':<16}"
+            f"{'Database type':<16}{'(Hyper-)Parameters':<18}"
+    )
 
     for metric in metrics_flattened:
         with open(
