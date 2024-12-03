@@ -19,8 +19,8 @@ from autoplex.fitting.common.utils import (
 )
 
 __all__ = [
-    "MLIPFitMaker",
     "DataPreprocessing",
+    "MLIPFitMaker",
 ]
 
 

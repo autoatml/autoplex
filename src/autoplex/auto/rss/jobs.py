@@ -16,7 +16,7 @@ from autoplex.data.rss.flows import BuildMultiRandomizedStructure
 from autoplex.data.rss.jobs import do_rss_multi_node
 from autoplex.fitting.common.flows import MLIPFitMaker
 
-__all__ = ["initial_rss", "do_rss_iterations"]
+__all__ = ["do_rss_iterations", "initial_rss"]
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"

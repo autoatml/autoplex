@@ -32,9 +32,9 @@ from autoplex.data.phonons.utils import (
 
 __all__ = [
     "DFTPhononMaker",
-    "MLPhononMaker",
     "IsoAtomMaker",
     "IsoAtomStaticMaker",
+    "MLPhononMaker",
     "RandomStructuresDataGenerator",
     "TightDFTStaticMaker",
 ]

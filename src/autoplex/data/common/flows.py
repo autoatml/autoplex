@@ -37,7 +37,7 @@ from autoplex.data.common.utils import (
     flatten,
 )
 
-__all__ = ["GenerateTrainingDataForTesting", "DFTStaticLabelling"]
+__all__ = ["DFTStaticLabelling", "GenerateTrainingDataForTesting"]
 
 logging.basicConfig(level=logging.DEBUG, format="[%(levelname)s] %(message)s")
 
