@@ -41,7 +41,7 @@ def write_benchmark_metrics(
             f"{'Potential':<11}{'Structure':<11}{'MPID':<12}{'Displacement (Å)':<18}"
             f"{'RMSE (THz)':<12}{'imagmodes(pot)':<16}{'imagmodes(dft)':<16}"
             f"{'Database type':<16}{'(Hyper-)Parameters':<18}"
-    )
+        )
 
     for metric in metrics_flattened:
         with open(
