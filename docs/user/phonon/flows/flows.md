@@ -106,8 +106,10 @@ for mpbm in mpbenchmark:
     bm_structure = mpr.get_structure_by_material_id(mpbm)
     benchmark_structure_list.append(bm_structure)
 
-complete_flow = CompleteDFTvsMLBenchmarkWorkflow().make(
-    structure_list=structure_list, mp_ids=mpids, preprocessing_data=True,
+complete_flow = CompleteDFTvsMLBenchmarkWorkflow(
+    apply_data_preprocessing=True,
+).make(
+    structure_list=structure_list, mp_ids=mpids, 
     benchmark_structures=benchmark_structure_list, benchmark_mp_ids=mpbenchmark)
 
 complete_flow.name = "tutorial"
@@ -126,8 +128,8 @@ As the `mp_id` parameter is a string, you can also use any other *unique* struct
 The following workflow diagram will give you an overview of the flows and jobs in the default autoplex workflow:
 ```{mermaid}
 flowchart TD
-    becfe032-c5ca-4398-9691-0f16baacb237(external) -->|'rand_struc_dir'| 42331e94-129c-45ef-9116-770369f6eab1(data_preprocessing_for_fitting)
-    becfe032-c5ca-4398-9691-0f16baacb237(external) -->|'rand_struc_dir'| 56cb031a-0cd7-4aa5-b857-c2c4d17e86c4(complete_benchmark_mp-22905)
+    becfe032-c5ca-4398-9691-0f16baacb237(external) -->|'rattled_dir'| 42331e94-129c-45ef-9116-770369f6eab1(data_preprocessing_for_fitting)
+    becfe032-c5ca-4398-9691-0f16baacb237(external) -->|'rattled_dir'| 56cb031a-0cd7-4aa5-b857-c2c4d17e86c4(complete_benchmark_mp-22905)
     a0286b49-988f-4628-8da6-270caade44bc(external) -->|'phonon_dir', 'phonon_data'| 42331e94-129c-45ef-9116-770369f6eab1(data_preprocessing_for_fitting)
     a0286b49-988f-4628-8da6-270caade44bc(external) -->|'phonon_dir', 'phonon_data'| 56cb031a-0cd7-4aa5-b857-c2c4d17e86c4(complete_benchmark_mp-22905)
     3b147b9e-05ff-4823-9dbc-7f8855fa99b5(external) -->|'dirs'| 42331e94-129c-45ef-9116-770369f6eab1(data_preprocessing_for_fitting)

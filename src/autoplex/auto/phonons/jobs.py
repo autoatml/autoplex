@@ -1,30 +1,22 @@
 """General AutoPLEX automation jobs."""
 
-from __future__ import annotations
-
+from collections.abc import Iterable
 from dataclasses import field
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 import numpy as np
-from jobflow import Flow, Response, job
-
-if TYPE_CHECKING:
-    from collections.abc import Iterable
-
-    from atomate2.vasp.jobs.base import BaseVaspMaker
-    from pymatgen.core.structure import Structure
-
-    from autoplex.data.phonons.flows import IsoAtomStaticMaker
-
 from atomate2.vasp.flows.core import DoubleRelaxMaker
+from atomate2.vasp.jobs.base import BaseVaspMaker
 from atomate2.vasp.jobs.core import StaticMaker, TightRelaxMaker
 from atomate2.vasp.sets.core import StaticSetGenerator, TightRelaxSetGenerator
+from jobflow import Flow, Response, job
+from pymatgen.core.structure import Structure
 
 from autoplex.benchmark.phonons.flows import PhononBenchmarkMaker
 from autoplex.data.phonons.flows import (
     DFTPhononMaker,
     IsoAtomMaker,
+    IsoAtomStaticMaker,
     MLPhononMaker,
     RandomStructuresDataGenerator,
     TightDFTStaticMaker,
@@ -121,8 +113,8 @@ def complete_benchmark(  # this function was put here to prevent circular import
     if phonon_displacement_maker is None:
         phonon_displacement_maker = TightDFTStaticMaker(name="dft phonon static")
 
-    for suffix in ["", "_wo_sigma", "_phonon", "_rand_struc"]:
-        # _wo_sigma", "_phonon", "_rand_struc" only available for GAP at the moment
+    for suffix in ["", "_wo_sigma", "_phonon", "_rattled"]:
+        # _wo_sigma", "_phonon", "_rattled" only available for GAP at the moment
         if ml_model == "GAP":
             ml_potential = Path(ml_path) / f"gap_file{suffix}.xml"
         elif ml_model == "J-ACE":
@@ -574,7 +566,7 @@ def dft_random_gen_data(
     )
     jobs.append(random_datagen)
 
-    flow = Flow(jobs, {"rand_struc_dir": random_datagen.output})
+    flow = Flow(jobs, {"rattled_dir": random_datagen.output})
     return Response(replace=flow)
 
 

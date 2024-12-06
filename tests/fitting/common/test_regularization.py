@@ -1,4 +1,3 @@
-from __future__ import annotations
 from ase.io import read
 from ase.atoms import Atom
 from autoplex.fitting.common.regularization import (

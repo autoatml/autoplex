@@ -113,7 +113,7 @@ def test_write_benchmark_metrics(test_dir, clean_dir):
         {'n_sparse': 6000, 'delta': 1.0},
     ]
 
-    suffixes = ["", '_wo_sigma', '_phonon', '_rand_struc']
+    suffixes = ["", '_wo_sigma', '_phonon', '_rattled']
 
     metrics = []
 

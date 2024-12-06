@@ -1,16 +1,10 @@
 """Utility functions for benchmarking jobs."""
 
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
 import matplotlib.pyplot as plt
 import numpy as np
-
-if TYPE_CHECKING:
-    from matplotlib.figure import Figure
-    from pymatgen.core.structure import Structure
-    from pymatgen.phonon.bandstructure import PhononBandStructureSymmLine
+from matplotlib.figure import Figure
+from pymatgen.core.structure import Structure
+from pymatgen.phonon.bandstructure import PhononBandStructureSymmLine
 from pymatgen.phonon.plotter import PhononBSPlotter
 
 

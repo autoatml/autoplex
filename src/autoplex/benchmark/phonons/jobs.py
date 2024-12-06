@@ -1,7 +1,5 @@
 """Atomistic Jobs to Benchmark Potentials."""
 
-from __future__ import annotations
-
 from jobflow import Response, job
 
 

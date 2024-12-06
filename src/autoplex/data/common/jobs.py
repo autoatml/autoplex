@@ -1,13 +1,5 @@
 """Jobs to create training data for ML potentials."""
 
-from __future__ import annotations
-
-from typing import TYPE_CHECKING, Literal
-
-if TYPE_CHECKING:
-    from ase import Atoms
-    from emmet.core.math import Matrix3D
-
 import logging
 import os
 import pickle
@@ -15,12 +7,14 @@ import shutil
 import traceback
 from itertools import chain
 from pathlib import Path
+from typing import TYPE_CHECKING, Literal
 
 import matplotlib.pyplot as plt
 import numpy as np
 from ase.constraints import voigt_6_to_full_3x3_stress
 from ase.io import read, write
 from atomate2.utils.path import strip_hostname
+from emmet.core.math import Matrix3D
 from jobflow.core.job import job
 from phonopy.structure.cells import get_supercell
 from pymatgen.core.structure import Structure
@@ -45,6 +39,9 @@ from autoplex.data.common.utils import (
     to_ase_trajectory,
 )
 from autoplex.fitting.common.regularization import set_custom_sigma
+
+if TYPE_CHECKING:
+    from ase import Atoms
 
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 
