@@ -1,14 +1,12 @@
-from __future__ import annotations
-
 import os.path
 
-from autoplex.fitting.common.utils import MLIP_PHONON_DEFAULTS_FILE_PATH  # this will not be needed anymore
 from autoplex.fitting.common.utils import (
     load_mlip_hyperparameter_defaults,
     gap_hyperparameter_constructor,
     check_convergence,
     data_distillation,
     prepare_fit_environment,
+    MLIP_PHONON_DEFAULTS_FILE_PATH
 )
 
 

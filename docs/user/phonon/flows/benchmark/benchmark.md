@@ -28,8 +28,10 @@ for mpbm in mpbenchmark:
     bm_structure = mpr.get_structure_by_material_id(mpbm)
     benchmark_structure_list.append(bm_structure)
 
-complete_flow = CompleteDFTvsMLBenchmarkWorkflow().make(
-    structure_list=structure_list, mp_ids=mpids, preprocessing_data=True,
+complete_flow = CompleteDFTvsMLBenchmarkWorkflow(
+    apply_data_preprocessing=True,
+).make(
+    structure_list=structure_list, mp_ids=mpids, 
     benchmark_structures=benchmark_structure_list, benchmark_mp_ids=mpbenchmark, 
     dft_references=[dft_reference])
 ```

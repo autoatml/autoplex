@@ -1,7 +1,5 @@
 """RSS Jobs include the generation of the initial potential model as well as iterative RSS exploration."""
 
-from __future__ import annotations
-
 import logging
 
 from jobflow import Flow, Response, job
@@ -223,14 +221,14 @@ def initial_rss(
         ref_energy_name=ref_energy_name,
         ref_force_name=ref_force_name,
         ref_virial_name=ref_virial_name,
-    ).make(
-        database_dir=do_data_preprocessing.output,
-        isolated_atom_energies=do_data_collection.output["isolated_atom_energies"],
         num_processes_fit=num_processes_fit,
         apply_data_preprocessing=False,
         auto_delta=auto_delta,
         glue_xml=False,
         device=device_for_fitting,
+    ).make(
+        database_dir=do_data_preprocessing.output,
+        isolated_atom_energies=do_data_collection.output["isolated_atom_energies"],
         **fit_kwargs,
     )
 
@@ -592,14 +590,14 @@ def do_rss_iterations(
             ref_energy_name=ref_energy_name,
             ref_force_name=ref_force_name,
             ref_virial_name=ref_virial_name,
-        ).make(
-            database_dir=do_data_preprocessing.output,
-            isolated_atom_energies=input["isolated_atom_energies"],
             num_processes_fit=num_processes_fit,
             apply_data_preprocessing=False,
             auto_delta=auto_delta,
             glue_xml=False,
             device=device_for_fitting,
+        ).make(
+            database_dir=do_data_preprocessing.output,
+            isolated_atom_energies=input["isolated_atom_energies"],
             **fit_kwargs,
         )
 

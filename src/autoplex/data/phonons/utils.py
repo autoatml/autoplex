@@ -1,22 +1,17 @@
 """Utility functions for data generation jobs."""
 
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
+import logging
 
 import numpy as np
+from atomate2.forcefields.jobs import (
+    ForceFieldRelaxMaker,
+    ForceFieldStaticMaker,
+)
+from atomate2.vasp.jobs.phonons import PhononDisplacementMaker
+from pymatgen.core import Structure
 from pymatgen.transformations.advanced_transformations import (
     CubicSupercellTransformation,
 )
-
-if TYPE_CHECKING:
-    from atomate2.forcefields.jobs import (
-        ForceFieldRelaxMaker,
-        ForceFieldStaticMaker,
-    )
-    from atomate2.vasp.jobs.phonons import PhononDisplacementMaker
-    from pymatgen.core import Structure
-import logging
 
 # Configure the logger
 logging.basicConfig(level=logging.INFO)

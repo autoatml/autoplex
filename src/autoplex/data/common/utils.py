@@ -1,37 +1,30 @@
 """Utility functions for training data jobs."""
 
-from __future__ import annotations
-
+import logging
+import os
 import random
 import shutil
 import warnings
-from multiprocessing import Pool
-from pathlib import Path
-from typing import TYPE_CHECKING
-
-import numpy as np
-from quippy import descriptors
-from scipy.sparse.linalg import LinearOperator, svds
-
-if TYPE_CHECKING:
-    from ase.atoms import Atom
-    from pymatgen.core import Structure
-
-import logging
-import os
 from collections.abc import Iterable
 from itertools import chain
+from multiprocessing import Pool
+from pathlib import Path
 
 import ase.io
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 from ase import Atoms
+from ase.atoms import Atom
 from ase.calculators.singlepoint import SinglePointCalculator
 from ase.io import Trajectory as AseTrajectory
 from ase.io import write
 from ase.units import GPa
 from hiphive.structure_generation import generate_mc_rattled_structures
+from pymatgen.core import Structure
 from pymatgen.io.ase import AseAtomsAdaptor
+from quippy import descriptors
+from scipy.sparse.linalg import LinearOperator, svds
 from sklearn.model_selection import StratifiedShuffleSplit
 
 from autoplex.fitting.common.regularization import (

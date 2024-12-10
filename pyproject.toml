@@ -145,8 +145,6 @@ isort.known-first-party = ["autoplex"]
 [tool.pydocstyle]
 ignore = "D100,D104,D105,D106,D107,D200,D203,D205,D212,D213,D301,D400,D401,D402,D403,D404,D406,D407,D413,D415"
 
-isort.required-imports = ["from __future__ import annotations"]
-
 [tool.ruff.per-file-ignores]
 "__init__.py" = ["F401"]
 "*/tests/*" = ["D"]

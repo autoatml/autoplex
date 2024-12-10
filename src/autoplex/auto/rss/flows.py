@@ -1,7 +1,5 @@
 """RSS (random structure searching) flow for exploring and learning potential energy surfaces from scratch."""
 
-from __future__ import annotations
-
 import os
 from dataclasses import dataclass
 from pathlib import Path

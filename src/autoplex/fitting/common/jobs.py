@@ -1,7 +1,5 @@
 """General fitting jobs using several MLIPs available."""
 
-from __future__ import annotations
-
 from pathlib import Path
 
 from jobflow import job
@@ -82,13 +80,13 @@ def machine_learning_fit(
         "train.extxyz",
         "train_wo_sigma.extxyz",
         "train_phonon.extxyz",
-        "train_rand_struc.extxyz",
+        "train_rattled.extxyz",
     ]
     test_files = [
         "test.extxyz",
         "test.extxyz",
         "test_phonon.extxyz",
-        "test_rand_struc.extxyz",
+        "test_rattled.extxyz",
     ]
 
     if mlip_type == "GAP":

@@ -32,10 +32,12 @@ shall be added to an existing database.
 
 Adding data to an existing database is achieved by:
 ```python
-complete_flow = CompleteDFTvsMLBenchmarkWorkflow(add_dft_random_struct=False).make(
+complete_flow = CompleteDFTvsMLBenchmarkWorkflow(
+    add_dft_random_struct=False,
+    pre_xyz_files=["vasp_ref.extxyz"], pre_database_dir=path/to/database
+).make(
     structure_list=structure_list, mp_ids=mpids, 
-    benchmark_structures=benchmark_structure_list, benchmark_mp_ids=mpbenchmark,
-    pre_xyz_files=["vasp_ref.extxyz"], pre_database_dir=path/to/database)
+    benchmark_structures=benchmark_structure_list, benchmark_mp_ids=mpbenchmark,)
 ```
 Where `pre_xyz_files` can also take a train and test database as argument, e.g. as 
 `pre_xyz_files=["pre_xyz_train.extxyz", "pre_xyz_test.extxyz"]`.

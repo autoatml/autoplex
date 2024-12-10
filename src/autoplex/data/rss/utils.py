@@ -1,16 +1,11 @@
 """Utility functions for rss."""
 
-from __future__ import annotations
-
 import ast
 import json
 import os
 from multiprocessing import Pool
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
-
-if TYPE_CHECKING:
-    from pymatgen.core import Structure
+from typing import Literal
 
 import ase.io
 import matgl
@@ -30,6 +25,7 @@ from ase.units import GPa
 from mace.calculators import MACECalculator
 from matgl.ext.ase import M3GNetCalculator
 from nequip.ase import NequIPCalculator
+from pymatgen.core import Structure
 from pymatgen.io.ase import AseAtomsAdaptor
 
 from autoplex.fitting.common.utils import extract_gap_label
