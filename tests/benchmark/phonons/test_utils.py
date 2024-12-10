@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from autoplex.benchmark.phonons.utils import get_rmse
 
 

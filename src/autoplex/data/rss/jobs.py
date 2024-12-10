@@ -1,7 +1,5 @@
 """Jobs for running RSS."""
 
-from __future__ import annotations
-
 import os
 import re
 from dataclasses import dataclass
@@ -9,19 +7,14 @@ from multiprocessing import Pool
 from pathlib import Path
 from shutil import which
 from subprocess import run
-from typing import TYPE_CHECKING
-
-from monty.dev import requires
-
-if TYPE_CHECKING:
-    from pymatgen.core import Structure
 
 import ase.io
 import numpy as np
 from ase import Atoms
 from ase.data import atomic_numbers, covalent_radii
 from jobflow import Flow, Maker, Response, job
-from pymatgen.core import Element
+from monty.dev import requires
+from pymatgen.core import Element, Structure
 from pymatgen.io.ase import AseAtomsAdaptor
 
 from autoplex.data.common.utils import flatten

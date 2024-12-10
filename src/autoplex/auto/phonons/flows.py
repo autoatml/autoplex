@@ -1,37 +1,22 @@
 """Flows to perform automatic data generation, fitting, and benchmarking of ML potentials."""
 
-from __future__ import annotations
-
 import logging
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING
+from pathlib import Path
 
+from atomate2.common.schemas.phonons import PhononBSDOSDoc
 from atomate2.vasp.flows.mp import (
     MPGGADoubleRelaxMaker,
     MPGGARelaxMaker,
     MPGGAStaticMaker,
 )
+from atomate2.vasp.jobs.base import BaseVaspMaker
+from jobflow import Flow, Maker
+from pymatgen.core.structure import Structure
 from pymatgen.io.vasp.sets import (
     MPRelaxSet,
     MPStaticSet,
 )
-
-from autoplex.data.phonons.flows import TightDFTStaticMaker
-from autoplex.fitting.common.utils import (
-    MLIP_PHONON_DEFAULTS_FILE_PATH,
-    load_mlip_hyperparameter_defaults,
-)
-
-if TYPE_CHECKING:
-    from pathlib import Path
-
-    from atomate2.common.schemas.phonons import PhononBSDOSDoc
-    from atomate2.vasp.jobs.base import BaseVaspMaker
-    from pymatgen.core.structure import Structure
-
-    from autoplex.data.phonons.flows import IsoAtomStaticMaker
-
-from jobflow import Flow, Maker
 
 from autoplex.auto.phonons.jobs import (
     complete_benchmark,
@@ -42,8 +27,13 @@ from autoplex.auto.phonons.jobs import (
     run_supercells,
 )
 from autoplex.benchmark.phonons.jobs import write_benchmark_metrics
+from autoplex.data.phonons.flows import IsoAtomStaticMaker, TightDFTStaticMaker
 from autoplex.data.phonons.jobs import reduce_supercell_size_job
 from autoplex.fitting.common.flows import MLIPFitMaker
+from autoplex.fitting.common.utils import (
+    MLIP_PHONON_DEFAULTS_FILE_PATH,
+    load_mlip_hyperparameter_defaults,
+)
 
 __all__ = [
     "CompleteDFTvsMLBenchmarkWorkflow",
@@ -79,7 +69,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         If True, will add randomly distorted structures for DFT calculation.
     add_rss_struct: bool.
         If True, will add RSS generated structures for DFT calculation.
-        n_structures: int.
+    n_structures: int.
         The total number of randomly displaced structures to be generated.
     displacement_maker: BaseVaspMaker
         Maker used for a static calculation for a supercell.
@@ -141,6 +131,33 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         Default=10.
     ml_models: list[str]
         List of the ML models to be used. Default is GAP.
+    force_max: float
+        Maximum allowed force in the dataset.
+    force_min: float
+        Minimal force cutoff value for atom-wise regularization.
+    split_ratio: float.
+        Parameter to divide the training set and the test set.
+        A value of 0.1 means that the ratio of the training set to the test set is 9:1.
+    regularization: bool
+        For using sigma regularization.
+    distillation: bool
+        For using data distillation.
+    separated: bool
+        Repeat the fit for each data_type available in the (combined) database.
+    num_processes_fit: int
+        Number of processes for fitting.
+    pre_xyz_files: list[str] or None
+        Names of the pre-database train xyz file and test xyz file.
+    pre_database_dir: str or None
+        The pre-database directory.
+    apply_data_preprocessing: bool
+        Apply data preprocessing.
+    atomwise_regularization_parameter: float
+        Regularization value for the atom-wise force components.
+    atom_wise_regularization: bool
+        For including atom-wise regularization.
+    auto_delta: bool
+        Automatically determines delta for 2b, 3b and soap terms.
     hyper_para_loop: bool
         Making it easier to loop through several hyperparameter sets.
     atomwise_regularization_list: list
@@ -155,8 +172,12 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         Keyword arguments for the benchmark flows
     summary_filename_prefix: str
         Prefix of the result summary file.
+    glue_xml: bool
+        Use the glue.xml core potential instead of fitting 2b terms.
     glue_file_path: str
         Name of the glue.xml file path.
+    use_defaults_fitting: bool
+        Use the fit defaults.
     """
 
     name: str = "add_data"
@@ -184,6 +205,19 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
     rattle_mc_n_iter: int = 10
     w_angle: list[float] | None = None
     ml_models: list[str] = field(default_factory=lambda: ["GAP"])
+    atomwise_regularization_parameter: float = 0.1
+    atom_wise_regularization: bool = True
+    force_max: float = 40.0
+    force_min: float = 0.01  # unit: eV Å-1
+    split_ratio: float = 0.4
+    regularization: bool = False
+    separated: bool = False
+    num_processes_fit: int | None = None
+    distillation: bool = True
+    pre_xyz_files: list[str] | None = None
+    pre_database_dir: str | None = None
+    apply_data_preprocessing: bool = True
+    auto_delta: bool = False
     hyper_para_loop: bool = False
     atomwise_regularization_list: list | None = None
     soap_delta_list: list | None = None
@@ -194,25 +228,17 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
     benchmark_kwargs: dict = field(default_factory=dict)
     path_to_default_hyperparameters: Path | str = MLIP_PHONON_DEFAULTS_FILE_PATH
     summary_filename_prefix: str = "results_"
+    glue_xml: bool = False
     glue_file_path: str = "glue.xml"
+    use_defaults_fitting: bool = True
 
     def make(
         self,
         structure_list: list[Structure],
         mp_ids,
-        split_ratio: float = 0.4,
-        force_max: float = 40.0,
-        pre_xyz_files: list[str] | None = None,
-        pre_database_dir: str | None = None,
-        apply_data_preprocessing: bool = True,
-        atomwise_regularization_parameter: float = 0.1,
-        force_min: float = 0.01,  # unit: eV Å-1
-        atom_wise_regularization: bool = True,
-        auto_delta: bool = False,
         dft_references: list[PhononBSDOSDoc] | None = None,
         benchmark_structures: list[Structure] | None = None,
         benchmark_mp_ids: list[str] | None = None,
-        use_defaults_fitting: bool = True,
         **fit_kwargs,
     ):
         """
@@ -224,33 +250,12 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
             List of pymatgen structures.
         mp_ids:
             Materials Project IDs.
-        split_ratio: float.
-            Parameter to divide the training set and the test set.
-            A value of 0.1 means that the ratio of the training set to the test set is 9:1.
-        force_max: float
-            Maximum allowed force in the dataset.
-        pre_xyz_files: list[str] or None
-            Names of the pre-database train xyz file and test xyz file.
-        pre_database_dir: str or None
-            The pre-database directory.
-        apply_data_preprocessing: bool
-            Apply data preprocessing.
-        atomwise_regularization_parameter: float
-            Regularization value for the atom-wise force components.
-        force_min: float
-            Minimal force cutoff value for atom-wise regularization.
-        atom_wise_regularization: bool
-            For including atom-wise regularization.
-        auto_delta: bool
-            Automatically determines delta for 2b, 3b and soap terms.
         dft_references: list[PhononBSDOSDoc] | None
             List of DFT reference files containing the PhononBSDOCDoc object.
         benchmark_structures: list[Structure] | None
             The pymatgen structure for benchmarking.
         benchmark_mp_ids: list[str] | None
             Materials Project ID of the benchmarking structure.
-        use_defaults_fitting: bool
-            Use the fit defaults.
         fit_kwargs : dict.
             Dict including MLIP fit keyword args.
 
@@ -335,7 +340,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                 fit_input.update(
                     {
                         mp_id: {
-                            "rand_struc_dir": add_dft_rand.output["rand_struc_dir"],
+                            "rattled_dir": add_dft_rand.output["rattled_dir"],
                             "phonon_dir": add_dft_phon.output["phonon_dir"],
                             "phonon_data": add_dft_phon.output["phonon_data"],
                         }
@@ -347,7 +352,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         isoatoms = get_iso_atom(structure_list, self.isolated_atom_maker)
         flows.append(isoatoms)
 
-        if pre_xyz_files is None:
+        if self.pre_xyz_files is None:
             fit_input.update(
                 {"IsolatedAtom": {"iso_atoms_dir": [isoatoms.output["dirs"]]}}
             )
@@ -355,21 +360,26 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         for ml_model in self.ml_models:
             add_data_fit = MLIPFitMaker(
                 mlip_type=ml_model,
+                glue_xml=self.glue_xml,
                 glue_file_path=self.glue_file_path,
-                use_defaults=use_defaults_fitting,
+                use_defaults=self.use_defaults_fitting,
+                split_ratio=self.split_ratio,
+                force_max=self.force_max,
+                pre_xyz_files=self.pre_xyz_files,
+                pre_database_dir=self.pre_database_dir,
+                atomwise_regularization_parameter=self.atomwise_regularization_parameter,
+                force_min=self.force_min,
+                atom_wise_regularization=self.atom_wise_regularization,
+                auto_delta=self.auto_delta,
+                apply_data_preprocessing=self.apply_data_preprocessing,
+                num_processes_fit=self.num_processes_fit,
+                separated=self.separated,
+                regularization=self.regularization,
+                distillation=self.distillation,
             ).make(
                 species_list=isoatoms.output["species"],
                 isolated_atom_energies=isoatoms.output["energies"],
                 fit_input=fit_input,
-                split_ratio=split_ratio,
-                force_max=force_max,
-                pre_xyz_files=pre_xyz_files,
-                pre_database_dir=pre_database_dir,
-                atomwise_regularization_parameter=atomwise_regularization_parameter,
-                force_min=force_min,
-                atom_wise_regularization=atom_wise_regularization,
-                auto_delta=auto_delta,
-                apply_data_preprocessing=apply_data_preprocessing,
                 **fit_kwargs,
             )
             flows.append(add_data_fit)
@@ -394,7 +404,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                             dft_references=dft_references,
                             supercell_settings=self.supercell_settings,
                             displacement=displacement,
-                            atomwise_regularization_parameter=atomwise_regularization_parameter,
+                            atomwise_regularization_parameter=self.atomwise_regularization_parameter,
                             soap_dict=soap_default_dict,
                             **self.benchmark_kwargs,
                         )
@@ -430,18 +440,23 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                             }
                             loop_data_fit = MLIPFitMaker(
                                 mlip_type=ml_model,
+                                glue_xml=self.glue_xml,
                                 glue_file_path=self.glue_file_path,
+                                split_ratio=self.split_ratio,
+                                force_max=self.force_max,
+                                pre_xyz_files=self.pre_xyz_files,
+                                pre_database_dir=self.pre_database_dir,
+                                atomwise_regularization_parameter=atomwise_reg_parameter,
+                                force_min=self.force_min,
+                                auto_delta=self.auto_delta,
+                                num_processes_fit=self.num_processes_fit,
+                                separated=self.separated,
+                                regularization=self.regularization,
+                                distillation=self.distillation,
                             ).make(
                                 species_list=isoatoms.output["species"],
                                 isolated_atom_energies=isoatoms.output["energies"],
                                 fit_input=fit_input,
-                                split_ratio=split_ratio,
-                                force_max=force_max,
-                                pre_xyz_files=pre_xyz_files,
-                                pre_database_dir=pre_database_dir,
-                                atomwise_regularization_parameter=atomwise_reg_parameter,
-                                force_min=force_min,
-                                auto_delta=auto_delta,
                                 soap=soap_dict,
                             )
                             flows.append(loop_data_fit)
@@ -724,8 +739,27 @@ class CompleteDFTvsMLBenchmarkWorkflowMPSettings(CompleteDFTvsMLBenchmarkWorkflo
         Default=10.
     ml_models: list[str]
         List of the ML models to be used. Default is GAP.
+    force_max: float
+        Maximum allowed force in the dataset.
+    force_min: float
+        Minimal force cutoff value for atom-wise regularization.
+    split_ratio: float.
+        Parameter to divide the training set and the test set.
+        A value of 0.1 means that the ratio of the training set to the test set is 9:1.
+    pre_xyz_files: list[str] or None
+        Names of the pre-database train xyz file and test xyz file.
+    pre_database_dir: str or None
+        The pre-database directory.
+    apply_data_preprocessing: bool
+        Apply data preprocessing.
+    atomwise_regularization_parameter: float
+        Regularization value for the atom-wise force components.
+    atom_wise_regularization: bool
+        For including atom-wise regularization.
+    auto_delta: bool
+        Automatically determines delta for 2b, 3b and soap terms.
     hyper_para_loop: bool
-        making it easier to loop through several hyperparameter sets.
+        Making it easier to loop through several hyperparameter sets.
     atomwise_regularization_list: list
         List of atom-wise regularization parameters that are checked.
     soap_delta_list: list
@@ -735,11 +769,13 @@ class CompleteDFTvsMLBenchmarkWorkflowMPSettings(CompleteDFTvsMLBenchmarkWorkflo
     supercell_settings: dict
         Settings for supercell generation
     benchmark_kwargs: dict
-        The kwargs for the benchmark flows
+        Keyword arguments for the benchmark flows
     summary_filename_prefix: str
         Prefix of the result summary file.
     glue_file_path: str
         Name of the glue.xml file path.
+    use_defaults_fitting: bool
+        Use the fit defaults.
     """
 
     phonon_bulk_relax_maker: BaseVaspMaker = field(

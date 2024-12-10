@@ -1,37 +1,30 @@
 """Utility functions for training data jobs."""
 
-from __future__ import annotations
-
+import logging
+import os
 import random
 import shutil
 import warnings
-from multiprocessing import Pool
-from pathlib import Path
-from typing import TYPE_CHECKING
-
-import numpy as np
-from quippy import descriptors
-from scipy.sparse.linalg import LinearOperator, svds
-
-if TYPE_CHECKING:
-    from ase.atoms import Atom
-    from pymatgen.core import Structure
-
-import logging
-import os
 from collections.abc import Iterable
 from itertools import chain
+from multiprocessing import Pool
+from pathlib import Path
 
 import ase.io
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 from ase import Atoms
+from ase.atoms import Atom
 from ase.calculators.singlepoint import SinglePointCalculator
 from ase.io import Trajectory as AseTrajectory
 from ase.io import write
 from ase.units import GPa
 from hiphive.structure_generation import generate_mc_rattled_structures
+from pymatgen.core import Structure
 from pymatgen.io.ase import AseAtomsAdaptor
+from quippy import descriptors
+from scipy.sparse.linalg import LinearOperator, svds
 from sklearn.model_selection import StratifiedShuffleSplit
 
 from autoplex.fitting.common.regularization import (
@@ -437,32 +430,6 @@ def mc_rattle(
     return [AseAtomsAdaptor.get_structure(xtal) for xtal in mc_rattle]
 
 
-def extract_base_name(filename: str, is_out=False) -> str:
-    """
-    Extract the base of a file name to easier manipulate other file names.
-
-    Parameters
-    ----------
-    filename:
-        The name of the file.
-    is_out: bool
-        If it is an out_file (i.e. prefix is "quip_")
-
-    """
-    if is_out:
-        # Extract "quip_train" or "quip_test"
-        if "quip_train" in filename:
-            return "quip_train"
-        if "quip_test" in filename:
-            return "quip_test"
-    else:
-        # Extract "train" or "test"
-        base_name = filename.split(".", 1)[0]
-        return base_name.split("_", 1)[0]
-
-    return "A problem with the files occurred."
-
-
 def filter_outlier_energy(
     in_file: str, out_file: str, criteria: float = 0.0005
 ) -> None:
@@ -502,23 +469,17 @@ def filter_outlier_energy(
         else:
             outliers.append(at_in)
 
-    write(
-        in_file.replace(extract_base_name(in_file), "filtered_in_energy"),
-        atoms_in,
-        append=True,
-    )
-    write(
-        out_file.replace(
-            extract_base_name(out_file, is_out=True), "filtered_out_energy"
-        ),
-        atoms_out,
-        append=True,
-    )
-    write(
-        in_file.replace(extract_base_name(in_file), "outliers_energy"),
-        outliers,
-        append=True,
-    )
+    output_files = {
+        "filtered_in_energy": atoms_in,
+        "filtered_out_energy": atoms_out,
+        "outliers_energy": outliers,
+    }
+
+    # Iterate over output files and write them
+    for suffix, atom_list in output_files.items():
+        path = Path(in_file).with_name(Path(in_file).name.replace("train", suffix))
+        path.parent.mkdir(parents=True, exist_ok=True)  # Ensure directory exists
+        write(path, atom_list, append=True)
 
 
 def filter_outlier_forces(
@@ -573,28 +534,22 @@ def filter_outlier_forces(
         else:
             outliers.append(at_in)
 
-    write(
-        in_file.replace(extract_base_name(in_file), "filtered_in_force"),
-        atoms_in,
-        append=True,
-    )
-    write(
-        out_file.replace(
-            extract_base_name(out_file, is_out=True), "filtered_out_force"
-        ),
-        atoms_out,
-        append=True,
-    )
-    write(
-        in_file.replace(extract_base_name(in_file), "outliers_force"),
-        outliers,
-        append=True,
-    )
+    output_files = {
+        "filtered_in_force": atoms_in,
+        "filtered_out_force": atoms_out,
+        "outliers_force": outliers,
+    }
+
+    # Iterate over output files and write them
+    for suffix, atom_list in output_files.items():
+        path = Path(in_file).with_name(Path(in_file).name.replace("train", suffix))
+        path.parent.mkdir(parents=True, exist_ok=True)  # Ensure directory exists
+        write(path, atom_list, append=True)
 
 
 def energy_plot(
-    in_file: str,
-    out_file: str,
+    in_file: str | Path,
+    out_file: str | Path,
     ax: plt.Axes,
     title: str = "Plot of energy",
     label: str = "energy",
@@ -678,8 +633,8 @@ def energy_plot(
 
 
 def force_plot(
-    in_file: str,
-    out_file: str,
+    in_file: str | Path,
+    out_file: str | Path,
     ax: plt.Axes,
     symbol: str = "Si",
     title: str = "Plot of force",
@@ -799,6 +754,9 @@ def plot_energy_forces(
     test_name: str
         Name of the test data file.
     """
+    quip_train_file = train_name.replace("train", "quip_train")
+    quip_test_file = test_name.replace("test", "quip_test")
+    path = Path(train_name)
     if species_list is None:
         species_list = ["Si"]
     fig, ax_list = plt.subplots(nrows=3, ncols=2, gridspec_kw={"hspace": 0.3})
@@ -811,63 +769,63 @@ def plot_energy_forces(
     )
 
     energy_rmse_train = energy_plot(
-        train_name, "quip_" + train_name, ax_list[0], "Energy on training data"
+        train_name, quip_train_file, ax_list[0], "Energy on training data"
     )
     rmse.append(f"Energy train: {energy_rmse_train}")
     for species in species_list:
         force_rmse_train = force_plot(
             train_name,
-            "quip_" + train_name,
+            quip_train_file,
             ax_list[1],
             species,
             f"Force on training data - {pretty_species_list}",
         )
         rmse.append(f"Force train {species}: {force_rmse_train}")
     energy_rmse_test = energy_plot(
-        test_name, "quip_" + test_name, ax_list[2], "Energy on test data"
+        test_name, quip_test_file, ax_list[2], "Energy on test data"
     )
     rmse.append(f"Energy test: {energy_rmse_test}")
-    filter_outlier_energy(train_name, "quip_" + train_name, energy_limit)
-    filter_outlier_energy(test_name, "quip_" + test_name, energy_limit)
+    filter_outlier_energy(train_name, quip_train_file, energy_limit)
+    filter_outlier_energy(test_name, quip_test_file, energy_limit)
     for species in species_list:
         force_rmse_test = force_plot(
             test_name,
-            "quip_" + test_name,
+            quip_test_file,
             ax_list[3],
             species,
             f"Force on test data - {pretty_species_list}",
         )
         rmse.append(f"Force test {species}: {force_rmse_test}")
-        filter_outlier_forces(train_name, "quip_" + train_name, species, force_limit)
-        filter_outlier_forces(test_name, "quip_" + test_name, species, force_limit)
+        filter_outlier_forces(train_name, quip_train_file, species, force_limit)
+        filter_outlier_forces(test_name, quip_test_file, species, force_limit)
 
     energy_plot(
-        train_name.replace("train", "filtered_in_energy"),
-        train_name.replace("train", "filtered_out_energy"),
+        path.with_name(path.name.replace("train", "filtered_in_energy")),
+        path.with_name(path.name.replace("train", "filtered_out_energy")),
         ax_list[4],
         "Energy on filtered data",
         "energy-filtered data, energy",
     )
     for species in species_list:
         force_plot(
-            train_name.replace("train", "filtered_in_force"),
-            train_name.replace("train", "filtered_out_force"),
+            path.with_name(path.name.replace("train", "filtered_in_force")),
+            path.with_name(path.name.replace("train", "filtered_out_force")),
             ax_list[5],
             species,
             f"Force on filtered data - {pretty_species_list}",
             "energy-filtered data, force for ",
         )
     energy_plot(
-        train_name.replace("train", "filtered_in_energy"),
-        train_name.replace("train", "filtered_out_energy"),
+        path.with_name(path.name.replace("train", "filtered_in_energy")),
+        path.with_name(path.name.replace("train", "filtered_out_energy")),
         ax_list[4],
         "Energy on filtered data",
         "force-filtered data, energy",
     )
     for species in species_list:
         force_plot(
-            train_name.replace("train", "filtered_in_force"),
-            train_name.replace("train", "filtered_out_force"),
+            path.with_name(path.name.replace("train", "filtered_in_force")),
+            path.with_name(path.name.replace("train", "filtered_out_force")),
             ax_list[5],
             species,
             f"Force on filtered data - {pretty_species_list}",

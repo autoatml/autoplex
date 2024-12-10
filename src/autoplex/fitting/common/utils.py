@@ -1,26 +1,17 @@
 """Utility functions for fitting jobs."""
 
-from __future__ import annotations
-
 import contextlib
 import json
+import logging
 import os
 import re
 import shutil
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
+from collections.abc import Iterable
 from functools import partial
 from pathlib import Path
-from typing import TYPE_CHECKING
-
-from monty.dev import requires
-
-if TYPE_CHECKING:
-    from pymatgen.core import Structure
-
-import logging
-from collections.abc import Iterable
 
 import ase
 import lightning as pl
@@ -40,8 +31,10 @@ from matgl.ext.pymatgen import Structure2Graph, get_element_list
 from matgl.graph.data import MGLDataLoader, MGLDataset, collate_fn_pes
 from matgl.models import M3GNet
 from matgl.utils.training import PotentialLightningModule
+from monty.dev import requires
 from nequip.ase import NequIPCalculator
 from numpy import ndarray
+from pymatgen.core import Structure
 from pymatgen.io.ase import AseAtomsAdaptor
 from pytorch_lightning.loggers import CSVLogger
 from scipy.spatial import ConvexHull
@@ -118,6 +111,8 @@ def gap_fitting(
     """
     # keep additional pre- and suffixes
     gap_file_xml = train_name.replace("train", "gap_file").replace(".extxyz", ".xml")
+    quip_train_file = train_name.replace("train", "quip_train")
+    quip_test_file = test_name.replace("test", "quip_test")
     mlip_path: Path = prepare_fit_environment(
         db_dir, Path.cwd(), glue_xml, train_name, test_name, glue_file_path
     )
@@ -159,12 +154,12 @@ def gap_fitting(
         )
 
         run_gap(num_processes_fit, fit_parameters_list)
-        run_quip(num_processes_fit, train_data_path, gap_file_xml, "quip_" + train_name)
+        run_quip(num_processes_fit, train_data_path, gap_file_xml, quip_train_file)
 
     if include_three_body:
         gap_default_hyperparameters["general"].update({"at_file": train_data_path})
         if auto_delta:
-            delta_3b = energy_remain("quip_" + train_name)
+            delta_3b = energy_remain(quip_train_file)
             delta_3b = delta_3b / num_triplet
             gap_default_hyperparameters["threeb"].update({"delta": delta_3b})
 
@@ -175,7 +170,7 @@ def gap_fitting(
         )
 
         run_gap(num_processes_fit, fit_parameters_list)
-        run_quip(num_processes_fit, train_data_path, gap_file_xml, "quip_" + train_name)
+        run_quip(num_processes_fit, train_data_path, gap_file_xml, quip_train_file)
 
     if glue_xml:
         gap_default_hyperparameters["general"].update({"at_file": train_data_path})
@@ -193,13 +188,13 @@ def gap_fitting(
             num_processes_fit,
             train_data_path,
             gap_file_xml,
-            "quip_" + train_name,
+            quip_train_file,
             glue_xml,
         )
 
     if include_soap:
         delta_soap = (
-            energy_remain("quip_" + train_name)
+            energy_remain(quip_train_file)
             if include_two_body or include_three_body
             else 1
         )
@@ -219,19 +214,17 @@ def gap_fitting(
             num_processes_fit,
             train_data_path,
             gap_file_xml,
-            "quip_" + train_name,
+            quip_train_file,
             glue_xml,
         )
 
     # Calculate training error
-    train_error = energy_remain("quip_" + train_name)
+    train_error = energy_remain(quip_train_file)
     logging.info(f"Training error of MLIP (eV/at.): {round(train_error, 7)}")
 
     # Calculate testing error
-    run_quip(
-        num_processes_fit, test_data_path, gap_file_xml, "quip_" + test_name, glue_xml
-    )
-    test_error = energy_remain("quip_" + test_name)
+    run_quip(num_processes_fit, test_data_path, gap_file_xml, quip_test_file, glue_xml)
+    test_error = energy_remain(quip_test_file)
     logging.info(f"Testing error of MLIP (eV/at.): {round(test_error, 7)}")
 
     if not glue_xml and species_list:
@@ -251,7 +244,6 @@ def gap_fitting(
         "train_error": train_error,
         "test_error": test_error,
         "mlip_path": mlip_path,
-        "mlip_pot": mlip_path.joinpath(gap_file_xml),
     }
 
 
@@ -1400,7 +1392,7 @@ def get_list_of_vasp_calc_dirs(flow_output) -> list[str]:
     for output in flow_output.values():
         for output_type, dirs in output.items():
             if output_type != "phonon_data" and isinstance(dirs, list):
-                if output_type == "rand_struc_dir":
+                if output_type == "rattled_dir":
                     flat_dirs = [[item for sublist in dirs for item in sublist]]
                     list_of_vasp_calc_dirs.extend(*flat_dirs)
                 else:
@@ -1870,6 +1862,9 @@ def prepare_fit_environment(
     -------
     the MLIP file path.
     """
+    os.makedirs(
+        os.path.join(mlip_path, train_name.replace("train.extxyz", "")), exist_ok=True
+    )
     shutil.copy(
         os.path.join(database_dir, test_name),
         os.path.join(mlip_path, test_name),
@@ -1884,7 +1879,7 @@ def prepare_fit_environment(
             os.path.join(mlip_path, "glue.xml"),
         )
 
-    return mlip_path
+    return Path(os.path.join(mlip_path, train_name.replace("train.extxyz", "")))
 
 
 def convert_xyz_to_structure(

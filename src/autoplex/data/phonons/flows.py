@@ -1,14 +1,7 @@
 """Flows to create training data for ML potentials."""
 
-from __future__ import annotations
-
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from atomate2.vasp.jobs.base import BaseVaspMaker
-    from atomate2.vasp.sets.base import VaspInputGenerator
-    from pymatgen.core.structure import Species, Structure
 from atomate2.common.jobs.phonons import run_phonon_displacements
 from atomate2.forcefields.flows.phonons import PhononMaker as FFPhononMaker
 from atomate2.forcefields.jobs import (
@@ -17,11 +10,14 @@ from atomate2.forcefields.jobs import (
 )
 from atomate2.vasp.flows.core import DoubleRelaxMaker
 from atomate2.vasp.flows.phonons import PhononMaker
+from atomate2.vasp.jobs.base import BaseVaspMaker
 from atomate2.vasp.jobs.core import StaticMaker, TightRelaxMaker
 from atomate2.vasp.jobs.phonons import PhononDisplacementMaker
+from atomate2.vasp.sets.base import VaspInputGenerator
 from atomate2.vasp.sets.core import StaticSetGenerator, TightRelaxSetGenerator
 from jobflow import Flow, Maker, Response, job
 from pymatgen.core import Molecule, Site
+from pymatgen.core.structure import Species, Structure
 
 from autoplex.data.common.jobs import generate_randomized_structures
 from autoplex.data.phonons.jobs import reduce_supercell_size_job
@@ -620,7 +616,7 @@ class MLPhononMaker(FFPhononMaker):
             ML model to be used. Default is GAP.
         potential_file :
             Complete path to MLIP file(s)
-            Train, test and MLIP files (+ suffixes "", "_wo_sigma", "_phonon", "_rand_struc").
+            Train, test and MLIP files (+ suffixes "", "_wo_sigma", "_phonon", "_rattled").
         calculator_kwargs :
             Keyword arguments for the ASE Calculator.
         supercell_settings:

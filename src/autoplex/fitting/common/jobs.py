@@ -1,7 +1,5 @@
 """General fitting jobs using several MLIPs available."""
 
-from __future__ import annotations
-
 from pathlib import Path
 
 from jobflow import job
@@ -80,16 +78,18 @@ def machine_learning_fit(
 
     train_files = [
         "train.extxyz",
-        "train_wo_sigma.extxyz",
-        "train_phonon.extxyz",
-        "train_rand_struc.extxyz",
+        "without_regularization/train.extxyz",
+        "phonon/train.extxyz",
+        "rattled/train.extxyz",
     ]
     test_files = [
         "test.extxyz",
-        "test.extxyz",
-        "test_phonon.extxyz",
-        "test_rand_struc.extxyz",
+        "without_regularization/test.extxyz",
+        "phonon/test.extxyz",
+        "rattled/test.extxyz",
     ]
+
+    mlip_paths = []
 
     if mlip_type == "GAP":
         for train_name, test_name in zip(train_files, test_files):
@@ -110,6 +110,7 @@ def machine_learning_fit(
                     test_name=test_name,
                     fit_kwargs=fit_kwargs,
                 )
+                mlip_paths.append(train_test_error["mlip_path"])
 
     elif mlip_type == "J-ACE":
         train_test_error = jace_fitting(
@@ -121,6 +122,7 @@ def machine_learning_fit(
             num_processes_fit=num_processes_fit,
             fit_kwargs=fit_kwargs,
         )
+        mlip_paths.append(train_test_error["mlip_path"])
 
     elif mlip_type == "NEQUIP":
         train_test_error = nequip_fitting(
@@ -132,6 +134,7 @@ def machine_learning_fit(
             fit_kwargs=fit_kwargs,
             device=device,
         )
+        mlip_paths.append(train_test_error["mlip_path"])
 
     elif mlip_type == "M3GNET":
         train_test_error = m3gnet_fitting(
@@ -142,6 +145,7 @@ def machine_learning_fit(
             fit_kwargs=fit_kwargs,
             device=device,
         )
+        mlip_paths.append(train_test_error["mlip_path"])
 
     elif mlip_type == "MACE":
         train_test_error = mace_fitting(
@@ -153,11 +157,12 @@ def machine_learning_fit(
             device=device,
             fit_kwargs=fit_kwargs,
         )
+        mlip_paths.append(train_test_error["mlip_path"])
 
     check_conv = check_convergence(train_test_error["test_error"])
 
     return {
-        "mlip_path": train_test_error["mlip_path"],
+        "mlip_path": mlip_paths,
         "train_error": train_test_error["train_error"],
         "test_error": train_test_error["test_error"],
         "convergence": check_conv,

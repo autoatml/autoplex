@@ -1,17 +1,10 @@
 """Flows to benchmark ML potentials."""
 
-from __future__ import annotations
-
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
 
-from jobflow import Maker
-
-if TYPE_CHECKING:
-    from atomate2.common.schemas.phonons import PhononBSDOSDoc
-    from pymatgen.core.structure import Structure
-
-from jobflow import job
+from atomate2.common.schemas.phonons import PhononBSDOSDoc
+from jobflow import Maker, job
+from pymatgen.core.structure import Structure
 
 from autoplex.benchmark.phonons.utils import compute_bandstructure_benchmark_metrics
 
@@ -67,7 +60,7 @@ class PhononBenchmarkMaker(Maker):
         atomwise_regularization_parameter: float
             Regularization value for the atom-wise force components.
         suffix: str
-            GAP potential file suffix.
+            GAP potential file path suffix.
         soap_dict: dict
             Dictionary containing SOAP parameters.
 

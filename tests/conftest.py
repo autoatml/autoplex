@@ -13,10 +13,18 @@ All rights reserved.
 
 import logging
 from pathlib import Path
-from typing import Any, Callable, Dict, Final, Generator, Literal, Sequence, Union
+from typing import Any, Callable, Dict, Final, Generator, Union, Optional
 
 import pytest
 from pytest import MonkeyPatch
+from atomate2.utils.testing.vasp import monkeypatch_vasp
+
+from jobflow import Response, job
+from autoplex.data.rss.jobs import do_rss_single_node, do_rss_multi_node
+from autoplex.data.common.jobs import sample_data, collect_dft_data, preprocess_data
+from autoplex.data.common.flows import DFTStaticLabelling
+from autoplex.fitting.common.flows import MLIPFitMaker
+from jobflow import Flow
 
 logger = logging.getLogger("autoplex")
 
@@ -41,7 +49,7 @@ def vasp_test_dir(test_dir):
 
 @pytest.fixture()
 def mock_vasp(
-    monkeypatch: MonkeyPatch, vasp_test_dir: Path
+        monkeypatch: MonkeyPatch, vasp_test_dir: Path
 ) -> Generator[Callable[[Any, Any], Any], None, None]:
     """
     This fixture allows one to mock (fake) running VASP.
@@ -85,228 +93,7 @@ def mock_vasp(
 
     For examples, see the tests in tests/vasp/makers/core.py.
     """
-    import atomate2.vasp.jobs.base
-    import atomate2.vasp.jobs.defect
-    import atomate2.vasp.run
-    from atomate2.vasp.sets.base import VaspInputGenerator
-    from pymatgen.io.vasp.sets import VaspInputSet
-
-    def mock_run_vasp(*args, **kwargs):
-        from jobflow import CURRENT_JOB
-
-        name = CURRENT_JOB.job.name
-        try:
-            ref_path = vasp_test_dir / _REF_PATHS[name]
-        except KeyError:
-            raise ValueError(
-                f"no reference directory found for job {name!r}; "
-                f"reference paths received={_REF_PATHS}"
-            ) from None
-
-        fake_run_vasp(ref_path, **_FAKE_RUN_VASP_KWARGS.get(name, {}))
-
-    get_input_set_orig = VaspInputGenerator.get_input_set
-
-    def mock_get_input_set(self, *args, **kwargs):
-        kwargs["potcar_spec"] = True
-        return get_input_set_orig(self, *args, **kwargs)
-
-    def mock_get_nelect(*_, **__):
-        return 12
-
-    monkeypatch.setattr(atomate2.vasp.run, "run_vasp", mock_run_vasp)
-    monkeypatch.setattr(atomate2.vasp.jobs.base, "run_vasp", mock_run_vasp)
-    monkeypatch.setattr(atomate2.vasp.jobs.defect, "run_vasp", mock_run_vasp)
-    monkeypatch.setattr(VaspInputGenerator, "get_input_set", mock_get_input_set)
-    monkeypatch.setattr(VaspInputSet, "get_input_set", mock_get_input_set)
-#    monkeypatch.setattr(VaspInputGenerator, "get_nelect", mock_get_nelect)
-
-    def _run(ref_paths, fake_run_vasp_kwargs=None):
-        _REF_PATHS.update(ref_paths)
-        _FAKE_RUN_VASP_KWARGS.update(fake_run_vasp_kwargs or {})
-
-    yield _run
-
-    monkeypatch.undo()
-    _REF_PATHS.clear()
-    _FAKE_RUN_VASP_KWARGS.clear()
-
-
-def fake_run_vasp(
-    ref_path: Path,
-    incar_settings: Sequence[str] = (),
-    check_inputs: Sequence[Literal["incar", "kpoints", "poscar", "potcar"]] = _VFILES,
-    clear_inputs: bool = True,
-):
-    """
-    Emulate running VASP and validate VASP input files.
-
-    Parameters
-    ----------
-    ref_path
-        Path to reference directory with VASP input files in the folder named 'inputs'
-        and output files in the folder named 'outputs'.
-    incar_settings
-        A list of INCAR settings to check.
-    check_inputs
-        A list of vasp input files to check. Supported options are "incar", "kpoints",
-        "poscar", "potcar", "wavecar".
-    clear_inputs
-        Whether to clear input files before copying in the reference VASP outputs.
-    """
-    logger.info("Running fake VASP.")
-
-    if "incar" in check_inputs:
-        check_incar(ref_path, incar_settings)
-
-    if "kpoints" in check_inputs:
-        check_kpoints(ref_path)
-
-    if "poscar" in check_inputs:
-        check_poscar(ref_path)
-
-    if "potcar" in check_inputs:
-        check_potcar(ref_path)
-
-    # This is useful to check if the WAVECAR has been copied
-    if "wavecar" in check_inputs and not Path("WAVECAR").exists():
-        raise ValueError("WAVECAR was not correctly copied")
-
-    logger.info("Verified inputs successfully")
-
-    if clear_inputs:
-        clear_vasp_inputs()
-
-    copy_vasp_outputs(ref_path)
-
-    # pretend to run VASP by copying pre-generated outputs from reference dir
-    logger.info("Generated fake vasp outputs")
-
-
-def check_incar(ref_path: Path, incar_settings: Sequence[str]):
-    from pymatgen.io.vasp import Incar
-
-    user = Incar.from_file("INCAR")
-    ref_incar_path = ref_path / "inputs" / "INCAR"
-    ref = Incar.from_file(ref_incar_path)
-    defaults = {"ISPIN": 1, "ISMEAR": 1, "SIGMA": 0.2}
-    for key in incar_settings:
-        user_val = user.get(key, defaults.get(key))
-        ref_val = ref.get(key, defaults.get(key))
-        if user_val != ref_val:
-            raise ValueError(
-                f"\n\nINCAR value of {key} is inconsistent: expected {ref_val}, "
-                f"got {user_val} \nin ref file {ref_incar_path}"
-            )
-
-
-def check_kpoints(ref_path: Path):
-    from pymatgen.io.vasp import Incar, Kpoints
-
-    user_kpoints_exists = Path("KPOINTS").exists()
-    ref_kpoints_exists = Path(ref_path / "inputs" / "KPOINTS").exists()
-
-    if user_kpoints_exists and not ref_kpoints_exists:
-        raise ValueError(
-            "atomate2 generated a KPOINTS file but the reference calculation is using "
-            "KSPACING"
-        )
-    if not user_kpoints_exists and ref_kpoints_exists:
-        raise ValueError(
-            "atomate2 is using KSPACING but the reference calculation is using "
-            "a KPOINTS file"
-        )
-    if user_kpoints_exists and ref_kpoints_exists:
-        user = Kpoints.from_file("KPOINTS")
-        ref_kpt_path = ref_path / "inputs" / "KPOINTS"
-        ref = Kpoints.from_file(ref_kpt_path)
-        if user.style != ref.style or user.num_kpts != ref.num_kpts:
-            raise ValueError(
-                f"\n\nKPOINTS files are inconsistent: {user.style} != {ref.style} "
-                f"or {user.num_kpts} != {ref.num_kpts}\nin ref file {ref_kpt_path}"
-            )
-    else:
-        # check k-spacing
-        user = Incar.from_file("INCAR")
-        ref_incar_path = ref_path / "inputs" / "INCAR"
-        ref = Incar.from_file(ref_incar_path)
-
-        user_ksp, ref_ksp = user.get("KSPACING"), ref.get("KSPACING")
-        if user_ksp != ref_ksp:
-            raise ValueError(
-                f"\n\nKSPACING is inconsistent: {user_ksp} != {ref_ksp} "
-                f"\nin ref file {ref_incar_path}"
-            )
-
-
-def check_poscar(ref_path: Path):
-    import numpy as np
-    from pymatgen.io.vasp import Poscar
-    from pymatgen.util.coord import pbc_diff
-
-    user = Poscar.from_file("POSCAR")
-    ref = Poscar.from_file(ref_path / "inputs" / "POSCAR")
-
-    if (
-        user.natoms != ref.natoms
-        or user.site_symbols != ref.site_symbols
-        or np.any(
-            np.abs(pbc_diff(user.structure.frac_coords, ref.structure.frac_coords))
-            > 1e-3
-        )
-    ):
-        ref_poscar_path = ref_path / "inputs" / "POSCAR"
-        user_poscar_path = Path("POSCAR").absolute()
-        raise ValueError(
-            f"POSCAR files are inconsistent\n\n{ref_poscar_path!s}\n{ref}"
-            f"\n\n{user_poscar_path!s}\n{user}"
-        )
-
-
-def check_potcar(ref_path: Path):
-    from pymatgen.io.vasp import Potcar
-
-    if Path(ref_path / "inputs" / "POTCAR").exists():
-        ref = Potcar.from_file(ref_path / "inputs" / "POTCAR").symbols
-    elif Path(ref_path / "inputs" / "POTCAR.spec").exists():
-        ref = Path(ref_path / "inputs" / "POTCAR.spec").read_text().strip().split("\n")
-    else:
-        raise FileNotFoundError("no reference POTCAR or POTCAR.spec file found")
-
-    if Path("POTCAR").exists():
-        user = Potcar.from_file("POTCAR").symbols
-    elif Path("POTCAR.spec").exists():
-        user = Path("POTCAR.spec").read_text().strip().split("\n")
-    else:
-        raise FileNotFoundError("no POTCAR or POTCAR.spec file found")
-
-    if user != ref:
-        raise ValueError(f"POTCAR files are inconsistent: {user} != {ref}")
-
-
-def clear_vasp_inputs():
-    for vasp_file in (
-        "INCAR",
-        "KPOINTS",
-        "POSCAR",
-        "POTCAR",
-        "CHGCAR",
-        "OUTCAR",
-        "vasprun.xml",
-        "CONTCAR",
-    ):
-        if Path(vasp_file).exists():
-            Path(vasp_file).unlink()
-    logger.info("Cleared vasp inputs")
-
-
-def copy_vasp_outputs(ref_path: Path):
-    import shutil
-
-    output_path = ref_path / "outputs"
-    for output_file in output_path.iterdir():
-        if output_file.is_file():
-            shutil.copy(output_file, ".")
+    yield from monkeypatch_vasp(monkeypatch, vasp_test_dir)
 
 
 @pytest.fixture(scope="session")
@@ -340,3 +127,231 @@ def memory_jobstore():
     store.connect()
 
     return store
+
+@job
+def mock_rss(input_dir: str = None,
+             selection_method: str = 'cur',
+             num_of_selection: int = 3,
+             bcur_params: Optional[str] = None,
+             random_seed: int = None,
+             e0_spin: bool = False,
+             isolated_atom: bool = True,
+             dimer: bool = True,
+             dimer_range: list = None,
+             dimer_num: int = None,
+             custom_incar: Optional[str] = None,
+             vasp_ref_file: str = 'vasp_ref.extxyz',
+             rss_group: str = 'initial',
+             test_ratio: float = 0.1,
+             regularization: bool = True,
+             distillation: bool = True,
+             f_max: float = 200,
+             pre_database_dir: Optional[str] = None,
+             mlip_type: str = 'GAP',
+             ref_energy_name: str = "REF_energy",
+             ref_force_name: str = "REF_forces",
+             ref_virial_name: str = "REF_virial",
+             num_processes_fit: int = None,
+             kt: float = None,
+             **fit_kwargs, ):
+    job2 = sample_data(selection_method=selection_method,
+                       num_of_selection=num_of_selection,
+                       bcur_params=bcur_params,
+                       dir=input_dir,
+                       random_seed=random_seed)
+    job3 = DFTStaticLabelling(e0_spin=e0_spin,
+                              isolated_atom=isolated_atom,
+                              dimer=dimer,
+                              dimer_range=dimer_range,
+                              dimer_num=dimer_num,
+                              custom_incar=custom_incar,
+                              ).make(structures=job2.output)
+    job4 = collect_dft_data(vasp_ref_file=vasp_ref_file,
+                            rss_group=rss_group,
+                            vasp_dirs=job3.output)
+    job5 = preprocess_data(test_ratio=test_ratio,
+                           regularization=regularization,
+                           distillation=distillation,
+                           force_max=f_max,
+                           vasp_ref_dir=job4.output['vasp_ref_dir'], pre_database_dir=pre_database_dir)
+    job6 = MLIPFitMaker(mlip_type=mlip_type,
+                        ref_energy_name=ref_energy_name,
+                        ref_force_name=ref_force_name,
+                        ref_virial_name=ref_virial_name,
+                        num_processes_fit=num_processes_fit,
+                        apply_data_preprocessing=False,
+                        database_dir=job5.output,
+                        ).make(isolated_atom_energies=job4.output['isolated_atom_energies'], **fit_kwargs)
+    job_list = [job2, job3, job4, job5, job6]
+
+    return Response(
+        replace=Flow(job_list),
+        output={
+            'test_error': job6.output['test_error'],
+            'pre_database_dir': job5.output,
+            'mlip_path': job6.output['mlip_path'],
+            'isolated_atom_energies': job4.output['isolated_atom_energies'],
+            'current_iter': 0,
+            'kt': kt
+        },
+    )
+
+
+@job
+def mock_do_rss_iterations(input=None,
+                           input_dir: str = None,
+                           selection_method1: str = 'cur',
+                           selection_method2: str = 'bcur1s',
+                           num_of_selection1: int = 3,
+                           num_of_selection2: int = 5,
+                           bcur_params: Optional[str] = None,
+                           random_seed: int = None,
+                           mlip_type: str = 'GAP',
+                           scalar_pressure_method: str = 'exp',
+                           scalar_exp_pressure: float = 100,
+                           scalar_pressure_exponential_width: float = 0.2,
+                           scalar_pressure_low: float = 0,
+                           scalar_pressure_high: float = 50,
+                           max_steps: int = 10,
+                           force_tol: float = 0.1,
+                           stress_tol: float = 0.1,
+                           Hookean_repul: bool = False,
+                           write_traj: bool = True,
+                           num_processes_rss: int = 4,
+                           device: str = "cpu",
+                           stop_criterion: float = 0.01,
+                           max_iteration_number: int = 9,
+                           **fit_kwargs, ):
+    if input is None:
+        input = {'test_error': None,
+                 'pre_database_dir': None,
+                 'mlip_path': None,
+                 'isolated_atom_energies': None,
+                 'current_iter': None,
+                 'kt': 0.6}
+    if input['test_error'] is not None and input['test_error'] > stop_criterion and input[
+        'current_iter'] < max_iteration_number:
+        if input['kt'] > 0.15:
+            kt = input['kt'] - 0.1
+        else:
+            kt = 0.1
+        print('kt:', kt)
+        current_iter = input['current_iter'] + 1
+        print('Current iter index:', current_iter)
+        print(f'The error of {current_iter}th iteration:', input['test_error'])
+
+        bcur_params['kt'] = kt
+
+        job2 = sample_data(selection_method=selection_method1,
+                           num_of_selection=num_of_selection1,
+                           bcur_params=bcur_params,
+                           dir=input_dir,
+                           random_seed=random_seed)
+        job3 = do_rss_single_node(mlip_type=mlip_type,
+                                  iteration_index=f'{current_iter}th',
+                                  mlip_path=input['mlip_path'],
+                                  structures=job2.output,
+                                  scalar_pressure_method=scalar_pressure_method,
+                                  scalar_exp_pressure=scalar_exp_pressure,
+                                  scalar_pressure_exponential_width=scalar_pressure_exponential_width,
+                                  scalar_pressure_low=scalar_pressure_low,
+                                  scalar_pressure_high=scalar_pressure_high,
+                                  max_steps=max_steps,
+                                  force_tol=force_tol,
+                                  stress_tol=stress_tol,
+                                  hookean_repul=Hookean_repul,
+                                  write_traj=write_traj,
+                                  num_processes_rss=num_processes_rss,
+                                  device=device)
+        job4 = sample_data(selection_method=selection_method2,
+                           num_of_selection=num_of_selection2,
+                           bcur_params=bcur_params,
+                           traj_path=job3.output,
+                           random_seed=random_seed,
+                           isolated_atom_energies=input["isolated_atom_energies"])
+
+        job_list = [job2, job3, job4]
+
+        return Response(detour=job_list, output=job4.output)
+
+
+@job
+def mock_do_rss_iterations_multi_jobs(input=None,
+                                      input_dir: str = None,
+                                      selection_method1: str = 'cur',
+                                      selection_method2: str = 'bcur1s',
+                                      num_of_selection1: int = 3,
+                                      num_of_selection2: int = 5,
+                                      bcur_params: Optional[str] = None,
+                                      random_seed: int = None,
+                                      mlip_type: str = 'GAP',
+                                      scalar_pressure_method: str = 'exp',
+                                      scalar_exp_pressure: float = 100,
+                                      scalar_pressure_exponential_width: float = 0.2,
+                                      scalar_pressure_low: float = 0,
+                                      scalar_pressure_high: float = 50,
+                                      max_steps: int = 10,
+                                      force_tol: float = 0.1,
+                                      stress_tol: float = 0.1,
+                                      Hookean_repul: bool = False,
+                                      write_traj: bool = True,
+                                      num_processes_rss: int = 4,
+                                      device: str = "cpu",
+                                      stop_criterion: float = 0.01,
+                                      max_iteration_number: int = 9,
+                                      num_groups: int = 2,
+                                      remove_traj_files: bool = True,
+                                      **fit_kwargs, ):
+    if input is None:
+        input = {'test_error': None,
+                 'pre_database_dir': None,
+                 'mlip_path': None,
+                 'isolated_atom_energies': None,
+                 'current_iter': None,
+                 'kt': 0.6}
+    if input['test_error'] is not None and input['test_error'] > stop_criterion and input[
+        'current_iter'] < max_iteration_number:
+        if input['kt'] > 0.15:
+            kt = input['kt'] - 0.1
+        else:
+            kt = 0.1
+        print('kt:', kt)
+        current_iter = input['current_iter'] + 1
+        print('Current iter index:', current_iter)
+        print(f'The error of {current_iter}th iteration:', input['test_error'])
+
+        bcur_params['kT'] = kt
+
+        job2 = sample_data(selection_method=selection_method1,
+                           num_of_selection=num_of_selection1,
+                           bcur_params=bcur_params,
+                           dir=input_dir,
+                           random_seed=random_seed)
+        job3 = do_rss_multi_node(mlip_type=mlip_type,
+                                 iteration_index=f'{current_iter}th',
+                                 mlip_path=input['mlip_path'],
+                                 structure=job2.output,
+                                 scalar_pressure_method=scalar_pressure_method,
+                                 scalar_exp_pressure=scalar_exp_pressure,
+                                 scalar_pressure_exponential_width=scalar_pressure_exponential_width,
+                                 scalar_pressure_low=scalar_pressure_low,
+                                 scalar_pressure_high=scalar_pressure_high,
+                                 max_steps=max_steps,
+                                 force_tol=force_tol,
+                                 stress_tol=stress_tol,
+                                 hookean_repul=Hookean_repul,
+                                 write_traj=write_traj,
+                                 num_processes_rss=num_processes_rss,
+                                 device=device,
+                                 num_groups=num_groups, )
+        job4 = sample_data(selection_method=selection_method2,
+                           num_of_selection=num_of_selection2,
+                           bcur_params=bcur_params,
+                           traj_path=job3.output,
+                           random_seed=random_seed,
+                           isolated_atom_energies=input["isolated_atom_energies"],
+                           remove_traj_files=remove_traj_files)
+
+        job_list = [job2, job3, job4]
+
+        return Response(detour=job_list, output=job4.output)

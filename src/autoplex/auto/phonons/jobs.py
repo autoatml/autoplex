@@ -1,30 +1,23 @@
 """General AutoPLEX automation jobs."""
 
-from __future__ import annotations
-
+import re
+from collections.abc import Iterable
 from dataclasses import field
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 import numpy as np
-from jobflow import Flow, Response, job
-
-if TYPE_CHECKING:
-    from collections.abc import Iterable
-
-    from atomate2.vasp.jobs.base import BaseVaspMaker
-    from pymatgen.core.structure import Structure
-
-    from autoplex.data.phonons.flows import IsoAtomStaticMaker
-
 from atomate2.vasp.flows.core import DoubleRelaxMaker
+from atomate2.vasp.jobs.base import BaseVaspMaker
 from atomate2.vasp.jobs.core import StaticMaker, TightRelaxMaker
 from atomate2.vasp.sets.core import StaticSetGenerator, TightRelaxSetGenerator
+from jobflow import Flow, Response, job
+from pymatgen.core.structure import Structure
 
 from autoplex.benchmark.phonons.flows import PhononBenchmarkMaker
 from autoplex.data.phonons.flows import (
     DFTPhononMaker,
     IsoAtomMaker,
+    IsoAtomStaticMaker,
     MLPhononMaker,
     RandomStructuresDataGenerator,
     TightDFTStaticMaker,
@@ -34,7 +27,7 @@ from autoplex.data.phonons.jobs import reduce_supercell_size
 
 @job
 def complete_benchmark(  # this function was put here to prevent circular import
-    ml_path: str,
+    ml_path: list,
     ml_model: str,
     ibenchmark_structure: int,
     benchmark_structure: Structure,
@@ -118,29 +111,38 @@ def complete_benchmark(  # this function was put here to prevent circular import
     """
     jobs = []
     collect_output = []
-    if phonon_displacement_maker is None:
-        phonon_displacement_maker = TightDFTStaticMaker(name="dft phonon static")
 
-    for suffix in ["", "_wo_sigma", "_phonon", "_rand_struc"]:
-        # _wo_sigma", "_phonon", "_rand_struc" only available for GAP at the moment
+    for path in ml_path:
+        suffix = Path(path).name
+        if suffix == "without_regularization":
+            suffix = "without_reg"
+        if re.match(r"job_\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2}-\d{6}-\d{5}", suffix):
+            suffix = ""
+
+        if phonon_displacement_maker is None:
+            phonon_displacement_maker = TightDFTStaticMaker(name="dft phonon static")
+
         if ml_model == "GAP":
-            ml_potential = Path(ml_path) / f"gap_file{suffix}.xml"
+            ml_potential = (
+                Path(path) / "gap_file.xml"
+            )  # TODO account for user-specific gap file name?
         elif ml_model == "J-ACE":
             raise UserWarning("No atomate2 ACE.jl PhononMaker implemented.")
         elif ml_model in ["M3GNET"]:
-            ml_potential = (
-                Path(ml_path) / suffix
+            ml_potential = Path(
+                path
             )  # M3GNet requires path and fit already returns the path
             # also need to find a different solution for separated fit then (name to path could be modified)
         elif ml_model in ["NEQUIP"]:
-            ml_potential = Path(ml_path) / f"deployed_nequip_model{suffix}.pth"
+            ml_potential = Path(path) / "deployed_nequip_model.pth"
         else:  # MACE
             # treat finetuned potentials
-            ml_potential_fine = Path(ml_path) / f"MACE_final{suffix}.model"
-            if ml_potential_fine.exists():
-                ml_potential = ml_potential_fine
-            else:
-                ml_potential = Path(ml_path) / f"MACE_model{suffix}.model"
+            ml_potential_fine = Path(path) / "MACE_final.model"
+            ml_potential = (
+                ml_potential_fine
+                if ml_potential_fine.exists()
+                else Path(path) / "MACE_model.model"
+            )
         if Path(ml_potential).exists():
             add_data_ml_phonon = MLPhononMaker(
                 relax_maker_kwargs=relax_maker_kwargs,
@@ -574,7 +576,7 @@ def dft_random_gen_data(
     )
     jobs.append(random_datagen)
 
-    flow = Flow(jobs, {"rand_struc_dir": random_datagen.output})
+    flow = Flow(jobs, {"rattled_dir": random_datagen.output})
     return Response(replace=flow)
 
 
