@@ -295,9 +295,9 @@ def generate_randomized_structures(
                 structure=cell,
                 n_structures=1,
                 rattle_std=rattle_std,
-                rattle_seed=rattle_seed,
+                rattle_seed=rattle_seed+icell,
             )
-            for cell in distorted_cells
+            for icell, cell in enumerate(distorted_cells)
         ]
         if rattle_type == 0
         else (
@@ -307,10 +307,10 @@ def generate_randomized_structures(
                     n_structures=1,
                     rattle_std=rattle_std,
                     min_distance=min_distance,
-                    rattle_seed=rattle_seed,
+                    rattle_seed=rattle_seed+icell,
                     rattle_mc_n_iter=rattle_mc_n_iter,
                 )
-                for cell in distorted_cells
+                for icell, cell in enumerate(distorted_cells)
             ]
             if rattle_type == 1
             else None
