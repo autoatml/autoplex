@@ -1,4 +1,20 @@
 # Changelog
+## v0.1.0
+### What's Changed
+* Update devcontainer.json version tag by @JaGeo in https://github.com/autoatml/autoplex/pull/279
+* Fix Docs build trigger case by @naik-aakash in https://github.com/autoatml/autoplex/pull/283
+* Bump hiphive from 1.3.1 to 1.4 by @dependabot in https://github.com/autoatml/autoplex/pull/285
+* pre-commit autoupdate by @pre-commit-ci in https://github.com/autoatml/autoplex/pull/286
+* Bump mace-torch from 0.3.8 to 0.3.9 by @dependabot in https://github.com/autoatml/autoplex/pull/290
+* Refactoring of the MLIP modules and other non-urgent things by @QuantumChemist in https://github.com/autoatml/autoplex/pull/280
+* Update test durations file by @JaGeo in https://github.com/autoatml/autoplex/pull/294
+* add more diversity to rattled cell creation by @JaGeo in https://github.com/autoatml/autoplex/pull/298
+
+### New Contributors
+* @pre-commit-ci made their first contribution in https://github.com/autoatml/autoplex/pull/286
+
+**Full Changelog**: https://github.com/autoatml/autoplex/compare/v0.0.9...v0.1.0
+
 ## v0.0.9
 ### What's Changed
 The release is in principle same as v0.0.8 with following changes: LAMMPS is now pinned to a stable release (`stable_29Aug2024_update1`):
