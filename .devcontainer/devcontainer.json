@@ -1,6 +1,7 @@
 {
   "name": "DeveloperEnv",
   "image": "ghcr.io/autoatml/autoplex/autoplex-python-3.10:0.1.0",
+  "initializeCommand": "docker system prune --all --force",
   "hostRequirements": {
    "cpus": 4,
    "memory": "16gb",
