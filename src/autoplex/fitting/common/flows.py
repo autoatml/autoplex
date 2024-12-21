@@ -315,6 +315,7 @@ class DataPreprocessing(Maker):
         )
 
         # Merging database
+        # TODO: does a merge happen here?
         if self.pre_database_dir and os.path.exists(self.pre_database_dir):
             if len(self.pre_xyz_files) == 2:
                 files_new = ["train.extxyz", "test.extxyz"]

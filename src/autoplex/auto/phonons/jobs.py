@@ -27,16 +27,44 @@ from autoplex.data.phonons.jobs import reduce_supercell_size
 
 @job
 def do_iterative_rattled_structures(workflow_maker,
-        number_of_iteration=0, rms=0.2, max_iteration=5, rms_max=0.2, random_seed=0,output_previous=None):
+                                    structure_list: list[Structure],
+                                    mp_ids,
+                                    dft_references: list[PhononBSDOSDoc] | None = None,
+                                    benchmark_structures: list[Structure] | None = None,
+                                    benchmark_mp_ids: list[str] | None = None,
+                                    pre_xyz_files: list[str] | None = None,
+                                    pre_database_dir: str | None = None,
+                                    random_seed: int | None = None,
+                                    fit_kwargs_list: list | None = None,
+                                    number_of_iteration=0, rms=0.2, max_iteration=5, rms_max=0.2, random_seed=0,output_previous=None):
     if rms is None or (not (number_of_iteration<=max_iteration and rms<rms_max)) :
         flows = []
-        flow1=workflow_maker.make()
+        flow1=workflow_maker.make(structure_list=structure_list,
+                                    mp_ids=mp_ids,
+                                    dft_references = dft_references,
+                                    benchmark_structures =benchmark_structures,
+                                    benchmark_mp_ids =benchmark_mp_ids,
+                                    pre_xyz_files = pre_xyz_files,
+                                    pre_database_dir = pre_database_dir,
+                                    random_seed = random_seed,
+                                    fit_kwargs_list=fit_kwargs_list)
 
         # rms needs to be computed somehow
 
         flows.append(flow1)
         # pass required info from Complete.. to do_iterative_phonon
-        flow2=do_iterative_rattled_structures(input_iteration=number_of_iteration+1, rms=rms, max_iteration=max_iteration, **input_kwargs)
+
+        flow2=do_iterative_rattled_structures(workflow_maker=workflow_maker,
+                                              structure_list=structure_list,
+                                              mp_ids=mp_ids,
+                                              dft_references=dft_references,
+                                              benchmark_structures=benchmark_structures,
+                                              benchmark_mp_ids=benchmark_mp_ids,
+                                              pre_xyz_files=pre_xyz_files,
+                                              pre_database_dir=pre_database_dir,
+                                              random_seed=random_seed,
+                                              fit_kwargs_list=fit_kwargs_list,
+                                              input_iteration=number_of_iteration+1, rms=rms, max_iteration=max_iteration)
         flows.append(flow2)
         # benchmark stuff has to be passed into the complete stuff later on instead of recalculating it every time
         # random seed update might be the hardest part.
@@ -157,6 +185,7 @@ def complete_benchmark(  # this function was put here to prevent circular import
             ml_potential = Path(path) / "deployed_nequip_model.pth"
         else:  # MACE
             # treat finetuned potentials
+            # TODO: fix this naming issue (depends on input)
             ml_potential_fine = Path(path) / "MACE_final.model"
             ml_potential = (
                 ml_potential_fine
@@ -245,7 +274,7 @@ def complete_benchmark(  # this function was put here to prevent circular import
             jobs.append(add_data_bm)
             collect_output.append(add_data_bm.output)
 
-    return Response(replace=Flow(jobs), output=collect_output)
+    return Response(replace=Flow(jobs), output={"bm_output": collect_output, "dft_references": dft_references)
 
 
 @job
