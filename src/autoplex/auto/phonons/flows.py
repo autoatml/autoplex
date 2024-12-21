@@ -11,12 +11,13 @@ from atomate2.vasp.flows.mp import (
     MPGGAStaticMaker,
 )
 from atomate2.vasp.jobs.base import BaseVaspMaker
-from jobflow import Flow, Maker
+from jobflow import Flow, Maker, job
 from pymatgen.core.structure import Structure
 from pymatgen.io.vasp.sets import (
     MPRelaxSet,
     MPStaticSet,
 )
+from pyparsing import Dict
 
 from autoplex.auto.phonons.jobs import (
     complete_benchmark,
@@ -25,6 +26,7 @@ from autoplex.auto.phonons.jobs import (
     generate_supercells,
     get_iso_atom,
     run_supercells,
+    do_iterative_rattled_structures
 )
 from autoplex.benchmark.phonons.jobs import write_benchmark_metrics
 from autoplex.data.phonons.flows import IsoAtomStaticMaker, TightDFTStaticMaker
@@ -36,13 +38,36 @@ from autoplex.fitting.common.utils import (
 )
 
 __all__ = [
+    "IterativeCompleteDFTvsMLBenchmarkWorkflow",
     "CompleteDFTvsMLBenchmarkWorkflow",
     "CompleteDFTvsMLBenchmarkWorkflowMPSettings",
     "DFTSupercellSettingsMaker",
 ]
 
 
-# Volker's idea: provide several default flows with different setting/setups
+@dataclass
+class IterativeCompleteDFTvsMLBenchmarkWorkflow:
+    """
+    Maker to run CompleteDFTvsMLBenchmarkWorkflow in an iterative
+    fashion to ensure convergence of the potentials
+    """
+    # random seed has to be changed in each iteration
+    # fitting folder has to be made accessible to the new workflows
+    # benchmark runs must be reused
+    input_kwargs: dict = field(default_factory=dict)
+    max_iterations: int = 10
+    rms_max: float = 0.2
+
+    @job
+    def make(self,
+        structure_list: list[Structure],
+        mp_ids,
+        dft_references: list[PhononBSDOSDoc] | None = None,
+        benchmark_structures: list[Structure] | None = None,
+        benchmark_mp_ids: list[str] | None = None,
+        fit_kwargs_list: list | None = None):
+
+        return do_iterative_rattled_structures(number_iteration=0, rms=None, max_iteration=self.max_iterations, **self.input_kwargs)
 
 
 @dataclass
@@ -264,6 +289,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         """
         flows = []
         fit_input = {}
+        fit_outputs=[]
         bm_outputs = []
 
         default_hyperparameters = load_mlip_hyperparameter_defaults(
@@ -391,6 +417,9 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                 **fit_kwargs,
             )
             flows.append(add_data_fit)
+
+            # do i need to add more info here to get the right files?
+            fit_outputs.append(add_data_fit.output)
             if (benchmark_structures is not None) and (benchmark_mp_ids is not None):
                 for ibenchmark_structure, benchmark_structure in enumerate(
                     benchmark_structures
@@ -469,6 +498,10 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                                 soap=soap_dict,
                             )
                             flows.append(loop_data_fit)
+                            # do i need to add more info here to get the right file?
+                            fit_outputs.append(loop_data_fit.output)
+                            # save the outputs from the fit somewhere
+
                             if (benchmark_structures is not None) and (
                                 benchmark_mp_ids is not None
                             ):
@@ -507,9 +540,13 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
             metrics=bm_outputs,
             filename_prefix=self.summary_filename_prefix,
         )
+        # collect_bm must be extended in a way that we get access to all benchmark structures and the previous databases
+
         flows.append(collect_bm)
 
-        return Flow(jobs=flows, output=collect_bm, name=self.name)
+        # leave the dicts similar to before but add info from all stages?
+        new_output={"metrics": collect_bm, "fit_input": fit_input}
+        return Flow(jobs=flows, output=new_output, name=self.name)
 
     @staticmethod
     def add_dft_phonons(
