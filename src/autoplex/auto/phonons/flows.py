@@ -262,7 +262,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         pre_database_dir: str or None
             The pre-database directory.
         random_seed: int | None
-            Random seed for rattled structure generation.
+            Random seed.
         fit_kwargs_list : list[dict].
             Dict including MLIP fit keyword args.
 
