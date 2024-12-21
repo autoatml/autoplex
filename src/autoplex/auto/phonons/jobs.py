@@ -5,7 +5,6 @@ from collections.abc import Iterable
 from dataclasses import field
 from pathlib import Path
 
-from atomate2.common.schemas.phonons import PhononBSDOSDoc
 import numpy as np
 from atomate2.vasp.flows.core import DoubleRelaxMaker
 from atomate2.vasp.jobs.base import BaseVaspMaker
@@ -25,7 +24,9 @@ from autoplex.data.phonons.flows import (
 )
 from autoplex.data.phonons.jobs import reduce_supercell_size
 
+
 @job
+<<<<<<< HEAD
 def do_iterative_rattled_structures(workflow_maker,
                                     structure_list: list[Structure],
                                     mp_ids,

@@ -11,7 +11,7 @@ from atomate2.vasp.flows.mp import (
     MPGGAStaticMaker,
 )
 from atomate2.vasp.jobs.base import BaseVaspMaker
-from jobflow import Flow, Maker, job
+from jobflow import Flow, Maker
 from pymatgen.core.structure import Structure
 from pymatgen.io.vasp.sets import (
     MPRelaxSet,
@@ -42,7 +42,6 @@ __all__ = [
     "DFTSupercellSettingsMaker",
     "IterativeCompleteDFTvsMLBenchmarkWorkflow",
 ]
-
 
 
 @dataclass
@@ -981,35 +980,39 @@ class DFTSupercellSettingsMaker(Maker):
         return Flow(jobs=job_list, output=supercell_job.output, name=self.name)
 
 
-
 @dataclass
 class IterativeCompleteDFTvsMLBenchmarkWorkflow:
     """
     Maker to run CompleteDFTvsMLBenchmarkWorkflow in an iterative
     fashion to ensure convergence of the potentials
     """
+
     # random seed has to be changed in each iteration
     # fitting folder has to be made accessible to the new workflows
     # benchmark runs must be reused
     max_iterations: int = 10
     rms_max: float = 0.2
-    complete_dft_vs_ml_benchmark_workflow: CompleteDFTvsMLBenchmarkWorkflow |None = field(
-        default_factory=CompleteDFTvsMLBenchmarkWorkflow)
+    complete_dft_vs_ml_benchmark_workflow: CompleteDFTvsMLBenchmarkWorkflow | None = (
+        field(default_factory=CompleteDFTvsMLBenchmarkWorkflow)
+    )
 
-
-    def make(self,
+    def make(
+        self,
         structure_list: list[Structure],
         mp_ids,
         dft_references: list[PhononBSDOSDoc] | None = None,
         benchmark_structures: list[Structure] | None = None,
         benchmark_mp_ids: list[str] | None = None,
-        fit_kwargs_list: list | None = None
+        fit_kwargs_list: list | None = None,
         # reference files
-
-
         # random seed here
+    ):
 
-             ):
-
-        flow=do_iterative_rattled_structures(workflow_maker=self.complete_dft_vs_ml_benchmark_workflow, number_of_iteration=0, rms=None, max_iteration=self.max_iterations, **self.input_kwargs)
+        flow = do_iterative_rattled_structures(
+            workflow_maker=self.complete_dft_vs_ml_benchmark_workflow,
+            number_of_iteration=0,
+            rms=None,
+            max_iteration=self.max_iterations,
+            **self.input_kwargs,
+        )
         return Flow(flow, flow.output)
