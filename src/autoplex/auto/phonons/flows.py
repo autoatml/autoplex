@@ -511,7 +511,9 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                                             f"_{benchmark_mp_ids[ibenchmark_structure]}"
                                         )
                                         flows.append(complete_bm)
-                                        bm_outputs.append(complete_bm.output["bm_output"])
+                                        bm_outputs.append(
+                                            complete_bm.output["bm_output"]
+                                        )
                                         # save the dft references okay
 
         collect_bm = write_benchmark_metrics(
@@ -525,9 +527,9 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
 
         # should have the following outputs for a follow-up workflow
         # do I need the structure as well?
-        #benchmark_structures = benchmark_structures,
-        #benchmark_mp_ids = benchmark_mp_ids,
-        #dft_references: list[PhononBSDOSDoc] | None = None,
+        # benchmark_structures = benchmark_structures,
+        # benchmark_mp_ids = benchmark_mp_ids,
+        # dft_references: list[PhononBSDOSDoc] | None = None,
         # pre_xyz_files: list[str] | None = None,
         # pre_database_dir: str | None = None,
         # random_seed: int | None = None,
@@ -535,16 +537,17 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
 
         # get this from the metrics
         rms_upper_limit = 0.0
-        new_output = {"metrics": collect_bm,
-                      "rms": rms_upper_limit,
-                      "benchmark_structures": benchmark_structures,
-                      "benchmark_mp_ids": benchmark_mp_ids,
-                      "dft_references": dft_references,
-                      "pre_xyz_files": pre_xyz_files,
-                      "pre_database_dir": add_data_fit.output["database_dir"],
-                      "last_random_seed": last_random_seed,
-                      "fit_kwargs_list": fit_kwargs_list,
-                      }
+        new_output = {
+            "metrics": collect_bm,
+            "rms": rms_upper_limit,
+            "benchmark_structures": benchmark_structures,
+            "benchmark_mp_ids": benchmark_mp_ids,
+            "dft_references": dft_references,
+            "pre_xyz_files": pre_xyz_files,
+            "pre_database_dir": add_data_fit.output["database_dir"],
+            "last_random_seed": last_random_seed,
+            "fit_kwargs_list": fit_kwargs_list,
+        }
         return Flow(jobs=flows, output=new_output, name=self.name)
 
     @staticmethod
