@@ -14,6 +14,7 @@ from jobflow import Flow, Response, job
 from pymatgen.core.structure import Structure
 
 from autoplex.benchmark.phonons.flows import PhononBenchmarkMaker
+from atomate2.common.schemas.phonons import PhononBSDOSDoc
 from autoplex.data.phonons.flows import (
     DFTPhononMaker,
     IsoAtomMaker,
@@ -26,7 +27,6 @@ from autoplex.data.phonons.jobs import reduce_supercell_size
 
 
 @job
-<<<<<<< HEAD
 def do_iterative_rattled_structures(workflow_maker,
                                     structure_list: list[Structure],
                                     mp_ids,
