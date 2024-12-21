@@ -46,31 +46,6 @@ __all__ = [
 
 
 @dataclass
-class IterativeCompleteDFTvsMLBenchmarkWorkflow:
-    """
-    Maker to run CompleteDFTvsMLBenchmarkWorkflow in an iterative
-    fashion to ensure convergence of the potentials
-    """
-    # random seed has to be changed in each iteration
-    # fitting folder has to be made accessible to the new workflows
-    # benchmark runs must be reused
-    input_kwargs: dict = field(default_factory=dict)
-    max_iterations: int = 10
-    rms_max: float = 0.2
-
-    @job
-    def make(self,
-        structure_list: list[Structure],
-        mp_ids,
-        dft_references: list[PhononBSDOSDoc] | None = None,
-        benchmark_structures: list[Structure] | None = None,
-        benchmark_mp_ids: list[str] | None = None,
-        fit_kwargs_list: list | None = None):
-
-        return do_iterative_rattled_structures(number_iteration=0, rms=None, max_iteration=self.max_iterations, **self.input_kwargs)
-
-
-@dataclass
 class CompleteDFTvsMLBenchmarkWorkflow(Maker):
     """
     Maker to construct a DFT (VASP) based dataset, composed of the following two configuration types.
@@ -171,10 +146,6 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         Repeat the fit for each data_type available in the (combined) database.
     num_processes_fit: int
         Number of processes for fitting.
-    pre_xyz_files: list[str] or None
-        Names of the pre-database train xyz file and test xyz file.
-    pre_database_dir: str or None
-        The pre-database directory.
     apply_data_preprocessing: bool
         Apply data preprocessing.
     atomwise_regularization_parameter: float
@@ -241,8 +212,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
     separated: bool = False
     num_processes_fit: int | None = None
     distillation: bool = True
-    pre_xyz_files: list[str] | None = None
-    pre_database_dir: str | None = None
+
     apply_data_preprocessing: bool = True
     auto_delta: bool = False
     hyper_para_loop: bool = False
@@ -266,7 +236,11 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         dft_references: list[PhononBSDOSDoc] | None = None,
         benchmark_structures: list[Structure] | None = None,
         benchmark_mp_ids: list[str] | None = None,
+        pre_xyz_files: list[str] | None = None,
+        pre_database_dir: str | None = None,
+        random_seed: int | None = None,
         fit_kwargs_list: list | None = None,
+
     ):
         """
         Make flow for constructing the dataset, fitting the potentials and performing the benchmarks.
@@ -283,6 +257,12 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
             The pymatgen structure for benchmarking.
         benchmark_mp_ids: list[str] | None
             Materials Project ID of the benchmarking structure.
+        pre_xyz_files: list[str] or None
+            Names of the pre-database train xyz file and test xyz file.
+        pre_database_dir: str or None
+            The pre-database directory.
+        random_seed: int | None
+            Random seed for rattled structure generation.
         fit_kwargs_list : list[dict].
             Dict including MLIP fit keyword args.
 
@@ -385,7 +365,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         isoatoms = get_iso_atom(structure_list, self.isolated_atom_maker)
         flows.append(isoatoms)
 
-        if self.pre_xyz_files is None:
+        if pre_xyz_files is None:
             fit_input.update(
                 {"IsolatedAtom": {"iso_atoms_dir": [isoatoms.output["dirs"]]}}
             )
@@ -398,8 +378,8 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                 use_defaults=self.use_defaults_fitting,
                 split_ratio=self.split_ratio,
                 force_max=self.force_max,
-                pre_xyz_files=self.pre_xyz_files,
-                pre_database_dir=self.pre_database_dir,
+                pre_xyz_files=pre_xyz_files,
+                pre_database_dir=pre_database_dir,
                 path_to_hyperparameters=self.path_to_hyperparameters,
                 atomwise_regularization_parameter=self.atomwise_regularization_parameter,
                 force_min=self.force_min,
@@ -481,8 +461,8 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                                 glue_file_path=self.glue_file_path,
                                 split_ratio=self.split_ratio,
                                 force_max=self.force_max,
-                                pre_xyz_files=self.pre_xyz_files,
-                                pre_database_dir=self.pre_database_dir,
+                                pre_xyz_files=pre_xyz_files,
+                                pre_database_dir=pre_database_dir,
                                 path_to_hyperparameters=self.path_to_hyperparameters,
                                 atomwise_regularization_parameter=atomwise_reg_parameter,
                                 force_min=self.force_min,
@@ -792,10 +772,6 @@ class CompleteDFTvsMLBenchmarkWorkflowMPSettings(CompleteDFTvsMLBenchmarkWorkflo
     split_ratio: float.
         Parameter to divide the training set and the test set.
         A value of 0.1 means that the ratio of the training set to the test set is 9:1.
-    pre_xyz_files: list[str] or None
-        Names of the pre-database train xyz file and test xyz file.
-    pre_database_dir: str or None
-        The pre-database directory.
     apply_data_preprocessing: bool
         Apply data preprocessing.
     atomwise_regularization_parameter: float
@@ -983,3 +959,31 @@ class DFTSupercellSettingsMaker(Maker):
         job_list.append(supercell_job)
 
         return Flow(jobs=job_list, output=supercell_job.output, name=self.name)
+
+
+
+@dataclass
+class IterativeCompleteDFTvsMLBenchmarkWorkflow:
+    """
+    Maker to run CompleteDFTvsMLBenchmarkWorkflow in an iterative
+    fashion to ensure convergence of the potentials
+    """
+    # random seed has to be changed in each iteration
+    # fitting folder has to be made accessible to the new workflows
+    # benchmark runs must be reused
+    max_iterations: int = 10
+    rms_max: float = 0.2
+    complete_dft_vs_ml_benchmark_workflow: CompleteDFTvsMLBenchmarkWorkflow |None = field(
+        default_factory=CompleteDFTvsMLBenchmarkWorkflow)
+
+
+    def make(self,
+        structure_list: list[Structure],
+        mp_ids,
+        dft_references: list[PhononBSDOSDoc] | None = None,
+        benchmark_structures: list[Structure] | None = None,
+        benchmark_mp_ids: list[str] | None = None,
+        fit_kwargs_list: list | None = None):
+
+        flow=do_iterative_rattled_structures(number_of_iteration=0, rms=None, max_iteration=self.max_iterations, **self.input_kwargs)
+        return Flow(flow, flow.output)

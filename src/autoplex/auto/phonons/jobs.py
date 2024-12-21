@@ -5,6 +5,7 @@ from collections.abc import Iterable
 from dataclasses import field
 from pathlib import Path
 
+from atomate2.common.schemas.phonons import PhononBSDOSDoc
 import numpy as np
 from atomate2.vasp.flows.core import DoubleRelaxMaker
 from atomate2.vasp.jobs.base import BaseVaspMaker
@@ -25,19 +26,22 @@ from autoplex.data.phonons.flows import (
 from autoplex.data.phonons.jobs import reduce_supercell_size
 
 @job
-def do_iterative_rattled_structures(number_of_iteration=1, rms=0.2, iteration_max=5, rms_max=0.2, random_seed=0,output_previous=None,  **input_kwargs):
-
-    if not (number_of_iteration<=iteration_max and rms>rms_max) or rms is None:
+def do_iterative_rattled_structures(workflow_maker,
+        number_of_iteration=0, rms=0.2, max_iteration=5, rms_max=0.2, random_seed=0,output_previous=None):
+    if rms is None or (not (number_of_iteration<=max_iteration and rms<rms_max)) :
         flows = []
         from autoplex.auto.phonons.flows import CompleteDFTvsMLBenchmarkWorkflow
         # adapt the random seed correctly and set the random seed
-        flow1=CompleteDFTvsMLBenchmarkWorkflow(**input_kwargs)
+        flow1=workflow_maker.make()
+
+        # rms needs to be computed somehow
+
         flows.append(flow1)
         # pass required info from Complete.. to do_iterative_phonon
-        flow2=do_iterative_rattled_structures()
+        flow2=do_iterative_rattled_structures(input_iteration=number_of_iteration+1, rms=rms, max_iteration=max_iteration, **input_kwargs)
         flows.append(flow2)
 
-        return Response(flows, flow2.output)
+        return Response(Flow(flows), flow2.output)
 
     return output_previous
 

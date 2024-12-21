@@ -3,7 +3,7 @@ import pytest
 from monty.serialization import loadfn
 from atomate2.common.schemas.phonons import PhononBSDOSDoc
 from pymatgen.core.structure import Structure
-from autoplex.auto.phonons.flows import CompleteDFTvsMLBenchmarkWorkflow, CompleteDFTvsMLBenchmarkWorkflowMPSettings
+from autoplex.auto.phonons.flows import CompleteDFTvsMLBenchmarkWorkflow, CompleteDFTvsMLBenchmarkWorkflowMPSettings, IterativeCompleteDFTvsMLBenchmarkWorkflow
 from jobflow import run_locally
 
 os.environ["OMP_NUM_THREADS"] = "1"
@@ -481,6 +481,39 @@ def fake_run_vasp_kwargs4_mpid():
         },
     }
 
+
+def test_iterative_complete_dft_vs_ml_benchmark_workflow_gap(vasp_test_dir, mock_vasp, test_dir, memory_jobstore,  ref_paths4_mpid, fake_run_vasp_kwargs4_mpid, clean_dir):
+    # first test with just one iteration (more tests need to be added)
+    path_to_struct = vasp_test_dir / "dft_ml_data_generation" / "POSCAR"
+    structure = Structure.from_file(path_to_struct)
+
+    complete_workflow = IterativeCompleteDFTvsMLBenchmarkWorkflow(
+        rms_max=0.5,
+        max_iterations=2,
+        input_kwargs={"symprec":1e-2, "displacements":[0.01],
+        "volume_custom_scale_factors":[0.975, 1.0, 1.025, 1.05],
+        "supercell_settings":{"min_length": 8, "min_atoms": 20},
+        "apply_data_preprocessing":True}
+    ).make(
+        structure_list=[structure],
+        mp_ids=["test"],
+        benchmark_mp_ids=["mp-22905"],
+        benchmark_structures=[structure],
+    )
+
+
+    # automatically use fake VASP and write POTCAR.spec during the test
+    mock_vasp(ref_paths4_mpid, fake_run_vasp_kwargs4_mpid)
+
+    # run the flow or job and ensure that it finished running successfully
+    responses = run_locally(
+        complete_workflow,
+        create_folders=True,
+        ensure_success=True,
+        store=memory_jobstore,
+    )
+
+    print(complete_workflow.output)
 
 def test_complete_dft_vs_ml_benchmark_workflow_gap(
         vasp_test_dir, mock_vasp, test_dir, memory_jobstore, ref_paths4_mpid, fake_run_vasp_kwargs4_mpid, clean_dir
