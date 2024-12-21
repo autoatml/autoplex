@@ -17,16 +17,15 @@ from pymatgen.io.vasp.sets import (
     MPRelaxSet,
     MPStaticSet,
 )
-from pyparsing import Dict
 
 from autoplex.auto.phonons.jobs import (
     complete_benchmark,
     dft_phonopy_gen_data,
     dft_random_gen_data,
+    do_iterative_rattled_structures,
     generate_supercells,
     get_iso_atom,
     run_supercells,
-    do_iterative_rattled_structures
 )
 from autoplex.benchmark.phonons.jobs import write_benchmark_metrics
 from autoplex.data.phonons.flows import IsoAtomStaticMaker, TightDFTStaticMaker
@@ -38,10 +37,10 @@ from autoplex.fitting.common.utils import (
 )
 
 __all__ = [
-    "IterativeCompleteDFTvsMLBenchmarkWorkflow",
     "CompleteDFTvsMLBenchmarkWorkflow",
     "CompleteDFTvsMLBenchmarkWorkflowMPSettings",
     "DFTSupercellSettingsMaker",
+    "IterativeCompleteDFTvsMLBenchmarkWorkflow",
 ]
 
 
@@ -51,6 +50,7 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
     Maker to run CompleteDFTvsMLBenchmarkWorkflow in an iterative
     fashion to ensure convergence of the potentials
     """
+
     # random seed has to be changed in each iteration
     # fitting folder has to be made accessible to the new workflows
     # benchmark runs must be reused
@@ -59,15 +59,22 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
     rms_max: float = 0.2
 
     @job
-    def make(self,
+    def make(
+        self,
         structure_list: list[Structure],
         mp_ids,
         dft_references: list[PhononBSDOSDoc] | None = None,
         benchmark_structures: list[Structure] | None = None,
         benchmark_mp_ids: list[str] | None = None,
-        fit_kwargs_list: list | None = None):
+        fit_kwargs_list: list | None = None,
+    ):
 
-        return do_iterative_rattled_structures(number_iteration=0, rms=None, max_iteration=self.max_iterations, **self.input_kwargs)
+        return do_iterative_rattled_structures(
+            number_iteration=0,
+            rms=None,
+            max_iteration=self.max_iterations,
+            **self.input_kwargs,
+        )
 
 
 @dataclass
@@ -289,7 +296,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         """
         flows = []
         fit_input = {}
-        fit_outputs=[]
+        fit_outputs = []
         bm_outputs = []
 
         default_hyperparameters = load_mlip_hyperparameter_defaults(
@@ -545,7 +552,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         flows.append(collect_bm)
 
         # leave the dicts similar to before but add info from all stages?
-        new_output={"metrics": collect_bm, "fit_input": fit_input}
+        new_output = {"metrics": collect_bm, "fit_input": fit_input}
         return Flow(jobs=flows, output=new_output, name=self.name)
 
     @staticmethod
