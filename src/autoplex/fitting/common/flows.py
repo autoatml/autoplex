@@ -309,17 +309,18 @@ class DataPreprocessing(Maker):
                     current_working_directory, "vasp_ref.extxyz"
                 )
                 for file_name in self.pre_xyz_files:
+                    # TODO: if it makes sense to remove isolated atoms from other files as well
+                    atoms_list = ase.io.read(os.path.join(self.pre_database_dir,file_name), index=":")
+                    new_atoms_list = []
+                    for atoms in atoms_list:
+                        if not atoms.info["config_type"] == "IsolatedAtom":
+                            new_atoms_list.append(atoms)
+                    ase.io.write(destination_file_path, new_atoms_list, append=True)
 
-                    with (
-                        open(
-                            os.path.join(self.pre_database_dir, file_name)
-                        ) as pre_xyz_file,
-                        open(destination_file_path, "a") as xyz_file,
-                    ):
-                        xyz_file.write(pre_xyz_file.read())
                     logging.info(
-                        f"File {file_name} has been copied to {destination_file_path}"
+                        f"File {self.pre_xyz_files[0]} has been copied to {destination_file_path}"
                     )
+
 
             elif len(self.pre_xyz_files) > 2:
                 raise ValueError(

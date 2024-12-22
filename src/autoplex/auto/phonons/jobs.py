@@ -254,9 +254,10 @@ def complete_benchmark(  # this function was put here to prevent circular import
                 if (
                     benchmark_mp_ids[ibenchmark_structure] in mp_ids
                 ) and add_dft_phonon_struct:
+
                     dft_references = fit_input[benchmark_mp_ids[ibenchmark_structure]][
                         "phonon_data"
-                    ]["001"]
+                    ][f"{int(displacement * 100):03d}"]
                 else:
                     dft_phonons = dft_phonopy_gen_data(
                         structure=benchmark_structure,
@@ -269,7 +270,7 @@ def complete_benchmark(  # this function was put here to prevent circular import
                         supercell_settings=supercell_settings,
                     )
                     jobs.append(dft_phonons)
-                    dft_references = dft_phonons.output["phonon_data"]["001"]
+                    dft_references = dft_phonons.output["phonon_data"][f"{int(displacement * 100):03d}"]
 
                 add_data_bm = PhononBenchmarkMaker(name="Benchmark").make(
                     ml_model=ml_model,
