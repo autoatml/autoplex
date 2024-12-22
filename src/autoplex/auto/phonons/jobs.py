@@ -6,6 +6,7 @@ from dataclasses import field
 from pathlib import Path
 
 import numpy as np
+from atomate2.common.schemas.phonons import PhononBSDOSDoc
 from atomate2.vasp.flows.core import DoubleRelaxMaker
 from atomate2.vasp.jobs.base import BaseVaspMaker
 from atomate2.vasp.jobs.core import StaticMaker, TightRelaxMaker
@@ -14,7 +15,6 @@ from jobflow import Flow, Response, job
 from pymatgen.core.structure import Structure
 
 from autoplex.benchmark.phonons.flows import PhononBenchmarkMaker
-from atomate2.common.schemas.phonons import PhononBSDOSDoc
 from autoplex.data.phonons.flows import (
     DFTPhononMaker,
     IsoAtomMaker,
@@ -27,53 +27,66 @@ from autoplex.data.phonons.jobs import reduce_supercell_size
 
 
 @job
-def do_iterative_rattled_structures(workflow_maker,
-                                    structure_list: list[Structure],
-                                    mp_ids,
-                                    dft_references: list[PhononBSDOSDoc] | None = None,
-                                    benchmark_structures: list[Structure] | None = None,
-                                    benchmark_mp_ids: list[str] | None = None,
-                                    pre_xyz_files: list[str] | None = None,
-                                    pre_database_dir: str | None = None,
-                                    random_seed: int | None = None,
-                                    fit_kwargs_list: list | None = None,
-                                    number_of_iteration=0, rms=0.2, max_iteration=5, rms_max=0.2,output_previous=None):
-    if rms is None or (not (number_of_iteration<=max_iteration and rms<rms_max)) :
+def do_iterative_rattled_structures(
+    workflow_maker,
+    structure_list: list[Structure],
+    mp_ids,
+    dft_references: list[PhononBSDOSDoc] | None = None,
+    benchmark_structures: list[Structure] | None = None,
+    benchmark_mp_ids: list[str] | None = None,
+    pre_xyz_files: list[str] | None = None,
+    pre_database_dir: str | None = None,
+    random_seed: int | None = None,
+    fit_kwargs_list: list | None = None,
+    number_of_iteration=0,
+    rms=0.2,
+    max_iteration=5,
+    rms_max=0.2,
+    output_previous=None,
+):
+    if rms is None or (not (number_of_iteration <= max_iteration and rms < rms_max)):
         jobs = []
         # add iterative number to workflow name
 
-        job1=workflow_maker.make(structure_list=structure_list,
-                                    mp_ids=mp_ids,
-                                    dft_references = dft_references,
-                                    benchmark_structures =benchmark_structures,
-                                    benchmark_mp_ids =benchmark_mp_ids,
-                                    pre_xyz_files = pre_xyz_files,
-                                    pre_database_dir = pre_database_dir,
-                                    random_seed = random_seed,
-                                    fit_kwargs_list=fit_kwargs_list)
+        job1 = workflow_maker.make(
+            structure_list=structure_list,
+            mp_ids=mp_ids,
+            dft_references=dft_references,
+            benchmark_structures=benchmark_structures,
+            benchmark_mp_ids=benchmark_mp_ids,
+            pre_xyz_files=pre_xyz_files,
+            pre_database_dir=pre_database_dir,
+            random_seed=random_seed,
+            fit_kwargs_list=fit_kwargs_list,
+        )
 
         # rms needs to be computed somehow
-        job1.append_name("_"+str(number_of_iteration))
+        job1.append_name("_" + str(number_of_iteration))
         jobs.append(job1)
         # TODO: check if these are all options
         # TODO: make sure the correct number of structures is always generated (check scale factors)
         if workflow_maker.n_structures is not None:
-            random_seed+workflow_maker.n_structures
+            random_seed + workflow_maker.n_structures
         elif workflow_maker.volume_custom_scale_factors is not None:
-            random_seed+len(workflow_maker.volume_custom_scale_factors)
+            random_seed + len(workflow_maker.volume_custom_scale_factors)
 
-        job2=do_iterative_rattled_structures(workflow_maker=workflow_maker,
-                                              structure_list=structure_list,
-                                              mp_ids=mp_ids,
-                                              dft_references=job1.output["dft_references"],
-                                              # TODO: check if they should be optimized
-                                              benchmark_structures=job1.output["benchmark_structures"],
-                                              benchmark_mp_ids=job1.output["benchmark_mp_ids"],
-                                              pre_xyz_files=pre_xyz_files,
-                                              pre_database_dir=job1.output["pre_database_dir"],
-                                              random_seed=random_seed,
-                                              fit_kwargs_list=fit_kwargs_list,
-                                              input_iteration=number_of_iteration+1, rms=rms, max_iteration=max_iteration, rms_max=rms_max)
+        job2 = do_iterative_rattled_structures(
+            workflow_maker=workflow_maker,
+            structure_list=structure_list,
+            mp_ids=mp_ids,
+            dft_references=job1.output["dft_references"],
+            # TODO: check if they should be optimized
+            benchmark_structures=job1.output["benchmark_structures"],
+            benchmark_mp_ids=job1.output["benchmark_mp_ids"],
+            pre_xyz_files=pre_xyz_files,
+            pre_database_dir=job1.output["pre_database_dir"],
+            random_seed=random_seed,
+            fit_kwargs_list=fit_kwargs_list,
+            input_iteration=number_of_iteration + 1,
+            rms=rms,
+            max_iteration=max_iteration,
+            rms_max=rms_max,
+        )
         jobs.append(job2)
         # benchmark stuff has to be passed into the complete stuff later on instead of recalculating it every time
         # random seed update might be the hardest part.
@@ -283,7 +296,10 @@ def complete_benchmark(  # this function was put here to prevent circular import
             jobs.append(add_data_bm)
             collect_output.append(add_data_bm.output)
 
-    return Response(replace=Flow(jobs), output={"bm_output": collect_output, "dft_references": dft_references})
+    return Response(
+        replace=Flow(jobs),
+        output={"bm_output": collect_output, "dft_references": dft_references},
+    )
 
 
 @job
@@ -680,17 +696,26 @@ def get_iso_atom(
 
 
 @job
-def get_output(metrics, benchmark_structures, benchmark_mp_ids, dft_references,pre_xyz_files,
-            pre_database_dir, fit_kwargs_list):
+def get_output(
+    metrics,
+    benchmark_structures,
+    benchmark_mp_ids,
+    dft_references,
+    pre_xyz_files,
+    pre_database_dir,
+    fit_kwargs_list,
+):
 
     # TODO: rms needs to be computed from metrics
     #
 
-    return {"metrics":metrics,
+    return {
+        "metrics": metrics,
         "rms": 0,
-    "benchmark_structures": benchmark_structures,
-    "benchmark_mp_ids": benchmark_mp_ids,
-    "dft_references": dft_references,
-    "pre_xyz_files": pre_xyz_files,
-    "pre_database_dir": pre_database_dir,
-    "fit_kwargs_list": fit_kwargs_list}
+        "benchmark_structures": benchmark_structures,
+        "benchmark_mp_ids": benchmark_mp_ids,
+        "dft_references": dft_references,
+        "pre_xyz_files": pre_xyz_files,
+        "pre_database_dir": pre_database_dir,
+        "fit_kwargs_list": fit_kwargs_list,
+    }

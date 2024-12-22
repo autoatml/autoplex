@@ -25,8 +25,8 @@ from autoplex.auto.phonons.jobs import (
     do_iterative_rattled_structures,
     generate_supercells,
     get_iso_atom,
+    get_output,
     run_supercells,
-    get_output
 )
 from autoplex.benchmark.phonons.jobs import write_benchmark_metrics
 from autoplex.data.phonons.flows import IsoAtomStaticMaker, TightDFTStaticMaker
@@ -535,12 +535,15 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         # pre_database_dir: str | None = None,
         # random_seed: int | None = None,
         # fit_kwargs_list: list | None = None,
-        output_flow=get_output(metrics=collect_bm.output["bm_output"], benchmark_structures=benchmark_structures,
-                               benchmark_mp_ids=benchmark_mp_ids,
-                               dft_references=dft_references,
-                               pre_xyz_files=pre_xyz_files,
-                               pre_database_dir=add_data_fit.output["database_dir"],
-                               fit_kwargs_list=fit_kwargs_list,)
+        output_flow = get_output(
+            metrics=collect_bm.output["bm_output"],
+            benchmark_structures=benchmark_structures,
+            benchmark_mp_ids=benchmark_mp_ids,
+            dft_references=dft_references,
+            pre_xyz_files=pre_xyz_files,
+            pre_database_dir=add_data_fit.output["database_dir"],
+            fit_kwargs_list=fit_kwargs_list,
+        )
         flows.append(output_flow)
         return Flow(jobs=flows, output=output_flow.output, name=self.name)
 
@@ -1016,5 +1019,6 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
             rms=None,
             max_iteration=self.max_iterations,
             rms_max=self.rms_max,
-            random_seed=random_seed)
+            random_seed=random_seed,
+        )
         return Flow(flow, flow.output)
