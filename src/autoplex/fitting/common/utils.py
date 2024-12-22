@@ -1252,8 +1252,17 @@ def mace_fitting(
             log_data = file.read()
     except FileNotFoundError:
         # to cover finetuning
-        with open("./logs/MACE_final_run-3.log") as file:
-            log_data = file.read()
+        try:
+            with open(f"./logs/{fit_kwargs['name']}_run-123.log") as file:
+                log_data = file.read()
+        except FileNotFoundError:
+            try:
+                with open("./logs/MACE_final_run-3.log") as file:
+                    log_data = file.read()
+            except FileNotFoundError:
+                with open(f"./logs/{fit_kwargs['name']}_run-3.log") as file:
+                    log_data = file.read()
+
     tables = re.split(r"\+-+\+\n", log_data)
     # if tables:
     last_table = tables[-2]
