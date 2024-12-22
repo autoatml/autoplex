@@ -1644,7 +1644,6 @@ def test_phonon_dft_ml_data_generation_flow(
 
     flow_data_generation = CompleteDFTvsMLBenchmarkWorkflow(
         n_structures=3, supercell_settings={"min_length": 10, "min_atoms": 20}, symprec=1e-2,
-        volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
         apply_data_preprocessing=True,
     ).make(structure_list=structure_list,
            mp_ids=mp_ids,
@@ -1658,7 +1657,6 @@ def test_phonon_dft_ml_data_generation_flow(
     flow_data_generation_without_rattled_structures = CompleteDFTvsMLBenchmarkWorkflow(
         n_structures=3, supercell_settings={"min_length": 10, "min_atoms": 20}, symprec=1e-2,
         add_dft_rattled_struct=False,
-        volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
         apply_data_preprocessing=True,
     ).make(structure_list=structure_list,
            mp_ids=mp_ids,
@@ -1687,12 +1685,12 @@ def test_phonon_dft_ml_data_generation_flow(
     )
     counter = 0
     counter_wor = 0
-    for job, uuid in flow_data_generation.iterflow():
+    for _ in flow_data_generation.iterflow():
         counter += 1
-    for job, uuid in flow_data_generation_without_rattled_structures.iterflow():
+    for _ in flow_data_generation_without_rattled_structures.iterflow():
         counter_wor += 1
-    assert counter == 8
-    assert counter_wor == 7
+    assert counter == 9
+    assert counter_wor == 8
 
 
 # TODO testing cell_factor_sequence

@@ -536,15 +536,6 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
 
         flows.append(collect_bm)
 
-        # should have the following outputs for a follow-up workflow
-        # do I need the structure as well?
-        # benchmark_structures = benchmark_structures,
-        # benchmark_mp_ids = benchmark_mp_ids,
-        # dft_references: list[PhononBSDOSDoc] | None = None,
-        # pre_xyz_files: list[str] | None = None,
-        # pre_database_dir: str | None = None,
-        # random_seed: int | None = None,
-        # fit_kwargs_list: list | None = None,
         output_flow = get_output(
             metrics=collect_bm.output,
             benchmark_structures=benchmark_structures,
@@ -993,13 +984,26 @@ class DFTSupercellSettingsMaker(Maker):
 @dataclass
 class IterativeCompleteDFTvsMLBenchmarkWorkflow:
     """
+    Iterative Version of CompleteDFTvsMLBenchmarkWorkflow.
+
     Maker to run CompleteDFTvsMLBenchmarkWorkflow in an iterative
-    fashion to ensure convergence of the potentials
+    fashion to ensure convergence of the potentials.
+
+    Parameters
+    ----------
+    name : str
+        Name of the flow produced by this maker.
+    max_iterations: int.
+        Maximum number of iterations to run.
+    rms_max: float.
+        Will stop once the best potential has a max rmse below this value.
+    complete_dft_vs_ml_benchmark_workflow_0: CompleteDFTvsMLBenchmarkWorkflow.
+        First Iteration will be performed with this flow.
+    complete_dft_vs_ml_benchmark_workflow_1: CompleteDFTvsMLBenchmarkWorkflow.
+        All Iterations after the first one will be performed with this flow.
     """
 
-    # random seed has to be changed in each iteration
-    # fitting folder has to be made accessible to the new workflows
-    # benchmark runs must be reused
+    name: str = "IterativeCompleteDFTvsMLBenchmarkWorkflow"
     max_iterations: int = 10
     rms_max: float = 0.2
     complete_dft_vs_ml_benchmark_workflow_0: CompleteDFTvsMLBenchmarkWorkflow | None = (
@@ -1012,19 +1016,42 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
     def make(
         self,
         structure_list: list[Structure],
-        mp_ids,
+        mp_ids: list[str] |None = None,
         dft_references: list[PhononBSDOSDoc] | None = None,
         benchmark_structures: list[Structure] | None = None,
         benchmark_mp_ids: list[str] | None = None,
-        fit_kwargs_list: list | None = None,
-        random_seed: int = 0,
         pre_database_dir: str | None = None,
         pre_xyz_files: list[str] | None = None,
-        # reference files
-        # random seed here
+        random_seed: int = 0,
+        fit_kwargs_list: list | None = None,
     ):
-        # TODO: avoid additional isolated atom calculation
-        # TODO: avoid duplicated calculation references
+        """Make flow for constructing the dataset, fitting the potentials and performing the benchmarks.
+
+        Parameters
+        ----------
+        structure_list:
+            List of pymatgen structures.
+        mp_ids:
+            Materials Project IDs.
+        dft_references: list[PhononBSDOSDoc] | None
+            List of DFT reference files containing the PhononBSDOCDoc object.
+            Reference files have to refer to a finite displacement of 0.01.
+            For benchmarking, only 0.01 is supported
+        benchmark_structures: list[Structure] | None
+            The pymatgen structure for benchmarking.
+        benchmark_mp_ids: list[str] | None
+            Materials Project ID of the benchmarking structure.
+        pre_xyz_files: list[str] or None
+            Names of the pre-database train xyz file and test xyz file.
+        pre_database_dir: str or None
+            The pre-database directory.
+        random_seed: int | None
+            Random seed.
+        fit_kwargs_list : list[dict].
+            Dict including MLIP fit keyword args.
+
+        """
+
         flow = do_iterative_rattled_structures(
             workflow_maker_gen_0=self.complete_dft_vs_ml_benchmark_workflow_0,
             workflow_maker_gen_1=self.complete_dft_vs_ml_benchmark_workflow_1,

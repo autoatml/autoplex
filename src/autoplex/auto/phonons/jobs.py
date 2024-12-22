@@ -46,10 +46,10 @@ def do_iterative_rattled_structures(
     previous_output=None,
 ):
     # TODO: check imaginary modes
-    print(pre_xyz_files)
+
     if rms is None or (number_of_iteration < max_iteration and rms > rms_max):
         jobs = []
-        # add iterative number to workflow name
+
         if number_of_iteration == 0:
             workflow_maker = workflow_maker_gen_0
             job1 = workflow_maker_gen_0.make(
@@ -82,9 +82,9 @@ def do_iterative_rattled_structures(
         jobs.append(job1)
         # order is the same as in the scaling "scale_cells"
         if workflow_maker.volume_custom_scale_factors is not None:
-            random_seed + len(workflow_maker.volume_custom_scale_factors)
+            random_seed=random_seed + len(workflow_maker.volume_custom_scale_factors)
         elif workflow_maker.n_structures is not None:
-            random_seed + workflow_maker.n_structures
+            random_seed=random_seed + workflow_maker.n_structures
 
         job2 = do_iterative_rattled_structures(
             workflow_maker_gen_0=workflow_maker_gen_0,
@@ -718,17 +718,36 @@ def get_iso_atom(
 
 
 @job
-def get_output(
-    metrics,
-    benchmark_structures,
-    benchmark_mp_ids,
-    dft_references,
-    pre_xyz_files,
-    pre_database_dir,
-    fit_kwargs_list,
-):
+def get_output(metrics: list,
+    benchmark_structures: list[Structure] | None = None,
+    benchmark_mp_ids: list[str] | None = None,
+    dft_references: list[PhononBSDOSDoc] | None = None,
+    pre_xyz_files: list[str] | None = None,
+    pre_database_dir:str | None = None,
+    fit_kwargs_list: list | None = None):
+    """
+    Job to collect all output infos for potential restarts.
 
-    # TODO: add evaluation of imaginary modes
+    Parameters
+    ----------
+    metrics: list[dict]
+        List of metric dictionaries from complete_benchmark jobs.
+    dft_references: list[PhononBSDOSDoc] | None
+        List of DFT reference files containing the PhononBSDOCDoc object.
+        Reference files have to refer to a finite displacement of 0.01.
+        For benchmarking, only 0.01 is supported
+    benchmark_structures: list[Structure] | None
+        The pymatgen structure for benchmarking.
+    benchmark_mp_ids: list[str] | None
+        Materials Project ID of the benchmarking structure.
+    pre_xyz_files: list[str] or None
+        Names of the pre-database train xyz file and test xyz file.
+    pre_database_dir: str or None
+        The pre-database directory.
+    fit_kwargs_list : list[dict].
+        Dict including MLIP fit keyword args.
+    """
+    # TODO: potentially evaluation of imaginary modes
     rms_list = []
     for metric in metrics:
         rms = 1000.0
