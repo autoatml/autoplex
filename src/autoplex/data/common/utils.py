@@ -165,8 +165,13 @@ def scale_cell(
     atoms = AseAtomsAdaptor.get_atoms(structure)
     distorted_cells = []
 
-    if volume_scale_factor_range is not None:
-        # range is specified
+    if volume_custom_scale_factors is not None:
+        scale_factors_defined = volume_custom_scale_factors
+        warnings.warn("Using your custom lattice scale factors", stacklevel=2)
+    if volume_custom_scale_factors is None:
+        if volume_scale_factor_range is None:
+            volume_scale_factor_range = [0.90, 1.1]
+
         scale_factors_defined = np.arange(
             volume_scale_factor_range[0],
             volume_scale_factor_range[1]
@@ -184,18 +189,6 @@ def scale_cell(
             f"Generated lattice scale factors {scale_factors_defined} within your range",
             stacklevel=2,
         )
-
-    else:  # range is not specified
-        if volume_custom_scale_factors is None:
-            # use default scale factors if not specified
-            scale_factors_defined = [0.90, 0.95, 0.98, 0.99, 1.01, 1.02, 1.05, 1.10]
-            warnings.warn(
-                "Using default lattice scale factors of [0.90, 0.95, 0.98, 0.99, 1.01, 1.02, 1.05, 1.10]",
-                stacklevel=2,
-            )
-        else:
-            scale_factors_defined = volume_custom_scale_factors
-            warnings.warn("Using your custom lattice scale factors", stacklevel=2)
 
     for scale_factor in scale_factors_defined:
         # make copy of ground state

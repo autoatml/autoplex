@@ -536,7 +536,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         # random_seed: int | None = None,
         # fit_kwargs_list: list | None = None,
         output_flow = get_output(
-            metrics=collect_bm.output["bm_output"],
+            metrics=collect_bm.output,
             benchmark_structures=benchmark_structures,
             benchmark_mp_ids=benchmark_mp_ids,
             dft_references=dft_references,
