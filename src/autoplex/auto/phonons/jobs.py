@@ -270,7 +270,9 @@ def complete_benchmark(  # this function was put here to prevent circular import
                         supercell_settings=supercell_settings,
                     )
                     jobs.append(dft_phonons)
-                    dft_references = dft_phonons.output["phonon_data"][f"{int(displacement * 100):03d}"]
+                    dft_references = dft_phonons.output["phonon_data"][
+                        f"{int(displacement * 100):03d}"
+                    ]
 
                 add_data_bm = PhononBenchmarkMaker(name="Benchmark").make(
                     ml_model=ml_model,

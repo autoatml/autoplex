@@ -392,7 +392,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                 separated=self.separated,
                 regularization=self.regularization,
                 distillation=self.distillation,
-                ).make(
+            ).make(
                 species_list=isoatoms.output["species"],
                 isolated_atom_energies=isoatoms.output["energies"],
                 fit_input=fit_input,
@@ -403,7 +403,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
             # do i need to add more info here to get the right files?
             fit_outputs.append(add_data_fit.output)
             if (benchmark_structures is not None) and (benchmark_mp_ids is not None):
-                dft_new_references=[]
+                dft_new_references = []
                 for ibenchmark_structure, benchmark_structure in enumerate(
                     benchmark_structures
                 ):
@@ -490,7 +490,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                             if (benchmark_structures is not None) and (
                                 benchmark_mp_ids is not None
                             ):
-                                dft_new_references=[]
+                                dft_new_references = []
                                 for (
                                     ibenchmark_structure,
                                     benchmark_structure,
@@ -520,12 +520,12 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                                         f"_{benchmark_mp_ids[ibenchmark_structure]}"
                                     )
                                     flows.append(complete_bm)
-                                    bm_outputs.append(
-                                        complete_bm.output["bm_output"]
-                                    )
+                                    bm_outputs.append(complete_bm.output["bm_output"])
                                     # save the dft references okay
 
-                                    dft_new_references.append(complete_bm.output["dft_references"])
+                                    dft_new_references.append(
+                                        complete_bm.output["dft_references"]
+                                    )
 
         collect_bm = write_benchmark_metrics(
             benchmark_structures=benchmark_structures,

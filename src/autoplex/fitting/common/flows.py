@@ -310,17 +310,18 @@ class DataPreprocessing(Maker):
                 )
                 for file_name in self.pre_xyz_files:
                     # TODO: if it makes sense to remove isolated atoms from other files as well
-                    atoms_list = ase.io.read(os.path.join(self.pre_database_dir,file_name), index=":")
+                    atoms_list = ase.io.read(
+                        os.path.join(self.pre_database_dir, file_name), index=":"
+                    )
                     new_atoms_list = []
                     for atoms in atoms_list:
-                        if not atoms.info["config_type"] == "IsolatedAtom":
+                        if atoms.info["config_type"] != "IsolatedAtom":
                             new_atoms_list.append(atoms)
                     ase.io.write(destination_file_path, new_atoms_list, append=True)
 
                     logging.info(
                         f"File {self.pre_xyz_files[0]} has been copied to {destination_file_path}"
                     )
-
 
             elif len(self.pre_xyz_files) > 2:
                 raise ValueError(
