@@ -992,10 +992,12 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
     # benchmark runs must be reused
     max_iterations: int = 10
     rms_max: float = 0.2
-    complete_dft_vs_ml_benchmark_workflow: CompleteDFTvsMLBenchmarkWorkflow | None = (
+    complete_dft_vs_ml_benchmark_workflow_0: CompleteDFTvsMLBenchmarkWorkflow | None = (
         field(default_factory=CompleteDFTvsMLBenchmarkWorkflow)
     )
-
+    complete_dft_vs_ml_benchmark_workflow_1: CompleteDFTvsMLBenchmarkWorkflow | None = (
+        field(default_factory=CompleteDFTvsMLBenchmarkWorkflow)
+    )
     def make(
         self,
         structure_list: list[Structure],
@@ -1005,12 +1007,18 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
         benchmark_mp_ids: list[str] | None = None,
         fit_kwargs_list: list | None = None,
         random_seed: int = 0,
+        pre_database_dir: str | None = None,
+        pre_xyz_files: list[str] | None = None,
+
         # reference files
         # random seed here
     ):
-
+        # TODO: avoid additional isolated atom calculation
+        # TODO: avoid duplicated calculation references
         flow = do_iterative_rattled_structures(
-            workflow_maker=self.complete_dft_vs_ml_benchmark_workflow,
+            workflow_maker_gen_0=self.complete_dft_vs_ml_benchmark_workflow_0,
+            workflow_maker_gen_1=self.complete_dft_vs_ml_benchmark_workflow_1,
+
             structure_list=structure_list,
             mp_ids=mp_ids,
             benchmark_structures=benchmark_structures,
@@ -1020,5 +1028,9 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
             max_iteration=self.max_iterations,
             rms_max=self.rms_max,
             random_seed=random_seed,
+            dft_references=dft_references,
+            fit_kwargs_list=fit_kwargs_list,
+            pre_database_dir=pre_database_dir,
+            pre_xyz_files=pre_xyz_files,
         )
         return Flow(flow, flow.output)

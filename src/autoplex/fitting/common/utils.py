@@ -124,6 +124,8 @@ def gap_fitting(
     train_data_path = os.path.join(db_dir, train_name)
     test_data_path = os.path.join(db_dir, test_name)
 
+    print(train_data_path)
+    print(test_data_path)
     default_hyperparameters = load_mlip_hyperparameter_defaults(
         mlip_fit_parameter_file_path=path_to_hyperparameters
     )
@@ -1770,6 +1772,7 @@ def run_gap(num_processes_fit: int, parameters) -> None:
         open("std_gap_out.log", "w", encoding="utf-8") as file_std,
         open("std_gap_err.log", "w", encoding="utf-8") as file_err,
     ):
+        print(*parameters)
         subprocess.call(["gap_fit", *parameters], stdout=file_std, stderr=file_err)
 
 

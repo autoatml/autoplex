@@ -384,8 +384,9 @@ def ref_paths4_mpid():
         "dft phonon static 2/2_mp-22905": "dft_ml_data_generation/phonon_static_2/",
         "dft phonon static 2/2_mp-22905_0": "dft_ml_data_generation/phonon_static_2/",
         "dft rattle static 1/4_test": "dft_ml_data_generation/rand_static_1/",
+        "dft rattle static 1/4_test": "dft_ml_data_generation/rand_static_1/",
         "dft rattle static 1/4_test_0": "dft_ml_data_generation/rand_static_1/",
-        "dft rattle static 1/4_test_1": "dft_ml_data_generation/rand_static_1/",
+        "dft rattle static 1/1_test_1": "dft_ml_data_generation/rand_static_1/",
         "dft rattle static 1/4_mp-22905": "dft_ml_data_generation/rand_static_1/",
         "dft rattle static 1/4_mp-22905_0": "dft_ml_data_generation/rand_static_1/",
         "dft rattle static 2/4_test": "dft_ml_data_generation/rand_static_4/",
@@ -487,6 +488,10 @@ def fake_run_vasp_kwargs4_mpid():
             "check_inputs": ["incar", "potcar"],
         },
         "dft rattle static 1/4_test_0": {
+            "incar_settings": ["NSW", "ISMEAR"],
+            "check_inputs": ["incar", "potcar"],
+        },
+        "dft rattle static 1/1_test_1": {
             "incar_settings": ["NSW", "ISMEAR"],
             "check_inputs": ["incar", "potcar"],
         },
@@ -593,15 +598,26 @@ def test_iterative_complete_dft_vs_ml_benchmark_workflow_gap(vasp_test_dir, mock
     complete_workflow = IterativeCompleteDFTvsMLBenchmarkWorkflow(
         rms_max=0.5,
         max_iterations=2,
-        complete_dft_vs_ml_benchmark_workflow=CompleteDFTvsMLBenchmarkWorkflow(symprec=1e-2, displacements=[0.01],
+        complete_dft_vs_ml_benchmark_workflow_0=CompleteDFTvsMLBenchmarkWorkflow( symprec=1e-2, displacements=[0.01],
         volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
         supercell_settings={"min_length": 8, "min_atoms": 20},
         apply_data_preprocessing=True),
+        complete_dft_vs_ml_benchmark_workflow_1=CompleteDFTvsMLBenchmarkWorkflow(symprec=1e-2, displacements=[0.01],
+                                                                                 volume_custom_scale_factors=[0.975],
+                                                                                 supercell_settings={"min_length": 8,
+                                                                                                     "min_atoms": 20},
+                                                                                 apply_data_preprocessing=True,
+                                                                                 add_dft_phonon_struct=False,
+                                                                                 num_processes_fit=4,
+                                                                                 ),
+
+
     ).make(
         structure_list=[structure],
         mp_ids=["test"],
         benchmark_mp_ids=["mp-22905"],
         benchmark_structures=[structure],
+
     )
 
 

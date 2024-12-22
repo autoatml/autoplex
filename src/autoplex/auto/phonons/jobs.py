@@ -28,7 +28,8 @@ from autoplex.data.phonons.jobs import reduce_supercell_size
 
 @job
 def do_iterative_rattled_structures(
-    workflow_maker,
+    workflow_maker_gen_0,
+    workflow_maker_gen_1,
     structure_list: list[Structure],
     mp_ids,
     dft_references: list[PhononBSDOSDoc] | None = None,
@@ -48,38 +49,55 @@ def do_iterative_rattled_structures(
     if rms is None or (number_of_iteration < max_iteration and rms > rms_max):
         jobs = []
         # add iterative number to workflow name
-
-        job1 = workflow_maker.make(
-            structure_list=structure_list,
-            mp_ids=mp_ids,
-            dft_references=dft_references,
-            benchmark_structures=benchmark_structures,
-            benchmark_mp_ids=benchmark_mp_ids,
-            pre_xyz_files=pre_xyz_files,
-            pre_database_dir=pre_database_dir,
-            random_seed=random_seed,
-            fit_kwargs_list=fit_kwargs_list,
-        )
+        if number_of_iteration==0:
+            workflow_maker=workflow_maker_gen_0
+            job1 = workflow_maker_gen_0.make(
+                structure_list=structure_list,
+                mp_ids=mp_ids,
+                dft_references=dft_references,
+                benchmark_structures=benchmark_structures,
+                benchmark_mp_ids=benchmark_mp_ids,
+                pre_xyz_files=pre_xyz_files,
+                pre_database_dir=pre_database_dir,
+                random_seed=random_seed,
+                fit_kwargs_list=fit_kwargs_list,
+            )
+        else:
+            workflow_maker=workflow_maker_gen_1
+            job1 = workflow_maker_gen_1.make(
+                structure_list=structure_list,
+                mp_ids=mp_ids,
+                dft_references=dft_references,
+                benchmark_structures=benchmark_structures,
+                benchmark_mp_ids=benchmark_mp_ids,
+                pre_xyz_files=pre_xyz_files,
+                pre_database_dir=pre_database_dir,
+                random_seed=random_seed,
+                fit_kwargs_list=fit_kwargs_list,
+            )
 
         # rms needs to be computed somehow
         job1.append_name("_" + str(number_of_iteration))
         jobs.append(job1)
         # TODO: check if these are all options
         # TODO: make sure the correct number of structures is always generated (check scale factors)
+        # TODO: needs to be confirmed with the logic of the other parts of the workflow
+        # which number is checked first
         if workflow_maker.n_structures is not None:
             random_seed + workflow_maker.n_structures
         elif workflow_maker.volume_custom_scale_factors is not None:
             random_seed + len(workflow_maker.volume_custom_scale_factors)
 
         job2 = do_iterative_rattled_structures(
-            workflow_maker=workflow_maker,
+            workflow_maker_gen_0=workflow_maker_gen_0,
+            workflow_maker_gen_1=workflow_maker_gen_1,
             structure_list=structure_list,
             mp_ids=mp_ids,
             dft_references=job1.output["dft_references"],
             # TODO: check if they should be optimized
             benchmark_structures=job1.output["benchmark_structures"],
             benchmark_mp_ids=job1.output["benchmark_mp_ids"],
-            pre_xyz_files=pre_xyz_files,
+            pre_xyz_files=job1.output["pre_xyz_files"],
             pre_database_dir=job1.output["pre_database_dir"],
             random_seed=random_seed,
             fit_kwargs_list=fit_kwargs_list,
@@ -707,15 +725,19 @@ def get_output(
     pre_database_dir,
     fit_kwargs_list,
 ):
-    rms = 1000.0
+
+    # TODO: add evaluation of imaginary modes
+    rms_list=[]
     for metric in metrics:
+        rms=1000.0
         for metri in metric:
             if metri["benchmark_phonon_rmse"] < rms:
                 rms = metri["benchmark_phonon_rmse"]
+        rms_list.append(rms)
 
     return {
         "metrics": metrics,
-        "rms": rms,
+        "rms": min(rms_list),
         "benchmark_structures": benchmark_structures,
         "benchmark_mp_ids": benchmark_mp_ids,
         "dft_references": dft_references,
