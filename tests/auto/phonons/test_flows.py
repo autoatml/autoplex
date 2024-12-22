@@ -1168,8 +1168,6 @@ def test_complete_dft_vs_ml_benchmark_workflow_separated(
                                                              displacements=[0.01],
                                                              volume_custom_scale_factors=[0.975, 1.0, 1.025,
                                                                                           1.05],
-                                                             pre_xyz_files=["vasp_ref.extxyz"],
-                                                             pre_database_dir=test_dir / "fitting" / "ref_files",
                                                              apply_data_preprocessing=True,
                                                              separated=True,
                                                              ).make(
@@ -1177,6 +1175,9 @@ def test_complete_dft_vs_ml_benchmark_workflow_separated(
         mp_ids=["test"],
         benchmark_mp_ids=["mp-22905"],
         benchmark_structures=[structure],
+        pre_xyz_files=["vasp_ref.extxyz"],
+        pre_database_dir=test_dir / "fitting" / "ref_files",
+
     )
 
     # automatically use fake VASP and write POTCAR.spec during the test
@@ -1213,8 +1214,6 @@ def test_complete_dft_vs_ml_benchmark_workflow_separated_sigma_reg_hploop_three_
                                                                atomwise_regularization_list=[0.01],
                                                                n_sparse_list=[3000, 5000],
                                                                soap_delta_list=[1.0],
-                                                               pre_xyz_files=["vasp_ref.extxyz"],
-                                                               pre_database_dir=test_dir / "fitting" / "ref_files",
                                                                apply_data_preprocessing=True,
                                                                regularization=True,
                                                                separated=True,
@@ -1223,6 +1222,9 @@ def test_complete_dft_vs_ml_benchmark_workflow_separated_sigma_reg_hploop_three_
         mp_ids=["test", "test2", "test3"],
         benchmark_mp_ids=["mp-22905"],
         benchmark_structures=[structure],
+        pre_xyz_files=["vasp_ref.extxyz"],
+        pre_database_dir=test_dir / "fitting" / "ref_files",
+
     )
 
     # automatically use fake VASP and write POTCAR.spec during the test
