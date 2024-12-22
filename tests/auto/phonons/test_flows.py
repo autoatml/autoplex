@@ -934,14 +934,14 @@ def test_complete_dft_vs_ml_benchmark_workflow_nequip(
         symprec=1e-2, supercell_settings={"min_length": 8, "min_atoms": 20}, displacements=[0.01],
         volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
         benchmark_kwargs={"calculator_kwargs": {"device": "cpu"}},
-        pre_xyz_files=["vasp_ref.extxyz"],
-        pre_database_dir=test_dir / "fitting" / "ref_files",
         apply_data_preprocessing=True,
     ).make(
         structure_list=[structure],
         mp_ids=["test"],
         benchmark_mp_ids=["mp-22905"],
         benchmark_structures=[structure],
+        pre_xyz_files=["vasp_ref.extxyz"],
+        pre_database_dir=test_dir / "fitting" / "ref_files",
         fit_kwargs_list=[{
             "r_max": 4.0,
             "num_layers": 4,
@@ -1319,8 +1319,7 @@ class TestCompleteDFTvsMLBenchmarkWorkflow:
             supercell_settings={"min_length": 8, "min_atoms": 20},
             displacements=[0.01],
             volume_custom_scale_factors=[0.975, 0.975, 0.975, 1.0, 1.0, 1.0, 1.025, 1.025, 1.025, 1.05, 1.05, 1.05],
-            pre_xyz_files=["vasp_ref.extxyz"],
-            pre_database_dir=test_dir / "fitting" / "ref_files",
+
             apply_data_preprocessing=True,
         ).make(
             structure_list=[structure],
@@ -1328,6 +1327,8 @@ class TestCompleteDFTvsMLBenchmarkWorkflow:
             benchmark_mp_ids=["mp-22905"],
             benchmark_structures=[structure],
             dft_references=None,
+            pre_xyz_files=["vasp_ref.extxyz"],
+            pre_database_dir=test_dir / "fitting" / "ref_files",
             fit_kwargs_list=[{"general": {"two_body": True, "three_body": False, "soap": False}}]
             # reduce unit test run time
         )
@@ -1371,8 +1372,6 @@ class TestCompleteDFTvsMLBenchmarkWorkflow:
             displacements=[0.01],
             add_dft_phonon_struct=False,
             volume_custom_scale_factors=[0.975, 0.975, 0.975, 1.0, 1.0, 1.0, 1.025, 1.025, 1.025, 1.05, 1.05, 1.05],
-            pre_xyz_files=["vasp_ref.extxyz"],
-            pre_database_dir=test_dir / "fitting" / "ref_files",
             apply_data_preprocessing=True,
         ).make(
             structure_list=[structure],
@@ -1380,6 +1379,8 @@ class TestCompleteDFTvsMLBenchmarkWorkflow:
             benchmark_mp_ids=["mp-22905"],
             benchmark_structures=[structure],
             dft_references=[dft_reference],
+            pre_xyz_files=["vasp_ref.extxyz"],
+            pre_database_dir=test_dir / "fitting" / "ref_files",
             fit_kwargs_list=[{"general": {"two_body": True, "three_body": False, "soap": False}}]
             # reduce unit test run time
         )
@@ -1421,8 +1422,6 @@ class TestCompleteDFTvsMLBenchmarkWorkflow:
             displacements=[0.01],
             add_dft_phonon_struct=False,
             volume_custom_scale_factors=[0.975, 0.975, 0.975, 1.0, 1.0, 1.0, 1.025, 1.025, 1.025, 1.05, 1.05, 1.05],
-            pre_xyz_files=["vasp_ref.extxyz"],
-            pre_database_dir=test_dir / "fitting" / "ref_files",
             apply_data_preprocessing=True,
         ).make(
             structure_list=[structure],
@@ -1430,6 +1429,8 @@ class TestCompleteDFTvsMLBenchmarkWorkflow:
             benchmark_mp_ids=["mp-22905"],
             benchmark_structures=[structure],
             dft_references=None,
+            pre_xyz_files=["vasp_ref.extxyz"],
+            pre_database_dir=test_dir / "fitting" / "ref_files",
             fit_kwargs_list=[{"general": {"two_body": True, "three_body": False, "soap": False}}]
             # reduce unit test run time
         )
@@ -1458,8 +1459,6 @@ class TestCompleteDFTvsMLBenchmarkWorkflow:
             displacements=[0.01],
             add_dft_rattled_struct=False,
             volume_custom_scale_factors=[0.975, 0.975, 0.975, 1.0, 1.0, 1.0, 1.025, 1.025, 1.025, 1.05, 1.05, 1.05],
-            pre_xyz_files=["vasp_ref.extxyz"],
-            pre_database_dir=test_dir / "fitting" / "ref_files",
             apply_data_preprocessing=True,
         ).make(
             structure_list=[structure],
@@ -1467,6 +1466,8 @@ class TestCompleteDFTvsMLBenchmarkWorkflow:
             benchmark_mp_ids=["mp-22905"],
             benchmark_structures=[structure],
             dft_references=None,
+            pre_xyz_files=["vasp_ref.extxyz"],
+            pre_database_dir=test_dir / "fitting" / "ref_files",
             fit_kwargs_list=[{"general": {"two_body": True, "three_body": False, "soap": False}}]
             # reduce unit test run time
         )
@@ -1494,8 +1495,6 @@ class TestCompleteDFTvsMLBenchmarkWorkflow:
             supercell_settings={"min_length": 8, "min_atoms": 20},
             displacements=[0.01],
             volume_custom_scale_factors=[0.975, 0.975, 0.975, 1.0, 1.0, 1.0, 1.025, 1.025, 1.025, 1.05, 1.05, 1.05],
-            pre_xyz_files=["vasp_ref.extxyz"],
-            pre_database_dir=test_dir / "fitting" / "ref_files",
             apply_data_preprocessing=True,
         ).make(
             structure_list=[structure],
@@ -1503,6 +1502,8 @@ class TestCompleteDFTvsMLBenchmarkWorkflow:
             benchmark_mp_ids=["mp-22905"],
             benchmark_structures=[structure],
             dft_references=None,
+            pre_xyz_files=["vasp_ref.extxyz"],
+            pre_database_dir=test_dir / "fitting" / "ref_files",
             fit_kwargs_list=[{"general": {"two_body": True, "three_body": False, "soap": False}}]
             # reduce unit test run time
         )
@@ -1607,8 +1608,6 @@ class TestCompleteDFTvsMLBenchmarkWorkflow:
             phonon_static_energy_maker=test_phonon_static_energy_maker,
             rattled_bulk_relax_maker=test_rattled_bulk_relax_maker,
             isolated_atom_maker=test_static_iso_atom_maker,
-            pre_xyz_files=["vasp_ref.extxyz"],
-            pre_database_dir=test_dir / "fitting" / "ref_files",
             apply_data_preprocessing=True,
         ).make(
             structure_list=[structure],
@@ -1616,6 +1615,8 @@ class TestCompleteDFTvsMLBenchmarkWorkflow:
             benchmark_mp_ids=["mp-22905"],
             benchmark_structures=[structure],
             dft_references=None,
+            pre_xyz_files=["vasp_ref.extxyz"],
+            pre_database_dir=test_dir / "fitting" / "ref_files",
             fit_kwargs_list=[{"general": {"two_body": True, "three_body": False, "soap": False}}]
             # reduce unit test run time
         )
@@ -1644,13 +1645,13 @@ def test_phonon_dft_ml_data_generation_flow(
     flow_data_generation = CompleteDFTvsMLBenchmarkWorkflow(
         n_structures=3, supercell_settings={"min_length": 10, "min_atoms": 20}, symprec=1e-2,
         volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
-        pre_xyz_files=["vasp_ref.extxyz"],
-        pre_database_dir=test_dir / "fitting" / "ref_files",
         apply_data_preprocessing=True,
     ).make(structure_list=structure_list,
            mp_ids=mp_ids,
            benchmark_structures=structure_list,
            benchmark_mp_ids=mp_ids,
+           pre_xyz_files=["vasp_ref.extxyz"],
+           pre_database_dir=test_dir / "fitting" / "ref_files",
            fit_kwargs_list=[{"general": {"two_body": True, "three_body": False, "soap": False}}]  # reduce unit test run time
            )
 
@@ -1658,13 +1659,13 @@ def test_phonon_dft_ml_data_generation_flow(
         n_structures=3, supercell_settings={"min_length": 10, "min_atoms": 20}, symprec=1e-2,
         add_dft_rattled_struct=False,
         volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
-        pre_xyz_files=["vasp_ref.extxyz"],
-        pre_database_dir=test_dir / "fitting" / "ref_files",
         apply_data_preprocessing=True,
     ).make(structure_list=structure_list,
            mp_ids=mp_ids,
            benchmark_structures=structure_list,
            benchmark_mp_ids=mp_ids,
+           pre_xyz_files=["vasp_ref.extxyz"],
+           pre_database_dir=test_dir / "fitting" / "ref_files",
            fit_kwargs_list=[{"general": {"two_body": True, "three_body": False, "soap": False}}]  # reduce unit test run time
            )
     # automatically use fake VASP and write POTCAR.spec during the test
