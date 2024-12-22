@@ -313,7 +313,11 @@ class DataPreprocessing(Maker):
                     atoms_list = ase.io.read(
                         os.path.join(self.pre_database_dir, file_name), index=":"
                     )
-                    new_atoms_list = [atoms for atoms in atoms_list if atoms.info["config_type"] != "IsolatedAtom"]
+                    new_atoms_list = [
+                        atoms
+                        for atoms in atoms_list
+                        if atoms.info["config_type"] != "IsolatedAtom"
+                    ]
 
                     ase.io.write(destination_file_path, new_atoms_list, append=True)
 
