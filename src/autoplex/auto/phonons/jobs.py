@@ -43,6 +43,7 @@ def do_iterative_rattled_structures(
     rms=0.2,
     max_iteration=5,
     rms_max=0.2,
+    previous_output=None
 ):
     # TODO: check imaginary modes
     print(pre_xyz_files)
@@ -102,6 +103,7 @@ def do_iterative_rattled_structures(
             rms=job1.output["rms"],
             max_iteration=max_iteration,
             rms_max=rms_max,
+            previous_output=job1.output,
         )
         jobs.append(job2)
         # benchmark stuff has to be passed into the complete stuff later on instead of recalculating it every time
@@ -109,7 +111,7 @@ def do_iterative_rattled_structures(
         return Response(replace=Flow(jobs), output=job2.output)
     # give a nicer output # what do we need to restart?
     # should be the same as for the completeworkflow
-    return None
+    return previous_output
 
 
 @job

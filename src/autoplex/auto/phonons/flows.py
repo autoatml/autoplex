@@ -1041,5 +1041,6 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
             fit_kwargs_list=fit_kwargs_list,
             pre_database_dir=pre_database_dir,
             pre_xyz_files=pre_xyz_files,
+            previous_output=None
         )
         return Flow(flow, flow.output)
