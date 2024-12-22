@@ -79,14 +79,11 @@ def do_iterative_rattled_structures(
         # rms needs to be computed somehow
         job1.append_name("_" + str(number_of_iteration))
         jobs.append(job1)
-        # TODO: check if these are all options
-        # TODO: make sure the correct number of structures is always generated (check scale factors)
-        # TODO: needs to be confirmed with the logic of the other parts of the workflow
-        # which number is checked first
-        if workflow_maker.n_structures is not None:
-            random_seed + workflow_maker.n_structures
-        elif workflow_maker.volume_custom_scale_factors is not None:
+        # order is the same as in the scaling "scale_cells"
+        if workflow_maker.volume_custom_scale_factors is not None:
             random_seed + len(workflow_maker.volume_custom_scale_factors)
+        elif workflow_maker.n_structures is not None:
+            random_seed + workflow_maker.n_structures
 
         job2 = do_iterative_rattled_structures(
             workflow_maker_gen_0=workflow_maker_gen_0,
