@@ -45,8 +45,42 @@ def do_iterative_rattled_structures(
     rms_max=0.2,
     previous_output=None,
 ):
-    # TODO: check imaginary modes
+    """
+    Job to run CompleteDFTvsMLBenchmarkWorkflow in an iterative manner.
 
+    Parameters
+    ----------
+    workflow_maker_gen_0: CompleteDFTvsMLBenchmarkWorkflow.
+        First Iteration will be performed with this flow.
+    workflow_maker_gen_1: CompleteDFTvsMLBenchmarkWorkflow.
+        All Iterations after the first one will be performed with this flow.
+    structure_list:
+            List of pymatgen structures.
+    mp_ids:
+        Materials Project IDs.
+    dft_references: list[PhononBSDOSDoc] | None
+        List of DFT reference files containing the PhononBSDOCDoc object.
+        Reference files have to refer to a finite displacement of 0.01.
+        For benchmarking, only 0.01 is supported
+    benchmark_structures: list[Structure] | None
+        The pymatgen structure for benchmarking.
+    benchmark_mp_ids: list[str] | None
+        Materials Project ID of the benchmarking structure.
+    pre_xyz_files: list[str] or None
+        Names of the pre-database train xyz file and test xyz file.
+    pre_database_dir: str or None
+        The pre-database directory.
+    random_seed: int | None
+        Random seed.
+    fit_kwargs_list : list[dict].
+        Dict including MLIP fit keyword args.
+    max_iterations: int.
+        Maximum number of iterations to run.
+    rms_max: float.
+        Will stop once the best potential has a max rmse below this value.
+    previous_output: dict | None.
+        Dict including the output of the previous flow.
+    """
     if rms is None or (number_of_iteration < max_iteration and rms > rms_max):
         jobs = []
 
