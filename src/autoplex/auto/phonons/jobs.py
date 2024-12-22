@@ -43,7 +43,7 @@ def do_iterative_rattled_structures(
     rms=0.2,
     max_iteration=5,
     rms_max=0.2,
-    previous_output=None
+    previous_output=None,
 ):
     # TODO: check imaginary modes
     print(pre_xyz_files)
