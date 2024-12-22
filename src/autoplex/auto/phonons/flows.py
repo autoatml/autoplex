@@ -1016,7 +1016,7 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
     def make(
         self,
         structure_list: list[Structure],
-        mp_ids: list[str] |None = None,
+        mp_ids: list[str] | None = None,
         dft_references: list[PhononBSDOSDoc] | None = None,
         benchmark_structures: list[Structure] | None = None,
         benchmark_mp_ids: list[str] | None = None,
@@ -1051,7 +1051,6 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
             Dict including MLIP fit keyword args.
 
         """
-
         flow = do_iterative_rattled_structures(
             workflow_maker_gen_0=self.complete_dft_vs_ml_benchmark_workflow_0,
             workflow_maker_gen_1=self.complete_dft_vs_ml_benchmark_workflow_1,

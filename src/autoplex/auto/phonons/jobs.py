@@ -82,9 +82,9 @@ def do_iterative_rattled_structures(
         jobs.append(job1)
         # order is the same as in the scaling "scale_cells"
         if workflow_maker.volume_custom_scale_factors is not None:
-            random_seed=random_seed + len(workflow_maker.volume_custom_scale_factors)
+            random_seed = random_seed + len(workflow_maker.volume_custom_scale_factors)
         elif workflow_maker.n_structures is not None:
-            random_seed=random_seed + workflow_maker.n_structures
+            random_seed = random_seed + workflow_maker.n_structures
 
         job2 = do_iterative_rattled_structures(
             workflow_maker_gen_0=workflow_maker_gen_0,
@@ -718,13 +718,15 @@ def get_iso_atom(
 
 
 @job
-def get_output(metrics: list,
+def get_output(
+    metrics: list,
     benchmark_structures: list[Structure] | None = None,
     benchmark_mp_ids: list[str] | None = None,
     dft_references: list[PhononBSDOSDoc] | None = None,
     pre_xyz_files: list[str] | None = None,
-    pre_database_dir:str | None = None,
-    fit_kwargs_list: list | None = None):
+    pre_database_dir: str | None = None,
+    fit_kwargs_list: list | None = None,
+):
     """
     Job to collect all output infos for potential restarts.
 
