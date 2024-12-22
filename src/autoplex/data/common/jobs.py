@@ -239,7 +239,7 @@ def generate_randomized_structures(
         supercell_matrix = [[2, 0, 0], [0, 2, 0], [0, 0, 2]]
 
     # TODO: remove this part
-    #if n_structures < 10:
+    # if n_structures < 10:
     #    n_structures = 10
 
     supercell = get_supercell(
