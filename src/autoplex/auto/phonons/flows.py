@@ -26,6 +26,7 @@ from autoplex.auto.phonons.jobs import (
     generate_supercells,
     get_iso_atom,
     run_supercells,
+    get_output
 )
 from autoplex.benchmark.phonons.jobs import write_benchmark_metrics
 from autoplex.data.phonons.flows import IsoAtomStaticMaker, TightDFTStaticMaker
@@ -534,21 +535,14 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         # pre_database_dir: str | None = None,
         # random_seed: int | None = None,
         # fit_kwargs_list: list | None = None,
-
-        # get this from the metrics
-        rms_upper_limit = 0.0
-        new_output = {
-            "metrics": collect_bm,
-            "rms": rms_upper_limit,
-            "benchmark_structures": benchmark_structures,
-            "benchmark_mp_ids": benchmark_mp_ids,
-            "dft_references": dft_references,
-            "pre_xyz_files": pre_xyz_files,
-            "pre_database_dir": add_data_fit.output["database_dir"],
-            "last_random_seed": last_random_seed,
-            "fit_kwargs_list": fit_kwargs_list,
-        }
-        return Flow(jobs=flows, output=new_output, name=self.name)
+        output_flow=get_output(metrics=collect_bm.output["bm_output"], benchmark_structures=benchmark_structures,
+                               benchmark_mp_ids=benchmark_mp_ids,
+                               dft_references=dft_references,
+                               pre_xyz_files=pre_xyz_files,
+                               pre_database_dir=add_data_fit.output["database_dir"],
+                               fit_kwargs_list=fit_kwargs_list,)
+        flows.append(output_flow)
+        return Flow(jobs=flows, output=output_flow.output, name=self.name)
 
     @staticmethod
     def add_dft_phonons(
@@ -1007,15 +1001,20 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
         benchmark_structures: list[Structure] | None = None,
         benchmark_mp_ids: list[str] | None = None,
         fit_kwargs_list: list | None = None,
+        random_seed: int = 0,
         # reference files
         # random seed here
     ):
 
         flow = do_iterative_rattled_structures(
             workflow_maker=self.complete_dft_vs_ml_benchmark_workflow,
+            structure_list=structure_list,
+            mp_ids=mp_ids,
+            benchmark_structures=benchmark_structures,
+            benchmark_mp_ids=benchmark_mp_ids,
             number_of_iteration=0,
             rms=None,
             max_iteration=self.max_iterations,
-            **self.input_kwargs,
-        )
+            rms_max=self.rms_max,
+            random_seed=random_seed)
         return Flow(flow, flow.output)
