@@ -151,7 +151,7 @@ def test_complete_benchmark(clean_dir, test_dir, memory_jobstore):
     jobs.append(bm)
 
     response = run_locally(Flow(jobs), store=memory_jobstore)
-    output = response[bm.output.uuid][1].output[0].resolve(store=memory_jobstore)
+    output = response[bm.output.uuid][1].output["bm_output"][0].resolve(store=memory_jobstore)
     assert output["benchmark_phonon_rmse"] == approx(4.177584429780592, abs=3.0)
     # fit results of LiCl got worse with default Si settings and fluctuate a lot more
     assert output["dft_imaginary_modes"] is False
