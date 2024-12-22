@@ -49,8 +49,8 @@ def do_iterative_rattled_structures(
     if rms is None or (number_of_iteration < max_iteration and rms > rms_max):
         jobs = []
         # add iterative number to workflow name
-        if number_of_iteration==0:
-            workflow_maker=workflow_maker_gen_0
+        if number_of_iteration == 0:
+            workflow_maker = workflow_maker_gen_0
             job1 = workflow_maker_gen_0.make(
                 structure_list=structure_list,
                 mp_ids=mp_ids,
@@ -63,7 +63,7 @@ def do_iterative_rattled_structures(
                 fit_kwargs_list=fit_kwargs_list,
             )
         else:
-            workflow_maker=workflow_maker_gen_1
+            workflow_maker = workflow_maker_gen_1
             job1 = workflow_maker_gen_1.make(
                 structure_list=structure_list,
                 mp_ids=mp_ids,
@@ -727,9 +727,9 @@ def get_output(
 ):
 
     # TODO: add evaluation of imaginary modes
-    rms_list=[]
+    rms_list = []
     for metric in metrics:
-        rms=1000.0
+        rms = 1000.0
         for metri in metric:
             if metri["benchmark_phonon_rmse"] < rms:
                 rms = metri["benchmark_phonon_rmse"]

@@ -305,9 +305,9 @@ class DataPreprocessing(Maker):
             if len(self.pre_xyz_files) == 2:
                 # join to one file and then split again afterwards
                 # otherwise, split percentage will not be true
-                destination_file_path=os.path.join(
-                        current_working_directory, "vasp_ref.extxyz"
-                    )
+                destination_file_path = os.path.join(
+                    current_working_directory, "vasp_ref.extxyz"
+                )
                 for file_name in self.pre_xyz_files:
 
                     with (
@@ -317,7 +317,9 @@ class DataPreprocessing(Maker):
                         open(destination_file_path, "a") as xyz_file,
                     ):
                         xyz_file.write(pre_xyz_file.read())
-                    logging.info(f"File {file_name} has been copied to {destination_file_path}")
+                    logging.info(
+                        f"File {file_name} has been copied to {destination_file_path}"
+                    )
 
             elif len(self.pre_xyz_files) > 2:
                 raise ValueError(

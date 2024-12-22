@@ -998,6 +998,7 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
     complete_dft_vs_ml_benchmark_workflow_1: CompleteDFTvsMLBenchmarkWorkflow | None = (
         field(default_factory=CompleteDFTvsMLBenchmarkWorkflow)
     )
+
     def make(
         self,
         structure_list: list[Structure],
@@ -1009,7 +1010,6 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
         random_seed: int = 0,
         pre_database_dir: str | None = None,
         pre_xyz_files: list[str] | None = None,
-
         # reference files
         # random seed here
     ):
@@ -1018,7 +1018,6 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
         flow = do_iterative_rattled_structures(
             workflow_maker_gen_0=self.complete_dft_vs_ml_benchmark_workflow_0,
             workflow_maker_gen_1=self.complete_dft_vs_ml_benchmark_workflow_1,
-
             structure_list=structure_list,
             mp_ids=mp_ids,
             benchmark_structures=benchmark_structures,
