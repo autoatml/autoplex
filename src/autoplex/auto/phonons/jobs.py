@@ -148,7 +148,7 @@ def do_iterative_rattled_structures(
     return previous_output
 
 
-@job
+@job(data=[PhononBSDOSDoc])
 def complete_benchmark(  # this function was put here to prevent circular import
     ml_path: list,
     ml_model: str,
