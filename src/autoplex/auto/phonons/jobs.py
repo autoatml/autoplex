@@ -751,7 +751,7 @@ def get_iso_atom(
     return Response(replace=flow)
 
 
-@job
+@job(data=[PhononBSDOSDoc])
 def get_output(
     metrics: list,
     benchmark_structures: list[Structure] | None = None,
