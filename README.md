@@ -42,7 +42,7 @@ This involves the following software packages:
 - [jobflow-remote](https://github.com/Matgenix/jobflow-remote) or [FireWorks](https://github.com/materialsproject/fireworks) for workflow and database (MongoDB) management,
 - [MongoDB](https://www.mongodb.com/) as the database (we recommend installing the MongoDB community edition). More help regarding the MongoDB installation can be found [here](https://materialsproject.github.io/fireworks/installation.html#install-mongodb).
 
-All of these software tools provide documentation and tutorials. Please take your time and check everything out! Please also cite the software packages if you are using them! 
+All of these software tools provide documentation and tutorials. Please take your time and check everything out! Please also cite the software packages if you are using them!
 
 # Setup
 
