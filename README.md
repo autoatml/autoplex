@@ -24,6 +24,13 @@
 You can find the `autoplex` documentation [here](https://autoatml.github.io/autoplex/index.html)!
 The documentation also contains tutorials that teach you how to use `autoplex` for different use cases for the RSS and phonon workflows and individual modules therein.
 
+# What to cite?
+
+Please cite our preprint on the random-structure searches (RSS) performed with `autoplex`: [Y. Liu, J. D. Morrow, C. Ertural, N. L. Fragapane, J. L. A. Gardner, A. A. Naik, Y. Zhou, J. George, V. L. Deringer, 2024, DOI 10.48550/arXiv.2412.16736](https://arxiv.org/abs/2412.16736).
+
+
+Please additionally cite all relevant software we rely on within `autoplex` and specific workflows. Please take a look below and check out the corresponding links.
+
 # Before you start using `autoplex`
 
 We expect the general user of `autoplex` to be familiar with the [Materials Project](https://github.com/materialsproject) framework software tools and related
@@ -35,7 +42,7 @@ This involves the following software packages:
 - [jobflow-remote](https://github.com/Matgenix/jobflow-remote) or [FireWorks](https://github.com/materialsproject/fireworks) for workflow and database (MongoDB) management,
 - [MongoDB](https://www.mongodb.com/) as the database (we recommend installing the MongoDB community edition). More help regarding the MongoDB installation can be found [here](https://materialsproject.github.io/fireworks/installation.html#install-mongodb).
 
-All of these software tools provide documentation and tutorials. Please take your time and check everything out!
+All of these software tools provide documentation and tutorials. Please take your time and check everything out! Please also cite the software packages if you are using them! 
 
 # Setup
 
@@ -81,6 +88,8 @@ Additionally, `buildcell` as a part of `AIRSS` needs to be installed if one want
 curl -O https://www.mtg.msm.cam.ac.uk/files/airss-0.9.3.tgz; tar -xf airss-0.9.3.tgz; rm airss-0.9.3.tgz; cd airss; make ; make install ; make neat; cd ..
 ```
 
+Please find out about licenses and citation requirements here: [https://airss-docs.github.io/](https://airss-docs.github.io/)
+
 ### LAMMPS installation
 
 You only need to install LAMMPS, if you want to use J-ACE as your MLIP.
@@ -108,7 +117,7 @@ make install-python
 $LAMMPS_INSTALL is the conda environment for installing the lammps-python interface.
 Use `BUILD_MPI=yes` to enable MPI for parallelization.
 
-After the installation is completed, enter the following commands in the Python environment.
+After the installation, enter the following commands in the Python environment.
 If you get the same output, it means the installation was successful.
 
 ```python
@@ -122,6 +131,8 @@ OMP_NUM_THREADS environment is not set. Defaulting to 1 thread. (src/comm.cpp:98
 ```
 It is very important to have it compiled with Python (`-D PKG_PYTHON=on`) and
 LIB PACE flags (`-D PACELIB_MD5=$(md5sum libpace.tar.gz | awk '{print $1}')`).
+
+Please find out about licenses and citation requirements here: [https://www.lammps.org/](https://www.lammps.org/)
 
 ### Contributing guidelines / Developer's installation
 
