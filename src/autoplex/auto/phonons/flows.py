@@ -239,7 +239,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         benchmark_mp_ids: list[str] | None = None,
         pre_database_dir: str | None = None,
         pre_xyz_files: list[str] | None = None,
-        random_seed: int | None = None,
+        random_seed: int | None = 42,
         fit_kwargs_list: list | None = None,
     ):
         """
