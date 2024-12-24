@@ -26,7 +26,7 @@ The documentation also contains tutorials that teach you how to use `autoplex` f
 
 # What to cite?
 
-Please cite our preprint on the random-structure searches (RSS) performed with `autoplex`: 
+Please cite our preprint on the random-structure searches (RSS) performed with `autoplex`:
 
 [Y. Liu, J. D. Morrow, C. Ertural, N. L. Fragapane, J. L. A. Gardner, A. A. Naik, Y. Zhou, J. George, V. L. Deringer, 2024, DOI 10.48550/arXiv.2412.16736](https://arxiv.org/abs/2412.16736).
 
