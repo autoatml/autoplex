@@ -339,7 +339,8 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                 )
                 add_dft_ratt.append_name(f"_{mp_id}")
                 flows.append(add_dft_ratt)
-                # update random seed here:
+                if random_seed is None:
+                    random_seed = 42
                 if self.volume_custom_scale_factors is not None:
                     random_seed = random_seed + len(self.volume_custom_scale_factors)
                 elif self.n_structures is not None:
