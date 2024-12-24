@@ -341,10 +341,9 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                 flows.append(add_dft_ratt)
                 # update random seed here:
                 if self.volume_custom_scale_factors is not None:
-                    random_seed = random_seed + (len(self.volume_custom_scale_factors)) * len(
-                        self.structure_list)
+                    random_seed = random_seed + len(self.volume_custom_scale_factors)
                 elif self.n_structures is not None:
-                    random_seed = random_seed + (self.n_structures) * len(self.structure_list)
+                    random_seed = random_seed + self.n_structures
 
                 fit_input.update({mp_id: add_dft_ratt.output})
             if self.add_dft_phonon_struct:
