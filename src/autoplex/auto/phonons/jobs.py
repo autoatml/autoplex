@@ -116,9 +116,9 @@ def do_iterative_rattled_structures(
         jobs.append(job1)
         # order is the same as in the scaling "scale_cells"
         if workflow_maker.volume_custom_scale_factors is not None:
-            random_seed = random_seed + len(workflow_maker.volume_custom_scale_factors)
+            random_seed = random_seed + (len(workflow_maker.volume_custom_scale_factors))*len(workflow_maker.structure_list)
         elif workflow_maker.n_structures is not None:
-            random_seed = random_seed + workflow_maker.n_structures
+            random_seed = random_seed + (workflow_maker.n_structures)*len(workflow_maker.structure_list)
 
         job2 = do_iterative_rattled_structures(
             workflow_maker_gen_0=workflow_maker_gen_0,

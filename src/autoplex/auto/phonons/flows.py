@@ -269,6 +269,9 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
             Dict including MLIP fit keyword args.
 
         """
+        self.structure_list = structure_list
+        self.mp_ids = mp_ids
+
         flows = []
         fit_input = {}
         fit_outputs = []
@@ -336,6 +339,13 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                 )
                 add_dft_ratt.append_name(f"_{mp_id}")
                 flows.append(add_dft_ratt)
+                # update random seed here:
+                if self.volume_custom_scale_factors is not None:
+                    random_seed = random_seed + (len(self.volume_custom_scale_factors)) * len(
+                        self.structure_list)
+                elif self.n_structures is not None:
+                    random_seed = random_seed + (self.n_structures) * len(self.structure_list)
+
                 fit_input.update({mp_id: add_dft_ratt.output})
             if self.add_dft_phonon_struct:
                 add_dft_phon = self.add_dft_phonons(
@@ -675,6 +685,10 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         supercell_settings: dict
             Settings for supercells
         """
+        # TODO: add option to increase random seed here as well!
+        # TODO: if you train with scaled structures, this might be otherwise too similar
+        # TODO: could be more data efficient
+        # TODO: must be adapted also in iterative flow
         additonal_dft_random = dft_random_gen_data(
             structure=structure,
             mp_id=mp_id,
