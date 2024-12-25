@@ -36,7 +36,7 @@ def do_iterative_rattled_structures(
     benchmark_mp_ids: list[str] | None = None,
     pre_xyz_files: list[str] | None = None,
     pre_database_dir: str | None = None,
-    random_seed: int | None = None,
+    rattle_seed: int | None = None,
     fit_kwargs_list: list | None = None,
     number_of_iteration=0,
     rms=0.2,
@@ -69,7 +69,7 @@ def do_iterative_rattled_structures(
         Names of the pre-database train xyz file and test xyz file.
     pre_database_dir: str or None
         The pre-database directory.
-    random_seed: int | None
+    rattle_seed: int | None
         Random seed.
     fit_kwargs_list : list[dict].
         Dict including MLIP fit keyword args.
@@ -93,7 +93,7 @@ def do_iterative_rattled_structures(
                 benchmark_mp_ids=benchmark_mp_ids,
                 pre_xyz_files=pre_xyz_files,
                 pre_database_dir=pre_database_dir,
-                random_seed=random_seed,
+                rattle_seed=rattle_seed,
                 fit_kwargs_list=fit_kwargs_list,
             )
         else:
@@ -106,7 +106,7 @@ def do_iterative_rattled_structures(
                 benchmark_mp_ids=benchmark_mp_ids,
                 pre_xyz_files=pre_xyz_files,
                 pre_database_dir=pre_database_dir,
-                random_seed=random_seed,
+                rattle_seed=rattle_seed,
                 fit_kwargs_list=fit_kwargs_list,
             )
 
@@ -115,12 +115,12 @@ def do_iterative_rattled_structures(
         jobs.append(job1)
         # order is the same as in the scaling "scale_cells"
         if workflow_maker.volume_custom_scale_factors is not None:
-            random_seed = random_seed + (
+            rattle_seed = rattle_seed + (
                 len(workflow_maker.volume_custom_scale_factors)
                 * len(workflow_maker.structure_list)
             )
         elif workflow_maker.n_structures is not None:
-            random_seed = random_seed + (workflow_maker.n_structures) * len(
+            rattle_seed = rattle_seed + (workflow_maker.n_structures) * len(
                 workflow_maker.structure_list
             )
 
@@ -135,7 +135,7 @@ def do_iterative_rattled_structures(
             benchmark_mp_ids=job1.output["benchmark_mp_ids"],
             pre_xyz_files=job1.output["pre_xyz_files"],
             pre_database_dir=job1.output["pre_database_dir"],
-            random_seed=random_seed,
+            rattle_seed=rattle_seed,
             fit_kwargs_list=fit_kwargs_list,
             number_of_iteration=number_of_iteration + 1,
             rms=job1.output["rms"],
@@ -512,7 +512,7 @@ def dft_phonopy_gen_data(
                         "LCHARG": False,  # Do not write the CHGCAR file
                         "LWAVE": False,  # Do not write the WAVECAR file
                         "LVTOT": False,  # Do not write LOCPOT file
-                        "LORBIT": 0,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
+                        "LORBIT": None,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
                         "LOPTICS": False,  # No PCDAT file
                         "NSW": 200,
                         "NELM": 500,
@@ -537,7 +537,7 @@ def dft_phonopy_gen_data(
                     "LCHARG": False,  # Do not write the CHGCAR file
                     "LWAVE": False,  # Do not write the WAVECAR file
                     "LVTOT": False,  # Do not write LOCPOT file
-                    "LORBIT": 0,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
+                    "LORBIT": None,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
                     "LOPTICS": False,  # No PCDAT file
                     # to be removed
                     "NPAR": 4,
@@ -671,7 +671,7 @@ def dft_random_gen_data(
                     "LCHARG": False,  # Do not write the CHGCAR file
                     "LWAVE": False,  # Do not write the WAVECAR file
                     "LVTOT": False,  # Do not write LOCPOT file
-                    "LORBIT": 0,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
+                    "LORBIT": None,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
                     "LOPTICS": False,  # No PCDAT file
                     "NSW": 200,
                     "NELM": 500,

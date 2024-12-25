@@ -201,7 +201,6 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
     angle_percentage_scale: float = 10
     angle_max_attempts: int = 1000
     rattle_type: int = 0
-    rattle_seed: int = 42
     rattle_mc_n_iter: int = 10
     w_angle: list[float] | None = None
     ml_models: list[str] = field(default_factory=lambda: ["GAP"])
@@ -239,7 +238,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         benchmark_mp_ids: list[str] | None = None,
         pre_database_dir: str | None = None,
         pre_xyz_files: list[str] | None = None,
-        random_seed: int | None = 42,
+        rattle_seed: int | None = 42,
         fit_kwargs_list: list | None = None,
     ):
         """
@@ -263,14 +262,16 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
             Names of the pre-database train xyz file and test xyz file.
         pre_database_dir: str or None
             The pre-database directory.
-        random_seed: int | None
-            Random seed.
+        rattle_seed: int | None
+            Random seed for structure generation.
         fit_kwargs_list : list[dict].
             Dict including MLIP fit keyword args.
 
         """
         self.structure_list = structure_list
         self.mp_ids = mp_ids
+        if rattle_seed is None:
+            rattle_seed = 42
 
         flows = []
         fit_input = {}
@@ -330,7 +331,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                     distort_type=self.distort_type,
                     min_distance=self.min_distance,
                     rattle_type=self.rattle_type,
-                    rattle_seed=self.rattle_seed,
+                    rattle_seed=rattle_seed,
                     rattle_mc_n_iter=self.rattle_mc_n_iter,
                     angle_max_attempts=self.angle_max_attempts,
                     angle_percentage_scale=self.angle_percentage_scale,
@@ -339,12 +340,10 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                 )
                 add_dft_ratt.append_name(f"_{mp_id}")
                 flows.append(add_dft_ratt)
-                if random_seed is None:
-                    random_seed = 42
                 if self.volume_custom_scale_factors is not None:
-                    random_seed = random_seed + len(self.volume_custom_scale_factors)
+                    rattle_seed = rattle_seed + len(self.volume_custom_scale_factors)
                 elif self.n_structures is not None:
-                    random_seed = random_seed + self.n_structures
+                    rattle_seed = rattle_seed + self.n_structures
                 fit_input.update({mp_id: add_dft_ratt.output})
             if self.add_dft_phonon_struct:
                 add_dft_phon = self.add_dft_phonons(
@@ -684,10 +683,6 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         supercell_settings: dict
             Settings for supercells
         """
-        # TODO: add option to increase random seed here as well!
-        # TODO: if you train with scaled structures, this might be otherwise too similar
-        # TODO: could be more data efficient
-        # TODO: must be adapted also in iterative flow
         additonal_dft_random = dft_random_gen_data(
             structure=structure,
             mp_id=mp_id,
@@ -1035,7 +1030,7 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
         benchmark_mp_ids: list[str] | None = None,
         pre_database_dir: str | None = None,
         pre_xyz_files: list[str] | None = None,
-        random_seed: int = 0,
+        rattle_seed: int = 0,
         fit_kwargs_list: list | None = None,
     ):
         """Make flow for constructing the dataset, fitting the potentials and performing the benchmarks.
@@ -1058,7 +1053,7 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
             Names of the pre-database train xyz file and test xyz file.
         pre_database_dir: str or None
             The pre-database directory.
-        random_seed: int | None
+        rattle_seed: int | None
             Random seed.
         fit_kwargs_list : list[dict].
             Dict including MLIP fit keyword args.
@@ -1075,7 +1070,7 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
             rms=None,
             max_iteration=self.max_iterations,
             rms_max=self.rms_max,
-            random_seed=random_seed,
+            rattle_seed=rattle_seed,
             dft_references=dft_references,
             fit_kwargs_list=fit_kwargs_list,
             pre_database_dir=pre_database_dir,
