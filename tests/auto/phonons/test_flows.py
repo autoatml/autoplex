@@ -433,6 +433,7 @@ def ref_paths4_mpid_new():
         "tight relax 2_mp-22905": "dft_ml_data_generation/strict_test/tight_relax_2_test/",
         "static_test": "dft_ml_data_generation/static/",
         "static_test2": "dft_ml_data_generation/static/",
+        "static_test_mp-22905": "dft_ml_data_generation/static/",
         "static_test3": "dft_ml_data_generation/static/",
         "static_test_mp-22905": "dft_ml_data_generation/static/",
         "Cl-stat_iso_atom": "Cl_iso_atoms/Cl-statisoatom/",
