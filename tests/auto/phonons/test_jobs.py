@@ -33,7 +33,7 @@ def relax_maker():
                     "LCHARG": False,  # Do not write the CHGCAR file
                     "LWAVE": False,  # Do not write the WAVECAR file
                     "LVTOT": False,  # Do not write LOCPOT file
-                    "LORBIT": 0,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
+                    "LORBIT": None,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
                     "LOPTICS": False,  # No PCDAT file
                     "NSW": 200,
                     "NELM": 500,
@@ -59,7 +59,7 @@ def static_energy_maker():
                     "LCHARG": False,  # Do not write the CHGCAR file
                     "LWAVE": False,  # Do not write the WAVECAR file
                     "LVTOT": False,  # Do not write LOCPOT file
-                    "LORBIT": 0,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
+                    "LORBIT": None,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
                     "LOPTICS": False,  # No PCDAT file
                     # to be removed
                     "NPAR": 4,
