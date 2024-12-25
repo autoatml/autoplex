@@ -242,9 +242,10 @@ def complete_benchmark(  # this function was put here to prevent circular import
 
     for path in ml_path:
         suffix = Path(path).name
+        print(suffix)
         if suffix == "without_regularization":
             suffix = "without_reg"
-        if re.match(r"job_\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2}-\d{6}-\d{5}", suffix):
+        if suffix not in ["phonon", "rattled"]:
             suffix = ""
 
         if phonon_displacement_maker is None:
