@@ -791,6 +791,7 @@ def get_output(
     # TODO: potentially evaluation of imaginary modes
 
     rms_max_values = []  # get the largest rms in each fit
+
     for i in range(len(metrics[0])):
         rms_max_value = max(sublist[i]["benchmark_phonon_rmse"] for sublist in metrics)
         rms_max_values.append(rms_max_value)
