@@ -117,6 +117,54 @@ def fake_run_vasp_kwargs():
         },
     }
 
+def test_get_output(clean_dir,test_dir,memory_jobstore):
+    from autoplex.auto.phonons.jobs import get_output
+    from jobflow import run_locally
+
+    input_dict={"metrics": [[{"benchmark_phonon_rmse": 0.12230662063050536, "dft_imaginary_modes": True,
+                  "ml_imaginary_modes": False, "ml_model": "GAP", "mp_id": "test",
+                  "structure": {"@module": "pymatgen.core.structure", "@class": "Structure", "charge": 0, "lattice": {
+                      "matrix": [[5.527464055912056, 0.0, 3.3845955817373727e-16],
+                                 [8.888840143585662e-16, 5.527464055912056, 3.3845955817373727e-16],
+                                 [0.0, 0.0, 3.006687739088837]], "pbc": [True, True, True], "a": 5.527464055912056,
+                      "b": 5.527464055912056, "c": 3.006687739088837, "alpha": 90.0, "beta": 90.0,
+                      "gamma": 89.99999999999999, "volume": 91.86290621686962}, "properties": {}, "sites": [
+                      {"species": [{"element": "Sn", "occu": 1}], "abc": [0.5, 0.0, 0.25], "properties": {},
+                       "label": "Sn", "xyz": [2.763732027956028, 0.0, 0.7516719347722095]},
+                      {"species": [{"element": "Sn", "occu": 1}], "abc": [0.0, 0.0, 0.0], "properties": {},
+                       "label": "Sn", "xyz": [0.0, 0.0, 0.0]},
+                      {"species": [{"element": "Sn", "occu": 1}], "abc": [0.0, 0.5, 0.75], "properties": {},
+                       "label": "Sn", "xyz": [4.444420071792831e-16, 2.763732027956028, 2.255015804316628]},
+                      {"species": [{"element": "Sn", "occu": 1}], "abc": [0.5, 0.5, 0.5], "properties": {},
+                       "label": "Sn", "xyz": [2.7637320279560282, 2.763732027956028, 1.503343869544419]}]},
+                  "displacement": 0.01, "atomwise_regularization_parameter": 0.1,
+                  "soap_dict": {"delta": 1.0, "n_sparse": 6000}, "suffix": "full"}], [
+                    {"benchmark_phonon_rmse": 0.08305510558730159, "dft_imaginary_modes": False,
+                     "ml_imaginary_modes": False, "ml_model": "GAP", "mp_id": "test2",
+                     "structure": {"@module": "pymatgen.core.structure", "@class": "Structure", "charge": 0,
+                                   "lattice": {"matrix": [[5.586266865017504, 0.0, 3.4206019177133026e-16],
+                                                          [8.983402272772745e-16, 5.586266865017504,
+                                                           3.4206019177133026e-16], [0.0, 0.0, 3.0386737788663782]],
+                                               "pbc": [True, True, True], "a": 5.586266865017504,
+                                               "b": 5.586266865017504, "c": 3.0386737788663782, "alpha": 90.0,
+                                               "beta": 90.0, "gamma": 89.99999999999999, "volume": 94.82600100373789},
+                                   "properties": {}, "sites": [
+                             {"species": [{"element": "Sn", "occu": 1}], "abc": [0.5, 0.0, 0.25], "properties": {},
+                              "label": "Sn", "xyz": [2.793133432508752, 0.0, 0.7596684447165948]},
+                             {"species": [{"element": "Sn", "occu": 1}], "abc": [0.0, 0.0, 0.0], "properties": {},
+                              "label": "Sn", "xyz": [0.0, 0.0, 0.0]},
+                             {"species": [{"element": "Sn", "occu": 1}], "abc": [0.0, 0.5, 0.75], "properties": {},
+                              "label": "Sn", "xyz": [4.491701136386372e-16, 2.793133432508752, 2.279005334149784]},
+                             {"species": [{"element": "Sn", "occu": 1}], "abc": [0.5, 0.5, 0.5], "properties": {},
+                              "label": "Sn", "xyz": [2.7931334325087525, 2.793133432508752, 1.5193368894331896]}]},
+                     "displacement": 0.01, "atomwise_regularization_parameter": 0.1,
+                     "soap_dict": {"delta": 1.0, "n_sparse": 6000}, "suffix": "full"}]]}
+
+    job_here=get_output(metrics=input_dict["metrics"])
+
+    responses=run_locally(job_here)
+
+    responses[job_here.uuid][1].output["rms"] == pytest.approx(0.1223)
 
 def test_complete_benchmark(clean_dir, test_dir, memory_jobstore):
     from monty.serialization import loadfn
