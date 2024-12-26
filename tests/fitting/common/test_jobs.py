@@ -1,3 +1,4 @@
+import pytest
 from autoplex.fitting.common.flows import MLIPFitMaker
 from pathlib import Path
 from jobflow import run_locally
@@ -45,6 +46,26 @@ def test_jace_fit_maker(test_dir, memory_jobstore, clean_dir):
 
     assert Path(jacefit.output["mlip_path"][0].resolve(memory_jobstore)).exists()
 
+
+@pytest.mark.skip(reason="We can enable this after mock_nep fixture is added")
+def test_nep_fit_maker(test_dir, memory_jobstore, clean_dir):
+    database_dir = test_dir / "fitting/ref_files/"
+
+    nepfit = MLIPFitMaker(
+        mlip_type="NEP",
+        num_processes_fit=1,
+        apply_data_preprocessing=False,
+        database_dir=database_dir,
+    ).make(
+        species_list=["Li", "Cl"],
+        **{"generation": 100, "batch": 100, "type_weight":[0.5, 1.0]},
+    )
+
+    _ = run_locally(
+        nepfit, ensure_success=True, create_folders=True, store=memory_jobstore
+    )
+
+    assert Path(nepfit.output["mlip_path"][0].resolve(memory_jobstore)).exists()
 
 def test_nequip_fit_maker(test_dir, memory_jobstore, clean_dir):
     database_dir = test_dir / "fitting/rss_training_dataset/"
