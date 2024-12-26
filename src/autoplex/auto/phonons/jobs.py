@@ -790,14 +790,14 @@ def get_output(
     """
     # TODO: potentially evaluation of imaginary modes
 
-    rms_max_values = [] # get the largest rms in each fit
+    rms_max_values = []  # get the largest rms in each fit
     for i in range(len(metrics[0])):
-        rms_max_value = max(sublist[i]['benchmark_phonon_rmse'] for sublist in metrics)
+        rms_max_value = max(sublist[i]["benchmark_phonon_rmse"] for sublist in metrics)
         rms_max_values.append(rms_max_value)
 
     return {
         "metrics": metrics,
-        "rms": min(rms_max_values), # get the best fit
+        "rms": min(rms_max_values),  # get the best fit
         "benchmark_structures": benchmark_structures,
         "benchmark_mp_ids": benchmark_mp_ids,
         "dft_references": dft_references,
