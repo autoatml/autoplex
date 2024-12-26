@@ -1005,6 +1005,7 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
         Maximum number of iterations to run.
     rms_max: float.
         Will stop once the best potential has a max rmse below this value.
+        The RMSE value is in THz.
     complete_dft_vs_ml_benchmark_workflow_0: CompleteDFTvsMLBenchmarkWorkflow.
         First Iteration will be performed with this flow.
     complete_dft_vs_ml_benchmark_workflow_1: CompleteDFTvsMLBenchmarkWorkflow.
