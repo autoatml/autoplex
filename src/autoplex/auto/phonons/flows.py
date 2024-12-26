@@ -86,9 +86,9 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         Must be provided if distorting volume without specifying a range, or if distorting angles.
         Default=10.
     displacements: list[float]
-        Displacement distances for phonon data generation.
+        Displacement distances for phonon data generation for the fiting.
         Only 0.01 is used for the benchmark at the moment.
-        Might be changed later.
+        This value can currently not be changed.
     symprec: float
         Symmetry precision to use in the
         reduction of symmetry to find the primitive/conventional cell
