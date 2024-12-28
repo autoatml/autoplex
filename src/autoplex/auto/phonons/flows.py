@@ -1,7 +1,7 @@
 """Flows to perform automatic data generation, fitting, and benchmarking of ML potentials."""
 
-import warnings
 import logging
+import warnings
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -1020,7 +1020,11 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
         field(default_factory=CompleteDFTvsMLBenchmarkWorkflow)
     )
     complete_dft_vs_ml_benchmark_workflow_1: CompleteDFTvsMLBenchmarkWorkflow | None = (
-        field(default_factory=lambda: CompleteDFTvsMLBenchmarkWorkflow(add_dft_phonon_struct=False))
+        field(
+            default_factory=lambda: CompleteDFTvsMLBenchmarkWorkflow(
+                add_dft_phonon_struct=False
+            )
+        )
     )
 
     def make(
