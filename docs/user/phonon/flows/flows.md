@@ -225,7 +225,7 @@ GAP        LiCl       mp-22905    0.01              0.57608     False           
 
 To systematically converge the quality of the potentials, we have built an iterative version of the default workflow `CompleteDFTvsMLBenchmarkWorkflow`. It will run the `CompleteDFTvsMLBenchmarkWorkflow` until the worst RMSE value of the benchmark structures falls under a certain value or a maximum number of repetitions is reached.
 
-We allow users in the first generation to use a slightly different  workflow than in the subsequent generations. This can help to initially obtain enough structures for an MLIP fit and only slightly increase the number of structures in the next generations.
+We allow users in the first generation to use a slightly different  workflow than in the subsequent generations. This can help to initially obtain enough structures for an MLIP fit and only slightly increase the number of structures in the next generations. Please don't forget to deactivate the phonon data generation after the first iteration.
 
 ```python
 from mp_api.client import MPRester
@@ -246,10 +246,10 @@ for mpbm in mpbenchmark:
 
 complete_flow=IterativeCompleteDFTvsMLBenchmarkWorkflow(rms_max=0.2, max_iterations=4, 
                                                         complete_dft_vs_ml_benchmark_workflow_0=CompleteDFTvsMLBenchmarkWorkflow(
-    apply_data_preprocessing=True,
+    apply_data_preprocessing=True, add_dft_phonon_struct=True,
 ), 
                                                         complete_dft_vs_ml_benchmark_workflow_1=CompleteDFTvsMLBenchmarkWorkflow(
-    apply_data_preprocessing=True,
+    apply_data_preprocessing=True, add_dft_phonon_struct=False,
 )
                                                         ).make(
     structure_list=structure_list, mp_ids=mpids, 

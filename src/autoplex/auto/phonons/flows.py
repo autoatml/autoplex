@@ -1,5 +1,6 @@
 """Flows to perform automatic data generation, fitting, and benchmarking of ML potentials."""
 
+import warnings
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -1019,7 +1020,7 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
         field(default_factory=CompleteDFTvsMLBenchmarkWorkflow)
     )
     complete_dft_vs_ml_benchmark_workflow_1: CompleteDFTvsMLBenchmarkWorkflow | None = (
-        field(default_factory=CompleteDFTvsMLBenchmarkWorkflow)
+        field(default_factory=lambda: CompleteDFTvsMLBenchmarkWorkflow(add_dft_phonon_struct=False))
     )
 
     def make(
@@ -1079,3 +1080,12 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
             previous_output=None,
         )
         return Flow(flow, flow.output)
+
+    def __post_init__(self) -> None:
+        """Test settings during the initialisation."""
+        if self.complete_dft_vs_ml_benchmark_workflow_1.add_dft_phonon_struct:
+            warnings.warn(
+                "Phonon Data is generated in the second iteration. This will likely"
+                "waste resources. It is recommended to switch this off.",
+                stacklevel=2,
+            )
