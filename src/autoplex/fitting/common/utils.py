@@ -1779,7 +1779,6 @@ def run_gap(num_processes_fit: int, parameters) -> None:
         open("std_gap_out.log", "w", encoding="utf-8") as file_std,
         open("std_gap_err.log", "w", encoding="utf-8") as file_err,
     ):
-        print(*parameters)
         subprocess.call(["gap_fit", *parameters], stdout=file_std, stderr=file_err)
 
 

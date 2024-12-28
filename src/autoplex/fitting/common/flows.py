@@ -339,7 +339,6 @@ class DataPreprocessing(Maker):
             atom_wise_regularization=self.atom_wise_regularization,
         )
 
-        # TODO: remove too many isolated atoms
         write_after_distillation_data_split(
             self.distillation, self.force_max, self.split_ratio
         )

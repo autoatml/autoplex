@@ -276,7 +276,6 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
 
         flows = []
         fit_input = {}
-        fit_outputs = []
         bm_outputs = []
 
         default_hyperparameters = load_mlip_hyperparameter_defaults(
@@ -317,6 +316,9 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
             self.supercell_settings[mp_id][
                 "supercell_matrix"
             ] = supercell_matrix_job.output
+
+            # TODO: add a separate optimization here if add_dft_rattld_structu or add_dft_phonon_struct is activated
+            # TODO: then forward the optimized structures to the next step
 
             if self.add_dft_rattled_struct:
                 add_dft_ratt = self.add_dft_rattled(
@@ -409,8 +411,6 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
             )
             flows.append(add_data_fit)
 
-            # do i need to add more info here to get the right files?
-            fit_outputs.append(add_data_fit.output)
             if (benchmark_structures is not None) and (benchmark_mp_ids is not None):
                 dft_new_references = []
                 for ibenchmark_structure, benchmark_structure in enumerate(
@@ -492,9 +492,6 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                                 soap=soap_dict,
                             )
                             flows.append(loop_data_fit)
-                            # do i need to add more info here to get the right file?
-                            fit_outputs.append(loop_data_fit.output)
-                            # save the outputs from the fit somewhere
 
                             if (benchmark_structures is not None) and (
                                 benchmark_mp_ids is not None
@@ -545,6 +542,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
 
         flows.append(collect_bm)
 
+        # TODO: add isolated atom energies and optimized structures to output
         output_flow = get_output(
             metrics=collect_bm.output,
             benchmark_structures=benchmark_structures,
