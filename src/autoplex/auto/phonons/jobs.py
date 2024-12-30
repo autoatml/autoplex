@@ -5,16 +5,17 @@ from dataclasses import field
 from pathlib import Path
 
 import numpy as np
-from atomate2.common.schemas.phonons import PhononBSDOSDoc, ForceConstants
+from atomate2.common.schemas.phonons import ForceConstants, PhononBSDOSDoc
 from atomate2.vasp.flows.core import DoubleRelaxMaker
 from atomate2.vasp.jobs.base import BaseVaspMaker
 from atomate2.vasp.jobs.core import StaticMaker, TightRelaxMaker
 from atomate2.vasp.sets.core import StaticSetGenerator, TightRelaxSetGenerator
 from jobflow import Flow, Response, job
 from pymatgen.core.structure import Structure
-from pymatgen.phonon.dos import PhononDos
 from pymatgen.phonon.bandstructure import PhononBandStructure
+from pymatgen.phonon.dos import PhononDos
 
+from autoplex.auto.phonons.flows import CompleteDFTvsMLBenchmarkWorkflow
 from autoplex.benchmark.phonons.flows import PhononBenchmarkMaker
 from autoplex.data.phonons.flows import (
     DFTPhononMaker,
@@ -25,10 +26,17 @@ from autoplex.data.phonons.flows import (
     TightDFTStaticMaker,
 )
 from autoplex.data.phonons.jobs import reduce_supercell_size
-from autoplex.auto.phonons.flows import CompleteDFTvsMLBenchmarkWorkflow
 
 
-@job(data=[PhononBSDOSDoc, "dft_references", PhononDos, PhononBandStructure, ForceConstants])
+@job(
+    data=[
+        PhononBSDOSDoc,
+        "dft_references",
+        PhononDos,
+        PhononBandStructure,
+        ForceConstants,
+    ]
+)
 def do_iterative_rattled_structures(
     workflow_maker_gen_0: CompleteDFTvsMLBenchmarkWorkflow,
     workflow_maker_gen_1: CompleteDFTvsMLBenchmarkWorkflow,
