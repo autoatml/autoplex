@@ -13,8 +13,6 @@ from atomate2.vasp.jobs.core import StaticMaker, TightRelaxMaker
 from atomate2.vasp.sets.core import StaticSetGenerator, TightRelaxSetGenerator
 from jobflow import Flow, Response, job
 from pymatgen.core.structure import Structure
-from pymatgen.phonon.bandstructure import PhononBandStructure
-from pymatgen.phonon.dos import PhononDos
 
 from autoplex.benchmark.phonons.flows import PhononBenchmarkMaker
 from autoplex.data.phonons.flows import (
@@ -28,7 +26,9 @@ from autoplex.data.phonons.flows import (
 from autoplex.data.phonons.jobs import reduce_supercell_size
 
 if TYPE_CHECKING:
-    from autoplex.auto.phonons.flows import CompleteDFTvsMLBenchmarkWorkflow
+    from pymatgen.phonon.bandstructure import PhononBandStructure
+    from pymatgen.phonon.dos import PhononDos
+
 
 @job(
     data=[
@@ -40,10 +40,10 @@ if TYPE_CHECKING:
     ]
 )
 def do_iterative_rattled_structures(
-    workflow_maker_gen_0: CompleteDFTvsMLBenchmarkWorkflow,
-    workflow_maker_gen_1: CompleteDFTvsMLBenchmarkWorkflow,
+    workflow_maker_gen_0,
+    workflow_maker_gen_1,
     structure_list: list[Structure],
-    mp_ids,
+    mp_ids: list[str],
     dft_references: list[PhononBSDOSDoc] | None = None,
     benchmark_structures: list[Structure] | None = None,
     benchmark_mp_ids: list[str] | None = None,
@@ -164,8 +164,9 @@ def do_iterative_rattled_structures(
         # benchmark stuff has to be passed into the complete stuff later on instead of recalculating it every time
         # random seed update might be the hardest part.
         return Response(replace=Flow(jobs), output=job2.output)
-    # give a nicer output # what do we need to restart?
-    # should be the same as for the completeworkflow
+
+
+    # TODO: could explicitly define the output names?
     return previous_output
 
 

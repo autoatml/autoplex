@@ -197,6 +197,10 @@ def test_mlip_fit_maker_with_pre_database_dir(
 
     # check if gap potential file is generated
     assert Path(gapfit.output["mlip_path"][0].resolve(memory_jobstore)).exists()
+    from ase.io import read
+
+    train_atoms = read(Path(gapfit.output["database_dir"][0].resolve(memory_jobstore))/"train.extxyz",':')
+    test_atoms = read(Path(gapfit.output["database_dir"][0].resolve(memory_jobstore))/"test.extxyz",':')
 
 
 def test_mlip_fit_maker_jace(
