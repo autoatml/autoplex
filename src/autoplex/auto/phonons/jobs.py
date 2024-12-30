@@ -3,6 +3,7 @@
 from collections.abc import Iterable
 from dataclasses import field
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import numpy as np
 from atomate2.common.schemas.phonons import ForceConstants, PhononBSDOSDoc
@@ -15,7 +16,6 @@ from pymatgen.core.structure import Structure
 from pymatgen.phonon.bandstructure import PhononBandStructure
 from pymatgen.phonon.dos import PhononDos
 
-from autoplex.auto.phonons.flows import CompleteDFTvsMLBenchmarkWorkflow
 from autoplex.benchmark.phonons.flows import PhononBenchmarkMaker
 from autoplex.data.phonons.flows import (
     DFTPhononMaker,
@@ -27,6 +27,8 @@ from autoplex.data.phonons.flows import (
 )
 from autoplex.data.phonons.jobs import reduce_supercell_size
 
+if TYPE_CHECKING:
+    from autoplex.auto.phonons.flows import CompleteDFTvsMLBenchmarkWorkflow
 
 @job(
     data=[
