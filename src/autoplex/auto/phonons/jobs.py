@@ -30,6 +30,7 @@ if TYPE_CHECKING:
     from pymatgen.phonon.dos import PhononDos
 
 
+
 @job(
     data=[
         PhononBSDOSDoc,
