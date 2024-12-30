@@ -30,6 +30,7 @@ from autoplex.data.phonons.jobs import reduce_supercell_size
 if TYPE_CHECKING:
     from autoplex.auto.phonons.flows import CompleteDFTvsMLBenchmarkWorkflow
 
+
 @job(
     data=[
         PhononBSDOSDoc,
