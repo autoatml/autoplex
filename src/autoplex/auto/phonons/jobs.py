@@ -25,9 +25,8 @@ from autoplex.data.phonons.flows import (
 )
 from autoplex.data.phonons.jobs import reduce_supercell_size
 
-if TYPE_CHECKING:
-    from pymatgen.phonon.bandstructure import PhononBandStructure
-    from pymatgen.phonon.dos import PhononDos
+from pymatgen.phonon.bandstructure import PhononBandStructure
+from pymatgen.phonon.dos import PhononDos
 
 
 @job(
