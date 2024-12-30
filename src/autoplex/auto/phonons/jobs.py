@@ -30,7 +30,6 @@ if TYPE_CHECKING:
     from pymatgen.phonon.dos import PhononDos
 
 
-
 @job(
     data=[
         PhononBSDOSDoc,
@@ -165,7 +164,6 @@ def do_iterative_rattled_structures(
         # benchmark stuff has to be passed into the complete stuff later on instead of recalculating it every time
         # random seed update might be the hardest part.
         return Response(replace=Flow(jobs), output=job2.output)
-
 
     # TODO: could explicitly define the output names?
     return previous_output
