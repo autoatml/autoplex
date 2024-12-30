@@ -25,9 +25,8 @@ def write_benchmark_metrics(
     -------
     A text file with root mean squared error between DFT and ML potential phonon band-structure
     """
-    # TODO: fix this part
     metrics_flattened = [item for sublist in metrics for item in sublist]
-    # TODO: think about a better solution here
+
     # the following code assumes all benchmark structures have the same composition
     structure_composition = benchmark_structures[0].composition.reduced_formula
     with open(

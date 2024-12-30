@@ -9,6 +9,16 @@ from autoplex.fitting.common.utils import (
     MLIP_PHONON_DEFAULTS_FILE_PATH
 )
 
+def test_stratified_split(test_dir):
+    from autoplex.fitting.common.utils import stratified_dataset_split
+    from ase.io import read
+    atoms=read(test_dir / "fitting" / "ref_files" / "vasp_ref.extxyz",':')
+
+
+    train, test=stratified_dataset_split(atoms,0.33)
+
+    assert len(train) == 7
+    assert len(test) == 3
 
 def test_gap_hyperparameter_constructor():
     hyper_parameter_dict = load_mlip_hyperparameter_defaults(

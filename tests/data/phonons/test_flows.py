@@ -104,7 +104,7 @@ def test_data_generation_distort_type_1(vasp_test_dir, mock_vasp, relax_maker, c
             "check_inputs": ["incar", "potcar"],
         },
     }
-    data_gen_dt_1 = RandomStructuresDataGenerator(n_structures=3, distort_type=1, bulk_relax_maker=relax_maker).make(
+    data_gen_dt_1 = RandomStructuresDataGenerator(n_structures=10, distort_type=1, bulk_relax_maker=relax_maker).make(
         structure=structure,
         mp_id=test_mpid,
         volume_custom_scale_factors=[1.0],

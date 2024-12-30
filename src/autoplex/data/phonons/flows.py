@@ -86,7 +86,7 @@ class TightDFTStaticMaker(PhononDisplacementMaker):
                 "LCHARG": False,  # Do not write the CHGCAR file
                 "LWAVE": False,  # Do not write the WAVECAR file
                 "LVTOT": False,  # Do not write LOCPOT file
-                "LORBIT": 0,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
+                "LORBIT": None,  # remove Lorbit
                 "LOPTICS": False,  # No PCDAT file
                 "SIGMA": 0.05,
                 "ISYM": 0,
@@ -214,7 +214,7 @@ class DFTPhononMaker(PhononMaker):
                         "LCHARG": False,  # Do not write the CHGCAR file
                         "LWAVE": False,  # Do not write the WAVECAR file
                         "LVTOT": False,  # Do not write LOCPOT file
-                        "LORBIT": 0,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
+                        "LORBIT": None,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
                         "LOPTICS": False,  # No PCDAT file
                         # to be removed
                         "NPAR": 4,
@@ -237,7 +237,7 @@ class DFTPhononMaker(PhononMaker):
                     "LCHARG": False,  # Do not write the CHGCAR file
                     "LWAVE": False,  # Do not write the WAVECAR file
                     "LVTOT": False,  # Do not write LOCPOT file
-                    "LORBIT": 0,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
+                    "LORBIT": None,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
                     "LOPTICS": False,  # No PCDAT file
                     # to be removed
                     "NPAR": 4,
@@ -328,7 +328,7 @@ class RandomStructuresDataGenerator(Maker):
                     "LCHARG": False,  # Do not write the CHGCAR file
                     "LWAVE": False,  # Do not write the WAVECAR file
                     "LVTOT": False,  # Do not write LOCPOT file
-                    "LORBIT": 0,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
+                    "LORBIT": None,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
                     "LOPTICS": False,  # No PCDAT file
                     # to be removed
                     "NPAR": 4,
@@ -797,7 +797,7 @@ class IsoAtomStaticMaker(StaticMaker):
                 "LCHARG": False,  # Do not write the CHGCAR file
                 "LWAVE": False,  # Do not write the WAVECAR file
                 "LVTOT": False,  # Do not write LOCPOT file
-                "LORBIT": 0,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
+                "LORBIT": None,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
                 "LOPTICS": False,  # No PCDAT file
                 # to be removed
                 "NPAR": 4,
@@ -848,7 +848,7 @@ class IsoAtomMaker(Maker):
                     "LCHARG": False,  # Do not write the CHGCAR file
                     "LWAVE": False,  # Do not write the WAVECAR file
                     "LVTOT": False,  # Do not write LOCPOT file
-                    "LORBIT": 0,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
+                    "LORBIT": None,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
                     "LOPTICS": False,  # No PCDAT file
                     # to be removed
                     "NPAR": 4,

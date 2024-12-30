@@ -183,8 +183,10 @@ class MLIPFitMaker(Maker):
             jobs.append(mlip_fit_job)
 
             return Flow(jobs=jobs, output=mlip_fit_job.output, name=self.name)
-        # this will only run if train.extxyz and test.extxyz files are present in the database_dir
 
+        # this will only run if train.extxyz and test.extxyz files are present in the database_dir
+        # TODO: shouldn't this be the exception rather then the default run?!
+        # TODO: I assume we always want to use data from before?
         if isinstance(self.database_dir, str):
             self.database_dir = Path(self.database_dir)
 
@@ -300,6 +302,33 @@ class DataPreprocessing(Maker):
                     logging.info(
                         f"File {file_name} has been copied to {destination_file_path}"
                     )
+            if len(self.pre_xyz_files) == 2:
+                # join to one file and then split again afterwards
+                # otherwise, split percentage will not be true
+                destination_file_path = os.path.join(
+                    current_working_directory, "vasp_ref.extxyz"
+                )
+                for file_name in self.pre_xyz_files:
+                    # TODO: if it makes sense to remove isolated atoms from other files as well
+                    atoms_list = ase.io.read(
+                        os.path.join(self.pre_database_dir, file_name), index=":"
+                    )
+                    new_atoms_list = [
+                        atoms
+                        for atoms in atoms_list
+                        if atoms.info["config_type"] != "IsolatedAtom"
+                    ]
+
+                    ase.io.write(destination_file_path, new_atoms_list, append=True)
+
+                    logging.info(
+                        f"File {self.pre_xyz_files[0]} has been copied to {destination_file_path}"
+                    )
+
+            elif len(self.pre_xyz_files) > 2:
+                raise ValueError(
+                    "Please provide a train and a test extxyz file (two files in total) for the pre_xyz_files."
+                )
 
         vaspoutput_2_extended_xyz(
             path_to_vasp_static_calcs=list_of_vasp_calc_dirs,
@@ -315,23 +344,7 @@ class DataPreprocessing(Maker):
         )
 
         # Merging database
-        if self.pre_database_dir and os.path.exists(self.pre_database_dir):
-            if len(self.pre_xyz_files) == 2:
-                files_new = ["train.extxyz", "test.extxyz"]
-                for file_name, file_new in zip(self.pre_xyz_files, files_new):
-                    with (
-                        open(
-                            os.path.join(self.pre_database_dir, file_name)
-                        ) as pre_xyz_file,
-                        open(file_new, "a") as xyz_file,
-                    ):
-                        xyz_file.write(pre_xyz_file.read())
-                    logging.info(f"File {file_name} has been copied to {file_new}")
-
-            elif len(self.pre_xyz_files) > 2:
-                raise ValueError(
-                    "Please provide a train and a test extxyz file (two files in total) for the pre_xyz_files."
-                )
+        # TODO: does a merge happen here?
         if self.regularization:
             base_dir = os.getcwd()
             folder_name = os.path.join(base_dir, "without_regularization")

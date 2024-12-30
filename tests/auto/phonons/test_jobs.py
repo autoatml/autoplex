@@ -33,7 +33,7 @@ def relax_maker():
                     "LCHARG": False,  # Do not write the CHGCAR file
                     "LWAVE": False,  # Do not write the WAVECAR file
                     "LVTOT": False,  # Do not write LOCPOT file
-                    "LORBIT": 0,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
+                    "LORBIT": None,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
                     "LOPTICS": False,  # No PCDAT file
                     "NSW": 200,
                     "NELM": 500,
@@ -59,7 +59,7 @@ def static_energy_maker():
                     "LCHARG": False,  # Do not write the CHGCAR file
                     "LWAVE": False,  # Do not write the WAVECAR file
                     "LVTOT": False,  # Do not write LOCPOT file
-                    "LORBIT": 0,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
+                    "LORBIT": None,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
                     "LOPTICS": False,  # No PCDAT file
                     # to be removed
                     "NPAR": 4,
@@ -117,6 +117,34 @@ def fake_run_vasp_kwargs():
         },
     }
 
+def test_get_output(clean_dir,test_dir,memory_jobstore):
+    from autoplex.auto.phonons.jobs import get_output
+    from jobflow import run_locally
+
+    input_dict={"metrics": [[{"benchmark_phonon_rmse": 0.12230662063050536, "dft_imaginary_modes": True,
+                  "ml_imaginary_modes": False}], [
+                    {"benchmark_phonon_rmse": 0.08305510558730159, "dft_imaginary_modes": False,
+                     "ml_imaginary_modes": False}]]}
+
+    job_here=get_output(metrics=input_dict["metrics"])
+
+    responses=run_locally(job_here)
+
+    responses[job_here.uuid][1].output["rms"] == pytest.approx(0.1223)
+
+    input_dict = {"metrics": [[{"benchmark_phonon_rmse": 0.12230662063050536, "dft_imaginary_modes": True,
+                                "ml_imaginary_modes": False}, {"benchmark_phonon_rmse": 0.15230662063050536, "dft_imaginary_modes": True,
+                                "ml_imaginary_modes": False}], [
+                                  {"benchmark_phonon_rmse": 0.08305510558730159, "dft_imaginary_modes": False,
+                                   "ml_imaginary_modes": False}, {"benchmark_phonon_rmse": 0.12230662063050536, "dft_imaginary_modes": True,
+                                "ml_imaginary_modes": False}]]}
+
+    job_here=get_output(metrics=input_dict["metrics"])
+
+    responses=run_locally(job_here)
+
+    responses[job_here.uuid][1].output["rms"] == pytest.approx(0.1223)
+
 
 def test_complete_benchmark(clean_dir, test_dir, memory_jobstore):
     from monty.serialization import loadfn
@@ -151,7 +179,7 @@ def test_complete_benchmark(clean_dir, test_dir, memory_jobstore):
     jobs.append(bm)
 
     response = run_locally(Flow(jobs), store=memory_jobstore)
-    output = response[bm.output.uuid][1].output[0].resolve(store=memory_jobstore)
+    output = response[bm.output.uuid][1].output["bm_output"][0].resolve(store=memory_jobstore)
     assert output["benchmark_phonon_rmse"] == approx(4.177584429780592, abs=3.0)
     # fit results of LiCl got worse with default Si settings and fluctuate a lot more
     assert output["dft_imaginary_modes"] is False

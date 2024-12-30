@@ -1,11 +1,11 @@
 """General AutoPLEX automation jobs."""
 
-import re
 from collections.abc import Iterable
 from dataclasses import field
 from pathlib import Path
 
 import numpy as np
+from atomate2.common.schemas.phonons import PhononBSDOSDoc
 from atomate2.vasp.flows.core import DoubleRelaxMaker
 from atomate2.vasp.jobs.base import BaseVaspMaker
 from atomate2.vasp.jobs.core import StaticMaker, TightRelaxMaker
@@ -26,6 +26,133 @@ from autoplex.data.phonons.jobs import reduce_supercell_size
 
 
 @job
+def do_iterative_rattled_structures(
+    workflow_maker_gen_0,
+    workflow_maker_gen_1,
+    structure_list: list[Structure],
+    mp_ids,
+    dft_references: list[PhononBSDOSDoc] | None = None,
+    benchmark_structures: list[Structure] | None = None,
+    benchmark_mp_ids: list[str] | None = None,
+    pre_xyz_files: list[str] | None = None,
+    pre_database_dir: str | None = None,
+    rattle_seed: int | None = None,
+    fit_kwargs_list: list | None = None,
+    number_of_iteration=0,
+    rms=0.2,
+    max_iteration=5,
+    rms_max=0.2,
+    previous_output=None,
+):
+    """
+    Job to run CompleteDFTvsMLBenchmarkWorkflow in an iterative manner.
+
+    Parameters
+    ----------
+    workflow_maker_gen_0: CompleteDFTvsMLBenchmarkWorkflow.
+        First Iteration will be performed with this flow.
+    workflow_maker_gen_1: CompleteDFTvsMLBenchmarkWorkflow.
+        All Iterations after the first one will be performed with this flow.
+    structure_list:
+            List of pymatgen structures.
+    mp_ids:
+        Materials Project IDs.
+    dft_references: list[PhononBSDOSDoc] | None
+        List of DFT reference files containing the PhononBSDOCDoc object.
+        Reference files have to refer to a finite displacement of 0.01.
+        For benchmarking, only 0.01 is supported
+    benchmark_structures: list[Structure] | None
+        The pymatgen structure for benchmarking.
+    benchmark_mp_ids: list[str] | None
+        Materials Project ID of the benchmarking structure.
+    pre_xyz_files: list[str] or None
+        Names of the pre-database train xyz file and test xyz file.
+    pre_database_dir: str or None
+        The pre-database directory.
+    rattle_seed: int | None
+        Random seed.
+    fit_kwargs_list : list[dict].
+        Dict including MLIP fit keyword args.
+    max_iterations: int.
+        Maximum number of iterations to run.
+    rms_max: float.
+        Will stop once the best potential has a max rmse below this value.
+    previous_output: dict | None.
+        Dict including the output of the previous flow.
+    """
+    if rms is None or (number_of_iteration < max_iteration and rms > rms_max):
+        jobs = []
+
+        if number_of_iteration == 0:
+            workflow_maker = workflow_maker_gen_0
+            job1 = workflow_maker_gen_0.make(
+                structure_list=structure_list,
+                mp_ids=mp_ids,
+                dft_references=dft_references,
+                benchmark_structures=benchmark_structures,
+                benchmark_mp_ids=benchmark_mp_ids,
+                pre_xyz_files=pre_xyz_files,
+                pre_database_dir=pre_database_dir,
+                rattle_seed=rattle_seed,
+                fit_kwargs_list=fit_kwargs_list,
+            )
+        else:
+            workflow_maker = workflow_maker_gen_1
+            job1 = workflow_maker_gen_1.make(
+                structure_list=structure_list,
+                mp_ids=mp_ids,
+                dft_references=dft_references,
+                benchmark_structures=benchmark_structures,
+                benchmark_mp_ids=benchmark_mp_ids,
+                pre_xyz_files=pre_xyz_files,
+                pre_database_dir=pre_database_dir,
+                rattle_seed=rattle_seed,
+                fit_kwargs_list=fit_kwargs_list,
+            )
+
+        # rms needs to be computed somehow
+        job1.append_name("_" + str(number_of_iteration))
+        jobs.append(job1)
+        # order is the same as in the scaling "scale_cells"
+        if workflow_maker.volume_custom_scale_factors is not None:
+            rattle_seed = rattle_seed + (
+                len(workflow_maker.volume_custom_scale_factors)
+                * len(workflow_maker.structure_list)
+            )
+        elif workflow_maker.n_structures is not None:
+            rattle_seed = rattle_seed + (workflow_maker.n_structures) * len(
+                workflow_maker.structure_list
+            )
+
+        job2 = do_iterative_rattled_structures(
+            workflow_maker_gen_0=workflow_maker_gen_0,
+            workflow_maker_gen_1=workflow_maker_gen_1,
+            structure_list=structure_list,
+            mp_ids=mp_ids,
+            dft_references=job1.output["dft_references"],
+            # TODO: check if they should be optimized
+            benchmark_structures=job1.output["benchmark_structures"],
+            benchmark_mp_ids=job1.output["benchmark_mp_ids"],
+            pre_xyz_files=job1.output["pre_xyz_files"],
+            pre_database_dir=job1.output["pre_database_dir"],
+            rattle_seed=rattle_seed,
+            fit_kwargs_list=fit_kwargs_list,
+            number_of_iteration=number_of_iteration + 1,
+            rms=job1.output["rms"],
+            max_iteration=max_iteration,
+            rms_max=rms_max,
+            previous_output=job1.output,
+        )
+        jobs.append(job2)
+        # benchmark stuff has to be passed into the complete stuff later on instead of recalculating it every time
+        # random seed update might be the hardest part.
+        return Response(replace=Flow(jobs), output=job2.output)
+    # give a nicer output # what do we need to restart?
+    # should be the same as for the completeworkflow
+    return previous_output
+
+
+@job(data=[PhononBSDOSDoc])
 def complete_benchmark(  # this function was put here to prevent circular import
     ml_path: list,
     ml_model: str,
@@ -114,9 +241,10 @@ def complete_benchmark(  # this function was put here to prevent circular import
 
     for path in ml_path:
         suffix = Path(path).name
+        print(suffix)
         if suffix == "without_regularization":
             suffix = "without_reg"
-        if re.match(r"job_\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2}-\d{6}-\d{5}", suffix):
+        if suffix not in ["phonon", "rattled"]:
             suffix = ""
 
         if phonon_displacement_maker is None:
@@ -137,6 +265,7 @@ def complete_benchmark(  # this function was put here to prevent circular import
             ml_potential = Path(path) / "deployed_nequip_model.pth"
         else:  # MACE
             # treat finetuned potentials
+            # TODO: fix this naming issue (depends on input)
             ml_potential_fine = Path(path) / "MACE_final.model"
             ml_potential = (
                 ml_potential_fine
@@ -163,9 +292,10 @@ def complete_benchmark(  # this function was put here to prevent circular import
                 if (
                     benchmark_mp_ids[ibenchmark_structure] in mp_ids
                 ) and add_dft_phonon_struct:
+
                     dft_references = fit_input[benchmark_mp_ids[ibenchmark_structure]][
                         "phonon_data"
-                    ]["001"]
+                    ][f"{int(displacement * 100):03d}"]
                 else:
                     dft_phonons = dft_phonopy_gen_data(
                         structure=benchmark_structure,
@@ -178,7 +308,9 @@ def complete_benchmark(  # this function was put here to prevent circular import
                         supercell_settings=supercell_settings,
                     )
                     jobs.append(dft_phonons)
-                    dft_references = dft_phonons.output["phonon_data"]["001"]
+                    dft_references = dft_phonons.output["phonon_data"][
+                        f"{int(displacement * 100):03d}"
+                    ]
 
                 add_data_bm = PhononBenchmarkMaker(name="Benchmark").make(
                     ml_model=ml_model,
@@ -225,7 +357,10 @@ def complete_benchmark(  # this function was put here to prevent circular import
             jobs.append(add_data_bm)
             collect_output.append(add_data_bm.output)
 
-    return Response(replace=Flow(jobs), output=collect_output)
+    return Response(
+        replace=Flow(jobs),
+        output={"bm_output": collect_output, "dft_references": dft_references},
+    )
 
 
 @job
@@ -377,7 +512,7 @@ def dft_phonopy_gen_data(
                         "LCHARG": False,  # Do not write the CHGCAR file
                         "LWAVE": False,  # Do not write the WAVECAR file
                         "LVTOT": False,  # Do not write LOCPOT file
-                        "LORBIT": 0,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
+                        "LORBIT": None,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
                         "LOPTICS": False,  # No PCDAT file
                         "NSW": 200,
                         "NELM": 500,
@@ -402,7 +537,7 @@ def dft_phonopy_gen_data(
                     "LCHARG": False,  # Do not write the CHGCAR file
                     "LWAVE": False,  # Do not write the WAVECAR file
                     "LVTOT": False,  # Do not write LOCPOT file
-                    "LORBIT": 0,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
+                    "LORBIT": None,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
                     "LOPTICS": False,  # No PCDAT file
                     # to be removed
                     "NPAR": 4,
@@ -536,7 +671,7 @@ def dft_random_gen_data(
                     "LCHARG": False,  # Do not write the CHGCAR file
                     "LWAVE": False,  # Do not write the WAVECAR file
                     "LVTOT": False,  # Do not write LOCPOT file
-                    "LORBIT": 0,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
+                    "LORBIT": None,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
                     "LOPTICS": False,  # No PCDAT file
                     "NSW": 200,
                     "NELM": 500,
@@ -619,3 +754,55 @@ def get_iso_atom(
         },
     )
     return Response(replace=flow)
+
+
+@job(data=[PhononBSDOSDoc, "dft_references"])
+def get_output(
+    metrics: list,
+    benchmark_structures: list[Structure] | None = None,
+    benchmark_mp_ids: list[str] | None = None,
+    dft_references: list[PhononBSDOSDoc] | None = None,
+    pre_xyz_files: list[str] | None = None,
+    pre_database_dir: str | None = None,
+    fit_kwargs_list: list | None = None,
+):
+    """
+    Job to collect all output infos for potential restarts.
+
+    Parameters
+    ----------
+    metrics: list[dict]
+        List of metric dictionaries from complete_benchmark jobs.
+    dft_references: list[PhononBSDOSDoc] | None
+        List of DFT reference files containing the PhononBSDOCDoc object.
+        Reference files have to refer to a finite displacement of 0.01.
+        For benchmarking, only 0.01 is supported
+    benchmark_structures: list[Structure] | None
+        The pymatgen structure for benchmarking.
+    benchmark_mp_ids: list[str] | None
+        Materials Project ID of the benchmarking structure.
+    pre_xyz_files: list[str] or None
+        Names of the pre-database train xyz file and test xyz file.
+    pre_database_dir: str or None
+        The pre-database directory.
+    fit_kwargs_list : list[dict].
+        Dict including MLIP fit keyword args.
+    """
+    # TODO: potentially evaluation of imaginary modes
+
+    rms_max_values = []  # get the largest rms in each fit
+
+    for i in range(len(metrics[0])):
+        rms_max_value = max(sublist[i]["benchmark_phonon_rmse"] for sublist in metrics)
+        rms_max_values.append(rms_max_value)
+
+    return {
+        "metrics": metrics,
+        "rms": min(rms_max_values),  # get the best fit
+        "benchmark_structures": benchmark_structures,
+        "benchmark_mp_ids": benchmark_mp_ids,
+        "dft_references": dft_references,
+        "pre_xyz_files": pre_xyz_files,
+        "pre_database_dir": pre_database_dir,
+        "fit_kwargs_list": fit_kwargs_list,
+    }
