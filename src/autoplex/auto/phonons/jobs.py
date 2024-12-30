@@ -3,7 +3,6 @@
 from collections.abc import Iterable
 from dataclasses import field
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 import numpy as np
 from atomate2.common.schemas.phonons import ForceConstants, PhononBSDOSDoc
@@ -13,6 +12,8 @@ from atomate2.vasp.jobs.core import StaticMaker, TightRelaxMaker
 from atomate2.vasp.sets.core import StaticSetGenerator, TightRelaxSetGenerator
 from jobflow import Flow, Response, job
 from pymatgen.core.structure import Structure
+from pymatgen.phonon.bandstructure import PhononBandStructure
+from pymatgen.phonon.dos import PhononDos
 
 from autoplex.benchmark.phonons.flows import PhononBenchmarkMaker
 from autoplex.data.phonons.flows import (
@@ -24,9 +25,6 @@ from autoplex.data.phonons.flows import (
     TightDFTStaticMaker,
 )
 from autoplex.data.phonons.jobs import reduce_supercell_size
-
-from pymatgen.phonon.bandstructure import PhononBandStructure
-from pymatgen.phonon.dos import PhononDos
 
 
 @job(
