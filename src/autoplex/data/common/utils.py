@@ -468,7 +468,7 @@ def filter_outlier_energy(
         "outliers_energy": outliers,
     }
 
-        # Iterate over output files and write them
+    # Iterate over output files and write them
     for suffix, atom_list in output_files.items():
         path = Path(in_file).with_name(Path(in_file).name.replace("train", suffix))
         path.parent.mkdir(parents=True, exist_ok=True)  # Ensure directory exists
