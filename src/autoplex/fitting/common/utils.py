@@ -122,7 +122,7 @@ def gap_fitting(
 
     db_atoms = ase.io.read(os.path.join(db_dir, train_name), index=":")
     train_data_path = os.path.join(db_dir, train_name)
-    db_atoms_test = ase.io.read(os.path.join(db_dir, test_name), index=":")
+
     test_data_path = os.path.join(db_dir, test_name)
     default_hyperparameters = load_mlip_hyperparameter_defaults(
         mlip_fit_parameter_file_path=path_to_hyperparameters
