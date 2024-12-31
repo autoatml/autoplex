@@ -320,6 +320,7 @@ class DataPreprocessing(Maker):
                     ]
 
                     ase.io.write(destination_file_path, new_atoms_list, append=True)
+                    print(len(ase.io.read("vasp_ref.extxyz", ':')))
 
                     logging.info(
                         f"File {self.pre_xyz_files[0]} has been copied to {destination_file_path}"
@@ -338,6 +339,7 @@ class DataPreprocessing(Maker):
             regularization=self.atomwise_regularization_parameter,
             atom_wise_regularization=self.atom_wise_regularization,
         )
+        print(len(ase.io.read("vasp_ref.extxyz", ':')))
 
         write_after_distillation_data_split(
             self.distillation, self.force_max, self.split_ratio

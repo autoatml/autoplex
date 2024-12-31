@@ -122,8 +122,8 @@ def gap_fitting(
 
     db_atoms = ase.io.read(os.path.join(db_dir, train_name), index=":")
     train_data_path = os.path.join(db_dir, train_name)
+    db_atoms_test=ase.io.read(os.path.join(db_dir, test_name), index=":")
     test_data_path = os.path.join(db_dir, test_name)
-
     default_hyperparameters = load_mlip_hyperparameter_defaults(
         mlip_fit_parameter_file_path=path_to_hyperparameters
     )
@@ -157,6 +157,7 @@ def gap_fitting(
         )
 
         run_gap(num_processes_fit, fit_parameters_list)
+
         run_quip(num_processes_fit, train_data_path, gap_file_xml, quip_train_file)
 
     if include_three_body:
@@ -222,6 +223,7 @@ def gap_fitting(
         )
 
     # Calculate training error
+
     train_error = energy_remain(quip_train_file)
     logging.info(f"Training error of MLIP (eV/at.): {round(train_error, 7)}")
 
@@ -1489,7 +1491,11 @@ def vaspoutput_2_extended_xyz(
                 i.info["config_type"] = config_type
                 i.info["data_type"] = data_type.rstrip("_dir")
                 i.pbc = True
+
+            #TODO: maybe only add isolated atoms energy if it wasn't there?
+
             write("vasp_ref.extxyz", file, append=True)
+
         except FileNotFoundError:
             counter += 1
 
@@ -2003,7 +2009,6 @@ def write_after_distillation_data_split(
 
     ase.io.write(train_name, train_structures, format="extxyz", append=True)
     ase.io.write(test_name, test_structures, format="extxyz", append=True)
-
 
 def mace_virial_format_conversion(
     atoms: list[Atoms], ref_virial_name: str, out_file_name: str

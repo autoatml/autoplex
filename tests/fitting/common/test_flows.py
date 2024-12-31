@@ -198,7 +198,7 @@ def test_mlip_fit_maker_with_pre_database_dir(
         fit_input=fit_input_dict,
     )
 
-    response=run_locally(gapfit, ensure_success=True, create_folders=True, store=memory_jobstore)
+    run_locally(gapfit, ensure_success=True, create_folders=True, store=memory_jobstore)
 
     train_atoms = read(Path(gapfit.output["database_dir"].resolve(memory_jobstore))/"train.extxyz",':')
     test_atoms = read(Path(gapfit.output["database_dir"].resolve(memory_jobstore))/"test.extxyz",':')
