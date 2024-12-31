@@ -468,7 +468,7 @@ def filter_outlier_energy(
         "outliers_energy": outliers,
     }
 
-    print(len(ase.io.read("test.extxyz", ':')))
+    print(len(ase.io.read("test.extxyz", ":")))
 
     # Iterate over output files and write them
     for suffix, atom_list in output_files.items():
@@ -476,7 +476,7 @@ def filter_outlier_energy(
         print(path)
         path.parent.mkdir(parents=True, exist_ok=True)  # Ensure directory exists
         write(path, atom_list, append=True)
-    print(len(ase.io.read("test.extxyz", ':')))
+    print(len(ase.io.read("test.extxyz", ":")))
 
 
 def filter_outlier_forces(
@@ -784,7 +784,7 @@ def plot_energy_forces(
     rmse.append(f"Energy test: {energy_rmse_test}")
 
     filter_outlier_energy(train_name, quip_train_file, energy_limit)
-    #filter_outlier_energy(test_name, quip_test_file, energy_limit)
+    # filter_outlier_energy(test_name, quip_test_file, energy_limit)
     for species in species_list:
         force_rmse_test = force_plot(
             test_name,
@@ -795,7 +795,7 @@ def plot_energy_forces(
         )
         rmse.append(f"Force test {species}: {force_rmse_test}")
         filter_outlier_forces(train_name, quip_train_file, species, force_limit)
-        #filter_outlier_forces(test_name, quip_test_file, species, force_limit)
+        # filter_outlier_forces(test_name, quip_test_file, species, force_limit)
 
     energy_plot(
         path.with_name(path.name.replace("train", "filtered_in_energy")),
