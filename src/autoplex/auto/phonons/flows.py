@@ -532,7 +532,6 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
 
         flows.append(collect_bm)
 
-
         output_flow = get_output(
             metrics=collect_bm.output,
             benchmark_structures=benchmark_structures,
