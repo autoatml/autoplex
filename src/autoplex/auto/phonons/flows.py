@@ -231,7 +231,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         pre_xyz_files: list[str] | None = None,
         rattle_seed: int | None = 42,
         fit_kwargs_list: list | None = None,
-    ):
+    ) -> Flow:
         """
         Make flow for constructing the dataset, fitting the potentials and performing the benchmarks.
 
@@ -532,7 +532,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
 
         flows.append(collect_bm)
 
-        # TODO: add isolated atom energies and optimized structures to output
+
         output_flow = get_output(
             metrics=collect_bm.output,
             benchmark_structures=benchmark_structures,
@@ -952,7 +952,7 @@ class DFTSupercellSettingsMaker(Maker):
     supercell_settings: dict = field(default_factory=lambda: {"min_length": 15})
     DFT_Maker: BaseVaspMaker = field(default_factory=TightDFTStaticMaker)
 
-    def make(self, structure_list: list[Structure], mp_ids: list[str]):
+    def make(self, structure_list: list[Structure], mp_ids: list[str]) -> Flow:
         """
         Generate and runs supercell jobs for the given list of structures.
 
@@ -1026,7 +1026,7 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
         pre_xyz_files: list[str] | None = None,
         rattle_seed: int = 0,
         fit_kwargs_list: list | None = None,
-    ):
+    ) -> Flow:
         """Make flow for constructing the dataset, fitting the potentials and performing the benchmarks.
 
         Parameters
