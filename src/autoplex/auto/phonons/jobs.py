@@ -35,7 +35,7 @@ from autoplex.data.phonons.jobs import reduce_supercell_size
         PhononDos,
         PhononBandStructure,
         ForceConstants,
-        Structure
+        Structure,
     ]
 )
 def do_iterative_rattled_structures(
