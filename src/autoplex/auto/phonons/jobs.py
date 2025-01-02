@@ -159,29 +159,30 @@ def do_iterative_rattled_structures(
             previous_output=job1.output,
         )
         jobs.append(job2)
-
         # recreate the output to make sure all is correctly put into data:
-        output_dict={"dft_references": job2.output["dft_references"],
-                "benchmark_structures": job2.output["benchmark_structures"],
-                "benchmark_mp_ids": job2.output["benchmark_mp_ids"],
-                "pre_xyz_files": job2.output["pre_xyz_files"],
-                "pre_database_dir": job2.output["pre_database_dir"],
-                "rms": job2.output["rms"],
-                "metrics": job2.output["metrics"],
-                "fit_kwargs_list": job2.output["fit_kwargs_list"],
-                }
+        output_dict = {
+            "dft_references": job2.output["dft_references"],
+            "benchmark_structures": job2.output["benchmark_structures"],
+            "benchmark_mp_ids": job2.output["benchmark_mp_ids"],
+            "pre_xyz_files": job2.output["pre_xyz_files"],
+            "pre_database_dir": job2.output["pre_database_dir"],
+            "rms": job2.output["rms"],
+            "metrics": job2.output["metrics"],
+            "fit_kwargs_list": job2.output["fit_kwargs_list"],
+        }
 
         return Response(replace=Flow(jobs), output=output_dict)
 
-    return {"dft_references": previous_output["dft_references"],
-     "benchmark_structures": previous_output["benchmark_structures"],
-     "benchmark_mp_ids": previous_output["benchmark_mp_ids"],
-     "pre_xyz_files": previous_output["pre_xyz_files"],
-     "pre_database_dir": previous_output["pre_database_dir"],
-     "rms": previous_output["rms"],
-     "metrics": previous_output["metrics"],
-     "fit_kwargs_list": previous_output["fit_kwargs_list"],
-     }
+    return {
+        "dft_references": previous_output["dft_references"],
+        "benchmark_structures": previous_output["benchmark_structures"],
+        "benchmark_mp_ids": previous_output["benchmark_mp_ids"],
+        "pre_xyz_files": previous_output["pre_xyz_files"],
+        "pre_database_dir": previous_output["pre_database_dir"],
+        "rms": previous_output["rms"],
+        "metrics": previous_output["metrics"],
+        "fit_kwargs_list": previous_output["fit_kwargs_list"],
+    }
 
 
 @job(data=[PhononBSDOSDoc])
