@@ -17,7 +17,7 @@ The displacement default is 0.1 Å and can be adjusted. A `phonopy` calculation 
 automatically included in the workflow for calculating the DFT benchmark reference 
 (if no reference is provided by the user). The `min_length` parameter controls the supercells size and is set to 20 
 per default as this value is good for ensuring that the periodic boundary conditions and the energy convergence criteria 
-for phonon calculations are met. More settings can be found in the [API reference](#autoplex.auto.phonons.flows.CompleteDFTvsMLBenchmarkWorkflow).
+for phonon calculations are met. More settings can be found in the [API reference](#reference/autoplex.auto.phonons.flows.CompleteDFTvsMLBenchmarkWorkflow).
 
 There is the possibility to run the complete `autoplex` workflow using only `phonopy` generated supercells:
 ```python
