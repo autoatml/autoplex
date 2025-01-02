@@ -58,7 +58,7 @@ mermaid_version = "11.2.0"
 mermaid_output_format = 'raw'
 mermaid_params = ['--theme', 'base']
 
-myst_heading_anchors = 2  # enable headings as link targets
+myst_heading_anchors = 4  # enable headings as link targets
 myst_enable_extensions = [
     "amsmath",
     "colon_fence",
