@@ -125,9 +125,6 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         Default=0.01.
         Note that for MC rattling, displacements generated will roughly be
         rattle_mc_n_iter**0.5 * rattle_std for small values of n_iter.
-    rattle_seed: int.
-        Seed for setting up NumPy random state from which random numbers are generated.
-        Default=42.
     rattle_mc_n_iter: int.
         Number of Monte Carlo iterations.
         Larger number of iterations will generate larger displacements.
