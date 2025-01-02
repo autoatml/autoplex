@@ -31,9 +31,11 @@ from autoplex.data.phonons.jobs import reduce_supercell_size
     data=[
         PhononBSDOSDoc,
         "dft_references",
+        "metrics",
         PhononDos,
         PhononBandStructure,
         ForceConstants,
+        Structure
     ]
 )
 def do_iterative_rattled_structures(
@@ -144,7 +146,6 @@ def do_iterative_rattled_structures(
             structure_list=structure_list,
             mp_ids=mp_ids,
             dft_references=job1.output["dft_references"],
-            # TODO: check if they should be optimized
             benchmark_structures=job1.output["benchmark_structures"],
             benchmark_mp_ids=job1.output["benchmark_mp_ids"],
             pre_xyz_files=job1.output["pre_xyz_files"],
@@ -158,16 +159,6 @@ def do_iterative_rattled_structures(
             previous_output=job1.output,
         )
         jobs.append(job2)
-
-        # # fix this here:
-        # "metrics": metrics,
-        #EP "rms": min(rms_max_values),  # get the best fit
-        # "benchmark_structures": benchmark_structures,
-        # "benchmark_mp_ids": benchmark_mp_ids,
-        # "dft_references": dft_references,
-        # "pre_xyz_files": pre_xyz_files,
-        # "pre_database_dir": pre_database_dir,
-        # "fit_kwargs_list": fit_kwargs_list,
 
         # recreate the output to make sure all is correctly put into data:
         output_dict={"dft_references": job2.output["dft_references"],
