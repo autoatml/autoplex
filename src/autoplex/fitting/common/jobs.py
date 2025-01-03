@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+import numpy as np
 from jobflow import job
 
 from autoplex.fitting.common.utils import (
@@ -21,6 +22,7 @@ GAP_DEFAULTS_FILE_PATH = current_dir / "mlip-phonon-defaults.json"
 def machine_learning_fit(
     database_dir: str | Path,
     species_list: list,
+    run_fits_on_different_cluster: bool = False,
     path_to_hyperparameters: Path | str | None = None,
     isolated_atom_energies: dict | None = None,
     num_processes_fit: int = 32,
@@ -33,6 +35,7 @@ def machine_learning_fit(
     ref_virial_name: str = "REF_virial",
     use_defaults: bool = True,
     device: str = "cuda",
+    database_dict: dict | None = None,
     hyperpara_opt: bool = False,
     **fit_kwargs,
 ):
@@ -45,6 +48,8 @@ def machine_learning_fit(
         Path to the directory containing the database.
     species_list: list
         List of element names (strings) involved in the training dataset
+    run_fit_on_different_cluster: bool
+        Whether to run fitting on different clusters.
     path_to_hyperparameters : str or Path.
         Path to JSON file containing the MLIP hyperparameters.
     isolated_atom_energies: dict
@@ -70,14 +75,35 @@ def machine_learning_fit(
         If True, use default fitting parameters
     device: str
         Device to be used for model fitting, either "cpu" or "cuda".
+    database_dict: dict
+        Dict including all training and test databases.
     hyperpara_opt: bool
         Perform hyperparameter optimization using XPOT
         (XPOT: https://pubs.aip.org/aip/jcp/article/159/2/024803/2901815)
     fit_kwargs: dict
         Additional keyword arguments for MLIP fitting.
     """
-    if isinstance(database_dir, str):  # data_prep_job.output is returned as string
-        database_dir = Path(database_dir)
+    if run_fits_on_different_cluster:
+        from ase.io import write
+        from pymatgen.io.ase import AseAtomsAdaptor
+
+        adapter = AseAtomsAdaptor()
+        for key, values in database_dict.items():
+            if values is not None:
+                if not Path(key).parent.exists():
+                    Path(key).parent.mkdir(parents=True, exist_ok=True)
+
+                for value in values:
+                    properties = value.properties.copy()
+                    properties["REF_virial"] = np.array(properties["REF_virial"])
+                    value.properties = properties
+                    new_value = adapter.get_atoms(value)
+                    write(key, new_value, parallel=False, format="extxyz", append=True)
+        database_dir = Path("./")
+
+    else:
+        if isinstance(database_dir, str):  # data_prep_job.output is returned as string
+            database_dir = Path(database_dir)
 
     train_files = [
         "train.extxyz",
@@ -174,4 +200,5 @@ def machine_learning_fit(
         "train_error": train_test_error["train_error"],
         "test_error": train_test_error["test_error"],
         "convergence": check_conv,
+        "database_dir": database_dir,
     }
