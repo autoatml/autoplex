@@ -1,4 +1,4 @@
-(rss)=
+(input)=
 
 # Input YAML configuration file
 

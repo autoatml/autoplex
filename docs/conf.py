@@ -103,7 +103,7 @@ latex_elements = {
 language = "en"
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]
-suppress_warnings = "etoc.toctree"
+suppress_warnings = ['toc.excluded', 'toc.not_readable']
 
 # autodoc options
 autosummary_imported_members = False
