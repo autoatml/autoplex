@@ -432,9 +432,9 @@ class DataPreprocessing(Maker):
 
         # TODO: add a database to MongoDB besides just the path
         if self.run_fits_on_different_cluster:
-            from pymatgen.io.ase import MSONAtoms
             from pymatgen.io.ase import AseAtomsAdaptor
-            adapter=AseAtomsAdaptor()
+
+            adapter = AseAtomsAdaptor()
 
             database_dict = {
                 "train.extxyz": [
