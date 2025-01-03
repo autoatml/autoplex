@@ -1906,7 +1906,7 @@ def prepare_fit_environment(
     if glue_xml:
         # TODO: might need to be fixed for remote connection
         shutil.copy(
-            os.path.join(database_dir, glue_name),
+            Path(glue_name),
             os.path.join(mlip_path, "glue.xml"),
         )
 
