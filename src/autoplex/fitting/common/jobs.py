@@ -3,7 +3,6 @@
 from pathlib import Path
 
 from jobflow import job
-from pymatgen.io.ase import MSONAtoms
 
 from autoplex.fitting.common.utils import (
     check_convergence,
@@ -83,9 +82,9 @@ def machine_learning_fit(
     fit_kwargs: dict
         Additional keyword arguments for MLIP fitting.
     """
-
     if run_fit_on_different_cluster:
         from ase.io import write
+
         for key, value in database_dict.items():
             if value is not None:
                 write(key, value)
@@ -94,8 +93,6 @@ def machine_learning_fit(
     else:
         if isinstance(database_dir, str):  # data_prep_job.output is returned as string
             database_dir = Path(database_dir)
-
-
 
     train_files = [
         "train.extxyz",

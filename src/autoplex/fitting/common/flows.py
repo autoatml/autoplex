@@ -433,30 +433,82 @@ class DataPreprocessing(Maker):
         # TODO: add a database to MongoDB besides just the path
         if self.run_fits_on_different_cluster:
             from pymatgen.io.ase import MSONAtoms
-            database_dict={"train.extxyz": [MSONAtoms(atoms) for atoms in ase.io.read(Path.cwd()/"train.extxyz",':')], "test.extxyz": [MSONAtoms(atoms) for atoms in ase.io.read(Path.cwd()/"test.extxyz",':')],
-                           "phonon/train.extxyz": None if not Path(Path.cwd()/"phonon"/"train.extxyz").exists() else [MSONAtoms(atoms) for atoms in ase.io.read(Path.cwd()/"phonon"/"train.extxyz",':')],
-            "phonon/test.extxyz": None if not Path(Path.cwd()/"phonon"/"test.extxyz").exists() else [MSONAtoms(atoms) for atoms in
-                                                                    ase.io.read(Path.cwd()/"phonon" / "test.extxyz", ':')],
-                           "rattled/train.extxyz": None if not Path(Path.cwd()/"rattled"/"train.extxyz").exists() else [MSONAtoms(atoms) for atoms in
-                                                                                   ase.io.read(
-                                                                                       Path.cwd() / "rattled" / "train.extxyz",
-                                                                                       ':')],
-                           "rattled/test.extxyz": None if not Path(Path.cwd()/"rattled"/"test.extxyz").exists() else [MSONAtoms(atoms) for atoms in
-                                                                                  ase.io.read(
-                                                                                      Path.cwd() / "rattled" / "test.extxyz",
-                                                                                      ':')],
 
-                           "without_regularization/train.extxyz": None if not Path(Path.cwd()/"without_regularization"/"train.extxyz").exists() else [MSONAtoms(atoms) for atoms in
-                                                                                   ase.io.read(
-                                                                                       Path.cwd() / "without_regularization" / "train.extxyz",
-                                                                                       ':')],
-                           "without_regularization/test.extxyz": None if not Path(Path.cwd()/"without_regularization"/"test.extxyz").exists() else [MSONAtoms(atoms) for atoms in
-                                                                                  ase.io.read(
-                                                                                      Path.cwd() / "without_regularization" / "test.extxyz",
-                                                                                      ':')],
-
-                           }
+            database_dict = {
+                "train.extxyz": [
+                    MSONAtoms(atoms)
+                    for atoms in ase.io.read(Path.cwd() / "train.extxyz", ":")
+                ],
+                "test.extxyz": [
+                    MSONAtoms(atoms)
+                    for atoms in ase.io.read(Path.cwd() / "test.extxyz", ":")
+                ],
+                "phonon/train.extxyz": (
+                    None
+                    if not Path(Path.cwd() / "phonon" / "train.extxyz").exists()
+                    else [
+                        MSONAtoms(atoms)
+                        for atoms in ase.io.read(
+                            Path.cwd() / "phonon" / "train.extxyz", ":"
+                        )
+                    ]
+                ),
+                "phonon/test.extxyz": (
+                    None
+                    if not Path(Path.cwd() / "phonon" / "test.extxyz").exists()
+                    else [
+                        MSONAtoms(atoms)
+                        for atoms in ase.io.read(
+                            Path.cwd() / "phonon" / "test.extxyz", ":"
+                        )
+                    ]
+                ),
+                "rattled/train.extxyz": (
+                    None
+                    if not Path(Path.cwd() / "rattled" / "train.extxyz").exists()
+                    else [
+                        MSONAtoms(atoms)
+                        for atoms in ase.io.read(
+                            Path.cwd() / "rattled" / "train.extxyz", ":"
+                        )
+                    ]
+                ),
+                "rattled/test.extxyz": (
+                    None
+                    if not Path(Path.cwd() / "rattled" / "test.extxyz").exists()
+                    else [
+                        MSONAtoms(atoms)
+                        for atoms in ase.io.read(
+                            Path.cwd() / "rattled" / "test.extxyz", ":"
+                        )
+                    ]
+                ),
+                "without_regularization/train.extxyz": (
+                    None
+                    if not Path(
+                        Path.cwd() / "without_regularization" / "train.extxyz"
+                    ).exists()
+                    else [
+                        MSONAtoms(atoms)
+                        for atoms in ase.io.read(
+                            Path.cwd() / "without_regularization" / "train.extxyz", ":"
+                        )
+                    ]
+                ),
+                "without_regularization/test.extxyz": (
+                    None
+                    if not Path(
+                        Path.cwd() / "without_regularization" / "test.extxyz"
+                    ).exists()
+                    else [
+                        MSONAtoms(atoms)
+                        for atoms in ase.io.read(
+                            Path.cwd() / "without_regularization" / "test.extxyz", ":"
+                        )
+                    ]
+                ),
+            }
             print(database_dict)
             return {"database_dir": Path.cwd(), "database_dict": database_dict}
 
-        return {"database_dir": Path.cwd(), "database_dict":None}
+        return {"database_dir": Path.cwd(), "database_dict": None}
