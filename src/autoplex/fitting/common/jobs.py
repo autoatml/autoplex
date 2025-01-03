@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-import numpy
+import numpy as np
 from jobflow import job
 
 from autoplex.fitting.common.utils import (
@@ -88,17 +88,17 @@ def machine_learning_fit(
         from pymatgen.io.ase import AseAtomsAdaptor
 
         adapter = AseAtomsAdaptor()
-        for key, value in database_dict.items():
-            if value is not None:
+        for key, values in database_dict.items():
+            if values is not None:
                 if not Path(key).parent.exists():
                     Path(key).parent.mkdir(parents=True, exist_ok=True)
 
-                for valu in value:
-                    properties = valu.properties.copy()
-                    properties["REF_virial"] = numpy.array(properties["REF_virial"])
-                    valu.properties = properties
-                    new_valu = adapter.get_atoms(valu)
-                    write(key, new_valu, parallel=False, format="extxyz", append=True)
+                for value in values:
+                    properties = value.properties.copy()
+                    properties["REF_virial"] = np.array(properties["REF_virial"])
+                    value.properties = properties
+                    new_value = adapter.get_atoms(value)
+                    write(key, new_value, parallel=False, format="extxyz", append=True)
         database_dir = Path("./")
 
     else:
