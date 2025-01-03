@@ -178,10 +178,15 @@ def test_mlip_fit_maker_with_kwargs(
 def test_mlip_fit_maker_with_pre_database_dir(
         test_dir, memory_jobstore, vasp_test_dir, fit_input_dict, clean_dir
 ):
+    from ase.io import read
     from pathlib import Path
     from jobflow import run_locally
 
     test_files_dir = Path(test_dir / "fitting").resolve()
+    train_atoms_before = read(test_files_dir / "pre_xyz_train.extxyz", ':')
+
+    test_atoms_before = read(test_files_dir / "pre_xyz_test.extxyz", ':')
+
 
     # Test if gap fit runs with pre_database_dir
     gapfit = MLIPFitMaker(
@@ -195,8 +200,21 @@ def test_mlip_fit_maker_with_pre_database_dir(
 
     run_locally(gapfit, ensure_success=True, create_folders=True, store=memory_jobstore)
 
-    # check if gap potential file is generated
     assert Path(gapfit.output["mlip_path"][0].resolve(memory_jobstore)).exists()
+
+    train_atoms = read(Path(gapfit.output["database_dir"].resolve(memory_jobstore))/"train.extxyz",':')
+    test_atoms = read(Path(gapfit.output["database_dir"].resolve(memory_jobstore))/"test.extxyz",':')
+    assert (len(train_atoms_before) +len(test_atoms_before)+7) == (len(train_atoms) +len(test_atoms))
+
+
+    train_atoms = read(Path(gapfit.output["mlip_path"][0].resolve(memory_jobstore))/"train.extxyz",':')
+    test_atoms = read(Path(gapfit.output["mlip_path"][0].resolve(memory_jobstore))/ "test.extxyz",':')
+    assert (len(train_atoms_before) +len(test_atoms_before)+7) == (len(train_atoms) +len(test_atoms))
+
+
+    train_atoms = read(Path(gapfit.output["mlip_path"][0].resolve(memory_jobstore))/"quip_train.extxyz",':')
+    test_atoms = read(Path(gapfit.output["mlip_path"][0].resolve(memory_jobstore))/ "quip_test.extxyz",':')
+    assert (len(train_atoms_before) +len(test_atoms_before)+7) == (len(train_atoms) +len(test_atoms))
 
 
 def test_mlip_fit_maker_jace(

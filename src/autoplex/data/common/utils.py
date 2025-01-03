@@ -165,8 +165,13 @@ def scale_cell(
     atoms = AseAtomsAdaptor.get_atoms(structure)
     distorted_cells = []
 
-    if volume_scale_factor_range is not None:
-        # range is specified
+    if volume_custom_scale_factors is not None:
+        scale_factors_defined = volume_custom_scale_factors
+        warnings.warn("Using your custom lattice scale factors", stacklevel=2)
+    if volume_custom_scale_factors is None:
+        if volume_scale_factor_range is None:
+            volume_scale_factor_range = [0.90, 1.1]
+
         scale_factors_defined = np.arange(
             volume_scale_factor_range[0],
             volume_scale_factor_range[1]
@@ -184,18 +189,6 @@ def scale_cell(
             f"Generated lattice scale factors {scale_factors_defined} within your range",
             stacklevel=2,
         )
-
-    else:  # range is not specified
-        if volume_custom_scale_factors is None:
-            # use default scale factors if not specified
-            scale_factors_defined = [0.90, 0.95, 0.98, 0.99, 1.01, 1.02, 1.05, 1.10]
-            warnings.warn(
-                "Using default lattice scale factors of [0.90, 0.95, 0.98, 0.99, 1.01, 1.02, 1.05, 1.10]",
-                stacklevel=2,
-            )
-        else:
-            scale_factors_defined = volume_custom_scale_factors
-            warnings.warn("Using your custom lattice scale factors", stacklevel=2)
 
     for scale_factor in scale_factors_defined:
         # make copy of ground state
@@ -785,8 +778,9 @@ def plot_energy_forces(
         test_name, quip_test_file, ax_list[2], "Energy on test data"
     )
     rmse.append(f"Energy test: {energy_rmse_test}")
+
     filter_outlier_energy(train_name, quip_train_file, energy_limit)
-    filter_outlier_energy(test_name, quip_test_file, energy_limit)
+    # filter_outlier_energy(test_name, quip_test_file, energy_limit)
     for species in species_list:
         force_rmse_test = force_plot(
             test_name,
@@ -797,7 +791,7 @@ def plot_energy_forces(
         )
         rmse.append(f"Force test {species}: {force_rmse_test}")
         filter_outlier_forces(train_name, quip_train_file, species, force_limit)
-        filter_outlier_forces(test_name, quip_test_file, species, force_limit)
+        # filter_outlier_forces(test_name, quip_test_file, species, force_limit)
 
     energy_plot(
         path.with_name(path.name.replace("train", "filtered_in_energy")),

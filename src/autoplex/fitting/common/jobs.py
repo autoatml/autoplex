@@ -174,4 +174,5 @@ def machine_learning_fit(
         "train_error": train_test_error["train_error"],
         "test_error": train_test_error["test_error"],
         "convergence": check_conv,
+        "database_dir": database_dir,
     }

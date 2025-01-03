@@ -238,8 +238,9 @@ def generate_randomized_structures(
     if supercell_matrix is None:
         supercell_matrix = [[2, 0, 0], [0, 2, 0], [0, 0, 2]]
 
-    if n_structures < 10:
-        n_structures = 10
+    # TODO: remove this part
+    # if n_structures < 10:
+    #    n_structures = 10
 
     supercell = get_supercell(
         unitcell=get_phonopy_structure(structure),

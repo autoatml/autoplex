@@ -122,8 +122,8 @@ def gap_fitting(
 
     db_atoms = ase.io.read(os.path.join(db_dir, train_name), index=":")
     train_data_path = os.path.join(db_dir, train_name)
-    test_data_path = os.path.join(db_dir, test_name)
 
+    test_data_path = os.path.join(db_dir, test_name)
     default_hyperparameters = load_mlip_hyperparameter_defaults(
         mlip_fit_parameter_file_path=path_to_hyperparameters
     )
@@ -157,6 +157,7 @@ def gap_fitting(
         )
 
         run_gap(num_processes_fit, fit_parameters_list)
+
         run_quip(num_processes_fit, train_data_path, gap_file_xml, quip_train_file)
 
     if include_three_body:
@@ -222,6 +223,7 @@ def gap_fitting(
         )
 
     # Calculate training error
+
     train_error = energy_remain(quip_train_file)
     logging.info(f"Training error of MLIP (eV/at.): {round(train_error, 7)}")
 
@@ -1250,8 +1252,17 @@ def mace_fitting(
             log_data = file.read()
     except FileNotFoundError:
         # to cover finetuning
-        with open("./logs/MACE_final_run-3.log") as file:
-            log_data = file.read()
+        try:
+            with open(f"./logs/{fit_kwargs['name']}_run-123.log") as file:
+                log_data = file.read()
+        except FileNotFoundError:
+            try:
+                with open("./logs/MACE_final_run-3.log") as file:
+                    log_data = file.read()
+            except FileNotFoundError:
+                with open(f"./logs/{fit_kwargs['name']}_run-3.log") as file:
+                    log_data = file.read()
+
     tables = re.split(r"\+-+\+\n", log_data)
     # if tables:
     last_table = tables[-2]
@@ -1480,7 +1491,11 @@ def vaspoutput_2_extended_xyz(
                 i.info["config_type"] = config_type
                 i.info["data_type"] = data_type.rstrip("_dir")
                 i.pbc = True
+
+            # TODO: maybe only add isolated atoms energy if it wasn't there?
+
             write("vasp_ref.extxyz", file, append=True)
+
         except FileNotFoundError:
             counter += 1
 

@@ -7,6 +7,7 @@ This tutorial will help you understand all the `autoplex` benchmark specificatio
 ## General settings
 
 For the benchmark, you do not have to worry about a lot of settings. The crucial part here is the number of benchmark structures you are interested in.
+All benchmark harmonic phonon runs will always be generated with a displacement of 0.01 even though the fitting procedure can also include different displacements.
 
 ```python
 from mp_api.client import MPRester

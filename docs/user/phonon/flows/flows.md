@@ -12,7 +12,9 @@ This tutorial will demonstrate how to use `autoplex` with its default setup and 
 
 The complete workflow of `autoplex` involves the data generation 
 (including the execution of VASP calculations), 
-the fitting of the machine-learned interatomic potential (MLIP) and the benchmark to the DFT results.
+the fitting of the machine-learned interatomic potential (MLIP) and the benchmark to the DFT results. 
+
+We also have an iterative version of this workflow that reruns the complete workflow until a certain quality of the phonons is reached. It is described below.
 
 ### Before running the workflow
 
@@ -89,7 +91,6 @@ Next, we are going to construct the workflow based on the rocksalt-type LiCl ([*
 Remember to replace `YOUR_MP_API_KEY` with your personal [Materials Project API key](https://next-gen.materialsproject.org/api#api-key).
 
 ```python
-from jobflow.core.flow import Flow
 from mp_api.client import MPRester
 from autoplex.auto.phonons.flows import CompleteDFTvsMLBenchmarkWorkflow
 
@@ -220,3 +221,40 @@ Potential  Structure  MPID        Displacement (Å)  RMSE (THz)  imagmodes(pot) 
 GAP        LiCl       mp-22905    0.01              0.57608     False           False           full            atom-wise f=0.1: n_sparse = 6000, SOAP delta = 0.5
 ```
 
+## Iterative version of the default workflow
+
+To systematically converge the quality of the potentials, we have built an iterative version of the default workflow `CompleteDFTvsMLBenchmarkWorkflow`. It will run the `CompleteDFTvsMLBenchmarkWorkflow` until the worst RMSE value of the benchmark structures falls under a certain value or a maximum number of repetitions is reached.
+
+We allow users in the first generation to use a slightly different  workflow than in the subsequent generations. This can help to initially obtain enough structures for an MLIP fit and only slightly increase the number of structures in the next generations. Please don't forget to deactivate the phonon data generation after the first iteration.
+
+```python
+from mp_api.client import MPRester
+from autoplex.auto.phonons.flows import CompleteDFTvsMLBenchmarkWorkflow, IterativeCompleteDFTvsMLBenchmarkWorkflow
+
+mpr = MPRester(api_key='YOUR_MP_API_KEY')
+structure_list = []
+benchmark_structure_list = []
+mpids = ["mp-22905"]  
+# you can put as many mpids as needed e.g. mpids = ["mp-22905", "mp-1185319"] for all LiCl entries in the Materials Project
+mpbenchmark = ["mp-22905"]
+for mpid in mpids:
+    structure = mpr.get_structure_by_material_id(mpid)
+    structure_list.append(structure)
+for mpbm in mpbenchmark:
+    bm_structure = mpr.get_structure_by_material_id(mpbm)
+    benchmark_structure_list.append(bm_structure)
+
+complete_flow=IterativeCompleteDFTvsMLBenchmarkWorkflow(rms_max=0.2, max_iterations=4, 
+                                                        complete_dft_vs_ml_benchmark_workflow_0=CompleteDFTvsMLBenchmarkWorkflow(
+    apply_data_preprocessing=True, add_dft_phonon_struct=True,
+), 
+                                                        complete_dft_vs_ml_benchmark_workflow_1=CompleteDFTvsMLBenchmarkWorkflow(
+    apply_data_preprocessing=True, add_dft_phonon_struct=False,
+)
+                                                        ).make(
+    structure_list=structure_list, mp_ids=mpids, 
+    benchmark_structures=benchmark_structure_list, benchmark_mp_ids=mpbenchmark)
+
+complete_flow.name = "tutorial"
+autoplex_flow = complete_flow
+```
