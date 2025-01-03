@@ -1,5 +1,5 @@
 """General fitting jobs using several MLIPs available."""
-
+import numpy
 from pathlib import Path
 
 from jobflow import job
@@ -19,24 +19,24 @@ GAP_DEFAULTS_FILE_PATH = current_dir / "mlip-phonon-defaults.json"
 
 @job
 def machine_learning_fit(
-    database_dir: str | Path,
-    species_list: list,
-    run_fit_on_different_cluster: bool = False,
-    path_to_hyperparameters: Path | str | None = None,
-    isolated_atom_energies: dict | None = None,
-    num_processes_fit: int = 32,
-    auto_delta: bool = True,
-    glue_xml: bool = False,
-    glue_file_path: str = "glue.xml",
-    mlip_type: str | None = None,
-    ref_energy_name: str = "REF_energy",
-    ref_force_name: str = "REF_forces",
-    ref_virial_name: str = "REF_virial",
-    use_defaults: bool = True,
-    device: str = "cuda",
-    database_dict: dict | None = None,
-    hyperpara_opt: bool = False,
-    **fit_kwargs,
+        database_dir: str | Path,
+        species_list: list,
+        run_fits_on_different_cluster: bool = False,
+        path_to_hyperparameters: Path | str | None = None,
+        isolated_atom_energies: dict | None = None,
+        num_processes_fit: int = 32,
+        auto_delta: bool = True,
+        glue_xml: bool = False,
+        glue_file_path: str = "glue.xml",
+        mlip_type: str | None = None,
+        ref_energy_name: str = "REF_energy",
+        ref_force_name: str = "REF_forces",
+        ref_virial_name: str = "REF_virial",
+        use_defaults: bool = True,
+        device: str = "cuda",
+        database_dict: dict | None = None,
+        hyperpara_opt: bool = False,
+        **fit_kwargs,
 ):
     """
     Job for fitting potential(s).
@@ -82,18 +82,29 @@ def machine_learning_fit(
     fit_kwargs: dict
         Additional keyword arguments for MLIP fitting.
     """
-    if run_fit_on_different_cluster:
+    if run_fits_on_different_cluster:
         from ase.io import write
-
+        from pymatgen.io.ase import AseAtomsAdaptor
+        adapter=AseAtomsAdaptor()
         for key, value in database_dict.items():
             if value is not None:
-                write(key, value)
+                if not Path(key).parent.exists():
+                    Path(key).parent.mkdir(parents=True, exist_ok=True)
+                from ase import Atoms
+                from pymatgen.core.structure import Structure
+
+                for valu in value:
+                    properties=valu.properties.copy()
+                    properties["REF_virial"]=numpy.array(properties["REF_virial"])
+                    valu.properties=properties
+                    new_valu=adapter.get_atoms(valu)
+                    write(key, new_valu, parallel=False, format="extxyz", append=True)
         database_dir = Path("./")
 
     else:
         if isinstance(database_dir, str):  # data_prep_job.output is returned as string
             database_dir = Path(database_dir)
-
+    print(database_dir)
     train_files = [
         "train.extxyz",
         "without_regularization/train.extxyz",
@@ -112,7 +123,7 @@ def machine_learning_fit(
     if mlip_type == "GAP":
         for train_name, test_name in zip(train_files, test_files):
             if (database_dir / train_name).exists() and (
-                database_dir / test_name
+                    database_dir / test_name
             ).exists():
                 train_test_error = gap_fitting(
                     db_dir=database_dir,

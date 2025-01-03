@@ -169,6 +169,7 @@ class MLIPFitMaker(Maker):
 
             mlip_fit_job = machine_learning_fit(
                 database_dir=data_prep_job.output["database_dir"],
+                run_fits_on_different_cluster=self.run_fits_on_different_cluster,
                 isolated_atom_energies=isolated_atom_energies,
                 num_processes_fit=self.num_processes_fit,
                 auto_delta=self.auto_delta,
@@ -183,7 +184,6 @@ class MLIPFitMaker(Maker):
                 device=device,
                 species_list=species_list,
                 database_dict=data_prep_job.output["database_dict"],
-                run_fits_on_different_cluster=self.run_fits_on_different_cluster,
                 **fit_kwargs,
             )
             jobs.append(mlip_fit_job)
@@ -433,21 +433,23 @@ class DataPreprocessing(Maker):
         # TODO: add a database to MongoDB besides just the path
         if self.run_fits_on_different_cluster:
             from pymatgen.io.ase import MSONAtoms
+            from pymatgen.io.ase import AseAtomsAdaptor
+            adapter=AseAtomsAdaptor()
 
             database_dict = {
                 "train.extxyz": [
-                    MSONAtoms(atoms)
+                    adapter.get_structure(atoms)
                     for atoms in ase.io.read(Path.cwd() / "train.extxyz", ":")
                 ],
                 "test.extxyz": [
-                    MSONAtoms(atoms)
+                    adapter.get_structure(atoms)
                     for atoms in ase.io.read(Path.cwd() / "test.extxyz", ":")
                 ],
                 "phonon/train.extxyz": (
                     None
                     if not Path(Path.cwd() / "phonon" / "train.extxyz").exists()
                     else [
-                        MSONAtoms(atoms)
+                        adapter.get_structure(atoms)
                         for atoms in ase.io.read(
                             Path.cwd() / "phonon" / "train.extxyz", ":"
                         )
@@ -457,7 +459,7 @@ class DataPreprocessing(Maker):
                     None
                     if not Path(Path.cwd() / "phonon" / "test.extxyz").exists()
                     else [
-                        MSONAtoms(atoms)
+                        adapter.get_structure(atoms)
                         for atoms in ase.io.read(
                             Path.cwd() / "phonon" / "test.extxyz", ":"
                         )
@@ -467,7 +469,7 @@ class DataPreprocessing(Maker):
                     None
                     if not Path(Path.cwd() / "rattled" / "train.extxyz").exists()
                     else [
-                        MSONAtoms(atoms)
+                        adapter.get_structure(atoms)
                         for atoms in ase.io.read(
                             Path.cwd() / "rattled" / "train.extxyz", ":"
                         )
@@ -477,7 +479,7 @@ class DataPreprocessing(Maker):
                     None
                     if not Path(Path.cwd() / "rattled" / "test.extxyz").exists()
                     else [
-                        MSONAtoms(atoms)
+                        adapter.get_structure(atoms)
                         for atoms in ase.io.read(
                             Path.cwd() / "rattled" / "test.extxyz", ":"
                         )
@@ -489,7 +491,7 @@ class DataPreprocessing(Maker):
                         Path.cwd() / "without_regularization" / "train.extxyz"
                     ).exists()
                     else [
-                        MSONAtoms(atoms)
+                        adapter.get_structure(atoms)
                         for atoms in ase.io.read(
                             Path.cwd() / "without_regularization" / "train.extxyz", ":"
                         )
@@ -501,7 +503,7 @@ class DataPreprocessing(Maker):
                         Path.cwd() / "without_regularization" / "test.extxyz"
                     ).exists()
                     else [
-                        MSONAtoms(atoms)
+                        adapter.get_structure(atoms)
                         for atoms in ase.io.read(
                             Path.cwd() / "without_regularization" / "test.extxyz", ":"
                         )

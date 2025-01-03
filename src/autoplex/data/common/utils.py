@@ -658,6 +658,7 @@ def force_plot(
 
     """
     in_atoms = ase.io.read(in_file, ":")
+
     for atoms in in_atoms[:-1]:
         kwargs = {
             "forces": atoms.arrays["REF_forces"],

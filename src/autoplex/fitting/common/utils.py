@@ -1893,15 +1893,18 @@ def prepare_fit_environment(
     os.makedirs(
         os.path.join(mlip_path, train_name.replace("train.extxyz", "")), exist_ok=True
     )
-    shutil.copy(
-        os.path.join(database_dir, test_name),
-        os.path.join(mlip_path, test_name),
-    )
-    shutil.copy(
-        os.path.join(database_dir, train_name),
-        os.path.join(mlip_path, train_name),
-    )
+    if not Path(database_dir/test_name).exists():
+        shutil.copy(
+            os.path.join(database_dir, test_name),
+            os.path.join(mlip_path, test_name),
+        )
+    if not Path(database_dir/train_name).exists():
+        shutil.copy(
+            os.path.join(database_dir, train_name),
+            os.path.join(mlip_path, train_name),
+        )
     if glue_xml:
+        # TODO: might need to be fixed for remote connection
         shutil.copy(
             os.path.join(database_dir, glue_name),
             os.path.join(mlip_path, "glue.xml"),
