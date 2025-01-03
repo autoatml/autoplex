@@ -104,8 +104,7 @@ def machine_learning_fit(
     else:
         if isinstance(database_dir, str):  # data_prep_job.output is returned as string
             database_dir = Path(database_dir)
-    
-    
+
     train_files = [
         "train.extxyz",
         "without_regularization/train.extxyz",
