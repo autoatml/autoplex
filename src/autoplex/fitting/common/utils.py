@@ -1893,12 +1893,12 @@ def prepare_fit_environment(
     os.makedirs(
         os.path.join(mlip_path, train_name.replace("train.extxyz", "")), exist_ok=True
     )
-    if not Path(database_dir / test_name).exists():
+    if not Path(mlip_path / test_name).exists():
         shutil.copy(
             os.path.join(database_dir, test_name),
             os.path.join(mlip_path, test_name),
         )
-    if not Path(database_dir / train_name).exists():
+    if not Path(mlip_path / train_name).exists():
         shutil.copy(
             os.path.join(database_dir, train_name),
             os.path.join(mlip_path, train_name),
