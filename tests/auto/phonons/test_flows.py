@@ -768,6 +768,56 @@ def test_complete_dft_vs_ml_benchmark_workflow_gap(
             assert expected_soap_dict in results_file, f"Expected soap_dict not found in {file_path}"
 
 
+def test_complete_dft_vs_gap_benchmark_workflow_database(
+        vasp_test_dir, mock_vasp, test_dir, memory_jobstore, ref_paths4_mpid, fake_run_vasp_kwargs4_mpid, clean_dir
+):
+    import glob
+
+    path_to_struct = vasp_test_dir / "dft_ml_data_generation" / "POSCAR"
+    structure = Structure.from_file(path_to_struct)
+
+    complete_workflow = CompleteDFTvsMLBenchmarkWorkflow(
+        symprec=1e-2, displacements=[0.01],
+        volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
+        supercell_settings={"min_length": 8, "min_atoms": 20},
+        apply_data_preprocessing=True,
+        run_fits_on_different_cluster=True,
+    ).make(
+        structure_list=[structure],
+        mp_ids=["test"],
+        benchmark_mp_ids=["mp-22905"],
+        benchmark_structures=[structure],
+    )
+
+    # automatically use fake VASP and write POTCAR.spec during the test
+    mock_vasp(ref_paths4_mpid, fake_run_vasp_kwargs4_mpid)
+
+    # run the flow or job and ensure that it finished running successfully
+    responses = run_locally(
+        complete_workflow,
+        create_folders=True,
+        ensure_success=True,
+        store=memory_jobstore,
+    )
+
+    assert complete_workflow.jobs[5].name == "complete_benchmark_mp-22905"
+
+    assert responses[complete_workflow.jobs[-1].output.uuid][1].output["metrics"][0][0]["benchmark_phonon_rmse"] == pytest.approx(
+        2.502641337594289, abs=1.5  # it's kinda fluctuating because of the little data
+    )
+
+    # check if soap_default_dict is correctly constructed from
+    # n_sparse and delta values in mlip_phonon_default json file
+    expected_soap_dict = "atom-wise f=0.1: n_sparse = 6000, SOAP delta = 1.0"
+    results_files = glob.glob('job*/results_LiCl.txt')
+
+    for file_path in results_files:
+        with open(file_path, 'r') as file:
+            results_file = file.read().strip()
+            assert expected_soap_dict in results_file, f"Expected soap_dict not found in {file_path}"
+
+
+
 def test_complete_dft_vs_ml_benchmark_workflow_m3gnet(
         vasp_test_dir, mock_vasp, test_dir, memory_jobstore, ref_paths4_mpid, fake_run_vasp_kwargs4_mpid, clean_dir
 ):
@@ -1250,6 +1300,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_separated(
     structure = Structure.from_file(path_to_struct)
 
     complete_workflow_sep = CompleteDFTvsMLBenchmarkWorkflow(symprec=1e-2,
+                                                             run_fits_on_different_cluster=True,
                                                              supercell_settings={"min_length": 8, "min_atoms": 20},
                                                              displacements=[0.01],
                                                              volume_custom_scale_factors=[0.975, 1.0, 1.025,

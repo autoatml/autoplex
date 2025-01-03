@@ -169,6 +169,9 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         Name of the glue.xml file path.
     use_defaults_fitting: bool
         Use the fit defaults.
+    run_fits_on_different_cluster: bool
+        Allows you to run fits on a different cluster than DFT (will transfer
+        fit database via MongoDB, might be slow).
     """
 
     name: str = "add_data"
@@ -219,6 +222,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
     glue_xml: bool = False
     glue_file_path: str = "glue.xml"
     use_defaults_fitting: bool = True
+    run_fits_on_different_cluster: bool = False
 
     def make(
         self,
@@ -393,6 +397,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                 separated=self.separated,
                 regularization=self.regularization,
                 distillation=self.distillation,
+                run_fits_on_different_cluster=self.run_fits_on_different_cluster,
             ).make(
                 species_list=isoatoms.output["species"],
                 isolated_atom_energies=isoatoms.output["energies"],
