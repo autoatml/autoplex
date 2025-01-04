@@ -80,7 +80,7 @@ def compute_bandstructure_benchmark_metrics(
             file_name=file_name,
         )
     except ValueError:
-        overall_rmse=None
+        overall_rmse = None
     return {
         "benchmark_phonon_rmse": overall_rmse,
         "dft_imaginary_modes": dft_imag_modes,
