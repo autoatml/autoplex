@@ -55,27 +55,32 @@ def compute_bandstructure_benchmark_metrics(
     dict including
        Overall root mean squared error between DFT and ML phonon band-structure.
     """
-    # compute overall root mean squared error
-    overall_rmse = get_rmse(ml_bs=ml_phonon_bs, dft_bs=dft_phonon_bs)
+    # might fail if band structures are not the same
+    # TODO: Robust alternative would be a mesh computation
+    try:
+        # compute overall root mean squared error
+        overall_rmse = get_rmse(ml_bs=ml_phonon_bs, dft_bs=dft_phonon_bs)
 
-    # saves rmse k-dependent plot
-    file_name = f"{structure.composition.reduced_formula}_rmse_phonons.pdf"
-    _ = rmse_qdep_plot(
-        ml_bs=ml_phonon_bs,
-        dft_bs=dft_phonon_bs,
-        which_q_path=2,
-        file_name=file_name,
-        img_format="pdf",
-    )
+        # saves rmse k-dependent plot
+        file_name = f"{structure.composition.reduced_formula}_rmse_phonons.pdf"
+        _ = rmse_qdep_plot(
+            ml_bs=ml_phonon_bs,
+            dft_bs=dft_phonon_bs,
+            which_q_path=2,
+            file_name=file_name,
+            img_format="pdf",
+        )
 
-    # saves DFT and ML phonon band-structure overlay plot
-    file_name = f"{structure.composition.reduced_formula}_band_comparison.pdf"
-    _ = compare_plot(
-        ml_model=ml_model,
-        ml_bs=ml_phonon_bs,
-        dft_bs=dft_phonon_bs,
-        file_name=file_name,
-    )
+        # saves DFT and ML phonon band-structure overlay plot
+        file_name = f"{structure.composition.reduced_formula}_band_comparison.pdf"
+        _ = compare_plot(
+            ml_model=ml_model,
+            ml_bs=ml_phonon_bs,
+            dft_bs=dft_phonon_bs,
+            file_name=file_name,
+        )
+    except ValueError:
+        overall_rmse=None
     return {
         "benchmark_phonon_rmse": overall_rmse,
         "dft_imaginary_modes": dft_imag_modes,

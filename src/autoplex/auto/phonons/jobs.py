@@ -32,6 +32,7 @@ from autoplex.data.phonons.jobs import reduce_supercell_size
         PhononBSDOSDoc,
         "dft_references",
         "metrics",
+        "benchmark_structures",
         PhononDos,
         PhononBandStructure,
         ForceConstants,
