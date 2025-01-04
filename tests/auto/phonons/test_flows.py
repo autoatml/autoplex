@@ -499,8 +499,8 @@ def ref_paths4_mpid_new2():
 @pytest.fixture(scope="class")
 def ref_paths5_mpid():
     return {
-        "MP GGA relax 1_test": "MP_finetuning/tight_relax_1/",
-        "MP GGA relax 2_test": "MP_finetuning/tight_relax_2/",
+        "dft tight relax 1_test": "MP_finetuning/tight_relax_1/",
+        "dft tight relax 2_test": "MP_finetuning/tight_relax_2/",
         "Sn-stat_iso_atom": "MP_finetuning/Sn-stat_iso_atom/",
         "dft static_test": "MP_finetuning/static_test/",
         "dft phonon static 1/1_test": "MP_finetuning/phonon_static_1/",
