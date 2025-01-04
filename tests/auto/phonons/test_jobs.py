@@ -71,9 +71,9 @@ def static_energy_maker():
 @pytest.fixture(scope="class")
 def ref_paths():
     return {
-        "tight relax 1": "dft_ml_data_generation/tight_relax_1/",
-        "tight relax 2": "dft_ml_data_generation/tight_relax_2/",
-        "static": "dft_ml_data_generation/static/",
+        "dft tight relax 1": "dft_ml_data_generation/tight_relax_1/",
+        "dft tight relax 2": "dft_ml_data_generation/tight_relax_2/",
+        "dft static": "dft_ml_data_generation/static/",
         "dft phonon static 1/2": "dft_ml_data_generation/phonon_static_1/",
         "dft phonon static 2/2": "dft_ml_data_generation/phonon_static_2/",
         "dft rattle static 1/3": "dft_ml_data_generation/rand_static_1/",
@@ -85,9 +85,9 @@ def ref_paths():
 @pytest.fixture(scope="class")
 def ref_paths_check_sc_mat():
     return {
-        "tight relax 1": "dft_ml_data_generation/tight_relax_1/",
-        "tight relax 2": "dft_ml_data_generation/tight_relax_2/",
-        "static": "dft_ml_data_generation/static/",
+        "dft tight relax 1": "dft_ml_data_generation/tight_relax_1/",
+        "dft tight relax 2": "dft_ml_data_generation/tight_relax_2/",
+        "dft static": "dft_ml_data_generation/static/",
         "dft phonon static 1/2": "dft_ml_data_generation/phonon_static_1_sc_mat/",
         "dft phonon static 2/2": "dft_ml_data_generation/phonon_static_2_sc_mat/",
         "dft rattle static 1/3": "dft_ml_data_generation/rand_static_1_sc_mat/",
@@ -99,8 +99,8 @@ def ref_paths_check_sc_mat():
 @pytest.fixture(scope="class")
 def fake_run_vasp_kwargs():
     return {
-        "tight relax 1": {"incar_settings": ["NSW", "ISMEAR"]},
-        "tight relax 2": {"incar_settings": ["NSW", "ISMEAR"]},
+        "dft tight relax 1": {"incar_settings": ["NSW", "ISMEAR"]},
+        "dft tight relax 2": {"incar_settings": ["NSW", "ISMEAR"]},
         "dft phonon static 1/2": {"incar_settings": ["NSW"]},
         "dft phonon static 2/2": {"incar_settings": ["NSW"]},
         "dft rattle static 1/3": {
