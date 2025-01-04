@@ -60,7 +60,7 @@ def write_benchmark_metrics(
 
             if not metric["suffix"]:
                 metric["suffix"] = "full"
-            if metric['benchmark_phonon_rmse'] is not None:
+            if metric["benchmark_phonon_rmse"] is not None:
                 file.write(
                     f"\n{metric['ml_model']:<11}{structure_composition:<11}{metric['mp_id']:<12}"
                     f"{metric['displacement']:<18.2f}{metric['benchmark_phonon_rmse']:<12.5f}"
