@@ -21,6 +21,7 @@ from pytest import approx
 def relax_maker():
     return DoubleRelaxMaker.from_relax_maker(
         TightRelaxMaker(
+            name="dft tight relax",
             run_vasp_kwargs={"handlers": {}},
             input_set_generator=TightRelaxSetGenerator(
                 user_incar_settings={
