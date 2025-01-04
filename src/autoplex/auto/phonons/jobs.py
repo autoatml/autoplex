@@ -827,12 +827,14 @@ def get_output(
         rms_max_values = []  # get the largest rms in each fit
 
         for i in range(len(metrics[0])):
-            rms_max_value = max(sublist[i]["benchmark_phonon_rmse"] for sublist in metrics)
+            rms_max_value = max(
+                sublist[i]["benchmark_phonon_rmse"] for sublist in metrics
+            )
             rms_max_values.append(rms_max_value)
-        rms=min(rms_max_values)
+        rms = min(rms_max_values)
     except TypeError:
         # Set a large value as a fall back if None is discovered
-        rms=1000.0
+        rms = 1000.0
     return {
         "metrics": metrics,
         "rms": rms,  # get the best fit
