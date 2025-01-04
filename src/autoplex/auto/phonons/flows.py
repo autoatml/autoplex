@@ -824,6 +824,7 @@ class CompleteDFTvsMLBenchmarkWorkflowMPSettings(CompleteDFTvsMLBenchmarkWorkflo
     phonon_bulk_relax_maker: BaseVaspMaker = field(
         default_factory=lambda: MPGGADoubleRelaxMaker.from_relax_maker(
             MPGGARelaxMaker(
+                name="dft tight relax",
                 run_vasp_kwargs={"handlers": ()},
                 input_set_generator=MPRelaxSet(
                     force_gamma=True,
