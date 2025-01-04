@@ -582,8 +582,11 @@ def dft_phonopy_gen_data(
 
     # always set autoplex default as job name
     phonon_displacement_maker.name = "dft phonon static"
-    phonon_bulk_relax_maker.relax_maker1.name = "dft tight relax"
-    phonon_bulk_relax_maker.relax_maker2.name = "dft tight relax"
+    try:
+        phonon_bulk_relax_maker.relax_maker1.name = "dft tight relax"
+        phonon_bulk_relax_maker.relax_maker2.name = "dft tight relax"
+    except AttributeError:
+        phonon_bulk_relax_maker.name = "dft tight relax"
     phonon_static_energy_maker.name = "dft static"
 
     for displacement in displacements:
