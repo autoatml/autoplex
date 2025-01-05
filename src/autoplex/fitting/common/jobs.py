@@ -99,7 +99,7 @@ def machine_learning_fit(
                     value.properties = properties
                     new_value = adapter.get_atoms(value)
                     write(key, new_value, parallel=False, format="extxyz", append=True)
-        database_dir = Path("./")
+        database_dir = Path().cwd()
 
     else:
         if isinstance(database_dir, str):  # data_prep_job.output is returned as string
