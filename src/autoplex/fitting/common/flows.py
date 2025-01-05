@@ -220,7 +220,7 @@ class MLIPFitMaker(Maker):
         "train_error": mlip_fit_job.output["train_error"],
         "test_error": mlip_fit_job.output["test_error"],
         "convergence": mlip_fit_job.output["convergence"],
-        "database_dir": pre_database_dir}
+        "database_dir": self.pre_database_dir}
         return Flow(jobs=mlip_fit_job, output=output, name=self.name)
 
 
