@@ -187,11 +187,13 @@ class MLIPFitMaker(Maker):
                 **fit_kwargs,
             )
             jobs.append(mlip_fit_job)
-            output={"mlip_path": mlip_fit_job.output["mlip_path"],
-        "train_error": mlip_fit_job.output["train_error"],
-        "test_error": mlip_fit_job.output["test_error"],
-        "convergence": mlip_fit_job.output["convergence"],
-         "database_dir": data_prep_job.output["database_dir"]}
+            output = {
+                "mlip_path": mlip_fit_job.output["mlip_path"],
+                "train_error": mlip_fit_job.output["train_error"],
+                "test_error": mlip_fit_job.output["test_error"],
+                "convergence": mlip_fit_job.output["convergence"],
+                "database_dir": data_prep_job.output["database_dir"],
+            }
             return Flow(jobs=jobs, output=mlip_fit_job.output, name=self.name)
 
         # this will only run if train.extxyz and test.extxyz files are present in the database_dir
@@ -216,11 +218,13 @@ class MLIPFitMaker(Maker):
             species_list=species_list,
             **fit_kwargs,
         )
-        output={"mlip_path": mlip_fit_job.output["mlip_path"],
-        "train_error": mlip_fit_job.output["train_error"],
-        "test_error": mlip_fit_job.output["test_error"],
-        "convergence": mlip_fit_job.output["convergence"],
-        "database_dir": pre_database_dir}
+        output = {
+            "mlip_path": mlip_fit_job.output["mlip_path"],
+            "train_error": mlip_fit_job.output["train_error"],
+            "test_error": mlip_fit_job.output["test_error"],
+            "convergence": mlip_fit_job.output["convergence"],
+            "database_dir": pre_database_dir,
+        }
         return Flow(jobs=mlip_fit_job, output=output, name=self.name)
 
 
