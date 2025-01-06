@@ -398,13 +398,15 @@ def complete_benchmark(  # this function was put here to prevent circular import
     if isinstance(dft_references, list):
         return Response(
             replace=Flow(jobs),
-            output={"bm_output": collect_output, "dft_references": dft_references[ibenchmark_structure]},
+            output={
+                "bm_output": collect_output,
+                "dft_references": dft_references[ibenchmark_structure],
+            },
         )
-    else:
-        return Response(
-            replace=Flow(jobs),
-            output={"bm_output": collect_output, "dft_references": dft_references},
-        )
+    return Response(
+        replace=Flow(jobs),
+        output={"bm_output": collect_output, "dft_references": dft_references},
+    )
 
 
 @job
