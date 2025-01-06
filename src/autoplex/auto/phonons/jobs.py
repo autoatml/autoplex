@@ -275,7 +275,7 @@ def complete_benchmark(  # this function was put here to prevent circular import
 
     for path in ml_path:
         suffix = Path(path).name
-        print(suffix)
+
         if suffix == "without_regularization":
             suffix = "without_reg"
         if suffix not in ["phonon", "rattled"]:
