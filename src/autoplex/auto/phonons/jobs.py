@@ -395,6 +395,10 @@ def complete_benchmark(  # this function was put here to prevent circular import
                 )
             jobs.append(add_data_bm)
             collect_output.append(add_data_bm.output)
+<<<<<<< HEAD
+=======
+
+>>>>>>> d3a87dfd25775a221a2e501191ec3ec90262e75b
     if isinstance(dft_references, list):
         return Response(
             replace=Flow(jobs),
