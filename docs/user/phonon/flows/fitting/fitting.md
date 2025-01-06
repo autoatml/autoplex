@@ -395,3 +395,125 @@ Additional fit settings can again be passed using `fit_kwargs` or `**{...}`.
 > containing at least one entry for "rattled_dir", "phonon_dir" and "isolated_atom" **VASP** calculations, 
 > otherwise the code will not finish successfully.
             
+
+## Fitting and DFT runs on to different computers possible?
+
+Very often, we might have the situation that our GPU does not share a hard drive with the computing center where we
+perform VASP run. In such situations, it is convenient to split up the computations.
+
+E.g., this can be done with jobflow-remote and the following settings for VASP and fitting jobs. The `local_worker` is the local machine (e.g., a GPU without slurm queue).
+
+```python
+from autoplex.auto.phonons.flows import CompleteDFTvsMLBenchmarkWorkflow, IterativeCompleteDFTvsMLBenchmarkWorkflow
+from jobflow_remote import submit_flow, set_run_config
+from atomate2.vasp.powerups import update_user_incar_settings
+from atomate2.vasp.powerups import update_vasp_custodian_handlers
+
+from atomate2.vasp.jobs.phonons import PhononDisplacementMaker
+from atomate2.settings import Atomate2Settings
+
+autoplex_flow = IterativeCompleteDFTvsMLBenchmarkWorkflow(max_iterations=3, rms_max=0.2,
+                                                          complete_dft_vs_ml_benchmark_workflow_0=CompleteDFTvsMLBenchmarkWorkflow(
+                                                              symprec=1e-3,
+                                                              run_fits_on_different_cluster=True,
+                                                              add_dft_phonon_struct=False,
+                                                              path_to_hyperparameters="/local_machine/mlip-phonon-defaults.json",
+                                                              apply_data_preprocessing=True,
+                                                              add_dft_rattled_struct=True,
+                                                              volume_custom_scale_factors=[1.0,1.0, 1.0],
+                                                              rattle_type=0, distort_type=0,
+                                                              rattle_std=0.1,  # maybe 0.1
+                                                              benchmark_kwargs={"relax_maker_kwargs": {
+                                                                  "relax_cell": False}},
+                                                              supercell_settings={"min_length": 5,
+                                                                                  "max_length": 15,
+                                                                                  "min_atoms": 10,
+                                                                                  "max_atoms": 300,
+                                                                                  "fallback_min_length": 9},
+                                                              # settings that worked with a GAP
+                                                              split_ratio=0.33,
+                                                              regularization=False,
+                                                              separated=False,
+                                                              num_processes_fit=48,
+                                                              displacement_maker=phonon_displacement_maker,
+                                                              phonon_bulk_relax_maker=phonon_bulk_relax_maker,
+                                                              phonon_static_energy_maker=phonon_static_energy_maker,
+                                                              rattled_bulk_relax_maker=phonon_bulk_relax_maker,
+                                                              isolated_atom_maker=static_isolated_atom_maker),
+                                                          complete_dft_vs_ml_benchmark_workflow_1=CompleteDFTvsMLBenchmarkWorkflow(
+                                                              symprec=1e-3,
+                                                              run_fits_on_different_cluster=True,
+                                                              path_to_hyperparameters="/local_machine/mlip-phonon-defaults.json",
+                                                              apply_data_preprocessing=True,
+                                                              add_dft_phonon_struct=False,
+                                                              add_dft_rattled_struct=True,
+                                                              volume_custom_scale_factors=[1.0],
+                                                              rattle_type=0, distort_type=0,
+                                                              rattle_std=0.1,  
+                                                              benchmark_kwargs={"relax_maker_kwargs": {
+                                                                  "relax_cell": False}},
+                                                              supercell_settings={"min_length": 5,
+                                                                                  "max_length": 15,
+                                                                                  "min_atoms": 10,
+                                                                                  "max_atoms": 300,
+                                                                                  "fallback_min_length": 9},
+                                                              split_ratio=0.33,
+                                                              regularization=False,
+                                                              separated=False,
+                                                              num_processes_fit=48,
+                                                              displacement_maker=phonon_displacement_maker,
+                                                              phonon_bulk_relax_maker=phonon_bulk_relax_maker,
+                                                              phonon_static_energy_maker=phonon_static_energy_maker,
+                                                              rattled_bulk_relax_maker=phonon_bulk_relax_maker,
+                                                              isolated_atom_maker=static_isolated_atom_maker)).make(
+    structure_list=structure_list, mp_ids=mpids, benchmark_structures=benchmark_structure_list,
+    benchmark_mp_ids=mpbenchmark,
+    rattle_seed=0,
+    fit_kwargs_list=[{
+        "soap": {"delta": 1.0, "l_max": 12, "n_max": 10,
+                 "atom_sigma": 0.5, "zeta": 4, "cutoff": 5.0,
+                 "cutoff_transition_width": 1.0,
+                 "central_weight": 1.0, "n_sparse": 6000, "f0": 0.0,
+                 "covariance_type": "dot_product",
+                 "sparse_method": "cur_points"},
+        "general": {"two_body": True, "three_body": False, "soap": True,
+                    "default_sigma": "{0.001 0.05 0.05 0.0}", "sparse_jitter": 1.0e-8, }}]
+)
+
+resources = {"nodes": 1, "partition": "micro", "time": "00:55:00", "ntasks": 48, "qverbatim": "#SBATCH --get-user-env",
+             "mail_user": "your_email@adress", "mail_type": "ALL", "account": "xxxxxx"}
+
+resources_phon = {"nodes": 3, "partition": "micro", "time": "0:55:00", "ntasks": 144,
+                  "qverbatim": "#SBATCH --get-user-env",
+                  "mail_user": "your_email@adress", "mail_type": "ALL", "account": "xxxxxx"}
+
+resources_ratt = {"nodes": 3, "partition": "micro", "time": "0:55:00", "ntasks": 144,
+                  "qverbatim": "#SBATCH --get-user-env",
+                  "mail_user": "your_email@adress", "mail_type": "ALL", "account": "xxxxxx"}
+
+resources_mlip = {}
+autoplex_flow = set_run_config(autoplex_flow, name_filter="dft static", resources=resources, worker="supermuc_worker")
+autoplex_flow = set_run_config(autoplex_flow, name_filter="stat_iso_atom", resources=resources, worker="supermuc_worker")
+
+autoplex_flow = set_run_config(autoplex_flow, name_filter="dft phonon static", resources=resources_phon, worker="supermuc_worker")
+autoplex_flow = set_run_config(autoplex_flow, name_filter="static", resources=resources_phon, worker="supermuc_worker")
+
+autoplex_flow = set_run_config(autoplex_flow, name_filter="dft rattle static", resources=resources_ratt, worker="supermuc_worker")
+autoplex_flow = set_run_config(autoplex_flow, name_filter="tight relax", resources=resources, worker="supermuc_worker")
+autoplex_flow = set_run_config(autoplex_flow, name_filter="dft tight relax", resources=resources, worker="supermuc_worker")
+
+autoplex_flow = set_run_config(autoplex_flow, name_filter="machine_learning_fit", resources=resources_mlip, worker="local_worker")
+autoplex_flow = set_run_config(autoplex_flow, name_filter="gap phonon static", resources=resources_mlip, worker="local_worker")
+autoplex_flow = set_run_config(autoplex_flow, name_filter="Force field", resources=resources_mlip, worker="local_worker")
+autoplex_flow = set_run_config(autoplex_flow, name_filter="data_preprocessing_for_fitting", resources=resources, worker="supermuc_worker")
+
+
+autoplex_flow = update_user_incar_settings(autoplex_flow, {"NPAR": 4})
+
+autoplex_flow = update_vasp_custodian_handlers(autoplex_flow, custom_handlers={})
+
+autoplex_flow.name = "small Sn test, test without phonon2"
+
+# submit the workflow to jobflow-remote
+print(submit_flow(autoplex_flow, worker="local_worker", resources=resources_mlip, project="phonons_qha"))
+```
