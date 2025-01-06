@@ -60,12 +60,18 @@ def write_benchmark_metrics(
 
             if not metric["suffix"]:
                 metric["suffix"] = "full"
-
-            file.write(
-                f"\n{metric['ml_model']:<11}{structure_composition:<11}{metric['mp_id']:<12}"
-                f"{metric['displacement']:<18.2f}{metric['benchmark_phonon_rmse']:<12.5f}"
-                f"{metric['ml_imaginary_modes']!s:<16}{metric['dft_imaginary_modes']!s:<16}"
-                f"{metric['suffix']!s:<16}{pretty_hyper_params!s:<50}"
-            )
-
+            if metric["benchmark_phonon_rmse"] is not None:
+                file.write(
+                    f"\n{metric['ml_model']:<11}{structure_composition:<11}{metric['mp_id']:<12}"
+                    f"{metric['displacement']:<18.2f}{metric['benchmark_phonon_rmse']:<12.5f}"
+                    f"{metric['ml_imaginary_modes']!s:<16}{metric['dft_imaginary_modes']!s:<16}"
+                    f"{metric['suffix']!s:<16}{pretty_hyper_params!s:<50}"
+                )
+            else:
+                file.write(
+                    f"\n{metric['ml_model']:<11}{structure_composition:<11}{metric['mp_id']:<12}"
+                    f"{metric['displacement']:<18.2f} None "
+                    f"{metric['ml_imaginary_modes']!s:<16}{metric['dft_imaginary_modes']!s:<16}"
+                    f"{metric['suffix']!s:<16}{pretty_hyper_params!s:<50}"
+                )
     return Response(output=metrics)
