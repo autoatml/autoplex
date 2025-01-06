@@ -194,7 +194,7 @@ class MLIPFitMaker(Maker):
                 "convergence": mlip_fit_job.output["convergence"],
                 "database_dir": data_prep_job.output["database_dir"],
             }
-            return Flow(jobs=jobs, output=mlip_fit_job.output, name=self.name)
+            return Flow(jobs=jobs, output=output, name=self.name)
 
         # this will only run if train.extxyz and test.extxyz files are present in the database_dir
         # TODO: shouldn't this be the exception rather then the default run?!
@@ -524,7 +524,7 @@ class DataPreprocessing(Maker):
                     ]
                 ),
             }
-            print(database_dict)
+
             return {"database_dir": Path.cwd(), "database_dict": database_dict}
 
         return {"database_dir": Path.cwd(), "database_dict": None}
