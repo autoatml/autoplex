@@ -97,6 +97,11 @@ def do_iterative_rattled_structures(
     previous_output: dict | None.
         Dict including the output of the previous flow.
     """
+    print(dft_references)
+    if dft_references is not None:
+        print(type(dft_references))
+        print(type(dft_references[0]))
+        print(len(dft_references))
     if rms is None or (number_of_iteration < max_iteration and rms > rms_max):
         jobs = []
 
@@ -390,11 +395,16 @@ def complete_benchmark(  # this function was put here to prevent circular import
                 )
             jobs.append(add_data_bm)
             collect_output.append(add_data_bm.output)
-
-    return Response(
-        replace=Flow(jobs),
-        output={"bm_output": collect_output, "dft_references": dft_references},
-    )
+    if isinstance(dft_references, list):
+        return Response(
+            replace=Flow(jobs),
+            output={"bm_output": collect_output, "dft_references": dft_references[ibenchmark_structure]},
+        )
+    else:
+        return Response(
+            replace=Flow(jobs),
+            output={"bm_output": collect_output, "dft_references": dft_references},
+        )
 
 
 @job

@@ -547,7 +547,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
             metrics=collect_bm.output,
             benchmark_structures=benchmark_structures,
             benchmark_mp_ids=benchmark_mp_ids,
-            dft_references=dft_new_references[0],
+            dft_references=dft_new_references,
             pre_xyz_files=pre_xyz_files,
             pre_database_dir=add_data_fit.output["database_dir"],
             fit_kwargs_list=fit_kwargs_list,
