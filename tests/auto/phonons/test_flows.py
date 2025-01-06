@@ -722,6 +722,9 @@ def test_iterative_complete_dft_vs_ml_benchmark_workflow_gap(vasp_test_dir, mock
     from pathlib import Path
     vasp_xyz=read(Path(complete_workflow.output.resolve(memory_jobstore)["pre_database_dir"])/"vasp_ref.extxyz",":")
     assert len(vasp_xyz)==10
+    assert isinstance(complete_workflow.output.resolve(memory_jobstore)["dft_references"], list)
+
+
 
 def test_complete_dft_vs_ml_benchmark_workflow_gap(
         vasp_test_dir, mock_vasp, test_dir, memory_jobstore, ref_paths4_mpid, fake_run_vasp_kwargs4_mpid, clean_dir

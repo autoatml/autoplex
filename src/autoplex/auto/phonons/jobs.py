@@ -391,10 +391,16 @@ def complete_benchmark(  # this function was put here to prevent circular import
             jobs.append(add_data_bm)
             collect_output.append(add_data_bm.output)
 
-    return Response(
-        replace=Flow(jobs),
-        output={"bm_output": collect_output, "dft_references": dft_references},
-    )
+    if isinstance(dft_references, list):
+        return Response(
+            replace=Flow(jobs),
+            output={"bm_output": collect_output, "dft_references": dft_references[ibenchmark_structure]},
+        )
+    else:
+        return Response(
+            replace=Flow(jobs),
+            output={"bm_output": collect_output, "dft_references": dft_references},
+        )
 
 
 @job
