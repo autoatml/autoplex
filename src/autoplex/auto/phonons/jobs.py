@@ -97,11 +97,7 @@ def do_iterative_rattled_structures(
     previous_output: dict | None.
         Dict including the output of the previous flow.
     """
-    print(dft_references)
-    if dft_references is not None:
-        print(type(dft_references))
-        print(type(dft_references[0]))
-        print(len(dft_references))
+
     if rms is None or (number_of_iteration < max_iteration and rms > rms_max):
         jobs = []
 
