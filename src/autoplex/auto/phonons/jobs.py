@@ -97,7 +97,6 @@ def do_iterative_rattled_structures(
     previous_output: dict | None.
         Dict including the output of the previous flow.
     """
-
     if rms is None or (number_of_iteration < max_iteration and rms > rms_max):
         jobs = []
 
