@@ -42,6 +42,7 @@ __all__ = [
     "CompleteDFTvsMLBenchmarkWorkflow",
     "CompleteDFTvsMLBenchmarkWorkflowMPSettings",
     "DFTSupercellSettingsMaker",
+    "IterativeCompleteDFTvsMLBenchmarkWorkflow",
 ]
 
 

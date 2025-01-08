@@ -3,7 +3,10 @@ import pytest
 from monty.serialization import loadfn
 from atomate2.common.schemas.phonons import PhononBSDOSDoc
 from pymatgen.core.structure import Structure
-from autoplex.auto.phonons.flows import CompleteDFTvsMLBenchmarkWorkflow, CompleteDFTvsMLBenchmarkWorkflowMPSettings, IterativeCompleteDFTvsMLBenchmarkWorkflow
+from autoplex.auto.phonons.flows import (
+    CompleteDFTvsMLBenchmarkWorkflow,
+    CompleteDFTvsMLBenchmarkWorkflowMPSettings,
+    IterativeCompleteDFTvsMLBenchmarkWorkflow)
 from jobflow import run_locally
 
 os.environ["OMP_NUM_THREADS"] = "1"
@@ -416,6 +419,7 @@ def ref_paths4_mpid():
         "dft rattle static 4/4_test3": "dft_ml_data_generation/rand_static_10/",
     }
 
+
 @pytest.fixture(scope="class")
 def ref_paths4_mpid_new():
     return {
@@ -456,6 +460,7 @@ def ref_paths4_mpid_new():
         "dft rattle static 4/4_test2": "dft_ml_data_generation/strict_test/rand_static_8/",
     }
 
+
 @pytest.fixture(scope="class")
 def ref_paths4_mpid_new2():
     return {
@@ -493,7 +498,7 @@ def ref_paths4_mpid_new2():
         "dft rattle static 2/4_test_0": "dft_ml_data_generation/strict_test/rand_static_2/",
         "dft rattle static 3/4_test_0": "dft_ml_data_generation/strict_test/rand_static_3/",
         "dft rattle static 4/4_test_0": "dft_ml_data_generation/strict_test/rand_static_4/",
-        }
+    }
 
 
 @pytest.fixture(scope="class")
@@ -666,15 +671,22 @@ def fake_run_vasp_kwargs4_mpid():
         },
     }
 
+
 @pytest.fixture(scope="class")
 def fake_run_vasp_kwargs4_mpid_new():
     return {}
+
 
 @pytest.fixture(scope="class")
 def fake_run_vasp_kwargs4_mpid_new2():
     return {}
 
-def test_iterative_complete_dft_vs_ml_benchmark_workflow_gap(vasp_test_dir, mock_vasp, test_dir, memory_jobstore,  ref_paths4_mpid_new2, fake_run_vasp_kwargs4_mpid_new2, clean_dir):
+
+def test_iterative_complete_dft_vs_ml_benchmark_workflow_gap(vasp_test_dir, mock_vasp, test_dir, memory_jobstore,
+                                                             ref_paths4_mpid_new2, fake_run_vasp_kwargs4_mpid_new2,
+                                                             clean_dir):
+    from ase.io import read
+    from pathlib import Path
     # first test with just one iteration (more tests need to be added)
     path_to_struct = vasp_test_dir / "dft_ml_data_generation" / "POSCAR"
     structure = Structure.from_file(path_to_struct)
@@ -682,11 +694,15 @@ def test_iterative_complete_dft_vs_ml_benchmark_workflow_gap(vasp_test_dir, mock
     complete_workflow = IterativeCompleteDFTvsMLBenchmarkWorkflow(
         rms_max=0.2,
         max_iterations=3,
-        complete_dft_vs_ml_benchmark_workflow_0=CompleteDFTvsMLBenchmarkWorkflow( symprec=1e-2, displacements=[0.01],
-                                                                                  split_ratio=0.33,
-        volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
-        supercell_settings={"min_length": 8, "min_atoms": 20},
-        apply_data_preprocessing=True),
+        complete_dft_vs_ml_benchmark_workflow_0=CompleteDFTvsMLBenchmarkWorkflow(symprec=1e-2, displacements=[0.01],
+                                                                                 split_ratio=0.33,
+                                                                                 volume_custom_scale_factors=[0.975,
+                                                                                                              1.0,
+                                                                                                              1.025,
+                                                                                                              1.05],
+                                                                                 supercell_settings={"min_length": 8,
+                                                                                                     "min_atoms": 20},
+                                                                                 apply_data_preprocessing=True),
         complete_dft_vs_ml_benchmark_workflow_1=CompleteDFTvsMLBenchmarkWorkflow(symprec=1e-2, displacements=[0.01],
                                                                                  split_ratio=0.33,
                                                                                  volume_custom_scale_factors=[0.975],
@@ -697,7 +713,6 @@ def test_iterative_complete_dft_vs_ml_benchmark_workflow_gap(vasp_test_dir, mock
                                                                                  num_processes_fit=4,
                                                                                  ),
 
-
     ).make(
         structure_list=[structure],
         mp_ids=["test"],
@@ -705,7 +720,6 @@ def test_iterative_complete_dft_vs_ml_benchmark_workflow_gap(vasp_test_dir, mock
         benchmark_structures=[structure],
         rattle_seed=42,
     )
-
 
     # automatically use fake VASP and write POTCAR.spec during the test
     mock_vasp(ref_paths4_mpid_new2, fake_run_vasp_kwargs4_mpid_new2)
@@ -717,13 +731,10 @@ def test_iterative_complete_dft_vs_ml_benchmark_workflow_gap(vasp_test_dir, mock
         ensure_success=True,
         store=memory_jobstore,
     )
-
-    from ase.io import read
-    from pathlib import Path
-    vasp_xyz=read(Path(complete_workflow.output.resolve(memory_jobstore)["pre_database_dir"])/"vasp_ref.extxyz",":")
-    assert len(vasp_xyz)==10
+    vasp_xyz = read(Path(complete_workflow.output.resolve(memory_jobstore)["pre_database_dir"]) / "vasp_ref.extxyz",
+                    ":")
+    assert len(vasp_xyz) == 10
     assert isinstance(complete_workflow.output.resolve(memory_jobstore)["dft_references"], list)
-
 
 
 def test_complete_dft_vs_ml_benchmark_workflow_gap(
@@ -759,7 +770,8 @@ def test_complete_dft_vs_ml_benchmark_workflow_gap(
 
     assert complete_workflow.jobs[5].name == "complete_benchmark_mp-22905"
 
-    assert responses[complete_workflow.jobs[-1].output.uuid][1].output["metrics"][0][0]["benchmark_phonon_rmse"] == pytest.approx(
+    assert responses[complete_workflow.jobs[-1].output.uuid][1].output["metrics"][0][0][
+               "benchmark_phonon_rmse"] == pytest.approx(
         2.502641337594289, abs=1.5  # it's kinda fluctuating because of the little data
     )
 
@@ -1071,7 +1083,8 @@ def test_complete_dft_vs_ml_benchmark_workflow_nequip(
 
 
 def test_complete_dft_vs_ml_benchmark_workflow_two_mpids(
-        vasp_test_dir, mock_vasp, test_dir, memory_jobstore, ref_paths4_mpid_new, fake_run_vasp_kwargs4_mpid_new, clean_dir
+        vasp_test_dir, mock_vasp, test_dir, memory_jobstore, ref_paths4_mpid_new, fake_run_vasp_kwargs4_mpid_new,
+        clean_dir
 ):
     path_to_struct = vasp_test_dir / "dft_ml_data_generation" / "POSCAR"
     structure = Structure.from_file(path_to_struct)
@@ -1743,7 +1756,8 @@ def test_phonon_dft_ml_data_generation_flow(
            benchmark_mp_ids=mp_ids,
            pre_xyz_files=["vasp_ref.extxyz"],
            pre_database_dir=test_dir / "fitting" / "ref_files",
-           fit_kwargs_list=[{"general": {"two_body": True, "three_body": False, "soap": False}}]  # reduce unit test run time
+           fit_kwargs_list=[{"general": {"two_body": True, "three_body": False, "soap": False}}]
+           # reduce unit test run time
            )
 
     flow_data_generation_without_rattled_structures = CompleteDFTvsMLBenchmarkWorkflow(
@@ -1756,7 +1770,8 @@ def test_phonon_dft_ml_data_generation_flow(
            benchmark_mp_ids=mp_ids,
            pre_xyz_files=["vasp_ref.extxyz"],
            pre_database_dir=test_dir / "fitting" / "ref_files",
-           fit_kwargs_list=[{"general": {"two_body": True, "three_body": False, "soap": False}}]  # reduce unit test run time
+           fit_kwargs_list=[{"general": {"two_body": True, "three_body": False, "soap": False}}]
+           # reduce unit test run time
            )
     # automatically use fake VASP and write POTCAR.spec during the test
     mock_vasp(ref_paths4_mpid, fake_run_vasp_kwargs4_mpid)
@@ -1800,9 +1815,8 @@ def test_supercell_test_runs(vasp_test_dir, clean_dir, memory_jobstore, test_dir
 
     autoplex_flow = DFTSupercellSettingsMaker(supercell_settings={"min_length": 10, "min_atoms": 10},
                                               DFT_Maker=ForceFieldStaticMaker(force_field_name="CHGNet")).make(
-                                              structure_list=structure_list, mp_ids=mp_ids, )
+        structure_list=structure_list, mp_ids=mp_ids, )
 
     responses_flow = run_locally(autoplex_flow)
     assert responses_flow[autoplex_flow.jobs[-1].output.uuid][1].replace[0].name == "Force field static"
     # seems that the current atomate2 implementation doesn't distinguish in the FF flow names
-
