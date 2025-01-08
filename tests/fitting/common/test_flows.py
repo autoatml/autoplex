@@ -385,6 +385,10 @@ def test_mlip_fit_maker_glue_xml(
 
     # check if gap fit file is generated
     assert Path(gapfit.output["mlip_path"][0].resolve(memory_jobstore)).exists()
+    assert Path(f"{gapfit.output['mlip_path'][0].resolve(memory_jobstore)}/glue.xml").exists()
+    with open(Path(f"{gapfit.output['mlip_path'][0].resolve(memory_jobstore)}/std_gap_out.log"), "r") as file:
+        content = file.read()
+        assert "core_param_file = glue.xml" in content
 
 
 def test_mlip_fit_maker_glue_xml_with_other_name(
