@@ -450,80 +450,39 @@ class DataPreprocessing(Maker):
 
             adapter = AseAtomsAdaptor()
 
+            # must always exist
+            required_paths = ["train.extxyz", "test.extxyz"]
+
+            optional_paths = [
+                "phonon/train.extxyz",
+                "phonon/test.extxyz",
+                "rattled/train.extxyz",
+                "rattled/test.extxyz",
+                "without_regularization/train.extxyz",
+                "without_regularization/test.extxyz",
+            ]
+
             database_dict = {
-                "train.extxyz": [
+                path: [
                     adapter.get_structure(atoms)
-                    for atoms in ase.io.read(Path.cwd() / "train.extxyz", ":")
-                ],
-                "test.extxyz": [
-                    adapter.get_structure(atoms)
-                    for atoms in ase.io.read(Path.cwd() / "test.extxyz", ":")
-                ],
-                "phonon/train.extxyz": (
-                    None
-                    if not Path(Path.cwd() / "phonon" / "train.extxyz").exists()
-                    else [
-                        adapter.get_structure(atoms)
-                        for atoms in ase.io.read(
-                            Path.cwd() / "phonon" / "train.extxyz", ":"
-                        )
-                    ]
-                ),
-                "phonon/test.extxyz": (
-                    None
-                    if not Path(Path.cwd() / "phonon" / "test.extxyz").exists()
-                    else [
-                        adapter.get_structure(atoms)
-                        for atoms in ase.io.read(
-                            Path.cwd() / "phonon" / "test.extxyz", ":"
-                        )
-                    ]
-                ),
-                "rattled/train.extxyz": (
-                    None
-                    if not Path(Path.cwd() / "rattled" / "train.extxyz").exists()
-                    else [
-                        adapter.get_structure(atoms)
-                        for atoms in ase.io.read(
-                            Path.cwd() / "rattled" / "train.extxyz", ":"
-                        )
-                    ]
-                ),
-                "rattled/test.extxyz": (
-                    None
-                    if not Path(Path.cwd() / "rattled" / "test.extxyz").exists()
-                    else [
-                        adapter.get_structure(atoms)
-                        for atoms in ase.io.read(
-                            Path.cwd() / "rattled" / "test.extxyz", ":"
-                        )
-                    ]
-                ),
-                "without_regularization/train.extxyz": (
-                    None
-                    if not Path(
-                        Path.cwd() / "without_regularization" / "train.extxyz"
-                    ).exists()
-                    else [
-                        adapter.get_structure(atoms)
-                        for atoms in ase.io.read(
-                            Path.cwd() / "without_regularization" / "train.extxyz", ":"
-                        )
-                    ]
-                ),
-                "without_regularization/test.extxyz": (
-                    None
-                    if not Path(
-                        Path.cwd() / "without_regularization" / "test.extxyz"
-                    ).exists()
-                    else [
-                        adapter.get_structure(atoms)
-                        for atoms in ase.io.read(
-                            Path.cwd() / "without_regularization" / "test.extxyz", ":"
-                        )
-                    ]
-                ),
+                    for atoms in ase.io.read(Path.cwd() / path, ":")
+                ]
+                for path in required_paths
             }
+
+            database_dict.update(
+                {
+                    path: (
+                        [
+                            adapter.get_structure(atoms)
+                            for atoms in ase.io.read(Path.cwd() / path, ":")
+                        ]
+                        if (Path.cwd() / path).exists()
+                        else None
+                    )
+                    for path in optional_paths
+                }
+            )
 
             return {"database_dir": Path.cwd(), "database_dict": database_dict}
 
