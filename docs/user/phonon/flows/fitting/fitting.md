@@ -396,10 +396,10 @@ Additional fit settings can again be passed using `fit_kwargs` or `**{...}`.
 > otherwise the code will not finish successfully.
             
 
-## Is it possible to run the DFT calculations and the fitting step on different machines?
+## Is it possible to run the DFT calculations and the MLIP fitting step on different machines?
 
 Very often, we might have the situation that our GPU does not share a hard drive with the compute cluster where we
-perform VASP run. In such situations, it is convenient to split up the computations.
+perform the VASP runs. In such situations, it is convenient to split up the computations.
 
 This can be done by e.g. using jobflow-remote and the following settings for VASP and fitting jobs. 
 The `local_worker` is the local machine (e.g., a GPU without slurm queue).
