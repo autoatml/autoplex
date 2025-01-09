@@ -237,11 +237,6 @@ def generate_randomized_structures(
     """
     if supercell_matrix is None:
         supercell_matrix = [[2, 0, 0], [0, 2, 0], [0, 0, 2]]
-
-    # TODO: remove this part
-    # if n_structures < 10:
-    #    n_structures = 10
-
     supercell = get_supercell(
         unitcell=get_phonopy_structure(structure),
         supercell_matrix=supercell_matrix,
@@ -345,17 +340,24 @@ def sample_data(
     ----------
     selection_method : Literal['cur', 'bcur1s', 'bcur2s', 'random', 'uniform']
        Method for selecting samples. Options include:
+
         - 'cur': Pure CUR selection.
+
         - 'bcur': Boltzmann flat histogram in enthalpy, then CUR.
+
             - 'bcur1s': Execute bcur with one shot (1s)
             - 'bcur2i': Execute bcur with two iterations (2i)
+
         - 'random': Random selection.
         - 'uniform': Uniform selection.
+
     num_of_selection: int
        Number of structures to be sampled.
     bcur_params: dict
         Parameters for Boltzmann CUR selection. The default dictionary includes:
-        - 'soap_paras': SOAP descriptor parameters:
+
+        - 'soap_paras': SOAP descriptor parameters
+
             - 'l_max': int, Maximum degree of spherical harmonics (default 12).
             - 'n_max': int, Maximum number of radial basis functions (default 12).
             - 'atom_sigma': float, Width of Gaussian smearing (default 0.0875).
@@ -364,11 +366,13 @@ def sample_data(
             - 'zeta': float, Exponent for dot-product SOAP kernel (default 4.0).
             - 'average': bool, Whether to average the SOAP vectors (default True).
             - 'species': bool, Whether to consider species information (default True).
+
         - 'kt': float, Temperature in eV for Boltzmann weighting (default 0.3).
         - 'frac_of_bcur': float, Fraction of Boltzmann CUR selections (default 0.8).
         - 'bolt_max_num': int, Maximum number of Boltzmann selections (default 3000).
         - 'kernel_exp': float, Exponent for the kernel (default 4.0).
         - 'energy_label': str, Label for the energy data (default 'energy').
+
     dir: str
         Directory containing trajectory files for MD/RSS simulations. Default is None.
     structure: list[Structure]
@@ -556,6 +560,7 @@ def collect_dft_data(
         Group name for GAP RSS. Default is 'RSS'.
     vasp_dirs : dict
         Dictionary containing VASP directories and configuration types. Should have keys:
+
         - 'dirs_of_vasp': list
             List of directories containing VASP data.
         - 'config_type': list
@@ -563,8 +568,9 @@ def collect_dft_data(
 
     Returns
     -------
-    dict
-        A dictionary containing:
+    dict:
+        A dictionary containing
+
         - 'vasp_ref_dir': Directory of the VASP reference file.
         - 'isolated_atom_energies': Isolated energy values.
     """

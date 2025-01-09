@@ -1,3 +1,7 @@
+---
+orphan: true
+---
+
 # MongoDB setup tutorial
 
 `autoplex` and `atomate2` use the MongoDB database framework to store the data output from the calculations. 

@@ -275,7 +275,6 @@ def complete_benchmark(  # this function was put here to prevent circular import
 
     for path in ml_path:
         suffix = Path(path).name
-
         if suffix == "without_regularization":
             suffix = "without_reg"
         if suffix not in ["phonon", "rattled"]:
@@ -805,7 +804,7 @@ def get_iso_atom(
 
 
 @job(data=[PhononBSDOSDoc, "dft_references"])
-def get_output(
+def get_phonon_output(
     metrics: list,
     benchmark_structures: list[Structure] | None = None,
     benchmark_mp_ids: list[str] | None = None,
@@ -815,7 +814,10 @@ def get_output(
     fit_kwargs_list: list | None = None,
 ):
     """
-    Job to collect all output infos for potential restarts.
+    Job to collect and process all phonon-related output information for a potential restart of the flow.
+
+    This function aggregates benchmark results, DFT reference data, and other input parameters
+    to determine the best fit RMSE from phonon calculations across all benchmark fits.
 
     Parameters
     ----------
@@ -851,7 +853,7 @@ def get_output(
         rms = 1000.0
     return {
         "metrics": metrics,
-        "rms": rms,  # get the best fit
+        "rms": rms,  # get the best fit RMSE
         "benchmark_structures": benchmark_structures,
         "benchmark_mp_ids": benchmark_mp_ids,
         "dft_references": dft_references,

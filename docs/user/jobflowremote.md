@@ -1,3 +1,7 @@
+---
+orphan: true
+---
+
 # Jobflow-remote setup
 
 This will result in a setup for automation where 

@@ -26,7 +26,7 @@ from autoplex.auto.phonons.jobs import (
     do_iterative_rattled_structures,
     generate_supercells,
     get_iso_atom,
-    get_output,
+    get_phonon_output,
     run_supercells,
 )
 from autoplex.benchmark.phonons.jobs import write_benchmark_metrics
@@ -42,6 +42,7 @@ __all__ = [
     "CompleteDFTvsMLBenchmarkWorkflow",
     "CompleteDFTvsMLBenchmarkWorkflowMPSettings",
     "DFTSupercellSettingsMaker",
+    "IterativeCompleteDFTvsMLBenchmarkWorkflow",
 ]
 
 
@@ -543,7 +544,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
 
         flows.append(collect_bm)
 
-        output_flow = get_output(
+        output_flow = get_phonon_output(
             metrics=collect_bm.output,
             benchmark_structures=benchmark_structures,
             benchmark_mp_ids=benchmark_mp_ids,

@@ -26,7 +26,7 @@ Once installed in the terminal, run the following commands to get Julia ACEpoten
 julia -e 'using Pkg; Pkg.Registry.add("General"); Pkg.Registry.add(Pkg.Registry.RegistrySpec(url="https://github.com/ACEsuit/ACEregistry")); Pkg.add(Pkg.PackageSpec(;name="ACEpotentials", version="0.6.7")); Pkg.add("DataFrames"); Pkg.add("CSV")'
 ```
 
-### Enabling RSS workflows
+## Enabling RSS workflows
 
 Additionally, `buildcell` as a part of `AIRSS` needs to be installed if one wants to use the RSS functionality:
 
@@ -34,7 +34,7 @@ Additionally, `buildcell` as a part of `AIRSS` needs to be installed if one want
 curl -O https://www.mtg.msm.cam.ac.uk/files/airss-0.9.3.tgz; tar -xf airss-0.9.3.tgz; rm airss-0.9.3.tgz; cd airss; make ; make install ; make neat; cd ..
 ```
 
-### LAMMPS installation
+## LAMMPS installation
 
 You only need to install LAMMPS, if you want to use J-ACE as your MLIP.
 Recipe for compiling lammps-ace including the download of the `libpace.tar.gz` file:
