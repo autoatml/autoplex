@@ -759,113 +759,6 @@ def fake_run_vasp_kwargs4_mpid_new2():
     return {}
 
 
-def test_iterative_complete_dft_vs_ml_benchmark_workflow_gap(vasp_test_dir, mock_vasp, test_dir, memory_jobstore,  ref_paths4_mpid_new2, fake_run_vasp_kwargs4_mpid_new2, clean_dir):
-    # first test with just one iteration (more tests need to be added)
-    from ase.io import read
-    from pathlib import Path
-    path_to_struct = vasp_test_dir / "dft_ml_data_generation" / "POSCAR"
-    structure = Structure.from_file(path_to_struct)
-
-    complete_workflow = IterativeCompleteDFTvsMLBenchmarkWorkflow(
-        rms_max=0.2,
-        max_iterations=3,
-        complete_dft_vs_ml_benchmark_workflow_0=CompleteDFTvsMLBenchmarkWorkflow(symprec=1e-2, displacements=[0.01],
-                                                                                  split_ratio=0.33,
-        volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
-        supercell_settings={"min_length": 8, "min_atoms": 20},
-        apply_data_preprocessing=True),
-        complete_dft_vs_ml_benchmark_workflow_1=CompleteDFTvsMLBenchmarkWorkflow(symprec=1e-2, displacements=[0.01],
-                                                                                 split_ratio=0.33,
-                                                                                 volume_custom_scale_factors=[0.975],
-                                                                                 supercell_settings={"min_length": 8,
-                                                                                                     "min_atoms": 20},
-                                                                                 apply_data_preprocessing=True,
-                                                                                 add_dft_phonon_struct=False,
-                                                                                 num_processes_fit=4,
-                                                                                 ),
-
-
-    ).make(
-        structure_list=[structure],
-        mp_ids=["test"],
-        benchmark_mp_ids=["test"],
-        benchmark_structures=[structure],
-        rattle_seed=42,
-    )
-
-
-    # automatically use fake VASP and write POTCAR.spec during the test
-    mock_vasp(ref_paths4_mpid_new2, fake_run_vasp_kwargs4_mpid_new2)
-
-    # run the flow or job and ensure that it finished running successfully
-    responses = run_locally(
-        complete_workflow,
-        create_folders=True,
-        ensure_success=True,
-        store=memory_jobstore,
-    )
-    vasp_xyz = read(Path(complete_workflow.output.resolve(memory_jobstore)["pre_database_dir"])/"vasp_ref.extxyz",":")
-    assert len(vasp_xyz) == 10
-    assert isinstance(complete_workflow.output.resolve(memory_jobstore)["dft_references"], list)
-
-def test_iterative_complete_dft_vs_ml_benchmark_workflow_gap_add_phonon_false(vasp_test_dir, mock_vasp, test_dir, memory_jobstore,  ref_paths4_mpid_new2, fake_run_vasp_kwargs4_mpid_new2, clean_dir):
-    # first test with just one iteration (more tests need to be added)
-    from ase.io import read
-    from pathlib import Path
-    path_to_struct = vasp_test_dir / "dft_ml_data_generation" / "POSCAR"
-    structure = Structure.from_file(path_to_struct)
-
-    complete_workflow = IterativeCompleteDFTvsMLBenchmarkWorkflow(
-        rms_max=0.2,
-        max_iterations=3,
-        complete_dft_vs_ml_benchmark_workflow_0=CompleteDFTvsMLBenchmarkWorkflow( symprec=1e-2, displacements=[0.01],
-                                                                                  split_ratio=0.33,
-                                                                                  add_dft_phonon_struct=False,
-        volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
-        supercell_settings={"min_length": 8, "min_atoms": 20},
-        apply_data_preprocessing=True),
-        complete_dft_vs_ml_benchmark_workflow_1=CompleteDFTvsMLBenchmarkWorkflow(symprec=1e-2, displacements=[0.01],
-                                                                                 split_ratio=0.33,
-                                                                                 volume_custom_scale_factors=[0.975],
-                                                                                 supercell_settings={"min_length": 8,
-                                                                                                     "min_atoms": 20},
-                                                                                 apply_data_preprocessing=True,
-                                                                                 add_dft_phonon_struct=False,
-                                                                                 num_processes_fit=4,
-                                                                                 ),
-
-
-    ).make(
-        structure_list=[structure],
-        mp_ids=["test"],
-        benchmark_mp_ids=["test"],
-        benchmark_structures=[structure],
-        rattle_seed=42,
-    )
-    # automatically use fake VASP and write POTCAR.spec during the test
-    mock_vasp(ref_paths4_mpid_new2, fake_run_vasp_kwargs4_mpid_new2)
-
-    # run the flow or job and ensure that it finished running successfully
-    responses = run_locally(
-        complete_workflow,
-        create_folders=True,
-        ensure_success=True,
-        store=memory_jobstore,
-    )
-    vasp_xyz = read(Path(complete_workflow.output.resolve(memory_jobstore)["pre_database_dir"])/"vasp_ref.extxyz",":")
-    assert len(vasp_xyz) == 8
-
-
-@pytest.fixture(scope="class")
-def fake_run_vasp_kwargs4_mpid_new():
-    return {}
-
-
-@pytest.fixture(scope="class")
-def fake_run_vasp_kwargs4_mpid_new2():
-    return {}
-
-
 def test_iterative_complete_dft_vs_ml_benchmark_workflow_gap(vasp_test_dir, mock_vasp, test_dir, memory_jobstore,
                                                              ref_paths4_mpid_new2, fake_run_vasp_kwargs4_mpid_new2,
                                                              clean_dir):
@@ -915,10 +808,56 @@ def test_iterative_complete_dft_vs_ml_benchmark_workflow_gap(vasp_test_dir, mock
         ensure_success=True,
         store=memory_jobstore,
     )
-    vasp_xyz = read(Path(complete_workflow.output.resolve(memory_jobstore)["pre_database_dir"]) / "vasp_ref.extxyz",
-                    ":")
+    vasp_xyz = read(Path(complete_workflow.output.resolve(memory_jobstore)["pre_database_dir"]) / "vasp_ref.extxyz",":")
     assert len(vasp_xyz) == 10
     assert isinstance(complete_workflow.output.resolve(memory_jobstore)["dft_references"], list)
+
+def test_iterative_complete_dft_vs_ml_benchmark_workflow_gap_add_phonon_false(vasp_test_dir, mock_vasp, test_dir, memory_jobstore,  ref_paths4_mpid_new2, fake_run_vasp_kwargs4_mpid_new2, clean_dir):
+    # first test with just one iteration (more tests need to be added)
+    from ase.io import read
+    from pathlib import Path
+    path_to_struct = vasp_test_dir / "dft_ml_data_generation" / "POSCAR"
+    structure = Structure.from_file(path_to_struct)
+
+    complete_workflow = IterativeCompleteDFTvsMLBenchmarkWorkflow(
+        rms_max=0.2,
+        max_iterations=3,
+        complete_dft_vs_ml_benchmark_workflow_0=CompleteDFTvsMLBenchmarkWorkflow( symprec=1e-2, displacements=[0.01],
+                                                                                  split_ratio=0.33,
+                                                                                  add_dft_phonon_struct=False,
+        volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
+        supercell_settings={"min_length": 8, "min_atoms": 20},
+        apply_data_preprocessing=True),
+        complete_dft_vs_ml_benchmark_workflow_1=CompleteDFTvsMLBenchmarkWorkflow(symprec=1e-2, displacements=[0.01],
+                                                                                 split_ratio=0.33,
+                                                                                 volume_custom_scale_factors=[0.975],
+                                                                                 supercell_settings={"min_length": 8,
+                                                                                                     "min_atoms": 20},
+                                                                                 apply_data_preprocessing=True,
+                                                                                 add_dft_phonon_struct=False,
+                                                                                 num_processes_fit=4,
+                                                                                 ),
+
+
+    ).make(
+        structure_list=[structure],
+        mp_ids=["test"],
+        benchmark_mp_ids=["test"],
+        benchmark_structures=[structure],
+        rattle_seed=42,
+    )
+    # automatically use fake VASP and write POTCAR.spec during the test
+    mock_vasp(ref_paths4_mpid_new2, fake_run_vasp_kwargs4_mpid_new2)
+
+    # run the flow or job and ensure that it finished running successfully
+    responses = run_locally(
+        complete_workflow,
+        create_folders=True,
+        ensure_success=True,
+        store=memory_jobstore,
+    )
+    vasp_xyz = read(Path(complete_workflow.output.resolve(memory_jobstore)["pre_database_dir"])/"vasp_ref.extxyz",":")
+    assert len(vasp_xyz) == 8
 
 
 def test_complete_dft_vs_ml_benchmark_workflow_gap(
