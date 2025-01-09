@@ -1,4 +1,4 @@
-(rss)=
+(rss-quickstart)=
 
 # Quick start
 
@@ -24,7 +24,7 @@ The `RssMaker` class in `autoplex` is the core interface for creating ML-RSS pot
 
 Parameters can be specified either through a YAML configuration file or as direct arguments in the `make` method.
 
-### Running the workflow with a YAML configuration file
+## Running the workflow with a YAML configuration file
 
 > **Recommendation**: This is currently our recommended approach for setting up and managing RSS workflows.
 
@@ -56,7 +56,7 @@ print(submit_flow(rss_job, worker="your worker", resources=resources, project="y
 
 For details on setting up `FireWorks`, see [FireWorks setup](../../../mongodb.md#fireworks-configuration) and for `jobflow-remote`, see [jobflow-remote setup](../../../jobflowremote.md).
 
-### Running the workflow with direct parameter specification
+## Running the workflow with direct parameter specification
 
 As an alternative to using a YAML configuration file, the RSS workflow can be initiated by directly specifying parameters in the `make` method. This approach is ideal for cases where only a few parameters need to be customized. You can override the default settings by passing them as keyword arguments, offering a more flexible and lightweight way to set up the workflow.
 
@@ -79,7 +79,7 @@ If you choose to use the direct parameter specification method, at a minimum, yo
 
 > **Note**: If both a YAML file and direct parameter specifications are provided, any overlapping parameters will be overridden by the directly specified values.
 
-### Building RSS models with various ML potentials
+## Building RSS models with various ML potentials
 
 Currently, `RssMaker` supports GAP (Gaussian Approximation Potential), ACE (Atomic Cluster Expansion), and three graph-based network models including NequIP, M3GNet, and MACE. You can specify the desired model using the `mlip_type` argument and adjust relevant hyperparameters within the `make` method. Default and adjustable hyperparameters are available in `autoplex/fitting/common/mlip-rss-defaults.json`.
 
@@ -93,7 +93,7 @@ rss_job = RssMaker(name="your workflow name").make(tag='SiO2',
 
 > **Note**: We primarily recommend the GAP-RSS model for now, as GAP has demonstrated great stability with small datasets. Other models have not been thoroughly explored yet. However, we encourage users to experiment with and test other individual models or combinations for potentially interesting results.
 
-### Resuming workflow from point of interruption
+## Resuming workflow from point of interruption
 
 To resume an interrupted RSS workflow, use the `resume_from_previous_state` argument, which accepts a dictionary containing the necessary state information. Additionally, ensure that `train_from_scratch` is set to `False` to enable resuming from the previous state. This way, you are allowed to continue the workflow from any previously saved state.
 

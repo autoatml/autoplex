@@ -37,6 +37,8 @@ jobs:
             micromamba activate autoplex_docs
             uv pip install --upgrade pip
             uv pip install --prerelease=allow .[docs,strict]
+            uv pip install --upgrade monty
+            uv pip install numpy==1.26.4
       - name: Build
         run: micromamba run -n autoplex_docs sphinx-build -W docs _build
       - name: Deploy to GitHub Pages

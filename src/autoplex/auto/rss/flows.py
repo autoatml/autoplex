@@ -53,17 +53,13 @@ class RssMaker(Maker):
         resume_from_previous_state: dict | None
             A dictionary containing the state information required to resume a previously interrupted
             or saved RSS workflow. When 'train_from_scratch' is set to False, this parameter is mandatory
-            for the workflow to pick up from a saved state.
-            Expected keys within this dictionary:
-                test_error: float
-                    The test error from the last completed training step.
-                pre_database_dir: str
-                    Path to the directory containing the pre-existing database for resuming.
-                mlip_path: str
-                    Path to the file of a previous MLIP model.
-                isolated_atom_energies: dict
-                    A dictionary of isolated atom energy values, with atomic numbers as keys
-                    and their energies as valuables.
+            for the workflow to pick up from a saved state.Expected keys within this dictionary are as follows
+
+            - 'test_error': float, The test error from the last completed training step.
+            - 'pre_database_dir': str, Path to the directory containing the pre-existing database for resuming.
+            - 'mlip_path': str, Path to the file of a previous MLIP model.
+            - 'isolated_atom_energies': dict, A dictionary with isolated atom energy values mapped to atomic numbers.
+
         generated_struct_numbers: list[int]
             Expected number of generated randomized unit cells by buildcell.
         buildcell_options: list[dict] | None
@@ -85,29 +81,26 @@ class RssMaker(Maker):
         rss_selection_method: str
             Method for selecting samples from the RSS trajectories:
             Boltzmann flat histogram in enthalpy first, then CUR.
-            Options include:
-                bcur1s: Execute bcur with one shot (1s)
-                bcur2i: Execute bcur with two iterations (2i)
+            Options are as follows
+
+            - 'bcur1s': Execute bcur with one shot (1s)
+            - 'bcur2i': Execute bcur with two iterations (2i)
+
         bcur_params: dict | None
-            Parameters for Boltzmann CUR selection. The default dictionary includes:
-                soap_paras: dict
-                   SOAP descriptor parameters:
-                l_max: int
-                    Maximum degree of spherical harmonics (default 12).
-                n_max: int
-                    Maximum number of radial basis functions (default 12).
-                atom_sigma: float
-                    Width of Gaussian smearing (default 0.0875).
-                cutoff: float
-                    Radial cutoff distance (default 10.5).
-                cutoff_transition_width: float
-                    Width of the transition region (default 1.0).
-                zeta: float
-                    Exponent for dot-product SOAP kernel (default 4.0).
-                average: bool
-                    Whether to average the SOAP vectors (default True).
-                species: bool
-                    Whether to consider species information (default True).
+            Parameters for Boltzmann CUR selection. The default dictionary includes following keys
+
+            soap_paras: dict
+                SOAP descriptor parameters dict with following acceptable keys
+
+            - 'l_max': int, Maximum degree of spherical harmonics (default 12).
+            - 'n_max': int, Maximum number of radial basis functions (default 12).
+            - 'atom_sigma': float, Width of Gaussian smearing (default 0.0875).
+            - 'cutoff': float, Radial cutoff distance (default 10.5).
+            - 'cutoff_transition_width': float, Width of the transition region (default 1.0).
+            - 'zeta': float,Exponent for dot-product SOAP kernel (default 4.0).
+            - 'average': bool, Whether to average the SOAP vectors (default True).
+            - 'species': bool, Whether to consider species information (default True).
+
             kb_temp: float
                 Temperature in eV for Boltzmann weighting (default 0.3).
             frac_of_bcur: float
@@ -152,9 +145,11 @@ class RssMaker(Maker):
         regularization: bool
             If True, apply regularization. This only works for GAP to date. Default is False.
         scheme: str
-            Method to use for regularization. Options are:
-                linear_hull: for single-composition system, use 2D convex hull (E, V)
-                volume-stoichiometry: for multi-composition system, use 3D convex hull of (E, V, mole-fraction)
+            Method to use for regularization. Options are
+
+            - 'linear_hull': for single-composition system, use 2D convex hull (E, V)
+            - 'volume-stoichiometry': for multi-composition system, use 3D convex hull of (E, V, mole-fraction)
+
         reg_minmax: list[tuple]
             List of tuples of (min, max) values for energy, force, virial sigmas for regularization.
         distillation: bool
@@ -180,13 +175,12 @@ class RssMaker(Maker):
             Number of processes used for fitting. Default is 1.
         device_for_fitting: str
             Device to be used for model fitting, either "cpu" or "cuda".
-        **fit_kwargs:
-            Additional keyword arguments for the MLIP fitting process.
         scalar_pressure_method: str
-            Method for adding external pressures.
-            Acceptable options are:
-                exp: Applies pressure using an exponential distribution.
-                uniform: Applies pressure using a uniform distribution.
+            Method for adding external pressures. Acceptable options are as follows
+
+            - 'exp': Applies pressure using an exponential distribution.
+            - 'uniform': Applies pressure using a uniform distribution.
+
         scalar_exp_pressure: float
             Scalar exponential pressure. Default is 100.
         scalar_pressure_exponential_width: float
@@ -226,23 +220,20 @@ class RssMaker(Maker):
             Initial temperature (in eV) for Boltzmann sampling. Default is 0.3.
         current_iter_index: int
             Index for the current RSS iteration. Default is 1.
+        **fit_kwargs:
+            Additional keyword arguments for the MLIP fitting process.
 
         Returns
         -------
-        dict
-            A dictionary whose keys contains:
-                test_error: float
-                    The test error of the fitted MLIP.
-                pre_database_dir: str
-                    The directory of the latest RSS database.
-                mlip_path: str
-                    The path to the latest fitted MLIP.
-                isolated_atom_energies: dict
-                    The isolated energy values.
-                current_iter: int
-                    The current iteration index.
-                kb_temp: float
-                    The temperature (in eV) for Boltzmann sampling.
+        dict:
+            A dictionary with following information
+
+            - 'test_error': float, The test error of the fitted MLIP.
+            - 'pre_database_dir': str, The directory of the latest RSS database.
+            - 'mlip_path': str, The path to the latest fitted MLIP.
+            - 'isolated_atom_energies': dict, The isolated energy values.
+            - 'current_iter': int, The current iteration index.
+            - 'kb_temp': float, The temperature (in eV) for Boltzmann sampling.
         """
         rss_default_config_path = (
             self.path_to_default_config_parameters

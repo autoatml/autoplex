@@ -45,6 +45,7 @@ def relax_maker():
         )
     )
 
+
 @pytest.fixture(scope="class")
 def static_energy_maker():
     return StaticMaker(
@@ -145,6 +146,37 @@ def test_get_output(clean_dir,test_dir,memory_jobstore):
     responses=run_locally(job_here)
 
     responses[job_here.uuid][1].output["rms"] == pytest.approx(0.1223)
+
+
+def test_get_output(clean_dir, test_dir, memory_jobstore):
+    from autoplex.auto.phonons.jobs import get_phonon_output
+    from jobflow import run_locally
+
+    input_dict = {"metrics": [[{"benchmark_phonon_rmse": 0.12230662063050536, "dft_imaginary_modes": True,
+                                "ml_imaginary_modes": False}], [
+                                  {"benchmark_phonon_rmse": 0.08305510558730159, "dft_imaginary_modes": False,
+                                   "ml_imaginary_modes": False}]]}
+
+    job_here = get_phonon_output(metrics=input_dict["metrics"])
+
+    responses = run_locally(job_here)
+
+    responses[job_here.uuid][1].output["rms"] == pytest.approx(0.1223)
+
+    input_dict = {"metrics": [[{"benchmark_phonon_rmse": 0.12230662063050536, "dft_imaginary_modes": True,
+                                "ml_imaginary_modes": False},
+                               {"benchmark_phonon_rmse": 0.15230662063050536, "dft_imaginary_modes": True,
+                                "ml_imaginary_modes": False}], [
+                                  {"benchmark_phonon_rmse": 0.08305510558730159, "dft_imaginary_modes": False,
+                                   "ml_imaginary_modes": False},
+                                  {"benchmark_phonon_rmse": 0.12230662063050536, "dft_imaginary_modes": True,
+                                   "ml_imaginary_modes": False}]]}
+
+    job_here = get_phonon_output(metrics=input_dict["metrics"])
+
+    responses = run_locally(job_here)
+
+    assert responses[job_here.uuid][1].output["rms"] == pytest.approx(0.1223, abs=0.00001)
 
 
 def test_complete_benchmark(clean_dir, test_dir, memory_jobstore):
