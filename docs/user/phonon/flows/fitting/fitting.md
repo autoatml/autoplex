@@ -396,12 +396,13 @@ Additional fit settings can again be passed using `fit_kwargs` or `**{...}`.
 > otherwise the code will not finish successfully.
             
 
-## Fitting and DFT runs on to different computers possible?
+## Is it possible to run the DFT calculations and the fitting step on different machines?
 
-Very often, we might have the situation that our GPU does not share a hard drive with the computing center where we
+Very often, we might have the situation that our GPU does not share a hard drive with the compute cluster where we
 perform VASP run. In such situations, it is convenient to split up the computations.
 
-E.g., this can be done with jobflow-remote and the following settings for VASP and fitting jobs. The `local_worker` is the local machine (e.g., a GPU without slurm queue).
+This can be done by e.g. using jobflow-remote and the following settings for VASP and fitting jobs. 
+The `local_worker` is the local machine (e.g., a GPU without slurm queue).
 
 ```python
 from autoplex.auto.phonons.flows import CompleteDFTvsMLBenchmarkWorkflow, IterativeCompleteDFTvsMLBenchmarkWorkflow
