@@ -1,4 +1,24 @@
 # Changelog
+## v0.1.1
+### What's changed
+
+* Update devcontainer.json version tag by @JaGeo in https://github.com/autoatml/autoplex/pull/303
+* Update start.md by @JaGeo in https://github.com/autoatml/autoplex/pull/304
+* add autoplex preprint to readme by @JaGeo in https://github.com/autoatml/autoplex/pull/309
+* Update README.md by @JaGeo in https://github.com/autoatml/autoplex/pull/310
+* Update README.md by @JaGeo in https://github.com/autoatml/autoplex/pull/311
+* Update docs dependencies by @naik-aakash in https://github.com/autoatml/autoplex/pull/315
+* Update test durations file by @JaGeo in https://github.com/autoatml/autoplex/pull/318
+* Revert "Update test durations file" by @naik-aakash in https://github.com/autoatml/autoplex/pull/319
+* pre-commit autoupdate by @pre-commit-ci in https://github.com/autoatml/autoplex/pull/321
+* Build an iterative phonon flow by @JaGeo in https://github.com/autoatml/autoplex/pull/306
+* Update test durations file by @JaGeo in https://github.com/autoatml/autoplex/pull/325
+* Allow fitting procedure on a different cluster and make the fitting database accessible via the MongoDB  by @JaGeo in https://github.com/autoatml/autoplex/pull/314
+* Update test durations file by @JaGeo in https://github.com/autoatml/autoplex/pull/326
+* Fix various smaller bugs (including correct counting of the random structure seed in case very similar input structures are chosen)
+
+**Full Changelog**: https://github.com/autoatml/autoplex/compare/v0.1.0...v0.1.1
+
 ## v0.1.0
 ### What's Changed
 * Update devcontainer.json version tag by @JaGeo in https://github.com/autoatml/autoplex/pull/279
