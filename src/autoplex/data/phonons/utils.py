@@ -24,7 +24,7 @@ def ml_phonon_maker_preparation(
     static_maker_kwargs: dict | None,
     bulk_relax_maker: ForceFieldRelaxMaker,
     phonon_displacement_maker: ForceFieldStaticMaker,
-    static_energy_maker: ForceFieldStaticMaker,
+    static_energy_maker: ForceFieldStaticMaker | None,
 ) -> tuple[
     ForceFieldRelaxMaker | None,
     ForceFieldStaticMaker | None,

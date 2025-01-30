@@ -559,9 +559,7 @@ class MLPhononMaker(FFPhononMaker):
             force_field_name="GAP",
         )
     )
-    static_energy_maker: ForceFieldStaticMaker | None = field(
-        default_factory=lambda: ForceFieldStaticMaker(force_field_name="GAP")
-    )
+    static_energy_maker: ForceFieldStaticMaker | None = None
     store_force_constants: bool = False
     get_supercell_size_kwargs: dict = field(
         default_factory=lambda: {"max_atoms": 20000, "step_size": 0.1}
@@ -647,9 +645,7 @@ class MLPhononMaker(FFPhononMaker):
                     name="nequip phonon static",
                     force_field_name="Nequip",
                 ),
-                static_energy_maker=ForceFieldStaticMaker(
-                    force_field_name="Nequip",
-                ),
+                static_energy_maker=None,
                 calculator_kwargs=calculator_kwargs,
                 relax_maker_kwargs=self.relax_maker_kwargs,
                 static_maker_kwargs=self.static_maker_kwargs,
@@ -669,9 +665,7 @@ class MLPhononMaker(FFPhononMaker):
                     name="m3gnet phonon static",
                     force_field_name="M3GNet",
                 ),
-                static_energy_maker=ForceFieldStaticMaker(
-                    force_field_name="M3GNet",
-                ),
+                static_energy_maker=None,
                 calculator_kwargs=calculator_kwargs,
                 relax_maker_kwargs=self.relax_maker_kwargs,
                 static_maker_kwargs=self.static_maker_kwargs,
@@ -699,9 +693,7 @@ class MLPhononMaker(FFPhononMaker):
                     name="mace phonon static",
                     force_field_name="MACE",
                 ),
-                static_energy_maker=ForceFieldStaticMaker(
-                    force_field_name="MACE",
-                ),
+                static_energy_maker=None,
                 calculator_kwargs=calculator_kwargs,
                 relax_maker_kwargs=self.relax_maker_kwargs,
                 static_maker_kwargs=self.static_maker_kwargs,
