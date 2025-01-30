@@ -13,8 +13,8 @@ from atomate2.vasp.flows.mp import (
     MPGGAStaticMaker,
 )
 from atomate2.vasp.jobs.base import BaseVaspMaker
-from atomate2.vasp.jobs.core import StaticMaker, TightRelaxMaker
-from atomate2.vasp.sets.core import StaticSetGenerator, TightRelaxSetGenerator
+from atomate2.vasp.jobs.core import TightRelaxMaker
+from atomate2.vasp.sets.core import TightRelaxSetGenerator
 from jobflow import Flow, Maker
 from pymatgen.core.structure import Structure
 from pymatgen.io.vasp.sets import (
@@ -218,29 +218,29 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
             )
         )
     )
-    phonon_static_energy_maker: BaseVaspMaker | None = field(
-        default_factory=lambda: StaticMaker(
-            name="dft static",
-            input_set_generator=StaticSetGenerator(
-                auto_ispin=False,
-                user_incar_settings={
-                    "ALGO": "Normal",
-                    "ISPIN": 1,
-                    "LAECHG": False,
-                    "ISMEAR": 0,
-                    "ENCUT": 700,
-                    "SIGMA": 0.05,
-                    "LCHARG": False,  # Do not write the CHGCAR file
-                    "LWAVE": False,  # Do not write the WAVECAR file
-                    "LVTOT": False,  # Do not write LOCPOT file
-                    "LORBIT": None,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
-                    "LOPTICS": False,  # No PCDAT file
-                    # to be removed
-                    "NPAR": 4,
-                },
-            ),
-        )
-    )
+    phonon_static_energy_maker: BaseVaspMaker | None = None  # field(
+    #     default_factory=lambda: StaticMaker(
+    #         name="dft static",
+    #         input_set_generator=StaticSetGenerator(
+    #             auto_ispin=False,
+    #             user_incar_settings={
+    #                 "ALGO": "Normal",
+    #                 "ISPIN": 1,
+    #                 "LAECHG": False,
+    #                 "ISMEAR": 0,
+    #                 "ENCUT": 700,
+    #                 "SIGMA": 0.05,
+    #                 "LCHARG": False,  # Do not write the CHGCAR file
+    #                 "LWAVE": False,  # Do not write the WAVECAR file
+    #                 "LVTOT": False,  # Do not write LOCPOT file
+    #                 "LORBIT": None,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
+    #                 "LOPTICS": False,  # No PCDAT file
+    #                 # to be removed
+    #                 "NPAR": 4,
+    #             },
+    #         ),
+    #     )
+    # )
     rattled_bulk_relax_maker: BaseVaspMaker | None = field(
         default_factory=lambda: TightRelaxMaker(
             run_vasp_kwargs={"handlers": {}},
