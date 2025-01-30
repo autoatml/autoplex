@@ -975,28 +975,7 @@ class CompleteDFTvsMLBenchmarkWorkflowMPSettings(CompleteDFTvsMLBenchmarkWorkflo
         )
     )
 
-    phonon_static_energy_maker: BaseVaspMaker = field(
-        default_factory=lambda: MPGGAStaticMaker(
-            run_vasp_kwargs={"handlers": ()},
-            name="dft phonon static",
-            input_set_generator=MPStaticSet(
-                force_gamma=True,
-                auto_metal_kpoints=True,
-                inherit_incar=False,
-                user_incar_settings={
-                    "NPAR": 4,
-                    "EDIFF": 1e-7,
-                    "EDIFFG": 1e-6,
-                    "ALGO": "NORMAL",
-                    "ISPIN": 1,
-                    "LREAL": False,
-                    "LCHARG": False,
-                    "ISMEAR": 0,
-                    "KSPACING": 0.2,
-                },
-            ),
-        )
-    )
+    phonon_static_energy_maker: BaseVaspMaker = None
 
 
 @dataclass
