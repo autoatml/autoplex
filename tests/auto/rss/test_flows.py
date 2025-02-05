@@ -1,8 +1,10 @@
 import os
-import pytest
 from pathlib import Path
 from jobflow import run_locally, Flow
+
 from tests.conftest import mock_rss, mock_do_rss_iterations, mock_do_rss_iterations_multi_jobs
+from autoplex.settings import RssConfig
+from autoplex.auto.rss.flows import RssMaker
 
 os.environ["OMP_NUM_THREADS"] = "1"
 
@@ -307,3 +309,19 @@ def test_mock_workflow_multi_node(test_dir, mock_vasp, memory_jobstore, clean_di
     selected_atoms = job2.output.resolve(memory_jobstore)
 
     assert len(selected_atoms) == 3
+
+def test_rssmaker_custom_config_file(test_dir):
+
+    config_model = RssConfig.from_file(test_dir / "rss" / "rss_config.yaml")
+
+    # Test if config is updated as expected
+    rss = RssMaker(rss_config=config_model)
+
+    assert rss.rss_config.tag == "test"
+    assert rss.rss_config.generated_struct_numbers == [9000, 1000]
+    assert rss.rss_config.num_processes_buildcell == 64
+    assert rss.rss_config.num_processes_fit == 64
+    assert rss.rss_config.device_for_rss == "cuda"
+    assert rss.rss_config.isolatedatom_box == [10, 10, 10]
+    assert rss.rss_config.dimer_box == [10, 10, 10]
+

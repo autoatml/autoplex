@@ -1,7 +1,6 @@
 """Utility functions for fitting jobs."""
 
 import contextlib
-import json
 import logging
 import os
 import re
@@ -15,6 +14,7 @@ from pathlib import Path
 
 import ase
 import lightning as pl
+import matgl
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -33,6 +33,7 @@ from matgl.graph.data import MGLDataLoader, MGLDataset, collate_fn_pes
 from matgl.models import M3GNet
 from matgl.utils.training import PotentialLightningModule
 from monty.dev import requires
+from monty.serialization import dumpfn
 from nequip.ase import NequIPCalculator
 from numpy import ndarray
 from pymatgen.core import Structure
@@ -41,6 +42,7 @@ from pytorch_lightning.loggers import CSVLogger
 from scipy.spatial import ConvexHull
 from scipy.special import comb
 
+from autoplex import GAP_HYPERS, JACE_HYPERS, M3GNET_HYPERS, MACE_HYPERS, NEQUIP_HYPERS
 from autoplex.data.common.utils import (
     data_distillation,
     plot_energy_forces,
@@ -48,9 +50,6 @@ from autoplex.data.common.utils import (
     stratified_dataset_split,
 )
 
-current_dir = Path(__file__).absolute().parent
-MLIP_PHONON_DEFAULTS_FILE_PATH = current_dir / "mlip-phonon-defaults.json"
-MLIP_RSS_DEFAULTS_FILE_PATH = current_dir / "mlip-rss-defaults.json"
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
@@ -59,7 +58,7 @@ logging.basicConfig(
 def gap_fitting(
     db_dir: Path,
     species_list: list | None = None,
-    path_to_hyperparameters: Path | str = MLIP_PHONON_DEFAULTS_FILE_PATH,
+    hyperparameters: GAP_HYPERS = GAP_HYPERS,
     num_processes_fit: int = 32,
     auto_delta: bool = True,
     glue_xml: bool = False,
@@ -80,8 +79,8 @@ def gap_fitting(
         Path to database directory.
     species_list: list
         List of element names (strings)
-    path_to_hyperparameters : str or Path.
-        Path to JSON file containing the GAP hyperparameters.
+    hyperparameters: MLIP_HYPERS.GAP
+        Fit hyperparameters.
     num_processes_fit: int
         Number of processes used for gap_fit
     auto_delta: bool
@@ -110,8 +109,7 @@ def gap_fitting(
         A dictionary with train_error, test_error, path_to_mlip
 
     """
-    if path_to_hyperparameters is None:
-        path_to_hyperparameters = MLIP_PHONON_DEFAULTS_FILE_PATH
+    hyperparameters = hyperparameters.model_copy(deep=True)
     # keep additional pre- and suffixes
     gap_file_xml = train_name.replace("train", "gap_file").replace(".extxyz", ".xml")
     quip_train_file = train_name.replace("train", "quip_train")
@@ -124,22 +122,22 @@ def gap_fitting(
     train_data_path = os.path.join(db_dir, train_name)
 
     test_data_path = os.path.join(db_dir, test_name)
-    default_hyperparameters = load_mlip_hyperparameter_defaults(
-        mlip_fit_parameter_file_path=path_to_hyperparameters
+
+    hyperparameters.update_parameters(
+        {
+            "general": {
+                "gp_file": gap_file_xml,
+                "energy_parameter_name": ref_energy_name,
+                "force_parameter_name": ref_force_name,
+                "virial_parameter_name": ref_virial_name,
+            }
+        }
     )
 
-    gap_default_hyperparameters = default_hyperparameters["GAP"]
+    if fit_kwargs:
+        hyperparameters.update_parameters(fit_kwargs)
 
-    gap_default_hyperparameters["general"].update({"gp_file": gap_file_xml})
-    gap_default_hyperparameters["general"]["energy_parameter_name"] = ref_energy_name
-    gap_default_hyperparameters["general"]["force_parameter_name"] = ref_force_name
-    gap_default_hyperparameters["general"]["virial_parameter_name"] = ref_virial_name
-
-    for parameter in gap_default_hyperparameters:
-        if fit_kwargs:
-            for arg in fit_kwargs:
-                if parameter == arg:
-                    gap_default_hyperparameters[parameter].update(fit_kwargs[arg])
+    gap_default_hyperparameters = hyperparameters.model_dump(by_alias=True)
 
     include_two_body = gap_default_hyperparameters["general"]["two_body"]
     include_three_body = gap_default_hyperparameters["general"]["three_body"]
@@ -271,7 +269,7 @@ def gap_fitting(
 )
 def jace_fitting(
     db_dir: str | Path,
-    path_to_hyperparameters: Path | str = MLIP_RSS_DEFAULTS_FILE_PATH,
+    hyperparameters: JACE_HYPERS = JACE_HYPERS,
     isolated_atom_energies: dict | None = None,
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
@@ -290,8 +288,8 @@ def jace_fitting(
     ----------
     db_dir: str or Path
         directory containing the training and testing data files.
-    path_to_hyperparameters : str or Path.
-        Path to JSON file containing the J-ACE hyperparameters.
+    hyperparameters: MLIP_HYPERS.J_ACE
+        Fit hyperparameters.
     isolated_atom_energies: dict:
         mandatory dictionary mapping element numbers to isolated energies.
     ref_energy_name : str, optional
@@ -327,8 +325,7 @@ def jace_fitting(
     ------
     - ValueError: If the `isolated_atom_energies` dictionary is empty or not provided when required.
     """
-    if path_to_hyperparameters is None:
-        path_to_hyperparameters = MLIP_RSS_DEFAULTS_FILE_PATH
+    hyperparameters = hyperparameters.model_copy(deep=True)
     train_atoms = ase.io.read(os.path.join(db_dir, "train.extxyz"), index=":")
     source_file_path = os.path.join(db_dir, "test.extxyz")
     shutil.copy(source_file_path, ".")
@@ -361,20 +358,10 @@ def jace_fitting(
     ]
     ase.io.write("train_ace.extxyz", train_ace, format="extxyz")
 
-    default_hyperparameters = load_mlip_hyperparameter_defaults(
-        mlip_fit_parameter_file_path=path_to_hyperparameters
-    )
-    jace_hypers = default_hyperparameters["J-ACE"]
-
     if fit_kwargs:
-        for parameter in jace_hypers:
-            if parameter in fit_kwargs:
-                if isinstance(fit_kwargs[parameter], type(jace_hypers[parameter])):
-                    jace_hypers[parameter] = fit_kwargs[parameter]
-                else:
-                    raise TypeError(
-                        f"The type of {parameter} should be {type(jace_hypers[parameter])}!"
-                    )
+        hyperparameters.update_parameters(fit_kwargs)
+
+    jace_hypers = hyperparameters.model_dump(by_alias=True)
 
     order = jace_hypers["order"]
     totaldegree = jace_hypers["totaldegree"]
@@ -455,7 +442,7 @@ export2lammps("acemodel.yace", model)
 
 def nequip_fitting(
     db_dir: Path,
-    path_to_hyperparameters: Path | str = MLIP_RSS_DEFAULTS_FILE_PATH,
+    hyperparameters: NEQUIP_HYPERS = NEQUIP_HYPERS,
     isolated_atom_energies: dict | None = None,
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
@@ -474,8 +461,8 @@ def nequip_fitting(
     ----------
     db_dir: Path
         directory containing the training and testing data files.
-    path_to_hyperparameters : str or Path.
-        Path to JSON file containing the NwquIP hyperparameters.
+    hyperparameters: MLIP_HYPERS.NEQUIP
+        Fit hyperparameters.
     isolated_atom_energies: dict
         mandatory dictionary mapping element numbers to isolated energies.
     ref_energy_name : str, optional
@@ -525,8 +512,8 @@ def nequip_fitting(
     """
     [TODO] train Nequip on virials
     """
-    if path_to_hyperparameters is None:
-        path_to_hyperparameters = MLIP_RSS_DEFAULTS_FILE_PATH
+    hyperparameters = hyperparameters.model_copy(deep=True)
+
     train_data = ase.io.read(os.path.join(db_dir, "train.extxyz"), index=":")
     train_nequip = [
         at for at in train_data if "IsolatedAtom" not in at.info["config_type"]
@@ -547,150 +534,29 @@ def nequip_fitting(
     else:
         raise ValueError("isolated_atom_energies is empty or not defined!")
 
-    default_hyperparameters = load_mlip_hyperparameter_defaults(
-        mlip_fit_parameter_file_path=path_to_hyperparameters
-    )
-
-    nequip_hypers = default_hyperparameters["NEQUIP"]
+    nequip_config_updates = {
+        "dataset_key_mapping": {
+            f"{ref_energy_name}": "total_energy",
+            f"{ref_force_name}": "forces",
+        },
+        "validation_dataset_key_mapping": {
+            f"{ref_energy_name}": "total_energy",
+            f"{ref_force_name}": "forces",
+        },
+        "chemical_symbols": ele_syms,
+        "dataset_file_name": "./train_nequip.extxyz",
+        "validation_dataset_file_name": f"{db_dir}/test.extxyz",
+        "n_train": num_of_train,
+        "n_val": num_of_val,
+    }
+    hyperparameters.update_parameters(nequip_config_updates)
 
     if fit_kwargs:
-        for parameter in nequip_hypers:
-            if parameter in fit_kwargs:
-                if isinstance(fit_kwargs[parameter], type(nequip_hypers[parameter])):
-                    nequip_hypers[parameter] = fit_kwargs[parameter]
-                else:
-                    raise TypeError(
-                        f"The type of {parameter} should be {type(nequip_hypers[parameter])}!"
-                    )
+        hyperparameters.update_parameters(fit_kwargs)
 
-    r_max = nequip_hypers["r_max"]
-    num_layers = nequip_hypers["num_layers"]
-    l_max = nequip_hypers["l_max"]
-    num_features = nequip_hypers["num_features"]
-    num_basis = nequip_hypers["num_basis"]
-    invariant_layers = nequip_hypers["invariant_layers"]
-    invariant_neurons = nequip_hypers["invariant_neurons"]
-    batch_size = nequip_hypers["batch_size"]
-    learning_rate = nequip_hypers["learning_rate"]
-    max_epochs = nequip_hypers["max_epochs"]
-    default_dtype = nequip_hypers["default_dtype"]
+    nequip_hypers = hyperparameters.model_dump(by_alias=True)
 
-    nequip_text = f"""root: results
-run_name: autoplex
-seed: 123
-dataset_seed: 456
-append: true
-default_dtype: {default_dtype}
-
-# network
-r_max: {r_max}
-num_layers: {num_layers}
-l_max: {l_max}
-parity: true
-num_features: {num_features}
-nonlinearity_type: gate
-
-nonlinearity_scalars:
-  e: silu
-  o: tanh
-
-nonlinearity_gates:
-  e: silu
-  o: tanh
-
-num_basis: {num_basis}
-BesselBasis_trainable: true
-PolynomialCutoff_p: 6
-
-invariant_layers: {invariant_layers}
-invariant_neurons: {invariant_neurons}
-avg_num_neighbors: auto
-
-use_sc: true
-dataset: ase
-validation_dataset: ase
-dataset_file_name: ./train_nequip.extxyz
-validation_dataset_file_name: {db_dir}/test.extxyz
-
-ase_args:
-  format: extxyz
-dataset_key_mapping:
-  {ref_energy_name}: total_energy
-  {ref_force_name}: forces
-validation_dataset_key_mapping:
-  {ref_energy_name}: total_energy
-  {ref_force_name}: forces
-
-chemical_symbols:
-{isolated_atom_energies_update}
-wandb: False
-
-verbose: info
-log_batch_freq: 10
-log_epoch_freq: 1
-save_checkpoint_freq: -1
-save_ema_checkpoint_freq: -1
-
-n_train: {num_of_train}
-n_val: {num_of_val}
-learning_rate: {learning_rate}
-batch_size: {batch_size}
-validation_batch_size: 10
-max_epochs: {max_epochs}
-shuffle: true
-metrics_key: validation_loss
-use_ema: true
-ema_decay: 0.99
-ema_use_num_updates: true
-report_init_validation: true
-
-early_stopping_patiences:
-  validation_loss: 50
-
-early_stopping_lower_bounds:
-  LR: 1.0e-5
-
-loss_coeffs:
-  forces: 1
-  total_energy:
-    - 1
-    - PerAtomMSELoss
-
-metrics_components:
-  - - forces
-    - mae
-  - - forces
-    - rmse
-  - - forces
-    - mae
-    - PerSpecies: True
-      report_per_component: False
-  - - forces
-    - rmse
-    - PerSpecies: True
-      report_per_component: False
-  - - total_energy
-    - mae
-  - - total_energy
-    - mae
-    - PerAtom: True
-
-optimizer_name: Adam
-optimizer_amsgrad: true
-
-lr_scheduler_name: ReduceLROnPlateau
-lr_scheduler_patience: 100
-lr_scheduler_factor: 0.5
-
-per_species_rescale_shifts_trainable: false
-per_species_rescale_scales_trainable: false
-
-per_species_rescale_shifts: dataset_per_atom_total_energy_mean
-per_species_rescale_scales: dataset_forces_rms
-    """
-
-    with open("nequip.yaml", "w") as file:
-        file.write(nequip_text)
+    dumpfn(nequip_hypers, "nequip.yaml")
 
     run_nequip("nequip-train nequip.yaml", "nequip_train")
     run_nequip(
@@ -736,11 +602,12 @@ per_species_rescale_scales: dataset_forces_rms
 
 def m3gnet_fitting(
     db_dir: Path,
-    path_to_hyperparameters: Path | str = MLIP_RSS_DEFAULTS_FILE_PATH,
+    hyperparameters: M3GNET_HYPERS = M3GNET_HYPERS,
     device: str = "cuda",
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",
+    test_equal_to_val: bool = True,
     fit_kwargs: dict | None = None,
 ) -> dict:
     """
@@ -750,8 +617,8 @@ def m3gnet_fitting(
     ----------
     db_dir: Path
         Directory containing the training and testing data files.
-    path_to_hyperparameters : str or Path.
-        Path to JSON file containing the M3GNet hyperparameters.
+    hyperparameters: MLIP_HYPERS.M3GNET
+        Fit hyperparameters.
     device: str
         Device on which the model will be trained, e.g., 'cuda' or 'cpu'.
     ref_energy_name : str, optional
@@ -760,9 +627,10 @@ def m3gnet_fitting(
         Reference force name.
     ref_virial_name : str, optional
         Reference virial name.
+    test_equal_to_val: bool
+        If True, the testing dataset will be the same as the validation dataset.
     fit_kwargs: dict.
-        optional dictionary with parameters for m3gnet fitting with keys same as
-        mlip-rss-defaults.json.
+        optional dictionary with parameters for M3GNET fitting.
 
     Keyword Arguments
     -----------------
@@ -780,16 +648,16 @@ def m3gnet_fitting(
         Maximum number of training epochs.
     include_stresses: bool
         If True, includes stress tensors in the model predictions and training process.
-    hidden_dim: int
-        Dimensionality of the hidden layers in the model.
-    num_units: int
+    dim_node_embedding: int
+         Dimension of node embedding.
+    dim_edge_embedding: int
+        Dimension of edge embeddings.
+    units: int
         Number of units in each dense layer of the model.
     max_l: int
         Maximum degree of spherical harmonics.
     max_n: int
         Maximum radial function degree.
-    test_equal_to_val: bool
-        If True, the testing dataset will be the same as the validation dataset.
 
     Returns
     -------
@@ -806,36 +674,15 @@ def m3gnet_fitting(
     *    Availability: https://matgl.ai/tutorials%2FTraining%20a%20M3GNet%20Potential%20with%20PyTorch%20Lightning.html
     *    License: BSD 3-Clause License
     """
-    if path_to_hyperparameters is None:
-        path_to_hyperparameters = MLIP_RSS_DEFAULTS_FILE_PATH
-    default_hyperparameters = load_mlip_hyperparameter_defaults(
-        mlip_fit_parameter_file_path=path_to_hyperparameters
-    )
-
-    m3gnet_hypers = default_hyperparameters["M3GNET"]
+    hyperparameters = hyperparameters.model_copy(deep=True)
 
     if fit_kwargs:
-        for parameter in m3gnet_hypers:
-            if parameter in fit_kwargs:
-                if isinstance(fit_kwargs[parameter], type(m3gnet_hypers[parameter])):
-                    m3gnet_hypers[parameter] = fit_kwargs[parameter]
-                else:
-                    raise TypeError(
-                        f"The type of {parameter} should be {type(m3gnet_hypers[parameter])}!"
-                    )
+        hyperparameters.update_parameters(fit_kwargs)
+
+    m3gnet_hypers = hyperparameters.model_dump(by_alias=True)
 
     exp_name = m3gnet_hypers["exp_name"]
     results_dir = m3gnet_hypers["results_dir"]
-    cutoff = m3gnet_hypers["cutoff"]
-    threebody_cutoff = m3gnet_hypers["threebody_cutoff"]
-    batch_size = m3gnet_hypers["batch_size"]
-    max_epochs = m3gnet_hypers["max_epochs"]
-    include_stresses = m3gnet_hypers["include_stresses"]
-    hidden_dim = m3gnet_hypers["hidden_dim"]
-    num_units = m3gnet_hypers["num_units"]
-    max_l = m3gnet_hypers["max_l"]
-    max_n = m3gnet_hypers["max_n"]
-    test_equal_to_val = m3gnet_hypers["test_equal_to_val"]
 
     os.makedirs(os.path.join(results_dir, exp_name), exist_ok=True)
 
@@ -875,7 +722,7 @@ def m3gnet_fitting(
         ) = convert_xyz_to_structure(
             train_m3gnet,
             include_forces=True,
-            include_stresses=include_stresses,
+            include_stresses=m3gnet_hypers.get("include_stresses"),
             ref_energy_name=ref_energy_name,
             ref_force_name=ref_force_name,
             ref_virial_name=ref_virial_name,
@@ -892,10 +739,10 @@ def m3gnet_fitting(
             train_element_types
         )  # this print has to stay as the stdout is written to the file
         train_converter = Structure2Graph(
-            element_types=train_element_types, cutoff=cutoff
+            element_types=train_element_types, cutoff=m3gnet_hypers.get("cutoff")
         )
         train_datasets = MGLDataset(
-            threebody_cutoff=threebody_cutoff,
+            threebody_cutoff=m3gnet_hypers.get("threebody_cutoff"),
             structures=train_structs,
             converter=train_converter,
             labels=train_labels,
@@ -919,7 +766,7 @@ def m3gnet_fitting(
             ) = convert_xyz_to_structure(
                 test_data,
                 include_forces=True,
-                include_stresses=include_stresses,
+                include_stresses=m3gnet_hypers.get("include_stresses"),
                 ref_energy_name=ref_energy_name,
                 ref_force_name=ref_force_name,
                 ref_virial_name=ref_virial_name,
@@ -932,10 +779,10 @@ def m3gnet_fitting(
             }
             test_element_types = get_element_list(test_structs)
             test_converter = Structure2Graph(
-                element_types=test_element_types, cutoff=cutoff
+                element_types=test_element_types, cutoff=m3gnet_hypers.get("cutoff")
             )
             test_dataset = MGLDataset(
-                threebody_cutoff=threebody_cutoff,
+                threebody_cutoff=m3gnet_hypers.get("threebody_cutoff"),
                 structures=test_structs,
                 converter=test_converter,
                 labels=test_labels,
@@ -975,21 +822,77 @@ def m3gnet_fitting(
             val_data=val_dataset,
             test_data=test_dataset,
             collate_fn=my_collate_fn,
-            batch_size=batch_size,
+            batch_size=m3gnet_hypers.get("batch_size"),
             num_workers=1,
         )
-        model = M3GNet(
-            element_types=train_element_types,
-            is_intensive=False,
-            cutoff=cutoff,
-            threebody_cutoff=threebody_cutoff,
-            dim_node_embedding=hidden_dim,
-            dim_edge_embedding=hidden_dim,
-            units=num_units,
-            max_l=max_l,
-            max_n=max_n,
-        )
-        lit_module = PotentialLightningModule(model=model, include_line_graph=True)
+        # train from scratch
+        if not m3gnet_hypers["foundation_model"]:  # train from scratch
+            model = M3GNet(
+                element_types=train_element_types,
+                is_intensive=m3gnet_hypers.get("is_intensive"),
+                cutoff=m3gnet_hypers.get("cutoff"),
+                threebody_cutoff=m3gnet_hypers.get("threebody_cutoff"),
+                dim_node_embedding=m3gnet_hypers.get("dim_node_embedding"),
+                dim_edge_embedding=m3gnet_hypers.get("dim_edge_embedding"),
+                units=m3gnet_hypers.get("units"),
+                max_l=m3gnet_hypers.get("max_l"),
+                max_n=m3gnet_hypers.get("max_n"),
+                nblocks=m3gnet_hypers.get("nblocks"),
+            )
+            lit_module = PotentialLightningModule(
+                model=model,
+                element_refs=m3gnet_hypers.get("element_refs"),
+                include_line_graph=m3gnet_hypers.get("include_line_graph"),
+                allow_missing_labels=m3gnet_hypers.get("allow_missing_labels"),
+                energy_weight=m3gnet_hypers.get("energy_weight"),
+                force_weight=m3gnet_hypers.get("force_weight"),
+                lr=m3gnet_hypers.get("lr"),
+                loss=m3gnet_hypers.get("loss"),
+                loss_params=m3gnet_hypers.get("loss_params"),
+                stress_weight=m3gnet_hypers.get("stress_weight"),
+                magmom_weight=m3gnet_hypers.get("magmom_weight"),
+                data_mean=m3gnet_hypers.get("data_mean"),
+                data_std=m3gnet_hypers.get("data_std"),
+                decay_alpha=m3gnet_hypers.get("decay_alpha"),
+                decay_steps=m3gnet_hypers.get("decay_steps"),
+                sync_dist=m3gnet_hypers.get("sync_dist"),
+                magmom_target=m3gnet_hypers.get("magmom_target"),
+                optimizer=m3gnet_hypers.get("optimizer"),
+                scheduler=m3gnet_hypers.get("scheduler"),
+            )
+        else:  # finetune a foundation model (pretrained model)
+            logging.info(
+                f"Finetuning foundation model: {m3gnet_hypers['foundation_model']}"
+            )
+            m3gnet_nnp = matgl.load_model(m3gnet_hypers["foundation_model"])
+            model = m3gnet_nnp.model
+            property_offset = (
+                m3gnet_nnp.element_refs.property_offset
+                if m3gnet_hypers["use_foundation_model_element_refs"]
+                else None
+            )
+            lit_module = PotentialLightningModule(
+                model=model,
+                element_refs=property_offset,
+                include_line_graph=m3gnet_hypers.get("include_line_graph"),
+                allow_missing_labels=m3gnet_hypers.get("allow_missing_labels"),
+                energy_weight=m3gnet_hypers.get("energy_weight"),
+                force_weight=m3gnet_hypers.get("force_weight"),
+                lr=m3gnet_hypers.get("lr"),
+                loss=m3gnet_hypers.get("loss"),
+                loss_params=m3gnet_hypers.get("loss_params"),
+                stress_weight=m3gnet_hypers.get("stress_weight"),
+                magmom_weight=m3gnet_hypers.get("magmom_weight"),
+                data_mean=m3gnet_hypers.get("data_mean"),
+                data_std=m3gnet_hypers.get("data_std"),
+                decay_alpha=m3gnet_hypers.get("decay_alpha"),
+                decay_steps=m3gnet_hypers.get("decay_steps"),
+                sync_dist=m3gnet_hypers.get("sync_dist"),
+                magmom_target=m3gnet_hypers.get("magmom_target"),
+                optimizer=m3gnet_hypers.get("optimizer"),
+                scheduler=m3gnet_hypers.get("scheduler"),
+            )
+
         logger = CSVLogger(name=exp_name, save_dir=os.path.join(results_dir, "logs"))
         # Inference mode = False is required for calculating forces, stress in test mode and prediction mode
         if device == "cuda":
@@ -997,7 +900,7 @@ def m3gnet_fitting(
                 gpu_id = os.environ.get("CUDA_VISIBLE_DEVICES", "0")
                 torch.cuda.set_device(torch.device(f"cuda:{gpu_id}"))
                 trainer = pl.Trainer(
-                    max_epochs=max_epochs,
+                    max_epochs=m3gnet_hypers.get("max_epochs"),
                     accelerator="gpu",
                     logger=logger,
                     inference_mode=False,
@@ -1006,7 +909,7 @@ def m3gnet_fitting(
                 raise ValueError("CUDA is not available.")
         else:
             trainer = pl.Trainer(
-                max_epochs=max_epochs,
+                max_epochs=m3gnet_hypers.get("max_epochs"),
                 accelerator="cpu",
                 logger=logger,
                 inference_mode=False,
@@ -1110,12 +1013,11 @@ def m3gnet_fitting(
 
 def mace_fitting(
     db_dir: Path,
-    path_to_hyperparameters: Path | str = MLIP_RSS_DEFAULTS_FILE_PATH,
+    hyperparameters: MACE_HYPERS = MACE_HYPERS,
     device: str = "cuda",
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",
-    use_defaults=True,
     fit_kwargs: dict | None = None,
 ) -> dict:
     """
@@ -1129,8 +1031,8 @@ def mace_fitting(
     ----------
     db_dir: Path
         directory containing the training and testing data files.
-    path_to_hyperparameters : str or Path.
-        Path to JSON file containing the MACE hyperparameters.
+    hyperparameters: MLIP_HYPERS.MACE
+        Fit hyperparameters.
     device: str
         specify device to use cuda or cpu.
     ref_energy_name : str, optional
@@ -1171,26 +1073,17 @@ def mace_fitting(
         A dictionary containing train_error, test_error, and the path to the fitted MLIP.
 
     """
-    if path_to_hyperparameters is None:
-        path_to_hyperparameters = MLIP_RSS_DEFAULTS_FILE_PATH
+    hyperparameters = hyperparameters.model_copy(deep=True)
+
     if ref_virial_name is not None:
         atoms = read(f"{db_dir}/train.extxyz", index=":")
         mace_virial_format_conversion(
             atoms=atoms, ref_virial_name=ref_virial_name, out_file_name="train.extxyz"
         )
 
-    if use_defaults:
-        default_hyperparameters = load_mlip_hyperparameter_defaults(
-            mlip_fit_parameter_file_path=path_to_hyperparameters
-        )
+    hyperparameters.update_parameters(fit_kwargs)
 
-        mace_hypers = default_hyperparameters["MACE"]
-    else:
-        mace_hypers = {}
-
-    # TODO: should we do a type check? not sure
-    #  as it will be a lot of work to keep it updated
-    mace_hypers.update(fit_kwargs)
+    mace_hypers = hyperparameters.model_dump(by_alias=True, exclude_none=True)
 
     boolean_hypers = [
         "distributed",
@@ -1305,24 +1198,6 @@ def check_convergence(test_error: float) -> bool:
         convergence = True
 
     return convergence
-
-
-def load_mlip_hyperparameter_defaults(mlip_fit_parameter_file_path: str | Path) -> dict:
-    """
-    Load gap fit default parameters from the json file.
-
-    Parameters
-    ----------
-    mlip_fit_parameter_file_path : str or Path.
-        Path to MLIP default parameter JSON files.
-
-    Returns
-    -------
-    dict
-       gap fit default parameters.
-    """
-    with open(mlip_fit_parameter_file_path, encoding="utf-8") as f:
-        return json.load(f)
 
 
 def gap_hyperparameter_constructor(

@@ -95,6 +95,12 @@ julia -e 'using Pkg; Pkg.Registry.add("General"); Pkg.Registry.add(Pkg.Registry.
 
 Additionally, `buildcell` as a part of `AIRSS` needs to be installed if one wants to use the RSS functionality:
 
+> ℹ️ To be able to build the AIRSS utilities one needs gcc and gfortran version 5 and above. Other compiler families (such as ifort) are not supported.
+> These compilers are usually available on HPCs and one can simply load them if needed. On Ubuntu/Debian systems, one can install the necessary compilers with the following command:
+````bash
+apt install -y build-essential gfortran
+````
+
 ```bash
 curl -O https://www.mtg.msm.cam.ac.uk/files/airss-0.9.3.tgz; tar -xf airss-0.9.3.tgz; rm airss-0.9.3.tgz; cd airss; make ; make install ; make neat; cd ..
 ```

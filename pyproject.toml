@@ -45,9 +45,9 @@ dependencies = [
 [tool.setuptools.packages.find]
 where = ["src"]
 
-[tool.setuptools.package-data]
-"autoplex.fitting.common" = ["*.json"]
-"autoplex.auto.rss" = ["*.yaml"]
+#[tool.setuptools.package-data]
+#"autoplex.fitting.common" = ["*.json"]
+#"autoplex.auto.rss" = ["*.yaml"]
 
 [project.optional-dependencies]
 docs = [

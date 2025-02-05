@@ -123,6 +123,11 @@ Both packages rely on the [MongoDB](https://www.mongodb.com/) database manager f
 We recommend using `jobflow-remote` as it is more flexible to use, especially on clusters where users cannot store their
 own MongoDB. You can find a more comprehensive `jobflow-remote` tutorial [here](../jobflowremote.md).
 
+> ℹ️ These workflow managers are not included in the standard installation by default, to install autoplex with workflow managers please install `autoplex` using `pip install autoplex[strict,workflow-managers]`
+
+> ℹ️ If using fireworks to manage your jobs, additionally please update `pymongo` package to v4.11, using
+`pip install --upgrade pymongo==4.11` 
+
 Submission using `FireWorks`:
 ```python
 from fireworks import LaunchPad

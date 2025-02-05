@@ -136,10 +136,10 @@ def test_complete_benchmark(clean_dir, test_dir, memory_jobstore):
         glue_xml=False,
         apply_data_preprocessing=False,
         separated=True,
-        database_dir=database_dir,
     ).make(
         twob={"delta": 2.0, "cutoff": 4},
         threeb={"n_sparse": 10},
+        database_dir=database_dir,
         **fit_kwargs
     )
     dft_data = loadfn(test_dir / "benchmark" / "phonon_doc_si.json")

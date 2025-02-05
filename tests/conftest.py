@@ -180,8 +180,8 @@ def mock_rss(input_dir: str = None,
                         ref_virial_name=ref_virial_name,
                         num_processes_fit=num_processes_fit,
                         apply_data_preprocessing=False,
-                        database_dir=job5.output,
-                        ).make(isolated_atom_energies=job4.output['isolated_atom_energies'], **fit_kwargs)
+                        ).make(isolated_atom_energies=job4.output['isolated_atom_energies'],
+                               database_dir=job5.output, **fit_kwargs)
     job_list = [job2, job3, job4, job5, job6]
 
     return Response(

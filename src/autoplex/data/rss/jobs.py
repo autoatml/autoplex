@@ -414,7 +414,7 @@ class RandomizedStructure(Maker):
 @job
 def do_rss_single_node(
     mlip_type: str,
-    mlip_path: str,
+    mlip_path: list[str],
     iteration_index: str,
     structures: list[Structure],
     output_file_name: str = "RSS_relax_results",
@@ -444,8 +444,8 @@ def do_rss_single_node(
     mlip_type: str
         Choose one specific MLIP type:
         'GAP' | 'J-ACE' | 'NequIP' | 'M3GNet' | 'MACE'.
-    mlip_path: str
-        Path to the MLIP model.
+    mlip_path: list[str]
+        List of Path to the MLIP model.
     iteration_index: str
         Index for the current iteration.
     structures: list[Structure]
@@ -522,7 +522,7 @@ def do_rss_single_node(
 @job
 def do_rss_multi_node(
     mlip_type: str,
-    mlip_path: str,
+    mlip_path: list[str],
     iteration_index: str,
     structure: list[Structure] | list[list[Structure]] | None = None,
     structure_paths: str | list[str] | None = None,
@@ -553,8 +553,8 @@ def do_rss_multi_node(
     mlip_type: str
         Choose one specific MLIP type:
         'GAP' | 'J-ACE' | 'NequIP' | 'M3GNet' | 'MACE'.
-    mlip_path: str
-        Path to the MLIP model.
+    mlip_path: list[str]
+        List of Path to the MLIP model.
     iteration_index: str
         Index for the current iteration.
     structure: list[Structure]

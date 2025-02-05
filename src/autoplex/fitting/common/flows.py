@@ -9,6 +9,7 @@ from pathlib import Path
 import ase.io
 from jobflow import Flow, Maker, job
 
+from autoplex import MLIP_HYPERS
 from autoplex.fitting.common.jobs import machine_learning_fit
 from autoplex.fitting.common.regularization import set_custom_sigma
 from autoplex.fitting.common.utils import (
@@ -70,8 +71,6 @@ class MLIPFitMaker(Maker):
         Names of the pre-database train xyz file and test xyz file.
     pre_database_dir: str or None
         The pre-database directory.
-    path_to_hyperparameters : str or Path.
-        Path to JSON file containing the MLIP hyperparameters.
     atomwise_regularization_parameter: float
         Regularization value for the atom-wise force components.
     atom_wise_regularization: bool
@@ -84,10 +83,6 @@ class MLIPFitMaker(Maker):
         Number of processes for fitting.
     apply_data_preprocessing: bool
         Determine whether to preprocess the data.
-    database_dir: Path | str
-        Path to the directory containing the database.
-    use_defaults: bool
-        If true, uses default fit parameters
     run_fits_on_different_cluster: bool
         If true, run fits on different clusters.
     """
@@ -106,7 +101,6 @@ class MLIPFitMaker(Maker):
     separated: bool = False
     pre_xyz_files: list[str] | None = None
     pre_database_dir: str | None = None
-    path_to_hyperparameters: Path | str | None = None
     regularization: bool = False  # This is only used for GAP.
     atomwise_regularization_parameter: float = 0.1  # This is only used for GAP.
     atom_wise_regularization: bool = True  # This is only used for GAP.
@@ -114,13 +108,13 @@ class MLIPFitMaker(Maker):
     glue_xml: bool = False  # This is only used for GAP.
     num_processes_fit: int | None = None
     apply_data_preprocessing: bool = True
-    database_dir: Path | str | None = None
-    use_defaults: bool = True
     run_fits_on_different_cluster: bool = False
 
     def make(
         self,
         fit_input: dict | None = None,  # This is specific to phonon workflow
+        database_dir: Path | str | None = None,
+        hyperparameters: MLIP_HYPERS = MLIP_HYPERS,
         species_list: list | None = None,
         isolated_atom_energies: dict | None = None,
         device: str = "cpu",
@@ -133,6 +127,10 @@ class MLIPFitMaker(Maker):
         ----------
         fit_input: dict
             Output from the CompletePhononDFTMLDataGenerationFlow process.
+        database_dir: Path | str
+            Path to the directory containing the database.
+        hyperparameters: MLIP_HYPERS
+            Hyperparameters for the MLIP.
         species_list: list
             List of element names (strings) involved in the training dataset
         isolated_atom_energies: dict
@@ -177,10 +175,10 @@ class MLIPFitMaker(Maker):
                 glue_file_path=self.glue_file_path,
                 mlip_type=self.mlip_type,
                 hyperpara_opt=self.hyperpara_opt,
+                hyperparameters=hyperparameters,
                 ref_energy_name=self.ref_energy_name,
                 ref_force_name=self.ref_force_name,
                 ref_virial_name=self.ref_virial_name,
-                use_defaults=self.use_defaults,
                 device=device,
                 species_list=species_list,
                 database_dict=data_prep_job.output["database_dict"],
@@ -199,11 +197,11 @@ class MLIPFitMaker(Maker):
         # this will only run if train.extxyz and test.extxyz files are present in the database_dir
         # TODO: shouldn't this be the exception rather then the default run?!
         # TODO: I assume we always want to use data from before?
-        if isinstance(self.database_dir, str):
-            self.database_dir = Path(self.database_dir)
+        if isinstance(database_dir, str):
+            database_dir = Path(database_dir)
 
         mlip_fit_job = machine_learning_fit(
-            database_dir=self.database_dir,
+            database_dir=database_dir,
             isolated_atom_energies=isolated_atom_energies,
             num_processes_fit=self.num_processes_fit,
             auto_delta=self.auto_delta,
@@ -211,6 +209,7 @@ class MLIPFitMaker(Maker):
             glue_file_path=self.glue_file_path,
             mlip_type=self.mlip_type,
             hyperpara_opt=self.hyperpara_opt,
+            hyperparameters=hyperparameters,
             ref_energy_name=self.ref_energy_name,
             ref_force_name=self.ref_force_name,
             ref_virial_name=self.ref_virial_name,
