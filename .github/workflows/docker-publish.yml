@@ -3,7 +3,7 @@ name: Build and Push Docker Image
 on:
   workflow_dispatch:
   release:
-    types: [ created ] # Runs only when a new release is created
+    types: [ published ] # Runs only when a new release is published
 
 jobs:
   build-image:
@@ -36,10 +36,9 @@ jobs:
       run: |
         echo "IMAGE_NAME=`echo ${{github.repository}} | tr '[:upper:]' '[:lower:]'`" >>${GITHUB_ENV}
     
-    - name: Extract version from pyproject.toml
+    - name: Extract version from release tag
       run: |
-          VERSION=$(grep '^version = ' pyproject.toml | sed -E 's/version = "(.*)"/\1/')
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
+        echo "VERSION=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
 
     # Build Docker image with a custom Python version
     - name: Build Docker image (Python ${{ matrix.python-version }})
@@ -53,7 +52,7 @@ jobs:
         docker push ghcr.io/${{ env.IMAGE_NAME }}/autoplex-python-${{ matrix.python-version }}:${{ env.VERSION }}
 
   update-devcontainer:
-    if: github.event_name == 'release' && github.event.action == 'created'
+    if: github.event_name == 'release' && github.event.action == 'published'
     needs: build-image
     runs-on: ubuntu-latest
     steps:
@@ -89,5 +88,7 @@ jobs:
         title: Update devcontainer.json version tag
         body: Update devcontainer.json version tag to reflect release changes
         branch: update-devcontainer
+        labels: |
+            automated-pr
         delete-branch: true
         base: main

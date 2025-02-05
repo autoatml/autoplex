@@ -1,0 +1,23 @@
+changelog:
+  exclude:
+    authors: [ dependabot, github-actions ]
+    labels: [automated-pr]
+  categories:
+    - title: 🚀 New Features
+      labels:
+        - enhancement
+    - title: 🐛 Bug Fixes 
+      labels:
+        - bug
+    - title: Enhancements 🛠
+      labels:
+        - enhancement
+    - title: 📚 Documentation
+      labels:
+        - documentation
+    - title: 🧹 House-Keeping
+      labels:
+        - housekeeping
+    - title: 🔄 Other Changes
+      labels:
+        - "*"

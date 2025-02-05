@@ -359,7 +359,7 @@ def complete_benchmark(  # this function was put here to prevent circular import
                 and benchmark_mp_ids is not None
             ):
                 add_data_bm = PhononBenchmarkMaker(name="Benchmark").make(
-                    # this is important for re-using the same internally calculated DFT reference
+                    # this is important for reusing the same internally calculated DFT reference
                     # for looping through several settings
                     ml_model=ml_model,
                     structure=benchmark_structure,
