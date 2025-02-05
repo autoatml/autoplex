@@ -321,7 +321,7 @@ class HookeanRepulsion(FixConstraint):
 def process_rss(
     atom: Atoms,
     mlip_type: str,
-    mlip_path: str,
+    mlip_path: str | list[str],
     output_file_name: str = "RSS_relax_results",
     scalar_pressure_method: str = "exp",
     scalar_exp_pressure: float = 100,
@@ -348,8 +348,8 @@ def process_rss(
     mlip_type: str
         Choose one specific MLIP type:
         'GAP' | 'J-ACE' | 'NequIP' | 'M3GNet' | 'MACE'.
-    mlip_path: str
-        Path to the MLIP model.
+    mlip_path: str | list[str]
+        Path to the MLIP model or List of Path to the MLIP model.
     output_file_name: str
         Prefix for the trajectory/log file name. The actual output file name
         may be composed of this prefix, an index, and file types.
@@ -394,6 +394,8 @@ def process_rss(
             ast.literal_eval(k) if isinstance(k, str) else k: v
             for k, v in hookean_paras.items()
         }
+
+    mlip_path = mlip_path[0] if isinstance(mlip_path, list) else mlip_path
 
     if mlip_type == "GAP":
         gap_label = os.path.join(mlip_path, "gap_file.xml")
@@ -554,7 +556,7 @@ def process_rss(
 
 def minimize_structures(
     mlip_type: str,
-    mlip_path: str,
+    mlip_path: list[str],
     iteration_index: str,
     structures: list[Structure],
     output_file_name: str = "RSS_relax_results",
@@ -583,8 +585,8 @@ def minimize_structures(
     mlip_type: str
         Choose one specific MLIP type:
         'GAP' | 'J-ACE' | 'NequIP' | 'M3GNet' | 'MACE'.
-    mlip_path: str
-        Path to the MLIP model.
+    mlip_path: list[str]
+        List of path to the MLIP model.
     iteration_index: str
         Index for the current iteration.
     structures: list[Structure]

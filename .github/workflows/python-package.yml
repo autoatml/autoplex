@@ -114,6 +114,8 @@ jobs:
         title: Update test durations file
         body: Auto update test durations file
         branch: update-test-durations
+        labels: |
+            automated-pr
         delete-branch: true
         base: main
 

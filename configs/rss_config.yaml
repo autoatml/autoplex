@@ -1,19 +1,10 @@
-(example)=
-
-# Examples
-
-This section demonstrates various YAML configurations beyond Si and explores use cases for the RSS workflow.
-
-##  SiO<sub>2</sub>
-
-This section provides guidance on exploring silica models at different functional levels.
-
-```yaml
-# General Parameters
 tag: SiO2
 train_from_scratch: true
-resume_from_previous_state: {}
-# Buildcell Parameters
+resume_from_previous_state:
+  test_error:
+  pre_database_dir:
+  mlip_path:
+  isolated_atom_energies:
 generated_struct_numbers:
 - 8000
 - 2000
@@ -21,17 +12,24 @@ buildcell_options:
 - ABFIX: false
   NFORM: '{2,4,6,8}'
   SYMMOPS: 1-4
+  SYSTEM:
+  SLACK:
   OCTET: false
+  OVERLAP:
   MINSEP: 1.5 Si-Si=2.7-3.0 Si-O=1.3-1.6 O-O=2.28-2.58
   SPECIES: Si%NUM=1,O%NUM=2
 - ABFIX: false
   NFORM: '{3,5,7}'
   SYMMOPS: 1-4
+  SYSTEM:
+  SLACK:
   OCTET: false
+  OVERLAP:
   MINSEP: 1.5 Si-Si=2.7-3.0 Si-O=1.3-1.6 O-O=2.28-2.58
   SPECIES: Si%NUM=1,O%NUM=2
+fragment_file:
+fragment_numbers:
 num_processes_buildcell: 128
-# Sampling Parameters
 num_of_initial_selected_structs:
 - 80
 - 20
@@ -50,8 +48,7 @@ bcur_params:
     species: true
   frac_of_bcur: 0.8
   bolt_max_num: 3000
-
-# DFT Labelling Parameters
+random_seed:
 include_isolated_atom: true
 isolatedatom_box:
 - 20.0
@@ -77,19 +74,27 @@ custom_incar:
   LWAVE: .FALSE.
   LCHARG: .FALSE.
   ALGO: normal
+  AMIX:
   LREAL: .FALSE.
   ISYM: 0
   ENCUT: 900.0
   KSPACING: 0.23
+  GGA:
   KPAR: 8
   NCORE: 16
   LSCALAPACK: .FALSE.
   LPLANE: .FALSE.
+  AMIX_MAG:
+  BMIX:
+  BMIX_MAG:
+  ISTART:
+  LMIXTAU:
+  NBANDS:
+  NELMDL:
   METAGGA: SCAN
   LASPH: .TRUE.
+custom_potcar:
 vasp_ref_file: vasp_ref.extxyz
-
-# Data Preprocessing Parameters
 config_types:
 - initial
 - traj_early
@@ -110,8 +115,16 @@ reg_minmax:
 - - 0.0632
   - 0.632
 distillation: false
-
-# RSS Exploration Parameters
+force_max:
+force_label:
+pre_database_dir:
+mlip_type: GAP
+ref_energy_name: REF_energy
+ref_force_name: REF_forces
+ref_virial_name: REF_virial
+auto_delta: true
+num_processes_fit: 32
+device_for_fitting: cpu
 scalar_pressure_method: exp
 scalar_exp_pressure: 100
 scalar_pressure_exponential_width: 0.2
@@ -140,15 +153,6 @@ keep_symmetry: false
 write_traj: true
 num_processes_rss: 128
 device_for_rss: cpu
-
-# MLIP Parameters
-mlip_type: GAP
-ref_energy_name: REF_energy
-ref_force_name: REF_forces
-ref_virial_name: REF_virial
-auto_delta: true
-num_processes_fit: 32
-device_for_fitting: cpu
 mlip_hypers:
   GAP:
     general:
@@ -201,6 +205,3 @@ mlip_hypers:
       f0: 0.0
       covariance_type: dot_product
       sparse_method: cur_points
-```
-
-To switch from SCAN to PBE, simply remove the `METAGGA` and `LASPH` entries from the `custom_incar` settings. All other parameters remain unchanged.

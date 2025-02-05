@@ -1,4 +1,20 @@
 # Changelog
+
+## v0.1.2
+
+<!-- Release notes generated using configuration in .github/release.yml at main -->
+
+## What's Changed
+### 🚀 New Features
+* Adapt Makers to use pydantic models instead of yamls by @naik-aakash in https://github.com/autoatml/autoplex/pull/307
+### 📚 Documentation
+* small docs extension by @QuantumChemist in https://github.com/autoatml/autoplex/pull/332
+### 🧹 House-Keeping
+* Update dependencies & CI publish workflow by @naik-aakash in https://github.com/autoatml/autoplex/pull/334
+
+
+**Full Changelog**: https://github.com/autoatml/autoplex/compare/v0.1.1...v0.1.2
+
 ## v0.1.1
 ### What's changed
 

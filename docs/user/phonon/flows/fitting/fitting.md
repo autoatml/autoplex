@@ -37,8 +37,20 @@ complete_flow = CompleteDFTvsMLBenchmarkWorkflow(
 
 The MLIP model specific settings and hyperparameters setup varies from model to model and is demonstrated in the next 
 sections. Also, [`atomate2`-based MLPhononMaker](https://materialsproject.github.io/atomate2/reference/atomate2.forcefields.jobs.html#module-atomate2.forcefields.jobs) settings can be changed via `benchmark_kwargs` as shown in the code snippet.
+
+> `autoplex` relies on pydantic models for validating the hyperparameter sets of the supported MLIP architectures.
+> Note that all the possible hyperparameters are not yet included. It is upto the user to ensure if any other parameters are supplied
+> are in correct format and required datatype. To get an overview of the default hyperparameter sets, 
+> you can use the following code snippet. 
+
+```python
+from autoplex import MLIP_HYPERS
+
+print(MLIP_HYPERS.model_dump(by_alias=True))
+```
+
 > ℹ️ Note that `autoplex` provides the most comprehensive features for **GAP**, and more features for the other models will 
-follow in future versions.  
+follow in future versions.
 
 ## GAP
 
@@ -83,12 +95,12 @@ complete_flow = CompleteDFTvsMLBenchmarkWorkflow(
     }]
 )
 ```
-`autoplex` provides a JSON dict file containing default GAP fit settings in 
-`autoplex/fitting/common/mlip-phonon-defaults.json`, 
+`autoplex` provides a Pydantic model containing default GAP fit settings in 
+`autoplex.settings.GAPSettings`, 
 that can be overwritten using the fit keyword arguments as demonstrated in the code snippet.
 
 `autoplex` follows a certain convention for naming files and labelling the data 
-(see `autoplex/fitting/common/mlip-phonon-defaults.json`).
+(see `autoplex.settings.GAPSettings.GeneralSettings`).
 ```json
   "general": {
     "at_file": "train.extxyz",
@@ -222,7 +234,6 @@ Currently, this can only be done by cloning the git-repo and installing it from 
 [https://github.com/ACEsuit/mace/](https://github.com/ACEsuit/mace/). We currently install the main branch from there
 automatically within autoplex.
 
-It is now important that you switch off the default settings for the fitting procedure (use_defaults_fitting=False).
 Please be careful with performing very low-data finetuning. Currently, we use a stratified split for splitting the 
 data into train and test data, i.e. there will be at least one data point from the dataset including single displaced 
 cells and one rattled structure. 
@@ -234,7 +245,7 @@ It can also be used without finetuning option. To finetune optimally, please ada
 complete_workflow_mace = CompleteDFTvsMLBenchmarkWorkflowMPSettings(
         ml_models=["MACE"],
         volume_custom_scale_factors=[0.95,1.00,1.05], rattle_type=0, distort_type=0,
-        apply_data_preprocessing=True, use_defaults_fitting=False,
+        apply_data_preprocessing=True,
         ...
     ).make(
         structure_list=[structure],

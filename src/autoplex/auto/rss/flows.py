@@ -1,13 +1,11 @@
 """RSS (random structure searching) flow for exploring and learning potential energy surfaces from scratch."""
 
-import os
-from dataclasses import dataclass
-from pathlib import Path
+from dataclasses import dataclass, field
 
 from jobflow import Flow, Maker, Response, job
-from ruamel.yaml import YAML
 
 from autoplex.auto.rss.jobs import do_rss_iterations, initial_rss
+from autoplex.settings import RssConfig
 
 
 @dataclass
@@ -19,24 +17,21 @@ class RssMaker(Maker):
     ----------
     name: str
         Name of the flow.
-    path_to_default_config_parameters: Path | str | None
-        Path to the default RSS configuration file 'rss_default_configuration.yaml'.
-        If None, the default path will be used.
+    rss_config: RssConfig
+        Pydantic model that defines the setup parameters for the whole RSS workflow.
+        If not explicitly set, the defaults from 'autoplex.settings.RssConfig' will be used.
     """
 
     name: str = "ml-driven rss"
-    path_to_default_config_parameters: Path | str | None = None
+    rss_config: RssConfig = field(default_factory=lambda: RssConfig())
 
     @job
-    def make(self, config_file: str | None = None, **kwargs):
+    def make(self, **kwargs):
         """
         Make a rss workflow using the specified configuration file and additional keyword arguments.
 
         Parameters
         ----------
-        config_file: str | None
-            Path to the configuration file that defines the setup parameters for the whole RSS workflow.
-            If not provided, the default file 'rss_default_configuration.yaml' will be used.
         kwargs: dict, optional
             Additional optional keyword arguments to customize the job execution.
 
@@ -65,7 +60,7 @@ class RssMaker(Maker):
         buildcell_options: list[dict] | None
             Customized parameters for buildcell. Default is None.
         fragment: Atoms | list[Atoms] | None
-            Fragment(s) for random structures, e.g., molecules, to be placed indivudally intact.
+            Fragment(s) for random structures, e.g., molecules, to be placed individually intact.
             atoms.arrays should have a 'fragment_id' key with unique identifiers for each fragment if in same Atoms.
             atoms.cell must be defined (e.g., Atoms.cell = np.eye(3)*20).
         fragment_numbers: list[str] | None
@@ -137,13 +132,16 @@ class RssMaker(Maker):
             Reference file for VASP data. Default is 'vasp_ref.extxyz'.
         config_types: list[str]
             Configuration types for the VASP calculations. Default is None.
-        rss_group: list[str]
+        rss_group: list[str] | str
             Group name for RSS to setting up regularization.
         test_ratio: float
             The proportion of the test set after splitting the data. The value is allowed to be set to 0;
             in this case, the testing error would not be meaningful anymore.
         regularization: bool
             If True, apply regularization. This only works for GAP to date. Default is False.
+        retain_existing_sigma: bool
+            Whether to keep the current sigma values for specific configuration types.
+            If set to True, existing sigma values for specific configurations will remain unchanged.
         scheme: str
             Method to use for regularization. Options are
 
@@ -230,30 +228,23 @@ class RssMaker(Maker):
 
             - 'test_error': float, The test error of the fitted MLIP.
             - 'pre_database_dir': str, The directory of the latest RSS database.
-            - 'mlip_path': str, The path to the latest fitted MLIP.
+            - 'mlip_path': List of path to the latest fitted MLIP.
             - 'isolated_atom_energies': dict, The isolated energy values.
             - 'current_iter': int, The current iteration index.
             - 'kb_temp': float, The temperature (in eV) for Boltzmann sampling.
         """
-        rss_default_config_path = (
-            self.path_to_default_config_parameters
-            or Path(__file__).absolute().parent / "rss_default_configuration.yaml"
-        )
+        default_config = self.rss_config.model_copy(deep=True)
+        if kwargs:
+            default_config.update_parameters(kwargs)
 
-        yaml = YAML(typ="safe", pure=True)
+        config_params = default_config.model_dump(by_alias=True, exclude_none=True)
 
-        with open(rss_default_config_path) as f:
-            config = yaml.load(f)
+        # Extract MLIP hyperparameters from the config_params
+        mlip_hypers = config_params["mlip_hypers"][config_params["mlip_type"]]
+        del config_params["mlip_hypers"]
+        config_params.update(mlip_hypers)
 
-        if config_file and os.path.exists(config_file):
-            with open(config_file) as f:
-                new_config = yaml.load(f)
-                config.update(new_config)
-
-        config.update(kwargs)
-        self._process_hookean_paras(config)
-
-        config_params = config.copy()
+        self._process_hookean_paras(config_params)
 
         if "train_from_scratch" not in config_params:
             raise ValueError(
@@ -350,8 +341,9 @@ class RssMaker(Maker):
 
         return Response(replace=Flow(rss_flow), output=do_rss_job.output)
 
-    def _process_hookean_paras(self, config):
-        if "hookean_paras" in config:
+    @staticmethod
+    def _process_hookean_paras(config):
+        if "hookean_paras" in config and config["hookean_paras"] is not None:
             config["hookean_paras"] = {
                 tuple(map(int, k.strip("()").split(", "))): tuple(v)
                 for k, v in config["hookean_paras"].items()
