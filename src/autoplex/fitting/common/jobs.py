@@ -12,6 +12,7 @@ from autoplex.fitting.common.utils import (
     jace_fitting,
     m3gnet_fitting,
     mace_fitting,
+    nep_fitting,
     nequip_fitting,
 )
 
@@ -26,6 +27,7 @@ def machine_learning_fit(
     auto_delta: bool = True,
     glue_xml: bool = False,
     glue_file_path: str = "glue.xml",
+    gpu_identifier_indices: list[int] | None = None,
     mlip_type: str | None = None,
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
@@ -57,9 +59,11 @@ def machine_learning_fit(
         Use the glue.xml core potential instead of fitting 2b terms.
     glue_file_path: str
         Name of the glue.xml file path.
+    gpu_identifier_indices: list[int]
+        List of GPU indices to be used for fitting. Only used for NEP fitting.
     mlip_type: str
         Choose one specific MLIP type to be fitted:
-        'GAP' | 'J-ACE' | 'NEQUIP' | 'M3GNET' | 'MACE'
+        'GAP' | 'J-ACE' | 'NEQUIP' | 'NEP' | 'M3GNET' | 'MACE'
     ref_energy_name: str
         Reference energy name.
     ref_force_name: str
@@ -151,6 +155,23 @@ def machine_learning_fit(
             num_processes_fit=num_processes_fit,
             fit_kwargs=fit_kwargs,
         )
+        mlip_paths.append(train_test_error["mlip_path"])
+
+    elif mlip_type == "NEP":
+        if gpu_identifier_indices is None:
+            gpu_identifier_indices = [0]
+
+        train_test_error = nep_fitting(
+            db_dir=database_dir,
+            hyperparameters=hyperparameters.NEP,
+            ref_energy_name=ref_energy_name,
+            ref_force_name=ref_force_name,
+            ref_virial_name=ref_virial_name,
+            species_list=species_list,
+            gpu_identifier_indices=gpu_identifier_indices,
+            fit_kwargs=fit_kwargs,
+        )
+
         mlip_paths.append(train_test_error["mlip_path"])
 
     elif mlip_type == "NEQUIP":

@@ -14,7 +14,7 @@ def test_stratified_split(test_dir):
     atoms=read(test_dir / "fitting" / "ref_files" / "vasp_ref.extxyz",':')
 
 
-    train, test=stratified_dataset_split(atoms,0.33)
+    train, test=stratified_dataset_split(atoms,0.33, energy_label="REF_energy")
 
     assert len(train) == 7
     assert len(test) == 3

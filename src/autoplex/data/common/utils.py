@@ -1485,7 +1485,9 @@ def data_distillation(
     return atoms_distilled
 
 
-def stratified_dataset_split(atoms: Atoms, split_ratio: float) -> tuple[
+def stratified_dataset_split(
+    atoms: Atoms, split_ratio: float, energy_label: str
+) -> tuple[
     list[Atom | Atoms]
     | list[Atom | Atoms | list[Atom | Atoms] | list[Atom | Atoms | list]],
     list[Atom | Atoms | list[Atom | Atoms] | list[Atom | Atoms | list]],
@@ -1499,6 +1501,8 @@ def stratified_dataset_split(atoms: Atoms, split_ratio: float) -> tuple[
         ASE Atoms object
     split_ratio: float
         Parameter to divide the training set and the test set.
+    energy_label: str
+        The label for the energy property in the atoms.
 
     Returns
     -------
@@ -1520,7 +1524,15 @@ def stratified_dataset_split(atoms: Atoms, split_ratio: float) -> tuple[
     if len(atoms) != len(atom_bulk):
         atoms = atom_bulk
 
-    average_energies = np.array([atom.info["REF_energy"] / len(atom) for atom in atoms])
+    # Need this try except block because the energy label is not present as info
+    try:
+        average_energies = np.array(
+            [atom.info[energy_label] / len(atom) for atom in atoms]
+        )
+    except KeyError:
+        average_energies = np.array(
+            [atom.get_potential_energy() / len(atom) for atom in atoms]
+        )
     # sort by energy
     sorted_indices = np.argsort(average_energies)
     atoms = [atoms[i] for i in sorted_indices]

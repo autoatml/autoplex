@@ -7,6 +7,7 @@ from multiprocessing import Pool
 from pathlib import Path
 from shutil import which
 from subprocess import run
+from typing import Literal
 
 import ase.io
 import numpy as np
@@ -413,7 +414,7 @@ class RandomizedStructure(Maker):
 
 @job
 def do_rss_single_node(
-    mlip_type: str,
+    mlip_type: Literal["GAP", "J-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"],
     mlip_path: list[str],
     iteration_index: str,
     structures: list[Structure],
@@ -441,9 +442,8 @@ def do_rss_single_node(
 
     Parameters
     ----------
-    mlip_type: str
-        Choose one specific MLIP type:
-        'GAP' | 'J-ACE' | 'NequIP' | 'M3GNet' | 'MACE'.
+    mlip_type: Literal["GAP", "J-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"]
+        Choose one specific MLIP type to be fitted.
     mlip_path: list[str]
         List of Path to the MLIP model.
     iteration_index: str
@@ -521,7 +521,7 @@ def do_rss_single_node(
 
 @job
 def do_rss_multi_node(
-    mlip_type: str,
+    mlip_type: Literal["GAP", "J-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"],
     mlip_path: list[str],
     iteration_index: str,
     structure: list[Structure] | list[list[Structure]] | None = None,
@@ -550,9 +550,8 @@ def do_rss_multi_node(
 
     Parameters
     ----------
-    mlip_type: str
-        Choose one specific MLIP type:
-        'GAP' | 'J-ACE' | 'NequIP' | 'M3GNet' | 'MACE'.
+    mlip_type: Literal["GAP", "J-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"]
+        Choose one specific MLIP type to be fitted.
     mlip_path: list[str]
         List of Path to the MLIP model.
     iteration_index: str

@@ -291,6 +291,8 @@ def complete_benchmark(  # this function was put here to prevent circular import
                 path
             )  # M3GNet requires path and fit already returns the path
             # also need to find a different solution for separated fit then (name to path could be modified)
+        elif ml_model in ["NEP"]:
+            ml_potential = Path(path) / "nep.txt"
         elif ml_model in ["NEQUIP"]:
             ml_potential = Path(path) / "deployed_nequip_model.pth"
         else:  # MACE

@@ -20,12 +20,14 @@ import numpy as np
 import pandas as pd
 import torch
 from ase.atoms import Atoms
+from ase.calculators.singlepoint import SinglePointCalculator
 from ase.constraints import voigt_6_to_full_3x3_stress
 from ase.data import chemical_symbols
 from ase.io import read, write
 from ase.io.extxyz import XYZError
 from ase.neighborlist import NeighborList, natural_cutoffs
 from atomate2.utils.path import strip_hostname
+from calorine.nep import read_loss, write_nepfile, write_structures
 from dgl.data.utils import split_dataset
 from matgl.apps.pes import Potential
 from matgl.ext.pymatgen import Structure2Graph, get_element_list
@@ -42,7 +44,14 @@ from pytorch_lightning.loggers import CSVLogger
 from scipy.spatial import ConvexHull
 from scipy.special import comb
 
-from autoplex import GAP_HYPERS, JACE_HYPERS, M3GNET_HYPERS, MACE_HYPERS, NEQUIP_HYPERS
+from autoplex import (
+    GAP_HYPERS,
+    JACE_HYPERS,
+    M3GNET_HYPERS,
+    MACE_HYPERS,
+    NEP_HYPERS,
+    NEQUIP_HYPERS,
+)
 from autoplex.data.common.utils import (
     data_distillation,
     plot_energy_forces,
@@ -436,6 +445,165 @@ export2lammps("acemodel.yace", model)
     return {
         "train_error": train_error,
         "test_error": test_error,
+        "mlip_path": Path.cwd(),
+    }
+
+
+def nep_fitting(
+    db_dir: str | Path,
+    hyperparameters: NEP_HYPERS = NEP_HYPERS,
+    ref_energy_name: str = "REF_energy",
+    ref_force_name: str = "REF_forces",
+    ref_virial_name: str = "REF_virial",
+    species_list: list | None = None,
+    gpu_identifier_indices: list[int] = list[0],
+    fit_kwargs: dict | None = None,
+) -> dict:
+    """
+    Perform the NEP (Neural evolution Potential) model fitting.
+
+    Parameters
+    ----------
+    db_dir: Path
+        Directory containing the training and testing data files.
+    path_to_hyperparameters : str or Path.
+        Path to JSON file containing the M3GNet hyperparameters.
+    ref_energy_name : str, optional
+        Reference energy name.
+    ref_force_name : str, optional
+        Reference force name.
+    ref_virial_name : str, optional
+        Reference virial name.
+    species_list: list
+        List of element names (strings)
+    gpu_identifier_indices: list[int]
+        Indices that identifies the GPU that NEP should be run with
+    fit_kwargs: dict.
+        optional dictionary with parameters for NEP fitting with keys same as
+        mlip-rss-defaults.json.
+
+    Keyword Arguments
+    -----------------
+    version: int
+        NEP model version to train can be 3 or 4. Default is 4.
+    type: list[int, str]
+        Number of atom types and list of chemical species. Number
+        of atom types must be an integer, followed by chemical
+        symbols of species as in periodic table for which model
+        needs to be trained, separated by comma.
+        Default is [1, "X"] as a placeholder. Example:
+        [2, "Pb", "Te"].
+    type_weight: float
+        Weights for different chemical species. Default is 1.0
+    model_type: int
+        Type of model that is being trained. Can be 0 (potential),
+        1 (dipole), 2 (polarizability). Default is 0.
+    prediction: int
+        Mode of NEP run. Set 0 for training and 1 for inference.
+        Default is 0.
+    cutoff: list[int, int]
+        Radial and angular cutoff. First element is for radial cutoff and
+        second element is for angular cutoff. Default is [6, 5].
+    n_max: list[int, int]
+        Number of radial and angular descriptors. First element is for radial
+        and second element is for angular. Default is [4, 4].
+    basis_size: list[int, int]
+        Number of basis functions that are used to build the radial and angular
+        descriptor. First element is for radial descriptor and
+        second element is for angular descriptor. Default is [8, 8].
+    l_max: list[int, int, int]
+       The maximum expansion order for the angular terms. First element is for
+       three-body, second element is for four-body and third element is for five-body.
+       Default is [4, 2, 1].
+    neuron: int
+        Number of neurons in the hidden layer. Default is 80.
+    lambda_1: float
+        Weight for L1 regularization. Default is 0.
+    lambda_e: float
+        Weight for energy loss. Default is 1.
+    lambda_f: float
+        Weight for force loss. Default is 1.
+    lambda_v: float
+        Weight for virial loss. Default is 0.1.
+    force_delta: float
+        Sets bias the on the loss function to put more emphasis on obtaining
+        accurate predictions for smaller forces. Default is 0.
+    batch: int
+        Batch size for training. Default is 1000.
+    population: int
+        Size of the population used by the SNES algorithm. Default is 50.
+    generation: bool
+        Sets the max number of generations for SNES algorithm.
+    zbl : float
+        Cutoff to use in universal ZBL potential at short distances.
+        Acceptable values are in range 1 to 2.5. Default is 2.
+
+    References
+    ----------
+    * GPUMD & NEP: https://doi.org/10.1063/5.0106617.
+    * SNES : https://doi.org/10.1145/2001576.2001692.
+    * Parameter defaults taken from SI: https://doi.org/10.1038/s41467-024-54554-x.
+
+    Returns
+    -------
+    dict[str, float]
+        A dictionary mapping 'train_error', 'test_error', and 'mlip_path'.
+    """
+    hyperparameters = hyperparameters.model_copy(deep=True)
+
+    train_data = ase.io.read(os.path.join(db_dir, "train.extxyz"), index=":")
+    test_data = ase.io.read(os.path.join(db_dir, "test.extxyz"), index=":")
+
+    try:
+        train_nep = [
+            at for at in train_data if "IsolatedAtom" not in at.info["config_type"]
+        ]
+        test_nep = [
+            at for at in test_data if "IsolatedAtom" not in at.info["config_type"]
+        ]
+    except KeyError:
+        train_nep = train_data
+        test_nep = test_data
+
+    # Use the SinglePointCalculator to set the energy, forces, and virial
+    # Step required to generate NEP compatible xyz file using write_structures from calorine
+    for at in train_data:
+        at.calc = SinglePointCalculator(
+            at, energy=at.info[ref_energy_name], forces=at.arrays[ref_force_name]
+        )
+        at.info["virial"] = at.info[ref_virial_name]
+        del at.info[ref_energy_name]
+        del at.info[ref_virial_name]
+        del at.arrays[ref_force_name]
+
+    for at in test_data:
+        at.calc = SinglePointCalculator(
+            at, energy=at.info[ref_energy_name], forces=at.arrays[ref_force_name]
+        )
+        at.info["virial"] = at.info[ref_virial_name]
+        del at.info[ref_energy_name]
+        del at.info[ref_virial_name]
+        del at.arrays[ref_force_name]
+
+    write_structures(outfile="train.xyz", structures=train_nep)
+    write_structures(outfile="test.xyz", structures=test_nep)
+
+    if fit_kwargs:
+        hyperparameters.update_parameters(fit_kwargs)
+
+    nep_hypers = hyperparameters.model_dump(by_alias=True)
+
+    nep_hypers["type"] = [len(species_list), *species_list]
+    nep_hypers["type_weight"] = [1.0] * len(species_list)
+
+    write_nepfile(parameters=nep_hypers, dirname=".")
+    run_nep(gpu_identifier_indices=gpu_identifier_indices)
+
+    metrics_df = read_loss("loss.out")
+
+    return {
+        "train_error": metrics_df.RMSE_E_train.values[-1],
+        "test_error": metrics_df.RMSE_E_test.values[-1],
         "mlip_path": Path.cwd(),
     }
 
@@ -1304,6 +1472,9 @@ def vaspoutput_2_extended_xyz(
     path_to_vasp_static_calcs: list,
     config_types: list[str] | None = None,
     data_types: list[str] | None = None,
+    ref_energy_name: str = "REF_energy",
+    ref_force_name: str = "REF_forces",
+    ref_virial_name: str = "REF_virial",
     regularization: float = 0.1,
     f_min: float = 0.01,  # unit: eV Å-1
     atom_wise_regularization: bool = True,
@@ -1322,6 +1493,12 @@ def vaspoutput_2_extended_xyz(
             list of config_types.
     data_types: list[str] or None
             track the data type (phonon or random).
+    ref_energy_name : str
+        Reference energy name in xyz file.
+    ref_force_name : str
+        Reference force name in xyz file.
+    ref_virial_name : str
+        Reference virial name in xyz file.
     regularization: float
         regularization value for the atom-wise force components.
     f_min: float
@@ -1347,11 +1524,11 @@ def vaspoutput_2_extended_xyz(
                 virial_list = (
                     -voigt_6_to_full_3x3_stress(i.get_stress()) * i.get_volume()
                 )
-                i.info["REF_virial"] = " ".join(map(str, virial_list.flatten()))
+                i.info[ref_virial_name] = " ".join(map(str, virial_list.flatten()))
                 del i.calc.results["stress"]
-                i.arrays["REF_forces"] = i.calc.results["forces"]
+                i.arrays[ref_force_name] = i.calc.results["forces"]
                 if atom_wise_regularization and (data_type == "phonon_dir"):
-                    atom_forces = np.array(i.arrays["REF_forces"])
+                    atom_forces = np.array(i.arrays[ref_force_name])
                     atom_wise_force = np.array(
                         [
                             force if force > f_min else f_min
@@ -1360,7 +1537,7 @@ def vaspoutput_2_extended_xyz(
                     )
                     i.arrays["force_atom_sigma"] = regularization * atom_wise_force
                 del i.calc.results["forces"]
-                i.info["REF_energy"] = i.calc.results["free_energy"]
+                i.info[ref_energy_name] = i.calc.results["free_energy"]
                 del i.calc.results["energy"]
                 del i.calc.results["free_energy"]
                 i.info["config_type"] = config_type
@@ -1699,6 +1876,25 @@ def run_quip(
         subprocess.call(command, stdout=file_std, stderr=file_err, shell=True)
 
 
+def run_nep(gpu_identifier_indices: list[int]) -> None:
+    """
+    NEP runner.
+
+    Parameters
+    ----------
+    gpu_identifier_indices: list[int]
+        Indices that identifies the GPU that NEP should be run with
+    """
+    env = os.environ.copy()
+    env["CUDA_VISIBLE_DEVICES"] = ",".join(map(str, gpu_identifier_indices))
+
+    with (
+        open("std_nep_out.log", "w", encoding="utf-8") as file_out,
+        open("std_nep_err.log", "w", encoding="utf-8") as file_err,
+    ):
+        subprocess.call("nep", stdout=file_out, stderr=file_err, env=env)
+
+
 def run_nequip(command: str, log_prefix: str) -> None:
     """
     Nequip runner.
@@ -1851,6 +2047,7 @@ def write_after_distillation_data_split(
     train_name: str = "train.extxyz",
     test_name: str = "test.extxyz",
     force_label: str = "REF_forces",
+    energy_label: str = "REF_energy",
 ) -> None:
     """
     Write train.extxyz and test.extxyz after data distillation and split.
@@ -1874,6 +2071,8 @@ def write_after_distillation_data_split(
         name of the test data file.
     force_label: str
         label of the force entries.
+    energy_label: str
+        label of the energy entries.
     """
     # reject structures with large force components
     atoms = (
@@ -1883,7 +2082,9 @@ def write_after_distillation_data_split(
     )
 
     # split dataset into training and test datasets
-    (train_structures, test_structures) = stratified_dataset_split(atoms, split_ratio)
+    (train_structures, test_structures) = stratified_dataset_split(
+        atoms=atoms, split_ratio=split_ratio, energy_label=energy_label
+    )
 
     ase.io.write(train_name, train_structures, format="extxyz", append=True)
     ase.io.write(test_name, test_structures, format="extxyz", append=True)

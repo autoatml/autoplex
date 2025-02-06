@@ -1,6 +1,9 @@
+import pytest
 from autoplex.fitting.common.flows import MLIPFitMaker
 from pathlib import Path
 from jobflow import run_locally
+
+from tests.auto.phonons.test_jobs import fake_run_vasp_kwargs
 
 
 def test_gap_fit_maker(test_dir, memory_jobstore, clean_dir):

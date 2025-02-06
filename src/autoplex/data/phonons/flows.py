@@ -626,6 +626,27 @@ class MLPhononMaker(FFPhononMaker):
         elif ml_model == "J-ACE":
             raise UserWarning("No atomate2 ACE.jl PhononMaker implemented.")
 
+        elif ml_model == "NEP":
+            if calculator_kwargs is None:
+                calculator_kwargs = {"model_filename": str(potential_file)}
+
+            ml_prep = ml_phonon_maker_preparation(
+                bulk_relax_maker=ForceFieldRelaxMaker(
+                    relax_cell=True,
+                    relax_kwargs={"interval": 500},
+                    force_field_name="NEP",
+                ),
+                phonon_displacement_maker=ForceFieldStaticMaker(
+                    name="nep phonon static",
+                    force_field_name="NEP",
+                ),
+                static_energy_maker=ForceFieldStaticMaker(
+                    force_field_name="NEP",
+                ),
+                calculator_kwargs=calculator_kwargs,
+                relax_maker_kwargs=self.relax_maker_kwargs,
+                static_maker_kwargs=self.static_maker_kwargs,
+            )
         elif ml_model == "NEQUIP":
             if calculator_kwargs is None:
                 calculator_kwargs = {
