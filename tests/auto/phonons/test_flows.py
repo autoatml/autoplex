@@ -899,6 +899,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_m3gnet(
         5.2622804443539355, abs=3.0  # bad fit data, fluctuates between 4 and 7
     )
 
+
 def test_complete_dft_vs_ml_benchmark_workflow_m3gnet_finetuning(
         vasp_test_dir, mock_vasp, test_dir, memory_jobstore, ref_paths4_mpid, fake_run_vasp_kwargs4_mpid, clean_dir
 ):
@@ -938,10 +939,58 @@ def test_complete_dft_vs_ml_benchmark_workflow_m3gnet_finetuning(
         ensure_success=True,
         store=memory_jobstore,
     )
+
     assert complete_workflow_m3gnet.jobs[5].name == "complete_benchmark_mp-22905"
     assert responses[complete_workflow_m3gnet.jobs[-1].output.uuid][1].output["metrics"][0][0][
                "benchmark_phonon_rmse"] == pytest.approx(
         4.6, abs=0.5,
+    )
+
+def test_complete_dft_vs_ml_benchmark_workflow_nep(
+        vasp_test_dir, mock_vasp, mock_nep, test_dir, memory_jobstore,
+        ref_paths4_mpid, fake_run_vasp_kwargs4_mpid, clean_dir
+):
+    path_to_struct = vasp_test_dir / "dft_ml_data_generation" / "POSCAR"
+    structure = Structure.from_file(path_to_struct)
+
+    complete_workflow_nep = CompleteDFTvsMLBenchmarkWorkflow(
+        ml_models=["NEP"],
+        symprec=1e-2, supercell_settings={"min_length": 8, "min_atoms": 20}, displacements=[0.01],
+        volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
+        apply_data_preprocessing=True,
+    ).make(
+        structure_list=[structure],
+        mp_ids=["test"],
+        benchmark_mp_ids=["mp-22905"],
+        pre_xyz_files=["vasp_ref.extxyz"],
+        pre_database_dir=test_dir / "fitting" / "ref_files",
+        benchmark_structures=[structure],
+        fit_kwargs_list=[{
+            "generation": 1000,
+            "batch": 1,
+            }]
+    )
+
+    # automatically use fake VASP and write POTCAR.spec during the test
+    mock_vasp(ref_paths4_mpid, fake_run_vasp_kwargs4_mpid)
+
+    # mock nep
+    ref_paths_nep = {"machine_learning_fit": "LiCl_complete_dft_vs_ml_benchmark_workflow"}
+    fake_run_nep_kwargs = {
+        "machine_learning_fit": {"nep_settings": ["generation", "batch", "type_weight"], "check_nep_inputs": True}}
+    mock_nep(ref_paths_nep, fake_run_nep_kwargs)
+
+    # run the flow or job and ensure that it finished running successfully
+    responses = run_locally(
+        complete_workflow_nep,
+        create_folders=True,
+        ensure_success=True,
+        store=memory_jobstore,
+    )
+    assert complete_workflow_nep.jobs[5].name == "complete_benchmark_mp-22905"
+    assert responses[complete_workflow_nep.jobs[-1].output.uuid][1].output["metrics"][0][0][
+               "benchmark_phonon_rmse"] == pytest.approx(
+        3.8951576702856716
     )
 
 

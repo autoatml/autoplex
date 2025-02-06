@@ -46,7 +46,7 @@ pip install autoplex[strict]
 ```
 This will install all the Python packages and dependencies needed for MLIP fits. 
 
-Additionally, to fit and validate `ACEpotentials`, one also needs to install Julia, as `autoplex` relies on [ACEpotentials](https://acesuit.github.io/ACEpotentials.jl/dev/gettingstarted/installation/), which supports fitting of linear ACE. Currently, no Python package exists for the same.
+> ℹ️ To fit and validate `ACEpotentials`, one also needs to install Julia, as `autoplex` relies on [ACEpotentials](https://acesuit.github.io/ACEpotentials.jl/dev/gettingstarted/installation/), which supports fitting of linear ACE. Currently, no Python package exists for the same.
 Please run the following commands to enable the `ACEpotentials` fitting options and further functionality.
 
 Install Julia v1.9.2
@@ -61,9 +61,17 @@ Once installed in the terminal, run the following commands to get Julia ACEpoten
 julia -e 'using Pkg; Pkg.Registry.add("General"); Pkg.Registry.add(Pkg.Registry.RegistrySpec(url="https://github.com/ACEsuit/ACEregistry")); Pkg.add(Pkg.PackageSpec(;name="ACEpotentials", version="0.6.7")); Pkg.add("DataFrames"); Pkg.add("CSV")'
 ```
 
+> ℹ️ To fit and validate `NEP` potentials, one requires an Nvidia GPU card with compute capability no less than 3.5 and CUDA toolkit 9.0 or newer. This potential can only be trained on GPU only and currently interface to NEP potential training is provided via [calorine](https://calorine.materialsmodeling.org/) package that uses `nep` executable from the [GPUMD](https://gpumd.org/index.html) package. To get this executable please follow the compilation instructions [here](https://gpumd.org/installation.html) and add this executable to the system path.
+
 ### Enabling RSS workflows
 
 Additionally, `buildcell` as a part of `AIRSS` needs to be installed if one wants to use the RSS functionality:
+
+> ℹ️ To be able to build the AIRSS utilities one needs `gcc` and `gfortran` version 5 and above. Other compiler families (such as ifort) are not supported.
+> These compilers are usually available on HPCs and one can simply load them if needed. On Ubuntu/Debian systems, one can install the necessary compilers with the following command:
+````bash
+apt install -y build-essential gfortran
+````
 
 ```bash
 curl -O https://www.mtg.msm.cam.ac.uk/files/airss-0.9.3.tgz; tar -xf airss-0.9.3.tgz; rm airss-0.9.3.tgz; cd airss; make ; make install ; make neat; cd ..

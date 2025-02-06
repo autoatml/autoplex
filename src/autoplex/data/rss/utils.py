@@ -555,7 +555,7 @@ def process_rss(
 
 
 def minimize_structures(
-    mlip_type: str,
+    mlip_type: Literal["GAP", "J-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"],
     mlip_path: list[str],
     iteration_index: str,
     structures: list[Structure],
@@ -582,9 +582,8 @@ def minimize_structures(
 
     Parameters
     ----------
-    mlip_type: str
-        Choose one specific MLIP type:
-        'GAP' | 'J-ACE' | 'NequIP' | 'M3GNet' | 'MACE'.
+    mlip_type: Literal["GAP", "J-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"]
+        Choose one specific MLIP type to be fitted.
     mlip_path: list[str]
         List of path to the MLIP model.
     iteration_index: str
