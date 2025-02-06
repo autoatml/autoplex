@@ -45,10 +45,6 @@ dependencies = [
 [tool.setuptools.packages.find]
 where = ["src"]
 
-#[tool.setuptools.package-data]
-#"autoplex.fitting.common" = ["*.json"]
-#"autoplex.auto.rss" = ["*.yaml"]
-
 [project.optional-dependencies]
 docs = [
     "autodoc_pydantic==2.2.0",
