@@ -54,11 +54,11 @@ def machine_learning_fit(
     num_processes_fit: int
         Number of processes for fitting.
     auto_delta: bool
-        Automatically determine delta for 2b, 3b and soap terms.
+        Automatically determine delta for 2b, 3b and soap terms. Only used for GAP fitting.
     glue_xml: bool
-        Use the glue.xml core potential instead of fitting 2b terms.
+        Use the glue.xml core potential instead of fitting 2b terms. Only used for GAP fitting.
     glue_file_path: str
-        Name of the glue.xml file path.
+        Name of the glue.xml file path. Only used for GAP fitting.
     gpu_identifier_indices: list[int]
         List of GPU indices to be used for fitting. Only used for NEP fitting.
     mlip_type: str
