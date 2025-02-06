@@ -640,9 +640,7 @@ class MLPhononMaker(FFPhononMaker):
                     name="nep phonon static",
                     force_field_name="NEP",
                 ),
-                static_energy_maker=ForceFieldStaticMaker(
-                    force_field_name="NEP",
-                ),
+                static_energy_maker=None,
                 calculator_kwargs=calculator_kwargs,
                 relax_maker_kwargs=self.relax_maker_kwargs,
                 static_maker_kwargs=self.static_maker_kwargs,
