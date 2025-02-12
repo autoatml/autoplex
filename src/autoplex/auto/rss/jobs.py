@@ -589,8 +589,8 @@ def do_rss_iterations(
             apply_data_preprocessing=False,
             auto_delta=auto_delta,
             glue_xml=False,
-            database_dir=do_data_preprocessing.output,
         ).make(
+            database_dir=do_data_preprocessing.output,
             isolated_atom_energies=input["isolated_atom_energies"],
             device=device_for_fitting,
             **fit_kwargs,
