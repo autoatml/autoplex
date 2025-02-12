@@ -112,8 +112,8 @@ class MLIPFitMaker(Maker):
 
     def make(
         self,
-        fit_input: dict | None = None,  # This is specific to phonon workflow
         database_dir: Path | str | None = None,
+        fit_input: dict | None = None,  # This is specific to phonon workflow
         hyperparameters: MLIP_HYPERS = MLIP_HYPERS,
         species_list: list | None = None,
         isolated_atom_energies: dict | None = None,
@@ -125,6 +125,8 @@ class MLIPFitMaker(Maker):
 
         Parameters
         ----------
+        database_dir: Path | str
+            Path to the directory containing the database.
         fit_input: dict
             Output from the CompletePhononDFTMLDataGenerationFlow process.
         database_dir: Path | str
