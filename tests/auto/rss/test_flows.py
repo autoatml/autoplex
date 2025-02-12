@@ -2,9 +2,40 @@ import os
 import pytest
 from pathlib import Path
 from jobflow import run_locally, Flow
-from tests.conftest import mock_rss, mock_do_rss_iterations, mock_do_rss_iterations_multi_jobs
+from autoplex.auto.rss.flows import RssMaker
 
 os.environ["OMP_NUM_THREADS"] = "1"
+
+def test_rss_workflow(test_dir, mock_vasp, memory_jobstore, clean_dir):
+    rss_job = RssMaker(name="rss").make(tag='Si',
+                                                       buildcell_options=[{'NFORM': '{1,3,5}'},
+                                                                          {'NFORM': '{2,4,6}'}],
+                                                       hookean_repul=True,
+                                                       hookean_paras={'(14, 14)': (100, 1.2)})
+
+    ref_paths = {
+        **{f"static_bulk_{i}": f"rss/Si_bulk_{i + 1}/" for i in range(18)},
+        "static_isolated_0": "rss/Si_isolated_1/",
+        "static_dimer_0": "rss/Si_dimer_1/",
+        "static_dimer_1": "rss/Si_dimer_2/",
+        "static_dimer_2": "rss/Si_dimer_3/",
+    }
+    fake_run_vasp_kwargs = {
+        **{f"static_bulk_{i}": {"incar_settings": ["NSW", "ISMEAR"], "check_inputs": ["incar", "potcar"]} for i in
+           range(18)},
+        "static_isolated_0": {"incar_settings": ["NSW", "ISMEAR"], "check_inputs": ["incar", "potcar"]},
+        "static_dimer_0": {"incar_settings": ["NSW", "ISMEAR"], "check_inputs": ["incar", "potcar"]},
+        "static_dimer_1": {"incar_settings": ["NSW", "ISMEAR"], "check_inputs": ["incar", "potcar"]},
+        "static_dimer_2": {"incar_settings": ["NSW", "ISMEAR"], "check_inputs": ["incar", "potcar"]},
+    }
+    mock_vasp(ref_paths, fake_run_vasp_kwargs)
+
+    responses = run_locally(
+        rss_job,
+        create_folders=True,
+        ensure_success=True,
+        store=memory_jobstore,
+    )
 
 
 def test_mock_workflow(test_dir, mock_vasp, memory_jobstore, clean_dir):

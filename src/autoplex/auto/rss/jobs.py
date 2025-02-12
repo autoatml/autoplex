@@ -236,7 +236,7 @@ def initial_rss(
         do_mlip_fit,
     ]
 
-    (mlip_path,) = do_mlip_fit.output["mlip_path"]
+    mlip_path = do_mlip_fit.output["mlip_path"]
 
     return Response(
         replace=Flow(job_list),
@@ -589,8 +589,8 @@ def do_rss_iterations(
             apply_data_preprocessing=False,
             auto_delta=auto_delta,
             glue_xml=False,
-        ).make(
             database_dir=do_data_preprocessing.output,
+        ).make(
             isolated_atom_energies=input["isolated_atom_energies"],
             device=device_for_fitting,
             **fit_kwargs,

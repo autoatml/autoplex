@@ -84,8 +84,6 @@ class MLIPFitMaker(Maker):
         Number of processes for fitting.
     apply_data_preprocessing: bool
         Determine whether to preprocess the data.
-    database_dir: Path | str
-        Path to the directory containing the database.
     use_defaults: bool
         If true, uses default fit parameters
     run_fits_on_different_cluster: bool
@@ -114,12 +112,12 @@ class MLIPFitMaker(Maker):
     glue_xml: bool = False  # This is only used for GAP.
     num_processes_fit: int | None = None
     apply_data_preprocessing: bool = True
-    database_dir: Path | str | None = None
     use_defaults: bool = True
     run_fits_on_different_cluster: bool = False
 
     def make(
         self,
+        database_dir: Path | str | None = None,
         fit_input: dict | None = None,  # This is specific to phonon workflow
         species_list: list | None = None,
         isolated_atom_energies: dict | None = None,
@@ -131,6 +129,8 @@ class MLIPFitMaker(Maker):
 
         Parameters
         ----------
+        database_dir: Path | str
+            Path to the directory containing the database.
         fit_input: dict
             Output from the CompletePhononDFTMLDataGenerationFlow process.
         species_list: list
@@ -199,11 +199,11 @@ class MLIPFitMaker(Maker):
         # this will only run if train.extxyz and test.extxyz files are present in the database_dir
         # TODO: shouldn't this be the exception rather then the default run?!
         # TODO: I assume we always want to use data from before?
-        if isinstance(self.database_dir, str):
-            self.database_dir = Path(self.database_dir)
+        if isinstance(database_dir, str):
+            database_dir = Path(database_dir)
 
         mlip_fit_job = machine_learning_fit(
-            database_dir=self.database_dir,
+            database_dir=database_dir,
             isolated_atom_energies=isolated_atom_energies,
             num_processes_fit=self.num_processes_fit,
             auto_delta=self.auto_delta,
