@@ -133,7 +133,7 @@ def test_get_output(clean_dir, test_dir, memory_jobstore):
 
     responses = run_locally(job_here)
 
-    responses[job_here.uuid][1].output["rms"] == pytest.approx(0.1223)
+    assert responses[job_here.uuid][1].output["rms"] == pytest.approx(0.1223, abs=0.00001)
 
     input_dict = {"metrics": [[{"benchmark_phonon_rmse": 0.12230662063050536, "dft_imaginary_modes": True,
                                 "ml_imaginary_modes": False},
@@ -163,10 +163,10 @@ def test_complete_benchmark(clean_dir, test_dir, memory_jobstore):
         glue_xml=False,
         apply_data_preprocessing=False,
         separated=True,
-        database_dir=database_dir,
     ).make(
         twob={"delta": 2.0, "cutoff": 4},
         threeb={"n_sparse": 10},
+        database_dir=database_dir,
         **fit_kwargs
     )
     dft_data = loadfn(test_dir / "benchmark" / "phonon_doc_si.json")
@@ -314,7 +314,7 @@ def test_dft_task_doc(
     mock_vasp(ref_paths, fake_run_vasp_kwargs)
 
     # run the flow or job and ensure that it finished running successfully
-    responses = run_locally(
+    _ = run_locally(
         dft_phonon_workflow,
         create_folders=True,
         ensure_success=True,
@@ -331,12 +331,9 @@ def test_dft_task_doc(
 def test_dft_phonopy_gen_data_manual_supercell_matrix(
         vasp_test_dir,
         mock_vasp,
-        test_dir,
         memory_jobstore,
         relax_maker,
         static_energy_maker,
-        ref_paths_check_sc_mat,
-        fake_run_vasp_kwargs,
         clean_dir
 ):
     path_to_struct = vasp_test_dir / "dft_ml_data_generation" / "POSCAR"
@@ -358,10 +355,29 @@ def test_dft_phonopy_gen_data_manual_supercell_matrix(
                                                supercell_settings=supercell_settings)
 
     # automatically use fake VASP and write POTCAR.spec during the test
-    mock_vasp(ref_paths_check_sc_mat, fake_run_vasp_kwargs)
+    ref_paths_manual_sc = {
+        "dft tight relax 1": "dft_ml_data_generation/manual_sc/tight_relax_1/",
+        "dft tight relax 2": "dft_ml_data_generation/manual_sc/tight_relax_2/",
+        "dft static": "dft_ml_data_generation/manual_sc/static/",
+        "dft phonon static 1/2": "dft_ml_data_generation/manual_sc/phonon_static_1/",
+        "dft phonon static 2/2": "dft_ml_data_generation/manual_sc/phonon_static_2/",
+    }
+
+    fake_run_vasp_manual_sc_kwargs = {
+        "dft tight relax 1": {"incar_settings": ["NSW", "ISMEAR"]},
+        "dft tight relax 2": {"incar_settings": ["NSW", "ISMEAR"]},
+        "dft static": {"incar_settings": ["NSW", "ISMEAR"],
+                       "check_inputs": ["incar", "poscar", "potcar"]},
+        "dft phonon static 1/2": {"incar_settings": ["NSW"],
+                                  "check_inputs": ["incar", "poscar", "potcar"]},
+        "dft phonon static 2/2": {"incar_settings": ["NSW"],
+                                  "check_inputs": ["incar", "poscar", "potcar"]},
+    }
+
+    mock_vasp(ref_paths_manual_sc, fake_run_vasp_manual_sc_kwargs)
 
     # run the flow or job and ensure that it finished running successfully
-    responses = run_locally(
+    _ = run_locally(
         dft_phonon_workflow,
         create_folders=True,
         ensure_success=True,
@@ -375,7 +391,6 @@ def test_dft_phonopy_gen_data_manual_supercell_matrix(
 def test_dft_random_gen_data_manual_supercell_matrix(
         vasp_test_dir,
         mock_vasp,
-        test_dir,
         memory_jobstore,
         relax_maker,
         ref_paths_check_sc_mat,
@@ -406,7 +421,7 @@ def test_dft_random_gen_data_manual_supercell_matrix(
     mock_vasp(ref_paths_check_sc_mat, fake_run_vasp_kwargs)
 
     # run the flow or job and ensure that it finished running successfully
-    responses = run_locally(
+    _ = run_locally(
         dft_rattled_workflow,
         create_folders=True,
         ensure_success=True,

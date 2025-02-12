@@ -166,33 +166,66 @@ pre_database_dir: null
 
 Regularization is currently only applicable to GAP potentials and is adjusted using the `scheme` parameter. Common schemes include `'linear-hull'` and `'volume-stoichiometry'`. For systems with fixed stoichiometry, `'linear-hull'` is recommended. For systems with varying stoichiometries, `'volume-stoichiometry'` is more appropriate.
 
-## MLIP Parameters
+## MLIP parameters
 
-The section defines the settings for training machine learning potentials. Currently supported architectures include GAP, ACE(Julia), NequIP, M3GNet, and MACE. You can specify the desired model using the `mlip_type` argument and tune hyperparameters flexibly by adding key-value pairs. Default and adjustable hyperparameters are available in `autoplex/autoplex/fitting/common/mlip-rss-defaults.json`.
+The section defines the settings for training machine learning potentials. Currently supported architectures include GAP, ACE(Julia), NequIP, M3GNet, and MACE. 
+You can specify the desired model using the `mlip_type` argument and tune hyperparameters flexibly by adding key-value pairs. 
 
 ```yaml
 # MLIP Parameters
 mlip_type: 'GAP'
-ref_energy_name: 'REF_energy'
-ref_force_name: 'REF_forces'
-ref_virial_name: 'REF_virial'
-auto_delta: true
-num_processes_fit: 32
-device_for_fitting: 'cpu'
-twob:
-  cutoff: 10.0
-  n_sparse: 30
-  theta_uniform: 1.0
-threeb:
-  cutoff: 3.25
-soap:
-  l_max: 8
-  n_max: 8
-  atom_sigma: 0.75
-  n_sparse: 2000
-  cutoff: 5.0
-general:
-  three_body: true
+mlip_hypers:
+  GAP:
+    general:
+      at_file: train.extxyz
+      default_sigma: '{0.0001 0.05 0.05 0}'
+      energy_parameter_name: REF_energy
+      force_parameter_name: REF_forces
+      virial_parameter_name: REF_virial
+      sparse_jitter: 1e-08
+      do_copy_at_file: F
+      openmp_chunk_size: 10000
+      gp_file: gap_file.xml
+      e0_offset: 0.0
+      two_body: true
+      three_body: false
+      soap: true
+    twob:
+      distance_Nb_order: 2
+      f0: 0.0
+      add_species: T
+      cutoff: 5.0
+      n_sparse: 15
+      covariance_type: ard_se
+      delta: 2.0
+      theta_uniform: 0.5
+      sparse_method: uniform
+      compact_clusters: T
+    threeb:
+      distance_Nb_order: 3
+      f0: 0.0
+      add_species: T
+      cutoff: 3.25
+      n_sparse: 100
+      covariance_type: ard_se
+      delta: 2.0
+      theta_uniform: 1.0
+      sparse_method: uniform
+      compact_clusters: T
+    soap:
+      add_species: T
+      l_max: 10
+      n_max: 12
+      atom_sigma: 0.5
+      zeta: 4
+      cutoff: 5.0
+      cutoff_transition_width: 1.0
+      central_weight: 1.0
+      n_sparse: 6000
+      delta: 1.0
+      f0: 0.0
+      covariance_type: dot_product
+      sparse_method: cur_points
 ```
 
 ## RSS Exploration Parameters

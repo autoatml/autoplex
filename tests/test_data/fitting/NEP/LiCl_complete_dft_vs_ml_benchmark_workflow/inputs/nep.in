@@ -1,0 +1,19 @@
+version  4
+type  2 Cl Li
+type_weight  1.0 1.0
+model_type   0
+prediction  0
+cutoff  6 5
+n_max  4 4
+basis_size  8 8
+l_max  4 2 1
+neuron   80
+lambda_1  0
+lambda_e  1.0
+lambda_f  1.0
+lambda_v  0.1
+force_delta  0
+batch  1
+population  60
+generation  1000
+zbl  2

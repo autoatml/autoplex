@@ -240,3 +240,128 @@ inconsistent because of this, can be fixed be force-rerunning the respective job
 1. Check slurm.py for finding different available options you can set for resources dict [here](https://github.com/Matgenix/qtoolkit/tree/develop/src/qtoolkit/io)
 2. More details on project config and settings can be found [here](https://matgenix.github.io/jobflow-remote/user/projectconf.html)
 3. Details on different setup options [here](https://matgenix.github.io/jobflow-remote/user/install.html)
+
+# Download (all) the data of a flow from your remote cluster
+
+Once, your workflows have finished, you can download the data you need for further analysis.
+You can first check the jobs of your workflow via jobflow-remote as `jf flow info db_id/flow_id` 
+to check the names of the jobs whose data you want to retrieve, like e.g.:
+```bash
+jf flow info 12345
+The selected project is autoplex from config file /home/user/.jfremote/auto.yaml
+                             Flow: LiCl - f45374e9-f095-4c8a-a0e5-be3e50e15e21 - COMPLETED                             
+┏━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┓
+┃ DB id ┃ Name                                         ┃ State     ┃ Job id  (Index)                           ┃ Worker      ┃
+┡━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━┩
+│ 43076 │ run_phonon_displacements_mp-22905            │ COMPLETED │ 0074c8d0-ce6a-49fd-a2a8-ffd00c14982e  (1) │ auto_worker │
+│ 43126 │ store_inputs_mp-22905                        │ COMPLETED │ 0074c8d0-ce6a-49fd-a2a8-ffd00c14982e  (2) │ auto_worker │
+│ 43106 │ gap phonon static 1/20_mp-22905              │ COMPLETED │ 025a49ba-a45d-493f-8761-021f506da5c4  (1) │ auto_worker │
+│ 43020 │ tight relax 1_mp-22905                       │ COMPLETED │ 07f2f80d-df47-4cf1-b4e8-0d5e00f1a74e  (1) │ auto_worker │
+│ 43070 │ run_phonon_displacements_mp-22905            │ COMPLETED │ 083c4c17-d1cd-4ef7-b1bc-8c6be8305f0f  (1) │ auto_worker │
+│ 43069 │ generate_phonon_displacements_mp-22905       │ COMPLETED │ 0b6bffe3-10a8-47b4-b15d-c948337c0dae  (1) │ auto_worker │
+│ 43017 │ generate_randomized_structures_mp-22905      │ COMPLETED │ 198b30d8-470c-4357-893e-a6ce98dcea3f  (1) │ auto_worker │
+│ 43047 │ dft phonon static 9/20_mp-22905              │ COMPLETED │ 20bdb7b3-875f-45cb-91a3-dbe11dfa5100  (1) │ auto_worker │
+│ 43036 │ dft rattle static 10/11_mp-22905             │ COMPLETED │ 24d92e7b-4aff-4f7a-9883-4f2b31d3f09c  (1) │ auto_worker │
+│ 43077 │ generate_frequencies_eigenvectors_mp-22905   │ COMPLETED │ 2829ea98-220b-4bdb-9c2f-11c19d95557d  (1) │ auto_worker │
+│ 43008 │ single-atom displaced supercells_mp-22905    │ COMPLETED │ 337cf0ee-c003-4b0f-a988-01b903c416ca  (1) │ auto_worker │
+│ 43062 │ Benchmark_mp-22905                           │ COMPLETED │ 3d456713-a88e-4b19-a9c4-970413631078  (1) │ auto_worker │
+│ 43010 │ machine_learning_fit                         │ COMPLETED │ 72665b79-bcdf-4455-a330-b2b5bca76b30  (1) │ auto_worker │
+│ 43011 │ complete_benchmark_mp-22905                  │ COMPLETED │ d4c6c8fb-b8b0-41ee-a794-d13f1cc874ef  (1) │ auto_worker │
+│ 43005 │ reduce_supercell_size_job                    │ COMPLETED │ f87e9be8-94f5-46a4-a7a8-d6ba2f4b0577  (1) │ auto_worker │
+│ ..... │ ...                                          │ COMPLETED │ ...                                   (1) │ auto_worker │
+│ ..... │ ...                                          │ COMPLETED │ ...                                   (1) │ auto_worker │
+│ 43084 │ store_inputs_mp-22905                        │ COMPLETED │ faf20068-67bc-426b-aa11-e9f2c9e11ea7  (2) │ auto_worker │
+└───────┴──────────────────────────────────────────────┴───────────┴───────────────────────────────────────────┴─────────────┘
+```
+Depending on the data you need, you can then use the job names in the following scripts for filtering.
+
+You can download your data in one batch from your remote cluster using this script:
+```python
+import os
+import subprocess
+from jobflow_remote.jobs.jobcontroller import JobController
+
+jc = JobController.from_project_name(project_name='project-name') # initialize a job controller
+
+flow_query = jc.get_flows_info(flow_ids="the-flow-id")  # make sure to use the long flow_id and not the db_id
+job_docs = jc.get_jobs_doc(db_ids=flow_query[0].db_ids)
+os.chdir("/your/desired/destination/directory")
+user = "your remote cluster user name"
+remote_tmp_dir = f"/home/path/to/{user}/tmp_folder"
+
+try:
+    subprocess.run(["ssh", f"{user}@remote_cluster", f"mkdir -p {remote_tmp_dir}"], check=True)
+    print(f"Created temporary folder on remote cluster: {remote_tmp_dir}")
+except subprocess.CalledProcessError as e:
+    print(f"Failed to create temporary folder on remote cluster: {e}")
+    exit(1)
+
+for i in job_docs:
+    base_dir_name = i.job.name.replace(' ', '_').replace('/', '_')
+    dir_name = base_dir_name
+    counter = 1
+
+    while os.path.exists(dir_name):
+        dir_name = f"{base_dir_name}_{counter}"
+        counter += 1
+
+    # filter out the data you don't need
+    if 'displacements' not in base_dir_name and 'store_inputs' not in base_dir_name and 'reduce_supercell_size' not in base_dir_name and 'relax' not in base_dir_name:
+        remote_target_dir = f"{remote_tmp_dir}/{dir_name}"
+
+        remote_dir = f"{i.run_dir}/*"
+        scp_to_tmp_command = ["ssh", f"{user}@remote_cluster", f"mkdir -p {remote_target_dir} && cp -r {remote_dir} {remote_target_dir}"]
+        try:
+            subprocess.run(scp_to_tmp_command, check=True)
+            print(f"Copied files from {remote_dir} to {remote_target_dir} on the remote cluster")
+        except subprocess.CalledProcessError as e:
+            print(f"Failed to copy files to remote temporary folder: {e}")
+
+try:
+    scp_final_command = ["scp", "-r", f"{user}@remote_cluster:{remote_tmp_dir}", "."]
+    subprocess.run(scp_final_command, check=True)
+    print(f"Copied {remote_tmp_dir} to the local machine")
+except subprocess.CalledProcessError as e:
+    print(f"Failed to copy the temporary folder to the local machine: {e}")
+
+try:
+    subprocess.run(["ssh", f"{user}@remote_cluster", f"rm -rf {remote_tmp_dir}"], check=True)
+    print(f"Cleaned up temporary folder on remote cluster: {remote_tmp_dir}")
+except subprocess.CalledProcessError as e:
+    print(f"Failed to clean up temporary folder on remote cluster: {e}")
+```
+
+Alternatively, you can use this script to download the data of a whole flow:
+
+```python
+import os
+import subprocess
+from jobflow_remote.jobs.jobcontroller import JobController
+
+jc = JobController.from_project_name(project_name='project-name') # initialize a job controller
+
+flow_query = jc.get_flows_info(flow_ids="the-flow-id")  # make sure to use the long flow_id and not the db_id
+job_docs = jc.get_jobs_doc(db_ids=flow_query[0].db_ids)
+os.chdir("/your/desired/destination/directory")
+user = "your remote cluster user name"
+
+for i in job_docs:
+    dir_name = i.job.name.replace(' ', '_').replace('/', '_')
+    # filter out the data you don't need
+    if 'displacements' not in dir_name and 'store_inputs' not in dir_name and 'reduce_supercell_size' not in dir_name and 'relax' not in dir_name:
+        base_dir_name = dir_name
+        counter = 1
+
+        while os.path.exists(dir_name):
+            dir_name = f"{base_dir_name}_{counter}"
+            counter += 1
+
+        os.mkdir(dir_name)
+        remote_dir = f"{user}@remote_cluster:{i.run_dir}/*"
+        scp_command = ["scp", "-r", remote_dir, dir_name]
+        try:
+            subprocess.run(scp_command, check=True)
+            print(f"Copied files from {remote_dir} to {dir_name}")
+        except subprocess.CalledProcessError as e:
+            print(f"Failed to copy files from {remote_dir}: {e}")
+```

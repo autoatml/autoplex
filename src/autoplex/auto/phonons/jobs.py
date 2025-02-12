@@ -294,6 +294,8 @@ def complete_benchmark(  # this function was put here to prevent circular import
                 path
             )  # M3GNet requires path and fit already returns the path
             # also need to find a different solution for separated fit then (name to path could be modified)
+        elif ml_model in ["NEP"]:
+            ml_potential = Path(path) / "nep.txt"
         elif ml_model in ["NEQUIP"]:
             ml_potential = Path(path) / "deployed_nequip_model.pth"
         else:  # MACE
@@ -362,7 +364,7 @@ def complete_benchmark(  # this function was put here to prevent circular import
                 and benchmark_mp_ids is not None
             ):
                 add_data_bm = PhononBenchmarkMaker(name="Benchmark").make(
-                    # this is important for re-using the same internally calculated DFT reference
+                    # this is important for reusing the same internally calculated DFT reference
                     # for looping through several settings
                     ml_model=ml_model,
                     structure=benchmark_structure,

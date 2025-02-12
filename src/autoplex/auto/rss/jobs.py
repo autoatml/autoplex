@@ -1,6 +1,7 @@
 """RSS Jobs include the generation of the initial potential model as well as iterative RSS exploration."""
 
 import logging
+from typing import Literal
 
 from jobflow import Flow, Response, job
 
@@ -54,7 +55,7 @@ def initial_rss(
     force_max: float | None = None,
     force_label: str = "REF_forces",
     pre_database_dir: str | None = None,
-    mlip_type: str = "GAP",
+    mlip_type: Literal["GAP", "J-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"] = "GAP",
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",
@@ -137,9 +138,8 @@ def initial_rss(
         The label of force values to use for distillation. Default is 'REF_forces'.
     pre_database_dir: str | None
         Directory where the previous database was saved. Default is None.
-    mlip_type: str
-        Choose one specific MLIP type to be fitted: 'GAP' | 'J-ACE' | 'NEQUIP' | 'M3GNET' | 'MACE'.
-        Default is 'GAP'.
+    mlip_type: Literal["GAP", "J-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"]
+        Choose one specific MLIP type to be fitted. Default is 'GAP'.
     ref_energy_name: str
         Reference energy name. Default is 'REF_energy'.
     ref_force_name: str
@@ -162,7 +162,7 @@ def initial_rss(
 
         - 'test_error': float, The test error of the fitted MLIP.
         - 'pre_database_dir': str, The directory of the preprocessed database.
-        - 'mlip_path': str, The path to the fitted MLIP.
+        - 'mlip_path': List of path to the fitted MLIP.
         - 'isolated_atom_energies': dict, The isolated energy values.
         - 'current_iter': int, The current iteration index, set to 0.
     """
@@ -170,6 +170,8 @@ def initial_rss(
         isolatedatom_box = [20.0, 20.0, 20.0]
     if dimer_box is None:
         dimer_box = [20.0, 20.0, 20.0]
+
+    print(buildcell_options)
 
     do_randomized_structure_generation = BuildMultiRandomizedStructure(
         generated_struct_numbers=generated_struct_numbers,
@@ -222,8 +224,8 @@ def initial_rss(
         auto_delta=auto_delta,
         glue_xml=False,
     ).make(
-        database_dir=do_data_preprocessing.output,
         isolated_atom_energies=do_data_collection.output["isolated_atom_energies"],
+        database_dir=do_data_preprocessing.output,
         device=device_for_fitting,
         **fit_kwargs,
     )
@@ -236,14 +238,12 @@ def initial_rss(
         do_mlip_fit,
     ]
 
-    mlip_path = do_mlip_fit.output["mlip_path"]
-
     return Response(
         replace=Flow(job_list),
         output={
             "test_error": do_mlip_fit.output["test_error"],
             "pre_database_dir": do_data_preprocessing.output,
-            "mlip_path": mlip_path,
+            "mlip_path": do_mlip_fit.output["mlip_path"],
             "isolated_atom_energies": do_data_collection.output[
                 "isolated_atom_energies"
             ],
@@ -286,7 +286,7 @@ def do_rss_iterations(
     distillation: bool = True,
     force_max: float = 200,
     force_label: str = "REF_forces",
-    mlip_type: str = "GAP",
+    mlip_type: Literal["GAP", "J-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"] = "GAP",
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",
@@ -330,8 +330,8 @@ def do_rss_iterations(
                 The test error of the fitted MLIP.
             pre_database_dir: str
                 The directory of the preprocessed database.
-            mlip_path: str
-                The path to the fitted MLIP.
+            mlip_path: list[str]
+                List of path to the fitted MLIP.
             isolated_atom_energies: dict
                 The isolated energy values.
             current_iter: int
@@ -409,8 +409,8 @@ def do_rss_iterations(
         Maximum force value to exclude structures. Default is 200.
     force_label: str
         The label of force values to use for distillation. Default is 'REF_forces'.
-    mlip_type: str
-        Choose one specific MLIP type: 'GAP' | 'J-ACE' | 'NequIP' | 'M3GNet' | 'MACE'. Default is 'GAP'.
+    mlip_type: Literal["GAP", "J-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"]
+        Choose one specific MLIP type to be fitted. Default is 'GAP'.
     ref_energy_name: str
         Reference energy name. Default is 'REF_energy'.
     ref_force_name: str
@@ -471,7 +471,7 @@ def do_rss_iterations(
 
         - 'test_error': float, The test error of the fitted MLIP.
         - 'pre_database_dir': str, The directory of the preprocessed database.
-        - 'mlip_path': str, The path to the fitted MLIP.
+        - 'mlip_path': List of path to the fitted MLIP.
         - 'isolated_atom_energies': dict, The isolated energy values.
         - 'current_iter': int, The current iteration index.
         - 'kt': float, The temperature (in eV) for Boltzmann sampling.
@@ -603,13 +603,11 @@ def do_rss_iterations(
         if include_dimer:
             include_dimer = False
 
-        (mlip_path,) = do_mlip_fit.output["mlip_path"]
-
         do_iteration = do_rss_iterations(
             input={
                 "test_error": do_mlip_fit.output["test_error"],
                 "pre_database_dir": do_data_preprocessing.output,
-                "mlip_path": mlip_path,
+                "mlip_path": do_mlip_fit.output["mlip_path"],
                 "isolated_atom_energies": input["isolated_atom_energies"],
                 "current_iter": current_iter,
                 "kt": kt,

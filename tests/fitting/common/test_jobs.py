@@ -1,6 +1,9 @@
+import pytest
 from autoplex.fitting.common.flows import MLIPFitMaker
 from pathlib import Path
 from jobflow import run_locally
+
+from tests.auto.phonons.test_jobs import fake_run_vasp_kwargs
 
 
 def test_gap_fit_maker(test_dir, memory_jobstore, clean_dir):
@@ -11,13 +14,13 @@ def test_gap_fit_maker(test_dir, memory_jobstore, clean_dir):
         auto_delta=False,
         glue_xml=False,
         apply_data_preprocessing=False,
-        database_dir=database_dir
     ).make(
         twob={"delta": 2.0, "cutoff": 4},
         threeb={"n_sparse": 10},
+        database_dir=database_dir
         )
 
-    responses = run_locally(
+    _ = run_locally(
         gapfit, ensure_success=True, create_folders=True, store=memory_jobstore
     )
 
@@ -32,14 +35,14 @@ def test_jace_fit_maker(test_dir, memory_jobstore, clean_dir):
         mlip_type="J-ACE",
         num_processes_fit=4,
         apply_data_preprocessing=False,
-        database_dir=database_dir,
     ).make(
+        database_dir=database_dir,
         isolated_atom_energies={14: -0.84696938},
         order=2,
         totaldegree=4,
     )
 
-    responses = run_locally(
+    _ = run_locally(
         jacefit, ensure_success=True, create_folders=True, store=memory_jobstore
     )
 
@@ -53,15 +56,15 @@ def test_nequip_fit_maker(test_dir, memory_jobstore, clean_dir):
         mlip_type="NEQUIP",
         num_processes_fit=1,
         apply_data_preprocessing=False,
-        database_dir=database_dir,
     ).make(
+        database_dir=database_dir,
         isolated_atom_energies={14: -0.84696938},
         r_max=3.14,
         max_epochs=10,
         device="cpu",
     )
 
-    responses = run_locally(
+    _ = run_locally(
         nequipfit, ensure_success=True, create_folders=True, store=memory_jobstore
     )
 
@@ -71,31 +74,32 @@ def test_nequip_fit_maker(test_dir, memory_jobstore, clean_dir):
 def test_m3gnet_fit_maker(test_dir, memory_jobstore, clean_dir):
     database_dir = test_dir / "fitting/rss_training_dataset/"
 
-    nequipfit = MLIPFitMaker(
+    m3gnetfit = MLIPFitMaker(
         mlip_type="M3GNET",
         num_processes_fit=1,
         apply_data_preprocessing=False,
-        database_dir=database_dir,
     ).make(
+        database_dir=database_dir,
         isolated_atom_energies={14: -0.84696938},
         cutoff=3.0,
         threebody_cutoff=2.0,
         batch_size=1,
         max_epochs=3,
         include_stresses=True,
-        hidden_dim=8,
-        num_units=8,
+        dim_node_embedding=8,
+        dim_edge_embedding=8,
+        units=8,
         max_l=4,
         max_n=4,
         device="cpu",
         test_equal_to_val=True,
     )
 
-    responses = run_locally(
-        nequipfit, ensure_success=True, create_folders=True, store=memory_jobstore
+    _ = run_locally(
+        m3gnetfit, ensure_success=True, create_folders=True, store=memory_jobstore
     )
 
-    assert Path(nequipfit.output["mlip_path"][0].resolve(memory_jobstore)).exists()
+    assert Path(m3gnetfit.output["mlip_path"][0].resolve(memory_jobstore)).exists()
 
 
 def test_mace_fit_maker(test_dir, memory_jobstore, clean_dir):
@@ -105,8 +109,8 @@ def test_mace_fit_maker(test_dir, memory_jobstore, clean_dir):
         mlip_type="MACE",
         num_processes_fit=1,
         apply_data_preprocessing=False,
-        database_dir=database_dir,
     ).make(
+        database_dir=database_dir,
         isolated_atom_energies={14: -0.84696938},
         model="MACE",
         config_type_weights='{"Default":1.0}',
@@ -122,7 +126,7 @@ def test_mace_fit_maker(test_dir, memory_jobstore, clean_dir):
         device="cpu",
     )
 
-    responses = run_locally(
+    _ = run_locally(
         macefit, ensure_success=True, create_folders=True, store=memory_jobstore
     )
 
@@ -137,11 +141,10 @@ def test_mace_finetuning_maker(test_dir, memory_jobstore, clean_dir):
         ref_energy_name=None,
         ref_force_name=None,
         ref_virial_name=None,
-        use_defaults=False,
         num_processes_fit=1,
         apply_data_preprocessing=False,
-        database_dir=database_dir,
     ).make(
+        database_dir=database_dir,
         name="MACE_final",
         foundation_model="small",
         multiheads_finetuning=False,
@@ -167,7 +170,7 @@ def test_mace_finetuning_maker(test_dir, memory_jobstore, clean_dir):
         seed = 3,
     )
 
-    responses = run_locally(
+    _ = run_locally(
         macefit, ensure_success=True, create_folders=True, store=memory_jobstore
     )
 
@@ -182,11 +185,10 @@ def test_mace_finetuning_maker2(test_dir, memory_jobstore, clean_dir):
         ref_energy_name=None,
         ref_force_name=None,
         ref_virial_name=None,
-        use_defaults=False,
         num_processes_fit=1,
         apply_data_preprocessing=False,
-        database_dir=database_dir,
     ).make(
+        database_dir=database_dir,
         name="MACE_final",
         foundation_model="small",
         multiheads_finetuning=False,
@@ -212,7 +214,7 @@ def test_mace_finetuning_maker2(test_dir, memory_jobstore, clean_dir):
         seed = 3,
     )
 
-    responses = run_locally(
+    _ = run_locally(
         macefit, ensure_success=True, create_folders=True, store=memory_jobstore
     )
 

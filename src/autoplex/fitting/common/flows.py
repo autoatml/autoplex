@@ -5,10 +5,12 @@ import os
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Literal
 
 import ase.io
 from jobflow import Flow, Maker, job
 
+from autoplex import MLIP_HYPERS
 from autoplex.fitting.common.jobs import machine_learning_fit
 from autoplex.fitting.common.regularization import set_custom_sigma
 from autoplex.fitting.common.utils import (
@@ -39,9 +41,8 @@ class MLIPFitMaker(Maker):
     ----------
     name : str
         Name of the flows produced by this maker.
-    mlip_type: str
-        Choose one specific MLIP type to be fitted:
-        'GAP' | 'J-ACE' | 'NEQUIP' | 'M3GNET' | 'MACE'
+    mlip_type: Literal["GAP", "J-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"]
+        Choose one specific MLIP type to be fitted.
     hyperpara_opt: bool
         Perform hyperparameter optimization using XPOT
         (XPOT: https://pubs.aip.org/aip/jcp/article/159/2/024803/2901815)
@@ -70,8 +71,6 @@ class MLIPFitMaker(Maker):
         Names of the pre-database train xyz file and test xyz file.
     pre_database_dir: str or None
         The pre-database directory.
-    path_to_hyperparameters : str or Path.
-        Path to JSON file containing the MLIP hyperparameters.
     atomwise_regularization_parameter: float
         Regularization value for the atom-wise force components.
     atom_wise_regularization: bool
@@ -84,14 +83,12 @@ class MLIPFitMaker(Maker):
         Number of processes for fitting.
     apply_data_preprocessing: bool
         Determine whether to preprocess the data.
-    use_defaults: bool
-        If true, uses default fit parameters
     run_fits_on_different_cluster: bool
         If true, run fits on different clusters.
     """
 
     name: str = "MLpotentialFit"
-    mlip_type: str = "GAP"
+    mlip_type: Literal["GAP", "J-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"] = "GAP"
     hyperpara_opt: bool = False
     ref_energy_name: str = "REF_energy"
     ref_force_name: str = "REF_forces"
@@ -104,7 +101,6 @@ class MLIPFitMaker(Maker):
     separated: bool = False
     pre_xyz_files: list[str] | None = None
     pre_database_dir: str | None = None
-    path_to_hyperparameters: Path | str | None = None
     regularization: bool = False  # This is only used for GAP.
     atomwise_regularization_parameter: float = 0.1  # This is only used for GAP.
     atom_wise_regularization: bool = True  # This is only used for GAP.
@@ -112,13 +108,13 @@ class MLIPFitMaker(Maker):
     glue_xml: bool = False  # This is only used for GAP.
     num_processes_fit: int | None = None
     apply_data_preprocessing: bool = True
-    use_defaults: bool = True
     run_fits_on_different_cluster: bool = False
 
     def make(
         self,
         database_dir: Path | str | None = None,
         fit_input: dict | None = None,  # This is specific to phonon workflow
+        hyperparameters: MLIP_HYPERS = MLIP_HYPERS,
         species_list: list | None = None,
         isolated_atom_energies: dict | None = None,
         device: str = "cpu",
@@ -133,6 +129,10 @@ class MLIPFitMaker(Maker):
             Path to the directory containing the database.
         fit_input: dict
             Output from the CompletePhononDFTMLDataGenerationFlow process.
+        database_dir: Path | str
+            Path to the directory containing the database.
+        hyperparameters: MLIP_HYPERS
+            Hyperparameters for the MLIP.
         species_list: list
             List of element names (strings) involved in the training dataset
         isolated_atom_energies: dict
@@ -142,10 +142,10 @@ class MLIPFitMaker(Maker):
         fit_kwargs: dict
             Additional keyword arguments for MLIP fitting.
         """
-        if self.mlip_type not in ["GAP", "J-ACE", "NEQUIP", "M3GNET", "MACE"]:
+        if self.mlip_type not in ["GAP", "J-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"]:
             raise ValueError(
                 "Please correct the MLIP name!"
-                "The current version ONLY supports the following models: GAP, J-ACE, NEQUIP, M3GNET, and MACE."
+                "The current version ONLY supports the following models: GAP, J-ACE, NEP, NEQUIP, M3GNET, and MACE."
             )
 
         if self.apply_data_preprocessing:
@@ -159,6 +159,9 @@ class MLIPFitMaker(Maker):
                 pre_xyz_files=self.pre_xyz_files,
                 pre_database_dir=self.pre_database_dir,
                 force_min=self.force_min,
+                ref_virial_name=self.ref_virial_name,
+                ref_force_name=self.ref_force_name,
+                ref_energy_name=self.ref_energy_name,
                 atomwise_regularization_parameter=self.atomwise_regularization_parameter,
                 atom_wise_regularization=self.atom_wise_regularization,
                 run_fits_on_different_cluster=self.run_fits_on_different_cluster,
@@ -177,10 +180,10 @@ class MLIPFitMaker(Maker):
                 glue_file_path=self.glue_file_path,
                 mlip_type=self.mlip_type,
                 hyperpara_opt=self.hyperpara_opt,
+                hyperparameters=hyperparameters,
                 ref_energy_name=self.ref_energy_name,
                 ref_force_name=self.ref_force_name,
                 ref_virial_name=self.ref_virial_name,
-                use_defaults=self.use_defaults,
                 device=device,
                 species_list=species_list,
                 database_dict=data_prep_job.output["database_dict"],
@@ -211,6 +214,7 @@ class MLIPFitMaker(Maker):
             glue_file_path=self.glue_file_path,
             mlip_type=self.mlip_type,
             hyperpara_opt=self.hyperpara_opt,
+            hyperparameters=hyperparameters,
             ref_energy_name=self.ref_energy_name,
             ref_force_name=self.ref_force_name,
             ref_virial_name=self.ref_virial_name,
@@ -248,6 +252,12 @@ class DataPreprocessing(Maker):
         Repeat the fit for each data_type available in the (combined) database.
     distillation: bool
         For using data distillation.
+    ref_energy_name : str
+        Reference energy name in xyz file.
+    ref_force_name : str
+        Reference force name in xyz file.
+    ref_virial_name : str
+        Reference virial name in xyz file.
     force_max: float
         Maximally allowed force in the data set.
     force_min: float
@@ -260,6 +270,10 @@ class DataPreprocessing(Maker):
         Regularization value for the atom-wise force components.
     atom_wise_regularization: bool
         If True, includes atom-wise regularization.
+    train_data_file: str
+        Name of the training xyz data file.
+    test_data_file: str
+        Name of the test xyz data file.
     run_fits_on_different_cluster: bool
         If True, will copy the fitting database to the MongoDB
 
@@ -270,12 +284,17 @@ class DataPreprocessing(Maker):
     regularization: bool = False
     separated: bool = False
     distillation: bool = False
+    ref_energy_name: str = "REF_energy"
+    ref_force_name: str = "REF_forces"
+    ref_virial_name: str = "REF_virial"
     force_max: float = 40.0
     force_min: float = 0.01  # unit: eV Å-1
     pre_database_dir: str | None = None
     pre_xyz_files: list[str] | None = None
     atomwise_regularization_parameter: float = 0.1
     atom_wise_regularization: bool = True
+    train_data_file: str = "train.extxyz"
+    test_data_file: str = "test.extxyz"
     run_fits_on_different_cluster: bool = False
 
     @job(data=["database_dict"])
@@ -360,10 +379,19 @@ class DataPreprocessing(Maker):
             f_min=self.force_min,
             regularization=self.atomwise_regularization_parameter,
             atom_wise_regularization=self.atom_wise_regularization,
+            ref_force_name=self.ref_force_name,
+            ref_energy_name=self.ref_energy_name,
+            ref_virial_name=self.ref_virial_name,
         )
 
         write_after_distillation_data_split(
-            self.distillation, self.force_max, self.split_ratio
+            distillation=self.distillation,
+            force_max=self.force_max,
+            split_ratio=self.split_ratio,
+            force_label=self.ref_force_name,
+            energy_label=self.ref_energy_name,
+            train_name=self.train_data_file,
+            test_name=self.test_data_file,
         )
 
         # Merging database
@@ -376,13 +404,13 @@ class DataPreprocessing(Maker):
                 logging.info(f"Created/verified folder: {folder_name}")
             except Exception as e:
                 logging.warning(f"Error creating folder {folder_name}: {e}")
-            train_path = os.path.join(folder_name, "train.extxyz")
-            test_path = os.path.join(folder_name, "test.extxyz")
-            atoms = ase.io.read("train.extxyz", index=":")
+            train_path = os.path.join(folder_name, self.train_data_file)
+            test_path = os.path.join(folder_name, self.test_data_file)
+            atoms = ase.io.read(self.train_data_file, index=":")
             ase.io.write(train_path, atoms, format="extxyz")
             logging.info(f"Written train file without regularization to: {train_path}")
             try:
-                shutil.copy("test.extxyz", test_path)
+                shutil.copy(self.test_data_file, test_path)
                 logging.info(f"Copied test file to: {test_path}")
             except FileNotFoundError:
                 logging.warning("test.extxyz not found. Skipping copy.")
@@ -392,11 +420,11 @@ class DataPreprocessing(Maker):
                 atoms,
                 reg_minmax=[(0.1, 1), (0.001, 0.1), (0.0316, 0.316), (0.0632, 0.632)],
             )
-            ase.io.write("train.extxyz", atoms_with_sigma, format="extxyz")
+            ase.io.write(self.train_data_file, atoms_with_sigma, format="extxyz")
         if self.separated:
             base_dir = os.getcwd()
-            atoms_train = ase.io.read("train.extxyz", index=":")
-            atoms_test = ase.io.read("test.extxyz", index=":")
+            atoms_train = ase.io.read(self.train_data_file, index=":")
+            atoms_test = ase.io.read(self.test_data_file, index=":")
             for dt in set(data_types):
                 data_type = dt.removesuffix("_dir")
                 if data_type != "iso_atoms":
@@ -411,8 +439,8 @@ class DataPreprocessing(Maker):
                         )
                         continue
                     vasp_ref_path = os.path.join(folder_name, "vasp_ref.extxyz")
-                    train_path = os.path.join(folder_name, "train.extxyz")
-                    test_path = os.path.join(folder_name, "test.extxyz")
+                    train_path = os.path.join(folder_name, self.train_data_file)
+                    test_path = os.path.join(folder_name, self.test_data_file)
 
                     for atoms in atoms_train + atoms_test:
                         if atoms.info["data_type"] == "iso_atoms":
@@ -437,6 +465,7 @@ class DataPreprocessing(Maker):
                             vasp_ref_name=vasp_ref_path,
                             train_name=train_path,
                             test_name=test_path,
+                            force_label=self.ref_force_name,
                         )
                         logging.info(f"Data split written: {train_path}, {test_path}")
                     except Exception as e:

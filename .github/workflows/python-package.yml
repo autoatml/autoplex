@@ -34,6 +34,9 @@ jobs:
         echo "VERSION=$TAG" >> $GITHUB_ENV
 
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch the entire Git history
+        
     - name: Run tests using Docker image for Python ${{ matrix.python-version }}
       run: |
         docker pull ghcr.io/autoatml/autoplex/autoplex-python-${{ matrix.python-version }}:${{ env.VERSION }}
@@ -111,6 +114,8 @@ jobs:
         title: Update test durations file
         body: Auto update test durations file
         branch: update-test-durations
+        labels: |
+            automated-pr
         delete-branch: true
         base: main
 

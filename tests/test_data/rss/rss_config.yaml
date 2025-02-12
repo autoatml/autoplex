@@ -1,5 +1,5 @@
 # General Parameters
-tag:
+tag: "test"
 train_from_scratch: true
 resume_from_previous_state:
   test_error:
@@ -9,12 +9,12 @@ resume_from_previous_state:
 
 # Buildcell Parameters
 generated_struct_numbers:
-  - 8000
-  - 2000
+  - 9000
+  - 1000
 buildcell_options:
 fragment_file: null
 fragment_numbers: null
-num_processes_buildcell: 128
+num_processes_buildcell: 64
 
 # Sampling Parameters
 num_of_initial_selected_structs:
@@ -40,15 +40,15 @@ random_seed: null
 # DFT Labelling Parameters
 include_isolated_atom: true
 isolatedatom_box:
-  - 20.0
-  - 20.0
-  - 20.0
+  - 10.0
+  - 10.0
+  - 10.0
 e0_spin: false
 include_dimer: true
 dimer_box:
-  - 20.0
-  - 20.0
-  - 20.0
+  - 10.0
+  - 10.0
+  - 10.0
 dimer_range:
   - 1.0
   - 5.0
@@ -102,7 +102,7 @@ ref_energy_name: 'REF_energy'
 ref_force_name: 'REF_forces'
 ref_virial_name: 'REF_virial'
 auto_delta: true
-num_processes_fit: 32
+num_processes_fit: 64
 device_for_fitting: 'cpu'
 ##The following hyperparameters are only applicable to GAP.
 ##If you want to use other models, please replace the corresponding hyperparameters.
@@ -140,4 +140,4 @@ hookean_paras:
 keep_symmetry: false
 write_traj: true
 num_processes_rss: 128
-device_for_rss: 'cpu'
+device_for_rss: 'cuda'

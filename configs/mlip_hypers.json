@@ -1,0 +1,306 @@
+{
+  "GAP": {
+    "general": {
+      "at_file": "train.extxyz",
+      "default_sigma": "{0.0001 0.05 0.05 0}",
+      "energy_parameter_name": "REF_energy",
+      "force_parameter_name": "REF_forces",
+      "virial_parameter_name": "REF_virial",
+      "sparse_jitter": 1e-08,
+      "do_copy_at_file": "F",
+      "openmp_chunk_size": 10000,
+      "gp_file": "gap_file.xml",
+      "e0_offset": 0.0,
+      "two_body": false,
+      "three_body": false,
+      "soap": true
+    },
+    "twob": {
+      "distance_Nb order": 2,
+      "f0": 0.0,
+      "add_species": "T",
+      "cutoff": 5.0,
+      "n_sparse": 15,
+      "covariance_type": "ard_se",
+      "delta": 2.0,
+      "theta_uniform": 0.5,
+      "sparse_method": "uniform",
+      "compact_clusters": "T"
+    },
+    "threeb": {
+      "distance_Nb order": 3,
+      "f0": 0.0,
+      "add_species": "T",
+      "cutoff": 3.25,
+      "n_sparse": 100,
+      "covariance_type": "ard_se",
+      "delta": 2.0,
+      "theta_uniform": 1.0,
+      "sparse_method": "uniform",
+      "compact_clusters": "T"
+    },
+    "soap": {
+      "add_species": "T",
+      "l_max": 10,
+      "n_max": 12,
+      "atom_sigma": 0.5,
+      "zeta": 4,
+      "cutoff": 5.0,
+      "cutoff_transition_width": 1.0,
+      "central_weight": 1.0,
+      "n_sparse": 6000,
+      "delta": 1.0,
+      "f0": 0.0,
+      "covariance_type": "dot_product",
+      "sparse_method": "cur_points"
+    }
+  },
+  "J-ACE": {
+    "order": 3,
+    "totaldegree": 6,
+    "cutoff": 2.0,
+    "solver": "BLR"
+  },
+  "NEQUIP": {
+    "root": "results",
+    "run_name": "autoplex",
+    "seed": 123,
+    "dataset_seed": 123,
+    "append": false,
+    "default_dtype": "float64",
+    "model_dtype": "float64",
+    "allow_tf32": true,
+    "r_max": 4.0,
+    "num_layers": 4,
+    "l_max": 2,
+    "parity": true,
+    "num_features": 32,
+    "nonlinearity_type": "gate",
+    "nonlinearity_scalars": {
+      "e": "silu",
+      "o": "tanh"
+    },
+    "nonlinearity_gates": {
+      "e": "silu",
+      "o": "tanh"
+    },
+    "num_basis": 8,
+    "BesselBasis_trainable": true,
+    "PolynomialCutoff_p": 5,
+    "invariant_layers": 2,
+    "invariant_neurons": 64,
+    "avg_num_neighbors": "auto",
+    "use_sc": true,
+    "dataset": "ase",
+    "validation_dataset": "ase",
+    "dataset_file_name": "./train_nequip.extxyz",
+    "validation_dataset_file_name": "./test.extxyz",
+    "ase_args": {
+      "format": "extxyz"
+    },
+    "dataset_key_mapping": {
+      "forces": "forces",
+      "energy": "total_energy"
+    },
+    "validation_dataset_key_mapping": {
+      "forces": "forces",
+      "energy": "total_energy"
+    },
+    "chemical_symbols": [],
+    "wandb": false,
+    "verbose": "info",
+    "log_batch_freq": 10,
+    "log_epoch_freq": 1,
+    "save_checkpoint_freq": -1,
+    "save_ema_checkpoint_freq": -1,
+    "n_train": 1000,
+    "n_val": 1000,
+    "learning_rate": 0.005,
+    "batch_size": 5,
+    "validation_batch_size": 10,
+    "max_epochs": 10000,
+    "shuffle": true,
+    "metrics_key": "validation_loss",
+    "use_ema": true,
+    "ema_decay": 0.99,
+    "ema_use_num_updates": true,
+    "report_init_validation": true,
+    "early_stopping_patiences": {
+      "validation_loss": 50
+    },
+    "early_stopping_lower_bounds": {
+      "LR": 1e-05
+    },
+    "loss_coeffs": {
+      "forces": 1,
+      "total_energy": [
+        1,
+        "PerAtomMSELoss"
+      ]
+    },
+    "metrics_components": [
+      [
+        "forces",
+        "mae"
+      ],
+      [
+        "forces",
+        "rmse"
+      ],
+      [
+        "forces",
+        "mae",
+        {
+          "PerSpecies": true,
+          "report_per_component": false
+        }
+      ],
+      [
+        "forces",
+        "rmse",
+        {
+          "PerSpecies": true,
+          "report_per_component": false
+        }
+      ],
+      [
+        "total_energy",
+        "mae"
+      ],
+      [
+        "total_energy",
+        "mae",
+        {
+          "PerAtom": true
+        }
+      ]
+    ],
+    "optimizer_name": "Adam",
+    "optimizer_amsgrad": true,
+    "lr_scheduler_name": "ReduceLROnPlateau",
+    "lr_scheduler_patience": 100,
+    "lr_scheduler_factor": 0.5,
+    "per_species_rescale_shifts_trainable": false,
+    "per_species_rescale_scales_trainable": false,
+    "per_species_rescale_shifts": "dataset_per_atom_total_energy_mean",
+    "per_species_rescale_scales": "dataset_per_species_forces_rms"
+  },
+  "M3GNET": {
+    "exp_name": "training",
+    "results_dir": "m3gnet_results",
+    "pretrained_model": null,
+    "allow_missing_labels": false,
+    "cutoff": 5.0,
+    "threebody_cutoff": 4.0,
+    "batch_size": 10,
+    "max_epochs": 1000,
+    "include_stresses": true,
+    "data_mean": 0.0,
+    "data_std": 1.0,
+    "decay_steps": 1000,
+    "decay_alpha": 0.96,
+    "dim_node_embedding": 128,
+    "dim_edge_embedding": 128,
+    "dim_state_embedding": 0,
+    "energy_weight": 1.0,
+    "element_refs": null,
+    "force_weight": 1.0,
+    "include_line_graph": true,
+    "loss": "mse_loss",
+    "loss_params": null,
+    "lr": 0.001,
+    "magmom_target": "absolute",
+    "magmom_weight": 0.0,
+    "max_l": 4,
+    "max_n": 4,
+    "nblocks": 3,
+    "optimizer": null,
+    "rbf_type": "Gaussian",
+    "scheduler": null,
+    "stress_weight": 0.0,
+    "sync_dist": false,
+    "is_intensive": false,
+    "units": 128
+  },
+  "MACE": {
+    "model": "MACE",
+    "name": "MACE_model",
+    "amsgrad": true,
+    "batch_size": 10,
+    "compute_avg_num_neighbors": true,
+    "compute_forces": true,
+    "config_type_weights": "{'Default':1.0}",
+    "compute_stress": false,
+    "compute_statistics": false,
+    "correlation": 3,
+    "default_dtype": "float32",
+    "device": "cpu",
+    "distributed": false,
+    "energy_weight": 1.0,
+    "ema": true,
+    "ema_decay": 0.99,
+    "E0s": null,
+    "forces_weight": 100.0,
+    "foundation_filter_elements": true,
+    "foundation_model": null,
+    "foundation_model_readout": true,
+    "keep_checkpoint": false,
+    "keep_isolated_atoms": false,
+    "hidden_irreps": "128x0e + 128x1o",
+    "loss": "huber",
+    "lr": 0.001,
+    "multiheads_finetuning": false,
+    "max_num_epochs": 1500,
+    "pair_repulsion": false,
+    "patience": 2048,
+    "r_max": 5.0,
+    "restart_latest": false,
+    "seed": 123,
+    "save_cpu": true,
+    "save_all_checkpoints": false,
+    "scaling": "rms_forces_scaling",
+    "stress_weight": 1.0,
+    "start_stage_two": 1200,
+    "stage_two": true,
+    "valid_batch_size": 10,
+    "virials_weight": 1.0,
+    "wandb": false
+  },
+  "NEP": {
+    "version": 4,
+    "type": [
+      1,
+      "X"
+    ],
+    "type_weight": 1.0,
+    "model_type": 0,
+    "prediction": 0,
+    "cutoff": [
+      6,
+      5
+    ],
+    "n_max": [
+      4,
+      4
+    ],
+    "basis_size": [
+      8,
+      8
+    ],
+    "l_max": [
+      4,
+      2,
+      1
+    ],
+    "neuron": 80,
+    "lambda_1": 0.0,
+    "lambda_e": 1.0,
+    "lambda_f": 1.0,
+    "lambda_v": 0.1,
+    "force_delta": 0,
+    "batch": 1000,
+    "population": 60,
+    "generation": 100000,
+    "zbl": 2
+  }
+}

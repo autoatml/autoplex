@@ -901,8 +901,9 @@ def test_complete_dft_vs_ml_benchmark_workflow_m3gnet(
             "batch_size": 1,
             "max_epochs": 3,
             "include_stresses": True,
-            "hidden_dim": 8,
-            "num_units": 8,
+            "dim_node_embedding": 8,
+            "dim_edge_embedding": 8,
+            "units": 8,
             "max_l": 4,
             "max_n": 4,
             "device": "cpu",
@@ -924,6 +925,100 @@ def test_complete_dft_vs_ml_benchmark_workflow_m3gnet(
     assert responses[complete_workflow_m3gnet.jobs[-1].output.uuid][1].output["metrics"][0][0][
                "benchmark_phonon_rmse"] == pytest.approx(
         5.2622804443539355, abs=3.0  # bad fit data, fluctuates between 4 and 7
+    )
+
+
+def test_complete_dft_vs_ml_benchmark_workflow_m3gnet_finetuning(
+        vasp_test_dir, mock_vasp, test_dir, memory_jobstore, ref_paths4_mpid, fake_run_vasp_kwargs4_mpid, clean_dir
+):
+    path_to_struct = vasp_test_dir / "dft_ml_data_generation" / "POSCAR"
+    structure = Structure.from_file(path_to_struct)
+
+    complete_workflow_m3gnet = CompleteDFTvsMLBenchmarkWorkflow(
+        ml_models=["M3GNET"],
+        symprec=1e-2, supercell_settings={"min_length": 8, "min_atoms": 20}, displacements=[0.01],
+        volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
+        apply_data_preprocessing=True,
+    ).make(
+        structure_list=[structure],
+        mp_ids=["test"],
+        benchmark_mp_ids=["mp-22905"],
+        pre_xyz_files=["vasp_ref.extxyz"],
+        pre_database_dir=test_dir / "fitting" / "ref_files",
+        benchmark_structures=[structure],
+        fit_kwargs_list=[{
+            "batch_size": 1,
+            "max_epochs": 1,
+            "include_stresses": True,
+            "device": "cpu",
+            "test_equal_to_val": True,
+            "foundation_model": "M3GNet-MP-2021.2.8-DIRECT-PES",
+            "use_foundation_model_element_refs": True,
+        }]
+    )
+
+    # automatically use fake VASP and write POTCAR.spec during the test
+    mock_vasp(ref_paths4_mpid, fake_run_vasp_kwargs4_mpid)
+
+    # run the flow or job and ensure that it finished running successfully
+    responses = run_locally(
+        complete_workflow_m3gnet,
+        create_folders=True,
+        ensure_success=True,
+        store=memory_jobstore,
+    )
+
+    assert complete_workflow_m3gnet.jobs[5].name == "complete_benchmark_mp-22905"
+    assert responses[complete_workflow_m3gnet.jobs[-1].output.uuid][1].output["metrics"][0][0][
+               "benchmark_phonon_rmse"] == pytest.approx(
+        4.6, abs=0.5,
+    )
+
+def test_complete_dft_vs_ml_benchmark_workflow_nep(
+        vasp_test_dir, mock_vasp, mock_nep, test_dir, memory_jobstore,
+        ref_paths4_mpid, fake_run_vasp_kwargs4_mpid, clean_dir
+):
+    path_to_struct = vasp_test_dir / "dft_ml_data_generation" / "POSCAR"
+    structure = Structure.from_file(path_to_struct)
+
+    complete_workflow_nep = CompleteDFTvsMLBenchmarkWorkflow(
+        ml_models=["NEP"],
+        symprec=1e-2, supercell_settings={"min_length": 8, "min_atoms": 20}, displacements=[0.01],
+        volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
+        apply_data_preprocessing=True,
+    ).make(
+        structure_list=[structure],
+        mp_ids=["test"],
+        benchmark_mp_ids=["mp-22905"],
+        pre_xyz_files=["vasp_ref.extxyz"],
+        pre_database_dir=test_dir / "fitting" / "ref_files",
+        benchmark_structures=[structure],
+        fit_kwargs_list=[{
+            "generation": 1000,
+            "batch": 1,
+            }]
+    )
+
+    # automatically use fake VASP and write POTCAR.spec during the test
+    mock_vasp(ref_paths4_mpid, fake_run_vasp_kwargs4_mpid)
+
+    # mock nep
+    ref_paths_nep = {"machine_learning_fit": "LiCl_complete_dft_vs_ml_benchmark_workflow"}
+    fake_run_nep_kwargs = {
+        "machine_learning_fit": {"nep_settings": ["generation", "batch", "type_weight"], "check_nep_inputs": True}}
+    mock_nep(ref_paths_nep, fake_run_nep_kwargs)
+
+    # run the flow or job and ensure that it finished running successfully
+    responses = run_locally(
+        complete_workflow_nep,
+        create_folders=True,
+        ensure_success=True,
+        store=memory_jobstore,
+    )
+    assert complete_workflow_nep.jobs[5].name == "complete_benchmark_mp-22905"
+    assert responses[complete_workflow_nep.jobs[-1].output.uuid][1].output["metrics"][0][0][
+               "benchmark_phonon_rmse"] == pytest.approx(
+        3.8951576702856716
     )
 
 
@@ -994,7 +1089,6 @@ def test_complete_dft_vs_ml_benchmark_workflow_mace_finetuning(
         volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
         benchmark_kwargs={"calculator_kwargs": {"device": "cpu"}},
         apply_data_preprocessing=True,
-        use_defaults_fitting=False,
     ).make(
         structure_list=[structure],
         mp_ids=["test"],
@@ -1064,7 +1158,6 @@ def test_complete_dft_vs_ml_benchmark_workflow_mace_finetuning_mp_settings(
         benchmark_kwargs={"calculator_kwargs": {"device": "cpu"}},
         add_dft_rattled_struct=True,
         apply_data_preprocessing=True,
-        use_defaults_fitting=False,
         split_ratio=0.3,
     ).make(
         structure_list=[structure],
@@ -1148,7 +1241,6 @@ def test_complete_dft_vs_ml_benchmark_workflow_nequip(
             "batch_size": 1,
             "learning_rate": 0.005,
             "max_epochs": 1,
-            "default_dtype": "float32",
             "device": "cpu",
         }]
     )

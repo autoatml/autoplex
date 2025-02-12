@@ -12,10 +12,48 @@ on:
     types: [published]
 
 jobs:
-  deploy:
+  update-changelog:
     runs-on: ubuntu-latest
-
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Fetch Version Tag & Release Notes
+        id: get_release_info
+        run: |
+          echo "VERSION=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
+          echo "NOTES<<EOF" >> $GITHUB_ENV
+          gh release view ${{ github.event.release.tag_name }} --json body -q .body >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Insert Version Tag & Release Notes Below `# Changelog`
+        run: |
+          { echo "# Changelog"; echo; echo "## $VERSION"; echo; echo "$NOTES"; echo; tail -n +2 CHANGELOG.md; } > temp.md && mv temp.md CHANGELOG.md
+          
+      - name: Create Pull Request to push updated CHANGELOG.md
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.ACTION_SECRET }}
+          commit-message: update CHANGELOG
+          title: Update changelog with latest release notes
+          body: Update CHANGELOG.md to reflect release changes
+          branch: update-changelog
+          labels: |
+            automated-pr
+          delete-branch: true
+          base: main
+
+  deploy:
+    needs: update-changelog
+    runs-on: ubuntu-latest
+    steps:
+    - name: Pause for 5 minutes to merge update Changelog PR
+      run: |
+          echo "Wait for 5 minutes to merge PR..."
+          sleep 300
+          echo "Resuming workflow..."
     - uses: actions/checkout@v4
     - name: Set up Python
       uses: actions/setup-python@v4

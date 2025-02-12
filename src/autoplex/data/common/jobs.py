@@ -702,6 +702,7 @@ def preprocess_data(
     distillation: bool = False,
     force_max: float = 40,
     force_label: str = "REF_forces",
+    energy_label: str = "REF_energy",
     pre_database_dir: str | None = None,
     reg_minmax: list[tuple] | None = None,
     isolated_atom_energies: dict | None = None,
@@ -733,6 +734,8 @@ def preprocess_data(
         Maximum force value to exclude structures.
     force_label: str
         The label of force values to use for distillation.
+    energy_label: str
+        The label of energy values to use for distillation.
     pre_database_dir : str
         Directory where the previous database was saved.
     reg_minmax: list[tuple]
@@ -755,7 +758,9 @@ def preprocess_data(
     if test_ratio == 0 or test_ratio is None:
         train_structures, test_structures = atoms, atoms
     else:
-        train_structures, test_structures = stratified_dataset_split(atoms, test_ratio)
+        train_structures, test_structures = stratified_dataset_split(
+            atoms, test_ratio, energy_label
+        )
 
     if pre_database_dir and os.path.exists(pre_database_dir):
         files_to_copy = ["train.extxyz", "test.extxyz"]

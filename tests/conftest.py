@@ -13,13 +13,18 @@ All rights reserved.
 
 import logging
 from pathlib import Path
-from typing import Any, Callable, Dict, Final, Generator, Union, Optional
+from typing import Any, Callable, Dict, Final, Generator, Union, Optional, Sequence, Literal
 
 import pytest
+import subprocess
+import shutil
 from pytest import MonkeyPatch
+from calorine.nep.io import read_nepfile
 from atomate2.utils.testing.vasp import monkeypatch_vasp
 
 from jobflow import Response, job
+
+import autoplex.fitting.common.utils
 from autoplex.data.rss.jobs import do_rss_single_node, do_rss_multi_node
 from autoplex.data.common.jobs import sample_data, collect_dft_data, preprocess_data
 from autoplex.data.common.flows import DFTStaticLabelling
@@ -30,8 +35,9 @@ logger = logging.getLogger("autoplex")
 
 _VFILES: Final = ("incar", "kpoints", "potcar", "poscar")
 _REF_PATHS: Dict[str, Union[str, Path]] = {}
+_NEP_REF_PATHS: Dict[str, str] = {}
+_FAKE_RUN_NEP_KWARGS: Dict[str, dict] = {}
 _FAKE_RUN_VASP_KWARGS: Dict[str, dict] = {}
-
 
 @pytest.fixture(scope="session")
 def test_dir():
@@ -128,6 +134,137 @@ def memory_jobstore():
 
     return store
 
+@pytest.fixture(scope="session")
+def nep_test_dir(test_dir):
+    return test_dir / "fitting" / "NEP"
+
+@pytest.fixture
+def mock_nep(monkeypatch, nep_test_dir):
+    """
+    This fixture allows one to mock (fake) running nep model training.
+    It works by monkeypatching (replacing) calls to nep that will work when the nep executable
+    are not present. Instead of running nep to generate the model,
+    reference files will be copied into the directory instead.
+
+    To use the fixture successfully, the following steps must be followed:
+    1. "mock_nep" should be included as an argument to any test that would
+        like to use its functionally.
+    2. For each job in your workflow, you should prepare a reference directory
+       containing two folders "inputs" (containing the reference input files
+       needed by the nep executable) and "outputs" (containing the expected
+       output files to be produced by call to nep executable). These files should reside in a
+       subdirectory of "tests/test_data/nep".
+    3. Create a dictionary mapping each job name to its reference directory.
+        For example, if your flow has one job named "machine_learning_fit" and the
+        reference files are present in "tests/test_data/nep/nep_licl", the
+        dictionary would look like: ``{"machine_learning_fit": "nep_licl"}``.
+    4. Optional: create a dictionary mapping each job name to custom
+       keyword arguments that will be supplied to fake_run_nep. This way you can
+       configure which nep settings are expected for each job. For example,
+       if your flow has job named "machine_learning_fit" (typically in which
+       nep executable is called) and you wish to validate that "neuron"
+       parameter is set correctly in the nep.in, your dictionary
+       would look like ``{"machine_learning_fit": {"nep_settings": ["neuron"]}``.
+    5. Inside the test function, call `mock_nep(ref_paths, fake_run_nep_kwargs)`
+       where ref_paths is the dictionary created in step 3 and fake_run_nep_kwargs is the
+       dictionary created in step 4.
+    6. Run your nep fit job after calling `mock_nep`.
+
+    """
+
+    def mock_nep_call(*args, **kwargs):
+
+        from jobflow import CURRENT_JOB
+
+        name = CURRENT_JOB.job.name
+
+        ref_path = nep_test_dir / _NEP_REF_PATHS[name]
+        fake_run_nep(ref_path, **_FAKE_RUN_NEP_KWARGS.get(name, {}))
+
+    monkeypatch.setattr(autoplex.fitting.common.utils, "run_nep", mock_nep_call)
+
+    def _run(ref_paths, fake_run_nep_kwargs):
+        _NEP_REF_PATHS.update(ref_paths)
+        _FAKE_RUN_NEP_KWARGS.update(fake_run_nep_kwargs)
+
+
+    yield _run
+
+    monkeypatch.undo()
+    _NEP_REF_PATHS.clear()
+
+def fake_run_nep(
+    ref_path: str | Path,
+    check_nep_inputs: bool = True,
+    nep_settings: Sequence[str] = ("version", "type", "cutoff", "neuron", "generation", "batch"),
+    ):
+    """
+    Emulate running nep.
+
+    Parameters
+    ----------
+    ref_path: str | Path
+        Reference directory with nep input files in the folder named 'inputs'
+        and output files in the folder named 'outputs'.
+    check_nep_inputs: bool
+        Whether to check the consistency of user nep inputs with the reference inputs.
+    nep_settings: Sequence[str]
+        List of nep model parameters to check for consistency between user and reference inputs.
+    """
+    logger.info("Running fake NEP model training.")
+    ref_path = Path(ref_path)
+
+    if check_nep_inputs:
+        verify_nep_inputs(ref_path, nep_settings)
+        logger.info("Verified NEP model training inputs successfully")
+
+    copy_nep_outputs(ref_path)
+
+    # mock a run nep by copying pre-generated outputs from reference dir
+    logger.info("Finished running fake NEP training, generated nep model")
+
+
+def verify_nep_inputs(ref_path: str | Path, nep_settings: Sequence[str]):
+    """
+    Verify that the user nep inputs are consistent with the reference inputs.
+
+    Parameters
+    ----------
+    ref_path: str | Path
+        Reference directory with nep input files in the folder named 'inputs'
+        and output files in the folder named 'outputs'.
+    nep_settings: Sequence[str]
+        List of nep model settings to check for consistency between user and reference inputs.
+
+    Returns
+    -------
+    None
+    """
+    user = read_nepfile("nep.in")
+
+    # Check nep.in file
+    ref = read_nepfile(ref_path / "inputs" / "nep.in")
+
+    for key in nep_settings:
+        if user.get(key) != ref.get(key):
+            raise ValueError(f"NEP model {key} parameter value is inconsistent!")
+
+    # Check if train.xyz and test.xyz file is present required for model training
+    # NEP cannot run without these files (extxyz format is not supported by NEP)
+    if not Path("train.xyz").exists():
+        raise FileNotFoundError("train.extxyz file not found in the job run directory")
+    if not Path("test.xyz").exists():
+        raise FileNotFoundError("test.extxyz file not found in the job run directory")
+
+
+def copy_nep_outputs(ref_path: str | Path):
+    """Copy the reference nep output files to the current working directory."""
+    output_path = ref_path / "outputs"
+    for output_file in output_path.iterdir():
+        # Copy all files except the input files
+        if output_file.is_file():
+            shutil.copy(output_file, ".")
+
 @job
 def mock_rss(input_dir: str = None,
              selection_method: str = 'cur',
@@ -180,8 +317,8 @@ def mock_rss(input_dir: str = None,
                         ref_virial_name=ref_virial_name,
                         num_processes_fit=num_processes_fit,
                         apply_data_preprocessing=False,
-                        database_dir=job5.output,
-                        ).make(isolated_atom_energies=job4.output['isolated_atom_energies'], **fit_kwargs)
+                        ).make(isolated_atom_energies=job4.output['isolated_atom_energies'],
+                               database_dir=job5.output, **fit_kwargs)
     job_list = [job2, job3, job4, job5, job6]
 
     return Response(
