@@ -1,7 +1,7 @@
 # This workflow will install Python dependencies, run tests and lint with Python 3.10 and 3.11
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Testing Linux
+name: Testing Tutorials
 
 on:
   workflow_dispatch:
