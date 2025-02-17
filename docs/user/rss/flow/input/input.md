@@ -19,7 +19,7 @@ resume_from_previous_state:
   isolated_atom_energies:
 ```
 
-The `tag` identifies the elements in the system, such as `Si` in this example, and can also be passed to the parameters for random structure generation. Setting `train_from_scratch=false` indicates that the RSS workflow will start from scratch. To resume a workflow, refer to the [Resuming workflow from point of interruption](../quick_start/start.md) section.
+The `tag` identifies the elements in the system, such as `Si` in this example, and can also be passed to the parameters for random structure generation. Setting `train_from_scratch=True` indicates that the RSS workflow will start from scratch. To resume a workflow, refer to the [Resuming workflow from point of interruption](../quick_start/start.md) section.
 
 ## Buildcell parameters
 

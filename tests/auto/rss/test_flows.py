@@ -10,11 +10,8 @@ os.environ["OMP_NUM_THREADS"] = "1"
 
 def test_rss_workflow(test_dir, mock_vasp, memory_jobstore, clean_dir):
     rss_job = RssMaker(name="rss").make(tag='Si',
-                                                       buildcell_options=[{'NFORM': '{1,3,5}'},
-                                                                          {'NFORM': '{2,4,6}'}],
-                                                       hookean_repul=True,
-                                                       hookean_paras={'(14, 14)': (100, 1.2)},
-                                        max_iteration_number=2)
+                                         
+                                        )
 
     ref_paths = {
         **{f"static_bulk_{i}": f"rss/Si_bulk_{i + 1}/" for i in range(18)},
