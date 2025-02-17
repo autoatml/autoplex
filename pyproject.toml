@@ -86,7 +86,7 @@ strict = [
      "hiphive==1.4",
 ]
 dev = ["pre-commit>=2.12.1"]
-tests = ["pytest", "pytest-mock", "pytest-split", "pytest-cov", "types-setuptools"]
+tests = ["pytest", "pytest-mock", "pytest-split", "pytest-cov", "types-setuptools", "nbmake"]
 
 [tool.setuptools_scm]
 
