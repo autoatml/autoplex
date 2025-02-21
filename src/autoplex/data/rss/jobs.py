@@ -384,15 +384,18 @@ class RandomizedStructure(Maker):
 
         """
         tmp_file_name = "tmp." + str(i) + "." + tag + ".cell"
+        tmp_error_file_name = "tmp_error." + str(i) + "." + tag + ".cell"
 
         with (
             open(bc_file) as bc_file_handle,
             open(tmp_file_name, "w") as tmp_file_handle,
+            open(tmp_error_file_name, "w") as tmp_error_file_handle,
         ):
             run(
                 "buildcell",
                 stdin=bc_file_handle,
                 stdout=tmp_file_handle,
+                stderr=tmp_error_file_handle,
                 shell=True,
                 check=True,
             )
@@ -408,6 +411,7 @@ class RandomizedStructure(Maker):
 
         if remove_tmp_files:
             os.remove(tmp_file_name)
+            os.remove(tmp_error_file_name)
 
         return atom
 

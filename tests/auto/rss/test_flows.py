@@ -60,6 +60,7 @@ def test_rss_workflow(test_dir, mock_vasp, memory_jobstore, clean_dir):
         ensure_success=True,
         store=memory_jobstore,
     )
+    assert rss_job.jobs[5].name == "rss"
 
 
 
