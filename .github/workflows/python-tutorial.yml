@@ -47,6 +47,6 @@ jobs:
           python -m pip install --upgrade pip && \
           python -m uv cache clean
           python -m uv pip install --prerelease=allow .[strict,tests] && \
-          OMP_NUM_THREADS=1 pytest --cache-clear  --nbmake ./tutorials  --ExecutePreprocessor.timeout=-1
+          OMP_NUM_THREADS=1 pytest --cache-clear  --nbmake  --nbmake-timeout=-1 ./tutorials 
         "
 
