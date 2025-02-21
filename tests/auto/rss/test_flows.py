@@ -47,7 +47,6 @@ def test_rss_workflow(test_dir, mock_vasp, memory_jobstore, clean_dir):
         "static_isolated_0": {"incar_settings": ["NSW", "ISMEAR"], "check_inputs": ["incar", "potcar"]},
     }
 
-    print(fake_run_vasp_kwargs)
     rss_config = RssConfig.from_file(test_dir/"rss/rss_si_config.yaml")
 
     rss_job = RssMaker(name="rss", rss_config=rss_config).make()
@@ -61,6 +60,7 @@ def test_rss_workflow(test_dir, mock_vasp, memory_jobstore, clean_dir):
         ensure_success=True,
         store=memory_jobstore,
     )
+
 
 
 def test_mock_workflow(test_dir, mock_vasp, memory_jobstore, clean_dir):
