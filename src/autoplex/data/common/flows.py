@@ -304,7 +304,6 @@ class DFTStaticLabelling(Maker):
             Configuration types corresponding to the structures. If None, defaults
             to 'bulk'. Default is None.
         """
-    
         job_list = []
 
         if isinstance(structures[0], list):

@@ -171,7 +171,6 @@ def initial_rss(
     if dimer_box is None:
         dimer_box = [20.0, 20.0, 20.0]
 
-
     do_randomized_structure_generation = BuildMultiRandomizedStructure(
         generated_struct_numbers=generated_struct_numbers,
         buildcell_options=buildcell_options,
