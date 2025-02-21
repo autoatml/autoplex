@@ -9,29 +9,54 @@ from autoplex.auto.rss.flows import RssMaker
 os.environ["OMP_NUM_THREADS"] = "1"
 
 def test_rss_workflow(test_dir, mock_vasp, memory_jobstore, clean_dir):
-    rss_job = RssMaker(name="rss").make(tag='Si',
-                                         
-                                        )
+    from autoplex.settings import RssConfig
+    from autoplex.auto.rss.flows import RssMaker
+    from jobflow import Flow
 
+    from jobflow import run_locally
+
+
+    # We need this to run the tutorial directly in the jupyter notebook
     ref_paths = {
-        **{f"static_bulk_{i}": f"rss/Si_bulk_{i + 1}/" for i in range(18)},
-        "static_isolated_0": "rss/Si_isolated_1/",
-        "static_dimer_0": "rss/Si_dimer_1/",
-        "static_dimer_1": "rss/Si_dimer_2/",
-        "static_dimer_2": "rss/Si_dimer_3/",
+        "static_bulk_0": "rss_Si_small/static_bulk_0",
+        "static_bulk_1": "rss_Si_small/static_bulk_1",
+        "static_bulk_2": "rss_Si_small/static_bulk_2",
+        "static_bulk_3": "rss_Si_small/static_bulk_3",
+        "static_bulk_4": "rss_Si_small/static_bulk_4",
+        "static_bulk_5": "rss_Si_small/static_bulk_5",
+        "static_bulk_6": "rss_Si_small/static_bulk_6",
+        "static_bulk_7": "rss_Si_small/static_bulk_7",
+        "static_bulk_8": "rss_Si_small/static_bulk_8",
+        "static_bulk_9": "rss_Si_small/static_bulk_9",
+        "static_bulk_10": "rss_Si_small/static_bulk_10",
+        "static_bulk_11": "rss_Si_small/static_bulk_11",
+        "static_bulk_12": "rss_Si_small/static_bulk_12",
+        "static_bulk_13": "rss_Si_small/static_bulk_13",
+        "static_bulk_14": "rss_Si_small/static_bulk_14",
+        "static_bulk_15": "rss_Si_small/static_bulk_15",
+        "static_bulk_16": "rss_Si_small/static_bulk_16",
+        "static_bulk_17": "rss_Si_small/static_bulk_17",
+        "static_bulk_18": "rss_Si_small/static_bulk_18",
+        "static_bulk_19": "rss_Si_small/static_bulk_19",
+        "static_isolated_0": "rss_Si_small/static_isolated_0",
     }
+
     fake_run_vasp_kwargs = {
         **{f"static_bulk_{i}": {"incar_settings": ["NSW", "ISMEAR"], "check_inputs": ["incar", "potcar"]} for i in
-           range(18)},
+           range(20)},
         "static_isolated_0": {"incar_settings": ["NSW", "ISMEAR"], "check_inputs": ["incar", "potcar"]},
-        "static_dimer_0": {"incar_settings": ["NSW", "ISMEAR"], "check_inputs": ["incar", "potcar"]},
-        "static_dimer_1": {"incar_settings": ["NSW", "ISMEAR"], "check_inputs": ["incar", "potcar"]},
-        "static_dimer_2": {"incar_settings": ["NSW", "ISMEAR"], "check_inputs": ["incar", "potcar"]},
     }
+
+    print(fake_run_vasp_kwargs)
+    rss_config = RssConfig.from_file(test_dir/"rss/rss_si_config.yaml")
+
+    rss_job = RssMaker(name="rss", rss_config=rss_config).make()
+    from atomate2.vasp.powerups import update_user_incar_settings
+    rss_job=update_user_incar_settings(rss_job, {"NPAR":8})
     mock_vasp(ref_paths, fake_run_vasp_kwargs)
 
-    responses = run_locally(
-        rss_job,
+    responses=run_locally(
+        Flow(jobs=[rss_job], output=rss_job.output),
         create_folders=True,
         ensure_success=True,
         store=memory_jobstore,
