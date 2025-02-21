@@ -6,7 +6,7 @@ resume_from_previous_state:
   mlip_path:
   isolated_atom_energies:
 generated_struct_numbers:
-  - 1000
+  - 200
 buildcell_options:
   - NFORM: '1'
     SYMMOPS: '1-4'
@@ -18,7 +18,7 @@ fragment_numbers:
 num_processes_buildcell: 128
 num_of_initial_selected_structs:
   - 20
-num_of_rss_selected_structs: 10
+num_of_rss_selected_structs: 1
 initial_selection_enabled: true
 rss_selection_method: bcur2i
 bcur_params:
