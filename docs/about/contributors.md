@@ -58,6 +58,11 @@ University of Oxford
 [MorrowChem]: https://github.com/morrowchem
 [0000-0002-3441-8646]: https://orcid.org/0000-0002-3441-8646
 
+**Celine Halkali** [![gh]][celinehalkali] (Documentation)\
+Montanuniversität Leoben
+
+[celinehalkali]: https://github.com/celinehalkali
+
 
 We welcome contributions from other researchers! If you would like to contribute, please see the `How to contribute` guidelines.
 
