@@ -699,6 +699,7 @@ def preprocess_data(
     regularization: bool = False,
     retain_existing_sigma: bool = False,
     scheme: str = "linear-hull",
+    element_order: list = None,
     distillation: bool = False,
     force_max: float = 40,
     force_label: str = "REF_forces",
@@ -728,6 +729,8 @@ def preprocess_data(
         If set to True, existing sigma values for specific configurations will remain unchanged.
     scheme: str
         Scheme to use for regularization.
+    element_order:
+        List of atomic numbers in order of choice (e.g. [42, 16] for MoS2)
     distillation: bool
         If True, apply data distillation.
     force_max: float
@@ -787,6 +790,7 @@ def preprocess_data(
             reg_minmax=reg_minmax,
             isolated_atom_energies=isolated_atom_energies,
             scheme=scheme,
+            element_order=element_order,
             retain_existing_sigma=retain_existing_sigma,
         )
 

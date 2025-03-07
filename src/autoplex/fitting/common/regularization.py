@@ -7,7 +7,7 @@ from contextlib import suppress
 
 import numpy as np
 from ase import Atoms
-from scipy.spatial import ConvexHull, Delaunay
+from scipy.spatial import ConvexHull
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
@@ -115,8 +115,8 @@ def set_custom_sigma(
         points = label_stoichiometry_volume(
             atoms, isolated_atom_energies, energy_name, element_order=element_order
         )  # label atoms with volume and mole fraction
-        hull = calculate_hull_3d(points)  # calculate 3D convex hull
-        get_e_distance_func = get_e_distance_to_hull_3d  # type: ignore
+        hull = calculate_hull_nd(points)  # calculate 3D convex hull
+        get_e_distance_func = get_e_distance_to_hull_nd  # type: ignore
 
     points = {}
     for group in sorted(
@@ -151,6 +151,7 @@ def set_custom_sigma(
                 val,
                 energy_name=energy_name,
                 isolated_atom_energies=isolated_atom_energies,
+                element_order=element_order,
             )
 
             if de > max_energy:
@@ -266,7 +267,11 @@ def get_convex_hull(
             continue
         try:
             volume_per_atom = atom.get_volume() / len(atom)
-            energy_per_atom = atom.info[energy_name] / len(atom)
+            energy_per_atom = (
+                atom.info[energy_name] / len(atom)
+                if energy_name != "energy"
+                else atom.get_potential_energy() / len(atom)
+            )
             points_list.append((volume_per_atom, energy_per_atom))
         except KeyError:
             failed_count += 1
@@ -321,7 +326,11 @@ def get_e_distance_to_hull(
 
     """
     volume = atoms.get_volume() / len(atoms)
-    energy = atoms.info[energy_name] / len(atoms)
+    energy = (
+        atoms.info[energy_name] / len(atoms)
+        if energy_name != "energy"
+        else atoms.get_potential_energy() / len(atoms)
+    )
     tp = np.array([volume, energy])
     hull_ps = hull.points if isinstance(hull, ConvexHull) else hull
 
@@ -444,6 +453,9 @@ def label_stoichiometry_volume(
             energy = (
                 atom.info[energy_name]
                 - sum([isolated_atom_energies[j] for j in atom.get_atomic_numbers()])
+                if energy_name != "energy"
+                else atom.get_potential_energy()
+                - sum([isolated_atom_energies[j] for j in atom.get_atomic_numbers()])
             ) / len(atom)
             mole_frac = get_mole_frac(atom, element_order=element_order)
             points_list.append(np.hstack((mole_frac, volume, energy)))
@@ -501,11 +513,17 @@ def point_in_triangle_nd(pn, *preg) -> bool:
     pn:
         Point to check (in ND)
     *preg:
-        List of points defining (in ND) to check against
+        A list of points defining an (N-1)D simplex.
 
     """
-    hull = Delaunay(preg)
-    return hull.find_simplex(pn) >= 0
+    preg = np.array(preg)
+    pn = np.array(pn)
+    if preg.shape[1] != pn.shape[0]:
+        raise ValueError(
+            f"Point and points must have the same dimensionality. Got {pn.shape[0]} and {preg.shape[1]}."
+        )
+    hull = ConvexHull(preg)
+    return np.all(np.dot(hull.equations[:, :-1], pn) + hull.equations[:, -1] <= 1e-12)
 
 
 def calculate_hull_3d(points_3d) -> ConvexHull:
@@ -602,6 +620,9 @@ def get_e_distance_to_hull_3d(
     energy = (
         atoms.info[energy_name]
         - sum([isolated_atom_energies[j] for j in atoms.get_atomic_numbers()])
+        if energy_name != "energy"
+        else atoms.get_potential_energy()
+        - sum([isolated_atom_energies[j] for j in atoms.get_atomic_numbers()])
     ) / len(atoms)
     volume = atoms.get_volume() / len(atoms)
 
@@ -629,6 +650,66 @@ def get_e_distance_to_hull_3d(
             )
 
     print("Failed to find distance to hull")
+    return 1e6
+
+
+def get_e_distance_to_hull_nd(
+    hull, atoms, isolated_atom_energies=None, energy_name="energy", element_order=None
+) -> float:
+    """
+    Calculate the energy distance to the N-dimensional convex hull.
+
+    Parameters
+    ----------
+    hull:
+        Convex hull.
+    atoms: (ase.Atoms)
+        Structure to calculate mole-fraction of
+    isolated_atom_energies: (dict)
+        Dictionary of isolated atom energies
+    energy_name: (str)
+        Name of energy key in atoms.info (typically a DFT energy)
+    element_order: (list)
+        List of atomic numbers in order of choice (e.g. [42, 16] for MoS2)
+
+    """
+    isolated_atom_energies = {
+        ast.literal_eval(k) if isinstance(k, str) else k: v
+        for k, v in isolated_atom_energies.items()
+    }
+    mole_frac = get_mole_frac(atoms, element_order=element_order)
+    energy = (
+        atoms.info[energy_name]
+        - sum([isolated_atom_energies[j] for j in atoms.get_atomic_numbers()])
+        if energy_name != "energy"
+        else atoms.get_potential_energy()
+        - sum([isolated_atom_energies[j] for j in atoms.get_atomic_numbers()])
+    ) / len(atoms)
+    volume = atoms.get_volume() / len(atoms)
+    sp = np.hstack([mole_frac, volume, energy])
+
+    for i in hull.remove_dim:
+        sp = np.delete(sp, i)
+
+    for _, visible_facet in enumerate(hull.simplices[hull.good]):
+        if point_in_triangle_nd(sp[:-1], *hull.points[visible_facet][:, :-1]):
+            n_d = hull.points[visible_facet]
+
+            if n_d.shape[1] == 3:
+                norm = np.cross(n_d[2] - n_d[0], n_d[1] - n_d[0])
+                plane_norm = norm / np.linalg.norm(norm)
+            else:
+                A = n_d[:-1] - n_d[0]
+                plane_norm = np.linalg.lstsq(A, np.ones(A.shape[0]), rcond=None)[0]
+
+            plane_constant = np.dot(plane_norm, n_d[0])
+
+            return (
+                energy
+                - (plane_constant - np.dot(plane_norm[:-1], sp[:-1])) / plane_norm[-1]
+            )
+
+    print("Failed to find distance to hull in ND")
     return 1e6
 
 
