@@ -219,6 +219,7 @@ def test_auxiliary_functions(test_dir, memory_jobstore, clean_dir):
 
 def test_regularization_for_three_element_system(test_dir, memory_jobstore, clean_dir):
     """Tests auxiliary functions related to three_element_system."""
+    import numpy as np
     from ase.io import read
 
     file = test_dir / "fitting" / "ref_files" / "test_regularization.extxyz"
