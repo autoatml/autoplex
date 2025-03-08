@@ -245,7 +245,7 @@ def test_regularization_for_three_element_system(test_dir, memory_jobstore, clea
         for at in atoms
     ]
 
-    assert np.all(np.array(des) >= -1e6)
+    assert np.all(np.array(des) >= -1e-6)
 
     reg_minmax = [(0.1, 1), (0.001, 0.1), (0.0316, 0.316), (0.0632, 0.632)]
 
