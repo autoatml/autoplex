@@ -257,5 +257,4 @@ def test_regularization_for_three_element_system(test_dir, memory_jobstore, clea
         element_order=[3, 15, 16],
         energy_name="energy",
     )
-    print(atoms_modi[2].info["energy_sigma"])
     assert atoms_modi[2].info["energy_sigma"] == 1e-3
