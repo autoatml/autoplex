@@ -502,7 +502,7 @@ def point_in_triangle_2D(p1, p2, p3, pn) -> bool:
     )
 
 
-def point_in_triangle_nd(pn, *preg) -> bool:
+def point_in_simplex_nd(pn, *preg) -> bool:
     """
     Check if a point is inside a region of hyperplanes in N dimensions.
 
@@ -523,7 +523,7 @@ def point_in_triangle_nd(pn, *preg) -> bool:
             f"Point and points must have the same dimensionality. Got {pn.shape[0]} and {preg.shape[1]}."
         )
     hull = ConvexHull(preg)
-    return np.all(np.dot(hull.equations[:, :-1], pn) + hull.equations[:, -1] <= 1e-12)
+    return np.all(np.dot(hull.equations[:, :-1], pn) + hull.equations[:, -1] <= 1e-10)
 
 
 def calculate_hull_3d(points_3d) -> ConvexHull:
@@ -635,7 +635,7 @@ def get_e_distance_to_hull_3d(
         return get_e_distance_to_hull(hull, atoms, energy_name=energy_name)
 
     for _ct, visible_facet in enumerate(hull.simplices[hull.good]):
-        if point_in_triangle_nd(sp[:-1], *hull.points[visible_facet][:, :-1]):
+        if point_in_simplex_nd(sp[:-1], *hull.points[visible_facet][:, :-1]):
             n_3 = hull.points[visible_facet]
             energy = sp[-1]
 
@@ -692,7 +692,7 @@ def get_e_distance_to_hull_nd(
         sp = np.delete(sp, i)
 
     for _, visible_facet in enumerate(hull.simplices[hull.good]):
-        if point_in_triangle_nd(sp[:-1], *hull.points[visible_facet][:, :-1]):
+        if point_in_simplex_nd(sp[:-1], *hull.points[visible_facet][:, :-1]):
             n_d = hull.points[visible_facet]
 
             if n_d.shape[1] == 3:
