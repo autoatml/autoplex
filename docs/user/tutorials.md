@@ -35,6 +35,11 @@ rss/index
 phonon/index
 ```
 
+```{toctree}
+:maxdepth: 3
+executable/index
+```
+
 ## Contributors and Their Contributions
 
 - **[Christina Ertural](mailto:christina.ertural@bam.de)**  

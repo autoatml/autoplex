@@ -1,0 +1,52 @@
+# This workflow will install Python dependencies, run tests and lint with Python 3.10 and 3.11
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Testing Tutorials
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11"]
+
+    steps:
+    - name: Fetch Most Recent Docker Image Tag
+      run: |
+        TAG=$(curl -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/orgs/autoatml/packages/container/autoplex%2Fautoplex-python-3.10/versions \
+            | jq -r 'sort_by(.created_at) | reverse | .[0].metadata.container.tags[0]')
+        echo "VERSION=$TAG" >> $GITHUB_ENV
+
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch the entire Git history
+
+    - name: Run tests using Docker image for Python ${{ matrix.python-version }}
+      run: |
+        docker pull ghcr.io/autoatml/autoplex/autoplex-python-${{ matrix.python-version }}:${{ env.VERSION }}
+        docker run --rm \
+          -v ${{ github.workspace }}:/workspace \
+          -w /workspace \
+          ghcr.io/autoatml/autoplex/autoplex-python-${{ matrix.python-version }}:${{ env.VERSION }} \
+          bash -c "
+          python -m pip install --upgrade pip && \
+          python -m uv cache clean
+          python -m uv pip install --prerelease=allow .[strict,tests] && \
+          OMP_NUM_THREADS=1 pytest -vv --cache-clear  --nbmake  --nbmake-timeout=-1 ./tutorials 
+        "
+
