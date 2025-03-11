@@ -6,10 +6,7 @@ from pathlib import Path
 
 import numpy as np
 from atomate2.common.schemas.phonons import ForceConstants, PhononBSDOSDoc
-from atomate2.vasp.flows.core import DoubleRelaxMaker
 from atomate2.vasp.jobs.base import BaseVaspMaker
-from atomate2.vasp.jobs.core import StaticMaker, TightRelaxMaker
-from atomate2.vasp.sets.core import StaticSetGenerator, TightRelaxSetGenerator
 from jobflow import Flow, Response, job
 from pymatgen.core.structure import Structure
 from pymatgen.phonon.bandstructure import PhononBandStructure
@@ -539,65 +536,17 @@ def dft_phonopy_gen_data(
 
     if phonon_displacement_maker is None:
         phonon_displacement_maker = TightDFTStaticMaker(name="dft phonon static")
-    if phonon_bulk_relax_maker is None:
-        phonon_bulk_relax_maker = DoubleRelaxMaker.from_relax_maker(
-            TightRelaxMaker(
-                name="dft tight relax",
-                run_vasp_kwargs={"handlers": {}},
-                input_set_generator=TightRelaxSetGenerator(
-                    user_incar_settings={
-                        "ALGO": "Normal",
-                        "ISPIN": 1,
-                        "LAECHG": False,
-                        "ISMEAR": 0,
-                        "ENCUT": 700,
-                        "ISYM": 0,
-                        "SIGMA": 0.05,
-                        "LCHARG": False,  # Do not write the CHGCAR file
-                        "LWAVE": False,  # Do not write the WAVECAR file
-                        "LVTOT": False,  # Do not write LOCPOT file
-                        "LORBIT": None,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
-                        "LOPTICS": False,  # No PCDAT file
-                        "NSW": 200,
-                        "NELM": 500,
-                        # to be removed
-                        "NPAR": 4,
-                    }
-                ),
-            )
-        )
-
-    if phonon_static_energy_maker is None:
-        phonon_static_energy_maker = StaticMaker(
-            name="dft static",
-            input_set_generator=StaticSetGenerator(
-                auto_ispin=False,
-                user_incar_settings={
-                    "ALGO": "Normal",
-                    "ISPIN": 1,
-                    "LAECHG": False,
-                    "ISMEAR": 0,
-                    "ENCUT": 700,
-                    "SIGMA": 0.05,
-                    "LCHARG": False,  # Do not write the CHGCAR file
-                    "LWAVE": False,  # Do not write the WAVECAR file
-                    "LVTOT": False,  # Do not write LOCPOT file
-                    "LORBIT": None,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
-                    "LOPTICS": False,  # No PCDAT file
-                    # to be removed
-                    "NPAR": 4,
-                },
-            ),
-        )
 
     # always set autoplex default as job name
     phonon_displacement_maker.name = "dft phonon static"
-    phonon_static_energy_maker.name = "dft static"
-    try:
-        phonon_bulk_relax_maker.relax_maker1.name = "dft tight relax"
-        phonon_bulk_relax_maker.relax_maker2.name = "dft tight relax"
-    except AttributeError:
-        phonon_bulk_relax_maker.name = "dft tight relax"
+    if phonon_static_energy_maker is not None:
+        phonon_static_energy_maker.name = "dft static"
+    if phonon_bulk_relax_maker is not None:
+        try:
+            phonon_bulk_relax_maker.relax_maker1.name = "dft tight relax"
+            phonon_bulk_relax_maker.relax_maker2.name = "dft tight relax"
+        except AttributeError:
+            phonon_bulk_relax_maker.name = "dft tight relax"
 
     for displacement in displacements:
         dft_phonons = DFTPhononMaker(
@@ -706,33 +655,11 @@ def dft_random_gen_data(
 
     if displacement_maker is None:
         displacement_maker = TightDFTStaticMaker(name="dft rattle static")
-    if rattled_bulk_relax_maker is None:
-        rattled_bulk_relax_maker = TightRelaxMaker(
-            run_vasp_kwargs={"handlers": {}},
-            input_set_generator=TightRelaxSetGenerator(
-                user_incar_settings={
-                    "ALGO": "Normal",
-                    "ISPIN": 1,
-                    "LAECHG": False,
-                    "ISYM": 0,  # to be changed
-                    "ISMEAR": 0,
-                    "SIGMA": 0.05,  # to be changed back
-                    "LCHARG": False,  # Do not write the CHGCAR file
-                    "LWAVE": False,  # Do not write the WAVECAR file
-                    "LVTOT": False,  # Do not write LOCPOT file
-                    "LORBIT": None,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
-                    "LOPTICS": False,  # No PCDAT file
-                    "NSW": 200,
-                    "NELM": 500,
-                    # to be removed
-                    "NPAR": 4,
-                }
-            ),
-        )
 
     # always set autoplex default as job name
     displacement_maker.name = "dft rattle static"
-    rattled_bulk_relax_maker.name = "dft tight relax"
+    if rattled_bulk_relax_maker is not None:
+        rattled_bulk_relax_maker.name = "dft tight relax"
 
     # TODO: decide if we should remove the additional response here as well
     # looks like only the output is changing
