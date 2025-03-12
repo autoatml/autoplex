@@ -93,6 +93,7 @@ jobs:
           uv pip install --prerelease=allow .[tests,strict]
           uv pip install --upgrade monty
           uv pip install numpy==1.26.4
+          uv pip freeze
           
     - name: Download test duration artifacts
       uses: actions/download-artifact@v4
