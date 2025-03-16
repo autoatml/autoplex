@@ -50,6 +50,7 @@ def initial_rss(
     regularization: bool = False,
     retain_existing_sigma: bool = False,
     scheme: str | None = None,
+    element_order: list | None = None,
     reg_minmax: list[tuple] | None = None,
     distillation: bool = False,
     force_max: float | None = None,
@@ -128,6 +129,8 @@ def initial_rss(
         If set to True, existing sigma values for specific configurations will remain unchanged.
     scheme: str | None
         Scheme to use for regularization. Default is None.
+    element_order: list | None
+        List of atomic numbers in order of choice (e.g. [42, 16] for MoS2)
     reg_minmax: list[tuple] | None
         A list of tuples representing the minimum and maximum values for regularization.
     distillation: bool
@@ -204,6 +207,7 @@ def initial_rss(
         regularization=regularization,
         retain_existing_sigma=retain_existing_sigma,
         scheme=scheme,
+        element_order=element_order,
         distillation=distillation,
         force_max=force_max,
         force_label=force_label,
@@ -280,6 +284,7 @@ def do_rss_iterations(
     regularization: bool = False,
     retain_existing_sigma: bool = False,
     scheme: str | None = None,
+    element_order: list | None = None,
     reg_minmax: list[tuple] | None = None,
     distillation: bool = True,
     force_max: float = 200,
@@ -399,6 +404,8 @@ def do_rss_iterations(
         If set to True, existing sigma values for specific configurations will remain unchanged.
     scheme: str | None
         Scheme to use for regularization. Default is None.
+    element_order: list | None
+        List of atomic numbers in order of choice (e.g. [42, 16] for MoS2)
     reg_minmax: list[tuple] | None
         A list of tuples representing the minimum and maximum values for regularization.
     distillation: bool
@@ -570,6 +577,7 @@ def do_rss_iterations(
             regularization=regularization,
             retain_existing_sigma=retain_existing_sigma,
             scheme=scheme,
+            element_order=element_order,
             distillation=distillation,
             force_max=force_max,
             force_label=force_label,
@@ -638,6 +646,7 @@ def do_rss_iterations(
             regularization=regularization,
             retain_existing_sigma=retain_existing_sigma,
             scheme=scheme,
+            element_order=element_order,
             reg_minmax=reg_minmax,
             distillation=distillation,
             force_max=force_max,
