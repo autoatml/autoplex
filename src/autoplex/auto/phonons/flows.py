@@ -215,8 +215,8 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
     )
     phonon_bulk_relax_maker: BaseVaspMaker | None = None
     phonon_static_energy_maker: BaseVaspMaker | None = None
-
     rattled_bulk_relax_maker: BaseVaspMaker | None = None
+    phonon_static_energy_maker: BaseVaspMaker | None = None
     isolated_atom_maker: IsoAtomStaticMaker | None = None
     n_structures: int = 10
     displacements: list[float] = field(default_factory=lambda: [0.01])
@@ -323,8 +323,6 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
             ),
             default_hyperparameters["GAP"]["soap"],
         )
-        # add an optional pre-optimization step here
-
 
         for structure, mp_id in zip(structure_list, mp_ids):
             if self.pre_relax_maker is not None:

@@ -1,0 +1,4 @@
+# Remove directories that are not needed in the package src distribution (reduces package size on pypi)
+prune docs
+prune tests
+prune tutorials
