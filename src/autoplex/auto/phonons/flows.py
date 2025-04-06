@@ -330,7 +330,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                 new_structure = pre_relax_job.output.structure
                 pre_relax_job.name = "dft tight relax"
             else:
-                new_structure=structure
+                new_structure = structure
             self.supercell_settings.setdefault(mp_id, {})
             logging.warning(
                 "Currently, "
@@ -452,8 +452,11 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                     benchmark_structures
                 ):
                     # To make sure that the structure is optimized
-                    if self.pre_relax_maker is not None and self.phonon_bulk_relax_maker is None:
-                        self.phonon_bulk_relax_maker=self.pre_relax_maker
+                    if (
+                        self.pre_relax_maker is not None
+                        and self.phonon_bulk_relax_maker is None
+                    ):
+                        self.phonon_bulk_relax_maker = self.pre_relax_maker
 
                     # hard coded at the moment as other displacements
                     # are not treated correctly in benchmark part
