@@ -73,6 +73,9 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         The total number of randomly displaced structures to be generated.
     displacement_maker: BaseVaspMaker
         Maker used for a static calculation for a supercell.
+    pre_relax_maker: BaseVaspMaker
+        Maker used for the bulk relax unit cell calculation
+        before the phonon_relax_maker or rattled_relax_maker.
     phonon_bulk_relax_maker: BaseVaspMaker
         Maker used for the bulk relax unit cell calculation.
     rattled_bulk_relax_maker: BaseVaspMaker
@@ -181,7 +184,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
     add_dft_rattled_struct: bool = True
     add_rss_struct: bool = False
     displacement_maker: BaseVaspMaker = None
-    phonon_bulk_relax_maker: BaseVaspMaker | None = field(
+    pre_relax_maker: BaseVaspMaker | None = field(
         default_factory=lambda: DoubleRelaxMaker.from_relax_maker(
             TightRelaxMaker(
                 name="dft tight relax",
@@ -210,32 +213,10 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
             )
         )
     )
+    phonon_bulk_relax_maker: BaseVaspMaker | None = None
     phonon_static_energy_maker: BaseVaspMaker | None = None
 
-    rattled_bulk_relax_maker: BaseVaspMaker | None = field(
-        default_factory=lambda: TightRelaxMaker(
-            run_vasp_kwargs={"handlers": {}},
-            input_set_generator=TightRelaxSetGenerator(
-                user_incar_settings={
-                    "ALGO": "Normal",
-                    "ISPIN": 1,
-                    "LAECHG": False,
-                    "ISYM": 0,  # to be changed
-                    "ISMEAR": 0,
-                    "SIGMA": 0.05,  # to be changed back
-                    "LCHARG": False,  # Do not write the CHGCAR file
-                    "LWAVE": False,  # Do not write the WAVECAR file
-                    "LVTOT": False,  # Do not write LOCPOT file
-                    "LORBIT": None,  # No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR
-                    "LOPTICS": False,  # No PCDAT file
-                    "NSW": 200,
-                    "NELM": 500,
-                    # to be removed
-                    "NPAR": 4,
-                }
-            ),
-        )
-    )
+    rattled_bulk_relax_maker: BaseVaspMaker | None = None
     isolated_atom_maker: IsoAtomStaticMaker | None = None
     n_structures: int = 10
     displacements: list[float] = field(default_factory=lambda: [0.01])
@@ -346,6 +327,10 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
 
 
         for structure, mp_id in zip(structure_list, mp_ids):
+            if self.pre_relax_maker is not None:
+                pre_relax_job=self.pre_relax_maker.make(structure)
+                structure=pre_relax_job.output.structure
+                pre_relax_job.name="dft tight relax"
             self.supercell_settings.setdefault(mp_id, {})
             logging.warning(
                 "Currently, "
