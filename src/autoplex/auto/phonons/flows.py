@@ -326,6 +326,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         for structure, mp_id in zip(structure_list, mp_ids):
             if self.pre_relax_maker is not None:
                 pre_relax_job = self.pre_relax_maker.make(structure)
+                flows.append(pre_relax_job)
                 structure = pre_relax_job.output.structure
                 pre_relax_job.name = "dft tight relax"
             self.supercell_settings.setdefault(mp_id, {})
