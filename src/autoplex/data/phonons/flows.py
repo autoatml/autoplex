@@ -360,10 +360,10 @@ class RandomStructuresDataGenerator(Maker):
             )
         jobs = []  # initializing empty job list
         outputs = []
-
-        relaxed = self.bulk_relax_maker.make(structure)
-        jobs.append(relaxed)
-        structure = relaxed.output.structure
+        if self.bulk_relax_maker is not None:
+            relaxed = self.bulk_relax_maker.make(structure)
+            jobs.append(relaxed)
+            structure = relaxed.output.structure
 
         supercell_matrix = self.supercell_settings.get(mp_id, {}).get(
             "supercell_matrix"
