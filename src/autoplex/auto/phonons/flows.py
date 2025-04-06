@@ -327,15 +327,17 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
             if self.pre_relax_maker is not None:
                 pre_relax_job = self.pre_relax_maker.make(structure)
                 flows.append(pre_relax_job)
-                structure = pre_relax_job.output.structure
+                new_structure = pre_relax_job.output.structure
                 pre_relax_job.name = "dft tight relax"
+            else:
+                new_structure=structure
             self.supercell_settings.setdefault(mp_id, {})
             logging.warning(
                 "Currently, "
                 "the same supercell settings for single-atom displaced and rattled supercells are used."
             )
             supercell_matrix_job = reduce_supercell_size_job(
-                structure=structure,
+                structure=new_structure,
                 min_length=self.supercell_settings.get("min_length", 15),
                 max_length=self.supercell_settings.get("max_length", 20),
                 fallback_min_length=self.supercell_settings.get(
@@ -355,7 +357,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
 
             if self.add_dft_rattled_struct:
                 add_dft_ratt = self.add_dft_rattled(
-                    structure=structure,
+                    structure=new_structure,
                     mp_id=mp_id,
                     displacement_maker=self.displacement_maker,
                     rattled_bulk_relax_maker=self.rattled_bulk_relax_maker,
@@ -383,7 +385,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                 fit_input.update({mp_id: add_dft_ratt.output})
             if self.add_dft_phonon_struct:
                 add_dft_phon = self.add_dft_phonons(
-                    structure=structure,
+                    structure=new_structure,
                     mp_id=mp_id,
                     displacements=self.displacements,
                     symprec=self.symprec,
@@ -449,6 +451,10 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                 for ibenchmark_structure, benchmark_structure in enumerate(
                     benchmark_structures
                 ):
+                    # To make sure that the structure is optimized
+                    if self.pre_relax_maker is not None and self.phonon_bulk_relax_maker is None:
+                        self.phonon_bulk_relax_maker=self.pre_relax_maker
+
                     # hard coded at the moment as other displacements
                     # are not treated correctly in benchmark part
                     complete_bm = complete_benchmark(
