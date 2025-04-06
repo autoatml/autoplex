@@ -344,7 +344,6 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         )
         # add an optional pre-optimization step here
 
-
         for structure, mp_id in zip(structure_list, mp_ids):
             self.supercell_settings.setdefault(mp_id, {})
             logging.warning(
