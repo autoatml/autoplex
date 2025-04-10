@@ -4,11 +4,9 @@ from ase.atoms import Atom
 from ase.io import read
 
 from autoplex.fitting.common.regularization import (
-    calculate_hull_3d,
     calculate_hull_nd,
     get_convex_hull,
     get_e_distance_to_hull,
-    get_e_distance_to_hull_3d,
     get_e_distance_to_hull_nd,
     get_intersect,
     get_mole_frac,
@@ -138,10 +136,7 @@ def test_auxiliary_functions(test_dir, memory_jobstore, clean_dir):
     assert arrays_allclose(label, array3)
 
     calc_hull = calculate_hull_nd(points)
-    calc_hull_3D = calculate_hull_3d(label)
     calc_hull_ND = calculate_hull_nd(label)
-
-    assert np.allclose(calc_hull_3D.equations, calc_hull_ND.equations, atol=1e-6)
 
     fraction_list = [[1.0]] + [[0.0]] + [[0.5]] * 8
     for atom, fraction in zip(atoms, fraction_list):
@@ -149,14 +144,10 @@ def test_auxiliary_functions(test_dir, memory_jobstore, clean_dir):
             calc_hull, atom, energy_name="REF_energy"
         )
         assert get_e_dist_hull == 0
-        get_e_dist_hull_3D = get_e_distance_to_hull_3d(
-            calc_hull_3D, atom, {3: -0.28649227, 17: -0.25638457}, "REF_energy"
-        )
         get_e_dist_hull_ND = get_e_distance_to_hull_nd(
             calc_hull_ND, atom, {3: -0.28649227, 17: -0.25638457}, "REF_energy"
         )
-        assert np.allclose(get_e_dist_hull_3D, get_e_dist_hull_ND, atol=1e-6)
-        assert round(get_e_dist_hull_3D) == 0
+        assert round(get_e_dist_hull_ND) == 0
         getmole_frac = get_mole_frac(atom, element_order=[3, 17])
         assert getmole_frac == fraction
 

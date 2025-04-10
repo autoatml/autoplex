@@ -28,10 +28,10 @@ from scipy.sparse.linalg import LinearOperator, svds
 from sklearn.model_selection import StratifiedShuffleSplit
 
 from autoplex.fitting.common.regularization import (
-    calculate_hull_3d,
+    calculate_hull_nd,
     get_convex_hull,
     get_e_distance_to_hull,
-    get_e_distance_to_hull_3d,
+    get_e_distance_to_hull_nd,
     label_stoichiometry_volume,
 )
 
@@ -1340,7 +1340,7 @@ def convexhull_cur(
         The scheme to use for the convex hull calculation.
         Default is 'linear-hull' (2D E,V hull).
         For 2-component systems with varying stoichiometry,
-        use 'volume-stoichiometry' (3D E,V,mole-fraction hull).
+        use 'volume-stoichiometry' (>=3D E,V,mole-fraction hull).
         TODO: need to generalise this to ND hulls for mcp systems.
         GST good test case.
 
@@ -1380,11 +1380,11 @@ def convexhull_cur(
             energy_name=energy_label,
             element_order=element_order,
         )
-        hull = calculate_hull_3d(points)
+        hull = calculate_hull_nd(points)
 
         des = np.array(
             [
-                get_e_distance_to_hull_3d(
+                get_e_distance_to_hull_nd(
                     hull,
                     at,
                     isolated_atom_energies=isolated_atom_energies,
