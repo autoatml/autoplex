@@ -115,7 +115,7 @@ def set_custom_sigma(
         points = label_stoichiometry_volume(
             atoms, isolated_atom_energies, energy_name, element_order=element_order
         )  # label atoms with volume and mole fraction
-        hull = calculate_hull_nd(points) 
+        hull = calculate_hull_nd(points)
         get_e_distance_func = get_e_distance_to_hull_nd  # type: ignore
 
     points = {}
@@ -690,7 +690,7 @@ def get_e_distance_to_hull_nd(
 
     for i in hull.remove_dim:
         sp = np.delete(sp, i)
-        
+
     if len(sp[:-1]) == 1:
         # print('doing convexhull analysis in 1D')
         return get_e_distance_to_hull(hull, atoms, energy_name=energy_name)
@@ -704,7 +704,9 @@ def get_e_distance_to_hull_nd(
                 plane_norm = norm / np.linalg.norm(norm)
             else:
                 relative_vectors = n_d[:-1] - n_d[0]
-                plane_norm = np.linalg.lstsq(relative_vectors, np.ones(relative_vectors.shape[0]), rcond=None)[0]
+                plane_norm = np.linalg.lstsq(
+                    relative_vectors, np.ones(relative_vectors.shape[0]), rcond=None
+                )[0]
 
             plane_constant = np.dot(plane_norm, n_d[0])
 
