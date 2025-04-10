@@ -699,7 +699,7 @@ def preprocess_data(
     regularization: bool = False,
     retain_existing_sigma: bool = False,
     scheme: str = "linear-hull",
-    element_order: list = None,
+    element_order: list | None = None,
     distillation: bool = False,
     force_max: float = 40,
     force_label: str = "REF_forces",

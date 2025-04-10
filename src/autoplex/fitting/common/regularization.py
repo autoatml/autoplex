@@ -115,7 +115,7 @@ def set_custom_sigma(
         points = label_stoichiometry_volume(
             atoms, isolated_atom_energies, energy_name, element_order=element_order
         )  # label atoms with volume and mole fraction
-        hull = calculate_hull_nd(points)  # calculate 3D convex hull
+        hull = calculate_hull_nd(points) 
         get_e_distance_func = get_e_distance_to_hull_nd  # type: ignore
 
     points = {}
@@ -462,7 +462,7 @@ def label_stoichiometry_volume(
         except KeyError:
             traceback.print_exc()
     points = np.array(points_list)
-    return points.T[:, np.argsort(points.T[0])].T
+    return points[np.lexsort(points.T[::-1])]
 
 
 def point_in_triangle_2D(p1, p2, p3, pn) -> bool:
@@ -690,6 +690,10 @@ def get_e_distance_to_hull_nd(
 
     for i in hull.remove_dim:
         sp = np.delete(sp, i)
+        
+    if len(sp[:-1]) == 1:
+        # print('doing convexhull analysis in 1D')
+        return get_e_distance_to_hull(hull, atoms, energy_name=energy_name)
 
     for _, visible_facet in enumerate(hull.simplices[hull.good]):
         if point_in_simplex_nd(sp[:-1], *hull.points[visible_facet][:, :-1]):
@@ -699,8 +703,8 @@ def get_e_distance_to_hull_nd(
                 norm = np.cross(n_d[2] - n_d[0], n_d[1] - n_d[0])
                 plane_norm = norm / np.linalg.norm(norm)
             else:
-                A = n_d[:-1] - n_d[0]
-                plane_norm = np.linalg.lstsq(A, np.ones(A.shape[0]), rcond=None)[0]
+                relative_vectors = n_d[:-1] - n_d[0]
+                plane_norm = np.linalg.lstsq(relative_vectors, np.ones(relative_vectors.shape[0]), rcond=None)[0]
 
             plane_constant = np.dot(plane_norm, n_d[0])
 
