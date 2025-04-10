@@ -553,11 +553,11 @@ def calculate_hull_nd(points_nd) -> ConvexHull:
     for i in range(points_nd.shape[1]):
         if np.all(points_nd.T[i, 0] == points_nd.T[i, :]):
             pn = np.delete(pn, i, axis=1)
-            print(f"Convex hull lower dimensional - removing dimension {i}")
+            logging.info(f"Convex hull lower dimensional - removing dimension {i}")
             remove_dim.append(i)
 
     hull = ConvexHull(pn, qhull_options="QG0")
-    print("done calculating hull")
+    logging.info("done calculating hull")
     hull.remove_dim = remove_dim
 
     return hull
@@ -602,7 +602,7 @@ def get_e_distance_to_hull_nd(
         sp = np.delete(sp, i)
 
     if len(sp[:-1]) == 1:
-        # print('doing convexhull analysis in 1D')
+        logging.info("doing convexhull analysis in 1D")
         return get_e_distance_to_hull(hull, atoms, energy_name=energy_name)
 
     for _, visible_facet in enumerate(hull.simplices[hull.good]):
@@ -625,7 +625,7 @@ def get_e_distance_to_hull_nd(
                 - (plane_constant - np.dot(plane_norm[:-1], sp[:-1])) / plane_norm[-1]
             )
 
-    print("Failed to find distance to hull in ND")
+    logging.info("Failed to find distance to hull in ND")
     return 1e6
 
 

@@ -129,8 +129,12 @@ def initial_rss(
         If set to True, existing sigma values for specific configurations will remain unchanged.
     scheme: str | None
         Scheme to use for regularization. Default is None.
-    element_order: list | None
-        List of atomic numbers in order of choice (e.g. [42, 16] for MoS2)
+    element_order:
+        List of atomic numbers in order of choice (e.g. [42, 16] for MoS2).
+        This value is useful when constructing high-dimensional convex hulls based on the
+        "volume-stoichiometry" scheme. Specially, if the dataset contains compounds with
+        different numbers of constituent elements (e.g., both binary and ternary structures),
+        this value must be explicitly set to ensure the convex hull is constructed consistently.
     reg_minmax: list[tuple] | None
         A list of tuples representing the minimum and maximum values for regularization.
     distillation: bool
@@ -404,8 +408,12 @@ def do_rss_iterations(
         If set to True, existing sigma values for specific configurations will remain unchanged.
     scheme: str | None
         Scheme to use for regularization. Default is None.
-    element_order: list | None
-        List of atomic numbers in order of choice (e.g. [42, 16] for MoS2)
+    element_order:
+        List of atomic numbers in order of choice (e.g. [42, 16] for MoS2).
+        This value is useful when constructing high-dimensional convex hulls based on the
+        "volume-stoichiometry" scheme. Specially, if the dataset contains compounds with
+        different numbers of constituent elements (e.g., both binary and ternary structures),
+        this value must be explicitly set to ensure the convex hull is constructed consistently.
     reg_minmax: list[tuple] | None
         A list of tuples representing the minimum and maximum values for regularization.
     distillation: bool

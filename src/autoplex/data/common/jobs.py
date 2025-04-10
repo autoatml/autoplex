@@ -730,7 +730,11 @@ def preprocess_data(
     scheme: str
         Scheme to use for regularization.
     element_order:
-        List of atomic numbers in order of choice (e.g. [42, 16] for MoS2)
+        List of atomic numbers in order of choice (e.g. [42, 16] for MoS2).
+        This value is useful when constructing high-dimensional convex hulls based on the
+        "volume-stoichiometry" scheme. Specially, if the dataset contains compounds with
+        different numbers of constituent elements (e.g., both binary and ternary structures),
+        this value must be explicitly set to ensure the convex hull is constructed consistently.
     distillation: bool
         If True, apply data distillation.
     force_max: float
