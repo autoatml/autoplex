@@ -123,3 +123,57 @@ rss_job = RssMaker(name="your workflow name").make(tag='SiO2',
                                                    'isolated_atom_energies': {8: -0.16613333, 14: -0.16438578},
                                                    })
 ```
+
+## Expanding pre-existing dataset and refining MLIPs
+
+If one already possesses an MLIP trained on some initial dataset, it is straightforward to use our RSS framework to generate supplemental data and refine the existing MLIP. Below, we describe three common use cases. 
+
+### Use case 1: combining an existing dataset with RSS to train a new MLIP
+
+If you simply want to combine your previous dataset with RSS-generated structures, and use the merged dataset to train an MLIP that will then drive RSS iterations, the framework supports this directly. In this case, the program first generates initial RSS structures, then merges them with the existing dataset you provide, and uses the combined data to train a new MLIP. This trained potential is then used to initiate RSS-driven iterative exploration.
+
+```python
+rss_config = RssConfig.from_file('path/to/your/config.yaml')
+rss_job = RssMaker(name="your workflow name", 
+                   rss_config=rss_config).make(
+                   pre_database_dir='path/to/pre-existing/database')
+```
+This is also ideal when you don't yet have a trained MLIP, but do have data you'd like to include in the training loop.
+
+### Use case 2: kicking off RSS using an existing MLIP and merging data for refinement
+
+If you already have a trained MLIP, you can use it to kick off the first round of RSS directly. Then, you can merge the RSS-generated data with your original dataset to train a new, refined potential. In this case, the usage pattern is the same as described in [**Resuming workflow from point of interruption**](#resuming-workflow-from-point-of-interruption).
+
+### Use case 3: generating the whole RSS data from scratch and merging later
+In the case, you can start by generating an RSS training set from scratch. Once the workflow completes, you can merge the generated dataset with any existing data and then invoke the training module to build a new MLIP. This approach can decouple data generation from model training.
+
+```python
+from autoplex.settings import RssConfig
+from autoplex.auto.rss.flows import RssMaker
+from autoplex.fitting.common.flows import MLIPFitMaker
+from autoplex.data.common.jobs import preprocess_data
+
+rss_config = RssConfig.from_file('path/to/your/config.yaml')
+rss_job = RssMaker(name="your workflow name", 
+                   rss_config=rss_config).make()
+
+data_preprocessing_job = preprocess_data(
+        vasp_ref_dir=rss_job.output["mlip_path"],  # The path to store the RSS dataset can be read from the previous job.
+        pre_database_dir='path/to/pre-existing/database',  # The path to store the pre-existing dataset that you'd like to merge.
+    )
+
+fitting_job = MLIPFitMaker(
+    mlip_type="MACE",              # Select the potential model you want to use for training.
+    ref_energy_name="REF_energy",  # Define the name of the labels you are using.
+    ref_force_name="REF_forces",
+    ref_virial_name="REF_virial",
+    apply_data_preprocessing=False,
+    ).make(
+    isolated_atom_energies=rss_job.output["isolated_atom_energies"],
+    database_dir=data_preprocessing_job.output,
+    device='cuda',
+    **fit_kwargs,   # define the hyperparameters for potential training here.
+    )
+
+jobs = [rss_job, data_preprocessing_job, fitting_job]
+```
