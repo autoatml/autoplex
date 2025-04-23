@@ -8,7 +8,7 @@
     </div>
 <br>
 
-`autoplex` is still under very active development and is only suitable for expert users as not all of the documentation is in place. This will change until end of November 2024.
+`autoplex` is still under very active development and larger modifications to the source code should be expected.
 </div>
 
 <br>
