@@ -1,29 +1,5 @@
 # Changelog
 
-## v0.1.3
-
-<!-- Release notes generated using configuration in .github/release.yml at main -->
-
-## What's Changed
-### 🚀 New Features
-* Enable NEP interface by @naik-aakash in https://github.com/autoatml/autoplex/pull/288
-* RSS Test and Interactive Tutorial for Phonon and RSS Workflow by @JaGeo in https://github.com/autoatml/autoplex/pull/343
-* Move Maker defaults to CompleteDFTvsMLBenchmarkWorkflow definition by @QuantumChemist in https://github.com/autoatml/autoplex/pull/333
-### 🐛 Bug Fixes
-* Regularization in higher dimensions by @YuanbinLiu in https://github.com/autoatml/autoplex/pull/354
-### 📚 Documentation
-* Include executable tutorials in documentation website by @naik-aakash in https://github.com/autoatml/autoplex/pull/349
-* New additions to documentation by @YuanbinLiu in https://github.com/autoatml/autoplex/pull/363
-* Update README.md by @JaGeo in https://github.com/autoatml/autoplex/pull/366
-### 🧹 House-Keeping
-* add non executed tutorial notebooks (reduce size) by @naik-aakash in https://github.com/autoatml/autoplex/pull/348
-* Add MANIFEST.in by @naik-aakash in https://github.com/autoatml/autoplex/pull/357
-* update dependencies by @naik-aakash in https://github.com/autoatml/autoplex/pull/367
-
-
-**Full Changelog**: https://github.com/autoatml/autoplex/compare/v0.1.2...v0.1.3
-
-
 ## v0.1.2
 
 <!-- Release notes generated using configuration in .github/release.yml at main -->
