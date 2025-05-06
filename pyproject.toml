@@ -73,7 +73,7 @@ strict = [
      "matgl==1.2.6",
      "quippy-ase==0.9.14; python_version < '3.12'",
      "ase==3.24.0",
-     "mace-torch==0.3.12",
+     "mace-torch==0.3.13",
      "lightning-utilities==0.14.3",
      "numpy",
      "typing",
