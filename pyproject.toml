@@ -25,7 +25,7 @@ classifiers = [
 requires-python = ">=3.10,<3.12"
 dependencies = [
      "pymatgen>=2024.11.13",
-     atomate2 = { git = "https://github.com/materialsproject/atomate2.git", rev = "e2968b0fba17d56d8c35c70b2cbb677ca3e46634", extras = ["strict"] },
+     "atomate2[strict] @ git+https://github.com/materialsproject/atomate2.git@e2968b0fba17d56d8c35c70b2cbb677ca3e46634",
      "ase==3.24.0",
      "calorine>=3.0",
      "matgl>=1.2.6",
