@@ -1517,7 +1517,9 @@ def vaspoutput_2_extended_xyz(
     ):
         # strip hostname if it exists in the path
         path_without_hostname = Path(strip_hostname(path)).joinpath("vasprun.xml.gz")
-        path_without_hostname2 = Path(strip_hostname(path)).joinpath("final_atoms_object.xyz")
+        path_without_hostname2 = Path(strip_hostname(path)).joinpath(
+            "final_atoms_object.xyz"
+        )
         try:
             # read the vasp output
             if path_without_hostname.exists():
