@@ -190,6 +190,9 @@ def initial_rss(
         bcur_params=bcur_params,
         random_seed=random_seed,
     ).make()
+
+    # TODO: this needs to be generalized beyond VASP and instead be able to use a different dft calculator,
+    # or a force field
     do_dft_static = DFTStaticLabelling(
         e0_spin=e0_spin,
         isolatedatom_box=isolatedatom_box,

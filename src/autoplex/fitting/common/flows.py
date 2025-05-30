@@ -314,7 +314,7 @@ class DataPreprocessing(Maker):
             self.pre_xyz_files = ["train.extxyz", "test.extxyz"]
 
         list_of_vasp_calc_dirs = get_list_of_vasp_calc_dirs(flow_output=fit_input)
-
+        print(fit_input)
         config_types = [
             key
             for key, value in fit_input.items()

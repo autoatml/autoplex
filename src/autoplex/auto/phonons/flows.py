@@ -427,6 +427,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         isoatoms = get_iso_atom(structure_list, self.isolated_atom_maker)
         flows.append(isoatoms)
 
+        # isolated atoms energy needs to be added
         if pre_xyz_files is None:
             fit_input.update(
                 {"IsolatedAtom": {"iso_atoms_dir": [isoatoms.output["dirs"]]}}
