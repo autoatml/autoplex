@@ -427,10 +427,10 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         isoatoms = get_iso_atom(structure_list, self.isolated_atom_maker)
         flows.append(isoatoms)
 
+        # isolated atoms energy needs to be added
         if pre_xyz_files is None:
             fit_input.update(
-                {"IsolatedAtom": {"iso_atoms_dir": [isoatoms.output["dirs"]]}}
-            )
+                {"IsolatedAtom": {"iso_atoms_dir": [isoatoms.output["dirs"]]}})
 
         for ml_model, fit_kwargs in zip(self.ml_models, fit_kwargs_list or [{}]):
             add_data_fit = MLIPFitMaker(
