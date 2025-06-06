@@ -25,7 +25,7 @@ classifiers = [
 requires-python = ">=3.10,<3.12"
 dependencies = [
      "pymatgen>=2024.11.13",
-     "atomate2[strict]=>0.0.21",
+     "atomate2[strict]>=0.0.21",
      "ase==3.24.0",
      "calorine>=3.0",
      "matgl>=1.2.6",
