@@ -25,7 +25,7 @@ classifiers = [
 requires-python = ">=3.10,<3.12"
 dependencies = [
      "pymatgen>=2024.11.13",
-     "atomate2[strict] @ git+https://github.com/materialsproject/atomate2.git@e2968b0fba17d56d8c35c70b2cbb677ca3e46634",
+     "atomate2[strict]=>0.0.21",
      "ase==3.24.0",
      "calorine>=3.0",
      "matgl>=1.2.6",
@@ -69,7 +69,7 @@ workflow-managers = [
 strict = [
      "calorine==3.0",
      "pymatgen==2025.2.18",
-     "atomate2[strict]==0.0.20",
+     "atomate2[strict]==0.0.21",
      "matgl==1.2.6",
      "quippy-ase==0.9.14; python_version < '3.12'",
      "ase==3.24.0",
