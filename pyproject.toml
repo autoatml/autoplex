@@ -82,7 +82,7 @@ strict = [
      "torchdata<=0.7.1",
      "torch<=2.2.0; sys.platform != 'linux'",
      "torch<=2.2.1; sys.platform == 'linux'",
-     "nequip==0.6.1",
+     "nequip==0.9.1",
      "hiphive==1.4",
 ]
 dev = ["pre-commit>=2.12.1"]
