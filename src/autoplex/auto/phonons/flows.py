@@ -12,6 +12,7 @@ from atomate2.vasp.flows.mp import (
     MPGGAStaticMaker,
 )
 from atomate2.vasp.jobs.base import BaseVaspMaker
+from atomate2.ase.jobs import AseMaker
 from atomate2.vasp.jobs.core import TightRelaxMaker
 from atomate2.vasp.sets.core import TightRelaxSetGenerator
 from jobflow import Flow, Maker
@@ -71,15 +72,15 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         If True, will add RSS generated structures for DFT calculation.
     n_structures: int.
         The total number of randomly displaced structures to be generated.
-    displacement_maker: BaseVaspMaker
+    displacement_maker: BaseVaspMaker|AseMaker
         Maker used for a static calculation for a supercell.
-    phonon_bulk_relax_maker: BaseVaspMaker
+    phonon_bulk_relax_maker: BaseVaspMaker|AseMaker
         Maker used for the bulk relax unit cell calculation.
-    rattled_bulk_relax_maker: BaseVaspMaker
+    rattled_bulk_relax_maker: BaseVaspMaker|AseMaker
         Maker used for the bulk relax unit cell calculation.
-    phonon_static_energy_maker: BaseVaspMaker
+    phonon_static_energy_maker: BaseVaspMaker|AseMaker
         Maker used for the static energy unit cell calculation.
-    isolated_atom_maker: IsoAtomStaticMaker
+    isolated_atom_maker: IsoAtomStaticMaker|AseMaker
         VASP maker for the isolated atom calculation.
     n_structures : int.
         Total number of distorted structures to be generated.
@@ -180,8 +181,8 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
     add_dft_phonon_struct: bool = True
     add_dft_rattled_struct: bool = True
     add_rss_struct: bool = False
-    displacement_maker: BaseVaspMaker = None
-    phonon_bulk_relax_maker: BaseVaspMaker | None = field(
+    displacement_maker: BaseVaspMaker | AseMaker = None
+    phonon_bulk_relax_maker: BaseVaspMaker|AseMaker | None = field(
         default_factory=lambda: DoubleRelaxMaker.from_relax_maker(
             TightRelaxMaker(
                 name="dft tight relax",
@@ -210,9 +211,9 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
             )
         )
     )
-    phonon_static_energy_maker: BaseVaspMaker | None = None
+    phonon_static_energy_maker: BaseVaspMaker|AseMaker | None = None
 
-    rattled_bulk_relax_maker: BaseVaspMaker | None = field(
+    rattled_bulk_relax_maker: BaseVaspMaker|AseMaker | None = field(
         default_factory=lambda: TightRelaxMaker(
             run_vasp_kwargs={"handlers": {}},
             input_set_generator=TightRelaxSetGenerator(
@@ -236,7 +237,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
             ),
         )
     )
-    isolated_atom_maker: IsoAtomStaticMaker | None = None
+    isolated_atom_maker: IsoAtomStaticMaker |AseMaker| None = None
     n_structures: int = 10
     displacements: list[float] = field(default_factory=lambda: [0.01])
     symprec: float = 1e-4
