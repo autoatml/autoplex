@@ -26,7 +26,7 @@ requires-python = ">=3.10,<3.12"
 dependencies = [
      "pymatgen>=2024.11.13",
      "atomate2[strict]>=0.0.21",
-     "ase==3.24.0",
+     "ase==3.25.0",
      "calorine>=3.0",
      "matgl>=1.2.6",
      "mace-torch>=0.3.12",
@@ -72,7 +72,7 @@ strict = [
      "atomate2[strict]==0.0.21",
      "matgl==1.2.6",
      "quippy-ase==0.9.14; python_version < '3.12'",
-     "ase==3.24.0",
+     "ase==3.25.0",
      "mace-torch==0.3.12",
      "lightning-utilities==0.14.3",
      "numpy",
