@@ -4,6 +4,7 @@ import logging
 import warnings
 from dataclasses import dataclass, field
 
+from atomate2.ase.jobs import AseMaker
 from atomate2.common.schemas.phonons import PhononBSDOSDoc
 from atomate2.vasp.flows.core import DoubleRelaxMaker
 from atomate2.vasp.flows.mp import (
@@ -12,7 +13,6 @@ from atomate2.vasp.flows.mp import (
     MPGGAStaticMaker,
 )
 from atomate2.vasp.jobs.base import BaseVaspMaker
-from atomate2.ase.jobs import AseMaker
 from atomate2.vasp.jobs.core import TightRelaxMaker
 from atomate2.vasp.sets.core import TightRelaxSetGenerator
 from jobflow import Flow, Maker
@@ -182,7 +182,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
     add_dft_rattled_struct: bool = True
     add_rss_struct: bool = False
     displacement_maker: BaseVaspMaker | AseMaker = None
-    phonon_bulk_relax_maker: BaseVaspMaker|AseMaker | None = field(
+    phonon_bulk_relax_maker: BaseVaspMaker | AseMaker | None = field(
         default_factory=lambda: DoubleRelaxMaker.from_relax_maker(
             TightRelaxMaker(
                 name="dft tight relax",
@@ -211,9 +211,9 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
             )
         )
     )
-    phonon_static_energy_maker: BaseVaspMaker|AseMaker | None = None
+    phonon_static_energy_maker: BaseVaspMaker | AseMaker | None = None
 
-    rattled_bulk_relax_maker: BaseVaspMaker|AseMaker | None = field(
+    rattled_bulk_relax_maker: BaseVaspMaker | AseMaker | None = field(
         default_factory=lambda: TightRelaxMaker(
             run_vasp_kwargs={"handlers": {}},
             input_set_generator=TightRelaxSetGenerator(
@@ -237,7 +237,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
             ),
         )
     )
-    isolated_atom_maker: IsoAtomStaticMaker |AseMaker| None = None
+    isolated_atom_maker: IsoAtomStaticMaker | AseMaker | None = None
     n_structures: int = 10
     displacements: list[float] = field(default_factory=lambda: [0.01])
     symprec: float = 1e-4
