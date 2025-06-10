@@ -335,6 +335,9 @@ class RssMaker(Maker):
 
             do_rss_job = do_rss_iterations(
                 input=initial_rss_job.output,
+                static_energy_maker=self.static_energy_maker,
+                static_energy_maker_isolated_species=self.static_energy_maker_isolated_species,
+                static_energy_maker_isolated_species_spin_polarization=self.static_energy_maker_isolated_species_spin_polarization,
                 **rss_params,
             )
         else:
