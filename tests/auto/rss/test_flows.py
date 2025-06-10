@@ -129,12 +129,12 @@ def test_rss_workflow_ml_potentials(test_dir, memory_jobstore, clean_dir):
 
     rss_config = {'tag': 'Si', 'train_from_scratch': True,
                   'resume_from_previous_state': {'test_error': None, 'pre_database_dir': None, 'mlip_path': None,
-                                                 'isolated_atom_energies': None}, 'generated_struct_numbers': [1000],
+                                                 'isolated_atom_energies': None}, 'generated_struct_numbers': [200],
                   'buildcell_options': [
                       {'ABFIX': False, 'NFORM': '1', 'SYMMOPS': '1-4', 'SYSTEM': None, 'SLACK': 0.25, 'OCTET': False,
                        'OVERLAP': 0.1, 'MINSEP': None, 'NATOM': '{6,8,10,12,14,16,18,20,22,24}'}],
                   'fragment_file': None, 'fragment_numbers': None, 'num_processes_buildcell': 16,
-                  'num_of_initial_selected_structs': [20], 'num_of_rss_selected_structs': 1,
+                  'num_of_initial_selected_structs': [40], 'num_of_rss_selected_structs': 1,
                   'initial_selection_enabled': True, 'rss_selection_method': 'bcur2i', 'bcur_params': {
             'soap_paras': {'l_max': 12, 'n_max': 12, 'atom_sigma': 0.0875, 'cutoff': 10.5,
                            'cutoff_transition_width': 1.0, 'zeta': 4.0, 'average': True, 'species': True},
