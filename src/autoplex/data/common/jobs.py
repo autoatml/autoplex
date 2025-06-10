@@ -613,7 +613,7 @@ def collect_dft_data(
                 at = read(os.path.join(val, "final_atoms_object.xyz"), index=":")
             for at_i in at:
                 print("test:")
-                print(at_i.get_stress())
+                logging.warning(at_i.get_stress())
 
                 virial_list = (
                     -voigt_6_to_full_3x3_stress(at_i.get_stress()) * at_i.get_volume()
