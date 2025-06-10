@@ -596,44 +596,45 @@ def collect_dft_data(
     isolated_atom_energies = {}
 
     for i, val in enumerate(dirs):
-        if os.path.exists(os.path.join(val, "vasprun.xml.gz")):
 
+        # TODO: think about fall back when we use ml potential outputs instead
+        has_vasp_output = os.path.exists(os.path.join(val, "vasprun.xml.gz"))
+        has_ase_output=os.path.exists(os.path.join(val, "final_atoms_object.xyz"))
+        if vasp:
             converged = check_convergence_vasp(os.path.join(val, "vasprun.xml.gz"))
 
-            if converged:
+        if converged and has_vasp_output or has_ase_output:
+            if converged and has_vasp_output:
                 at = read(os.path.join(val, "vasprun.xml.gz"), index=":")
-                for at_i in at:
-                    virial_list = (
-                        -voigt_6_to_full_3x3_stress(at_i.get_stress())
-                        * at_i.get_volume()
-                    )
-                    at_i.info["REF_virial"] = " ".join(map(str, virial_list.flatten()))
-                    del at_i.calc.results["stress"]
-                    at_i.arrays["REF_forces"] = at_i.calc.results["forces"]
-                    del at_i.calc.results["forces"]
-                    at_i.info["REF_energy"] = at_i.calc.results["free_energy"]
-                    del at_i.calc.results["energy"]
-                    del at_i.calc.results["free_energy"]
-                    atoms.append(at_i)
-                    at_i.info["config_type"] = config_types[i]
-                    if (
-                        at_i.info["config_type"] != "dimer"
-                        and at_i.info["config_type"] != "IsolatedAtom"
-                    ):
-                        at_i.pbc = True
-                        at_i.info["rss_group"] = rss_group
-                    else:
-                        at_i.info["rss_nonperiodic"] = "T"
-
-                    if at_i.info["config_type"] == "IsolatedAtom":
-                        at_ids = at_i.get_atomic_numbers()
-                        # array_key = at_ids.tostring()
-                        isolated_atom_energies[int(at_ids[0])] = at_i.info["REF_energy"]
-
-            else:
-                logging.warning(
-                    f"Calculation did not converge for path: {os.path.join(val, 'vasprun.xml.gz')}"
+            elif has_ase_output:
+                at = read(os.path.join(val, "final_atoms_object.xyz"), index=":")
+            for at_i in at:
+                virial_list = (
+                    -voigt_6_to_full_3x3_stress(at_i.get_stress())
+                    * at_i.get_volume()
                 )
+                at_i.info["REF_virial"] = " ".join(map(str, virial_list.flatten()))
+                del at_i.calc.results["stress"]
+                at_i.arrays["REF_forces"] = at_i.calc.results["forces"]
+                del at_i.calc.results["forces"]
+                at_i.info["REF_energy"] = at_i.calc.results["free_energy"]
+                del at_i.calc.results["energy"]
+                del at_i.calc.results["free_energy"]
+                atoms.append(at_i)
+                at_i.info["config_type"] = config_types[i]
+                if (
+                    at_i.info["config_type"] != "dimer"
+                    and at_i.info["config_type"] != "IsolatedAtom"
+                ):
+                    at_i.pbc = True
+                    at_i.info["rss_group"] = rss_group
+                else:
+                    at_i.info["rss_nonperiodic"] = "T"
+
+                if at_i.info["config_type"] == "IsolatedAtom":
+                    at_ids = at_i.get_atomic_numbers()
+                    # array_key = at_ids.tostring()
+                    isolated_atom_energies[int(at_ids[0])] = at_i.info["REF_energy"]
 
     logging.info(f"Total {len(atoms)} structures from VASP are exactly collected.")
 
