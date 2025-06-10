@@ -1019,15 +1019,6 @@ class RssConfig(AutoplexBaseModel):
         description="POTCAR settings to update. Keys are element symbols, "
         "values are the desired POTCAR labels.",
     )
-    static_energy_maker: BaseVaspMaker | AseMaker | None = Field(
-        default=None, description="Custom vasp parameters"
-    )
-    static_energy_maker_isolated_species: BaseVaspMaker | AseMaker | None = Field(
-        default=None, description="Custom vasp parameters"
-    )
-    static_energy_maker_isolated_species_spin_polarization: (
-        BaseVaspMaker | AseMaker | None
-    ) = Field(default=None, description="Custom vasp parameters")
     vasp_ref_file: str = Field(
         default="vasp_ref.extxyz", description="Reference file for VASP data"
     )
