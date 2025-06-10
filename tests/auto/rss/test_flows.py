@@ -122,11 +122,10 @@ def test_rss_workflow_custom_makers(test_dir, mock_vasp, memory_jobstore, clean_
 
 
 def test_rss_workflow_ml_potentials(test_dir, memory_jobstore, clean_dir):
+    from atomate2.forcefields.jobs import ForceFieldStaticMaker
     from autoplex.settings import RssConfig
     from autoplex.auto.rss.flows import RssMaker
-    from jobflow import Flow
-
-    from jobflow import run_locally
+    from jobflow import Flow, run_locally
 
     rss_config = {'tag': 'Si', 'train_from_scratch': True,
                   'resume_from_previous_state': {'test_error': None, 'pre_database_dir': None, 'mlip_path': None,
@@ -359,8 +358,6 @@ def test_rss_workflow_ml_potentials(test_dir, memory_jobstore, clean_dir):
                                                                                              'generation': 100000,
                                                                                              'zbl': 2}},
                   '@module': 'autoplex.settings', '@class': 'RssConfig', '@version': '0.1.4.dev16+g1029f622'}
-    # test the default VASPmakers instead
-    from atomate2.forcefields.jobs import ForceFieldStaticMaker
 
     rss_config = RssConfig.from_dict(rss_config)
 
