@@ -700,6 +700,9 @@ def do_rss_iterations(
             num_groups=num_groups,
             initial_kt=initial_kt,
             current_iter_index=current_iter_index,
+            static_energy_maker=static_energy_maker,
+            static_energy_maker_isolated_species=static_energy_maker_isolated_species,
+            static_energy_maker_isolated_species_isolated=static_energy_maker_isolated_species_spin_polarization,
             **fit_kwargs,
         )
 
