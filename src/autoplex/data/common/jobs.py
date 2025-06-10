@@ -600,7 +600,7 @@ def collect_dft_data(
         # TODO: think about fall back when we use ml potential outputs instead
         has_vasp_output = os.path.exists(os.path.join(val, "vasprun.xml.gz"))
         has_ase_output = os.path.exists(os.path.join(val, "final_atoms_object.xyz"))
-        if vasp:
+        if has_vasp_output:
             converged = check_convergence_vasp(os.path.join(val, "vasprun.xml.gz"))
 
         if (converged and has_vasp_output) or has_ase_output:
