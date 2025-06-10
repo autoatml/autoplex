@@ -129,7 +129,7 @@ def test_rss_workflow_ml_potentials(test_dir, memory_jobstore, clean_dir):
 
     rss_config = {'tag': 'Si', 'train_from_scratch': True,
                   'resume_from_previous_state': {'test_error': None, 'pre_database_dir': None, 'mlip_path': None,
-                                                 'isolated_atom_energies': None}, 'generated_struct_numbers': [200],
+                                                 'isolated_atom_energies': None}, 'generated_struct_numbers': [1000],
                   'buildcell_options': [
                       {'ABFIX': False, 'NFORM': '1', 'SYMMOPS': '1-4', 'SYSTEM': None, 'SLACK': 0.25, 'OCTET': False,
                        'OVERLAP': 0.1, 'MINSEP': None, 'NATOM': '{6,8,10,12,14,16,18,20,22,24}'}],
