@@ -361,8 +361,8 @@ def test_rss_workflow_ml_potentials(test_dir, memory_jobstore, clean_dir):
                   '@module': 'autoplex.settings', '@class': 'RssConfig', '@version': '0.1.4.dev16+g1029f622'}
     # test the default VASPmakers instead
     from atomate2.forcefields.jobs import ForceFieldRelaxMaker
-    rss_config["static_energy_maker"]=ForceFieldRelaxMaker(force_field_name="MACE-MP-0b3").as_dict()
-    rss_config["static_energy_maker_isolated_species"]=ForceFieldRelaxMaker(force_field_name="MACE-MP-0b3").as_dict()
+    rss_config["static_energy_maker"]=ForceFieldRelaxMaker(force_field_name="MACE-MP-0b3")
+    rss_config["static_energy_maker_isolated_species"]=ForceFieldRelaxMaker(force_field_name="MACE-MP-0b3")
 
     rss_config = RssConfig.from_dict(rss_config)
 
