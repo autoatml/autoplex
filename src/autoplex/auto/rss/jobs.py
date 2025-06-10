@@ -2,9 +2,10 @@
 
 import logging
 from typing import Literal
-from monty.serialization import loadfn
+
 from atomate2.vasp.jobs.base import BaseVaspMaker
 from jobflow import Flow, Response, job
+from monty.serialization import loadfn
 
 from autoplex.data.common.flows import DFTStaticLabelling
 from autoplex.data.common.jobs import (
@@ -208,8 +209,12 @@ def initial_rss(
         custom_incar=custom_incar,
         custom_potcar=custom_potcar,
         static_energy_maker=loadfn(static_energy_maker),
-        static_energy_maker_isolated_species=loadfn(static_energy_maker_isolated_species),
-        static_energy_maker_isolated_species_spin_polarization=loadfn(static_energy_maker_isolated_species_spin_polarization),
+        static_energy_maker_isolated_species=loadfn(
+            static_energy_maker_isolated_species
+        ),
+        static_energy_maker_isolated_species_spin_polarization=loadfn(
+            static_energy_maker_isolated_species_spin_polarization
+        ),
     ).make(
         structures=do_randomized_structure_generation.output, config_type=config_type
     )
@@ -588,8 +593,12 @@ def do_rss_iterations(
             custom_incar=custom_incar,
             custom_potcar=custom_potcar,
             static_energy_maker=loadfn(static_energy_maker),
-            static_energy_maker_isolated_species=loadfn(static_energy_maker_isolated_species),
-            static_energy_maker_isolated_species_spin_polarization=loadf(static_energy_maker_isolated_species_spin_polarization),
+            static_energy_maker_isolated_species=loadfn(
+                static_energy_maker_isolated_species
+            ),
+            static_energy_maker_isolated_species_spin_polarization=loadf(
+                static_energy_maker_isolated_species_spin_polarization
+            ),
         ).make(structures=do_data_sampling.output, config_type=config_type)
         do_data_collection = collect_dft_data(
             vasp_ref_file=vasp_ref_file,
