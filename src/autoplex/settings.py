@@ -6,8 +6,6 @@ import logging
 from typing import Any, Literal
 
 import numpy as np  # noqa: TC002
-from atomate2.ase.jobs import AseMaker
-from atomate2.vasp.jobs.base import BaseVaspMaker
 from monty.json import MontyDecoder, jsanitize
 from monty.serialization import loadfn
 from pydantic import BaseModel, ConfigDict, Field
