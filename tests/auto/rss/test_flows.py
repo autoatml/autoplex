@@ -364,13 +364,7 @@ def test_rss_workflow_ml_potentials(test_dir, memory_jobstore, clean_dir):
 
     rss_config = RssConfig.from_dict(rss_config)
 
-
-
-
-
     rss_job = RssMaker(name="rss", rss_config=rss_config, static_energy_maker=ForceFieldStaticMaker(force_field_name="MACE-MP-0b3"), static_energy_maker_=ForceFieldStaticMaker(force_field_name="MACE-MP-0b3")).make()
-    from atomate2.vasp.powerups import update_user_incar_settings
-
 
     responses=run_locally(
         Flow(jobs=[rss_job], output=rss_job.output),
