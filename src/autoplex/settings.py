@@ -3,16 +3,17 @@
 from __future__ import annotations
 
 import logging
-from atomate2.vasp.jobs.base import BaseVaspMaker
 from typing import Any, Literal
 
 import numpy as np  # noqa: TC002
+from atomate2.ase.jobs import AseMaker
+from atomate2.vasp.jobs.base import BaseVaspMaker
 from monty.json import MontyDecoder, jsanitize
 from monty.serialization import loadfn
 from pydantic import BaseModel, ConfigDict, Field
 from torch.optim import Optimizer  # noqa: TC002
 from torch.optim.lr_scheduler import LRScheduler  # noqa: TC002
-from atomate2.ase.jobs import AseMaker
+
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
@@ -1008,7 +1009,7 @@ class RssConfig(AutoplexBaseModel):
         default=21,
         description="Number of different distances to consider for dimer calculations.",
     )
-    custom_incar: CustomIncar|None = Field(
+    custom_incar: CustomIncar | None = Field(
         default_factory=CustomIncar,
         description="Custom VASP input parameters. "
         "If provided, will update the default parameters",
@@ -1018,9 +1019,15 @@ class RssConfig(AutoplexBaseModel):
         description="POTCAR settings to update. Keys are element symbols, "
         "values are the desired POTCAR labels.",
     )
-    static_energy_maker: BaseVaspMaker|AseMaker|None = Field(default=None, description="Custom vasp parameters")
-    static_energy_maker_isolated_species: BaseVaspMaker|AseMaker|None = Field(default=None, description="Custom vasp parameters")
-    static_energy_maker_isolated_species_spin_polarization: BaseVaspMaker|AseMaker|None = Field(default=None, description="Custom vasp parameters")
+    static_energy_maker: BaseVaspMaker | AseMaker | None = Field(
+        default=None, description="Custom vasp parameters"
+    )
+    static_energy_maker_isolated_species: BaseVaspMaker | AseMaker | None = Field(
+        default=None, description="Custom vasp parameters"
+    )
+    static_energy_maker_isolated_species_spin_polarization: (
+        BaseVaspMaker | AseMaker | None
+    ) = Field(default=None, description="Custom vasp parameters")
     vasp_ref_file: str = Field(
         default="vasp_ref.extxyz", description="Reference file for VASP data"
     )
