@@ -614,7 +614,7 @@ def collect_dft_data(
             for at_i in at:
                 print("test:")
                 print(at_i.get_stress())
-                
+
                 virial_list = (
                     -voigt_6_to_full_3x3_stress(at_i.get_stress()) * at_i.get_volume()
                 )
