@@ -207,9 +207,9 @@ def initial_rss(
         dimer_num=dimer_num,
         custom_incar=custom_incar,
         custom_potcar=custom_potcar,
-        static_energy_maker=loadfn(static_energy_maker),
-        static_energy_maker_isolated_species=loadfn(static_energy_maker_isolated_species),
-        static_energy_maker_isolated_species_spin_polarization=loadfn(static_energy_maker_isolated_species_spin_polarization),
+        static_energy_maker=static_energy_maker,
+        static_energy_maker_isolated_species=static_energy_maker_isolated_species,
+        static_energy_maker_isolated_species_spin_polarization=static_energy_maker_isolated_species_spin_polarization,
     ).make(
         structures=do_randomized_structure_generation.output, config_type=config_type
     )
