@@ -602,7 +602,8 @@ def collect_dft_data(
         has_ase_output = os.path.exists(os.path.join(val, "final_atoms_object.xyz"))
         if has_vasp_output:
             converged = check_convergence_vasp(os.path.join(val, "vasprun.xml.gz"))
-
+        else:
+            converged = False
         if (converged and has_vasp_output) or has_ase_output:
             if converged and has_vasp_output:
                 at = read(os.path.join(val, "vasprun.xml.gz"), index=":")
