@@ -6,6 +6,8 @@ from jobflow import Flow, Maker, Response, job
 
 from autoplex.auto.rss.jobs import do_rss_iterations, initial_rss
 from autoplex.settings import RssConfig
+from atomate2.vasp.jobs.base import BaseVaspMaker
+from atomate2.ase.jobs import AseMaker
 
 
 @dataclass
@@ -20,10 +22,15 @@ class RssMaker(Maker):
     rss_config: RssConfig
         Pydantic model that defines the setup parameters for the whole RSS workflow.
         If not explicitly set, the defaults from 'autoplex.settings.RssConfig' will be used.
+
+
     """
 
     name: str = "ml-driven rss"
     rss_config: RssConfig = field(default_factory=lambda: RssConfig())
+    static_energy_maker: BaseVaspMaker | None = None
+    static_energy_maker_isolated_species: BaseVaspMaker | None = None
+    static_energy_maker_isolated_species_spin_polarization: BaseVaspMaker | None = None
 
     @job
     def make(self, **kwargs):
@@ -290,7 +297,7 @@ class RssMaker(Maker):
                     "rss_group": config_params["rss_group"][0],
                 }
             )
-            initial_rss_job = initial_rss(**initial_params)
+            initial_rss_job = initial_rss( static_energy_maker=self.static_energy_maker ,static_energy_maker_isolated_species=self.static_energy_maker_isolated_species,static_energy_maker_isolated_species_spin_polarization=self.static_energy_maker_isolated_species_spin_polarization,   **initial_params)
             rss_flow.append(initial_rss_job)
 
         rss_group = config_params["rss_group"]
@@ -334,6 +341,9 @@ class RssMaker(Maker):
             resume_from_previous_state = config_params["resume_from_previous_state"]
             do_rss_job = do_rss_iterations(
                 input=resume_from_previous_state,
+                static_energy_maker=self.static_energy_maker,
+                static_energy_maker_isolated_species=self.static_energy_maker_isolated_species,
+                static_energy_maker_isolated_species_spin_polarization=self.static_energy_maker_isolated_species_spin_polarization,
                 **rss_params,
             )
 
