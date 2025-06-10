@@ -599,7 +599,7 @@ def collect_dft_data(
 
         # TODO: think about fall back when we use ml potential outputs instead
         has_vasp_output = os.path.exists(os.path.join(val, "vasprun.xml.gz"))
-        has_ase_output=os.path.exists(os.path.join(val, "final_atoms_object.xyz"))
+        has_ase_output = os.path.exists(os.path.join(val, "final_atoms_object.xyz"))
         if vasp:
             converged = check_convergence_vasp(os.path.join(val, "vasprun.xml.gz"))
 
@@ -610,8 +610,7 @@ def collect_dft_data(
                 at = read(os.path.join(val, "final_atoms_object.xyz"), index=":")
             for at_i in at:
                 virial_list = (
-                    -voigt_6_to_full_3x3_stress(at_i.get_stress())
-                    * at_i.get_volume()
+                    -voigt_6_to_full_3x3_stress(at_i.get_stress()) * at_i.get_volume()
                 )
                 at_i.info["REF_virial"] = " ".join(map(str, virial_list.flatten()))
                 del at_i.calc.results["stress"]
