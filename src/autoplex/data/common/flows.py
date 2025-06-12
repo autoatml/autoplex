@@ -8,6 +8,7 @@ from atomate2.forcefields.jobs import (
     ForceFieldRelaxMaker,
     ForceFieldStaticMaker,
 )
+from atomate2.vasp.jobs.base import BaseVaspMaker
 from atomate2.vasp.jobs.core import StaticMaker
 from atomate2.vasp.powerups import (
     update_user_incar_settings,
@@ -32,6 +33,7 @@ from autoplex.data.common.utils import (
 )
 
 __all__ = ["DFTStaticLabelling", "GenerateTrainingDataForTesting"]
+
 
 logging.basicConfig(level=logging.DEBUG, format="[%(levelname)s] %(message)s")
 
@@ -285,6 +287,110 @@ class DFTStaticLabelling(Maker):
     dimer_num: int = 21
     custom_incar: dict | None = None
     custom_potcar: dict | None = None
+    static_energy_maker: BaseVaspMaker | None = field(
+        default_factory=lambda: StaticMaker(
+            input_set_generator=StaticSetGenerator(
+                user_incar_settings={
+                    "ADDGRID": "True",
+                    "ENCUT": 520,
+                    "EDIFF": 1e-06,
+                    "ISMEAR": 0,
+                    "SIGMA": 0.01,
+                    "PREC": "Accurate",
+                    "ISYM": None,
+                    "KSPACING": 0.2,
+                    "NPAR": 8,
+                    "LWAVE": "False",
+                    "LCHARG": "False",
+                    "ENAUG": None,
+                    "GGA": None,
+                    "ISPIN": None,
+                    "LAECHG": None,
+                    "LELF": None,
+                    "LORBIT": None,
+                    "LVTOT": None,
+                    "NSW": None,
+                    "SYMPREC": None,
+                    "NELM": 100,
+                    "LMAXMIX": None,
+                    "LASPH": None,
+                    "AMIN": None,
+                }
+            ),
+            run_vasp_kwargs={"handlers": ()},
+        )
+    )
+    static_energy_maker_isolated_species: BaseVaspMaker | None = field(
+        default_factory=lambda: StaticMaker(
+            input_set_generator=StaticSetGenerator(
+                user_incar_settings={
+                    "ADDGRID": "True",
+                    "ENCUT": 520,
+                    "EDIFF": 1e-06,
+                    "ISMEAR": 0,
+                    "SIGMA": 0.01,
+                    "PREC": "Accurate",
+                    "ISYM": None,
+                    "KSPACING": 100.0,
+                    "NPAR": 1,
+                    "LWAVE": "False",
+                    "LCHARG": "False",
+                    "ENAUG": None,
+                    "GGA": None,
+                    "ISPIN": None,
+                    "LAECHG": None,
+                    "LELF": None,
+                    "LORBIT": None,
+                    "LVTOT": None,
+                    "NSW": None,
+                    "SYMPREC": None,
+                    "NELM": 100,
+                    "LMAXMIX": None,
+                    "LASPH": None,
+                    "AMIN": None,
+                    "ALGO": "All",
+                }
+            ),
+            run_vasp_kwargs={"handlers": ()},
+        )
+    )
+    static_energy_maker_isolated_species_spin_polarization: BaseVaspMaker | None = (
+        field(
+            default_factory=lambda: StaticMaker(
+                input_set_generator=StaticSetGenerator(
+                    user_incar_settings={
+                        "ISPIN": 2,
+                        "ADDGRID": "True",
+                        "ENCUT": 520,
+                        "EDIFF": 1e-06,
+                        "ISMEAR": 0,
+                        "SIGMA": 0.01,
+                        "PREC": "Accurate",
+                        "ISYM": None,
+                        "KSPACING": 100.0,
+                        "NPAR": 1,
+                        "LWAVE": "False",
+                        "LCHARG": "False",
+                        "ENAUG": None,
+                        "GGA": None,
+                        "ISPIN": None,
+                        "LAECHG": None,
+                        "LELF": None,
+                        "LORBIT": None,
+                        "LVTOT": None,
+                        "NSW": None,
+                        "SYMPREC": None,
+                        "NELM": 100,
+                        "LMAXMIX": None,
+                        "LASPH": None,
+                        "AMIN": None,
+                        "ALGO": "All",
+                    }
+                ),
+                run_vasp_kwargs={"handlers": ()},
+            )
+        )
+    )
 
     @job
     def make(
@@ -311,46 +417,50 @@ class DFTStaticLabelling(Maker):
 
         dirs: dict[str, list[str]] = {"dirs_of_vasp": [], "config_type": []}
 
-        default_custom_set = {
-            "ADDGRID": "True",
-            "ENCUT": 520,
-            "EDIFF": 1e-06,
-            "ISMEAR": 0,
-            "SIGMA": 0.01,
-            "PREC": "Accurate",
-            "ISYM": None,
-            "KSPACING": 0.2,
-            "NPAR": 8,
-            "LWAVE": "False",
-            "LCHARG": "False",
-            "ENAUG": None,
-            "GGA": None,
-            "ISPIN": None,
-            "LAECHG": None,
-            "LELF": None,
-            "LORBIT": None,
-            "LVTOT": None,
-            "NSW": None,
-            "SYMPREC": None,
-            "NELM": 100,
-            "LMAXMIX": None,
-            "LASPH": None,
-            "AMIN": None,
-        }
+        if self.static_energy_maker is None:
+            default_custom_set = {
+                "ADDGRID": "True",
+                "ENCUT": 520,
+                "EDIFF": 1e-06,
+                "ISMEAR": 0,
+                "SIGMA": 0.01,
+                "PREC": "Accurate",
+                "ISYM": None,
+                "KSPACING": 0.2,
+                "NPAR": 8,
+                "LWAVE": "False",
+                "LCHARG": "False",
+                "ENAUG": None,
+                "GGA": None,
+                "ISPIN": None,
+                "LAECHG": None,
+                "LELF": None,
+                "LORBIT": None,
+                "LVTOT": None,
+                "NSW": None,
+                "SYMPREC": None,
+                "NELM": 100,
+                "LMAXMIX": None,
+                "LASPH": None,
+                "AMIN": None,
+            }
 
-        if self.custom_incar is not None:
-            default_custom_set.update(self.custom_incar)
+            if self.custom_incar is not None:
+                default_custom_set.update(self.custom_incar)
 
-        custom_set = default_custom_set
+            custom_set = default_custom_set
 
-        st_m = StaticMaker(
-            input_set_generator=StaticSetGenerator(user_incar_settings=custom_set),
-            run_vasp_kwargs={"handlers": ()},
-        )
+            st_m = StaticMaker(
+                input_set_generator=StaticSetGenerator(user_incar_settings=custom_set),
+                run_vasp_kwargs={"handlers": ()},
+            )
 
-        if self.custom_potcar is not None:
-            st_m = update_user_potcar_settings(st_m, potcar_updates=self.custom_potcar)
-
+            if self.custom_potcar is not None:
+                st_m = update_user_potcar_settings(
+                    st_m, potcar_updates=self.custom_potcar
+                )
+        else:
+            st_m = self.static_energy_maker
         if structures:
             for idx, struct in enumerate(structures):
                 static_job = st_m.make(structure=struct)
@@ -379,18 +489,43 @@ class DFTStaticLabelling(Maker):
                         self.isolatedatom_box[2],
                     )
                     isolated_atom_struct = Structure(lattice, [sym], [[0.0, 0.0, 0.0]])
-                    static_job = st_m.make(structure=isolated_atom_struct)
+
+                    if (
+                        self.static_energy_maker_isolated_species is None
+                        and not self.e0_spin
+                    ) or (
+                        self.static_energy_maker_isolated_species_spin_polarization
+                        is None
+                        and self.e0_spin
+                    ):
+                        try:
+                            static_job = st_m.make(structure=isolated_atom_struct)
+
+                            # TODO: only makes sense for VASP jobs?
+                            static_job = update_user_incar_settings(
+                                static_job,
+                                {"KSPACING": 100.0, "ALGO": "All", "KPAR": 1},
+                            )
+                            if self.e0_spin:
+                                static_job = update_user_incar_settings(
+                                    static_job, {"ISPIN": 2}
+                                )
+
+                        except:
+                            raise ValueError(
+                                "Please define a static energy maker for the isolated species"
+                            )
+                    else:
+                        if self.e0_spin:
+                            static_job = self.static_energy_maker_isolated_species_spin_polarization.make(
+                                structure=isolated_atom_struct
+                            )
+                        else:
+                            static_job = self.static_energy_maker_isolated_species.make(
+                                structure=isolated_atom_struct
+                            )
+
                     static_job.name = f"static_isolated_{idx}"
-                    static_job = update_user_incar_settings(
-                        static_job,
-                        {"KSPACING": 100.0, "ALGO": "All", "KPAR": 1},
-                    )
-
-                    if self.e0_spin:
-                        static_job = update_user_incar_settings(
-                            static_job, {"ISPIN": 2}
-                        )
-
                     dirs["dirs_of_vasp"].append(static_job.output.dir_name)
                     dirs["config_type"].append("IsolatedAtom")
                     job_list.append(static_job)
@@ -429,17 +564,44 @@ class DFTStaticLabelling(Maker):
                             coords_are_cartesian=True,
                         )
 
-                        static_job = st_m.make(structure=dimer_struct)
-                        static_job.name = f"static_dimer_{dimer_i}"
-                        static_job = update_user_incar_settings(
-                            static_job,
-                            {"KSPACING": 100.0, "ALGO": "All", "KPAR": 1},
-                        )
+                        if (
+                            self.static_energy_maker_isolated_species is None
+                            and not self.e0_spin
+                        ) or (
+                            self.static_energy_maker_isolated_species_spin_polarization
+                            is None
+                            and self.e0_spin
+                        ):
+                            try:
+                                static_job = st_m.make(structure=dimer_struct)
 
-                        if self.e0_spin:
-                            static_job = update_user_incar_settings(
-                                static_job, {"ISPIN": 2}
-                            )
+                                # TODO: only makes sense for VASP jobs?
+                                static_job = update_user_incar_settings(
+                                    static_job,
+                                    {"KSPACING": 100.0, "ALGO": "All", "KPAR": 1},
+                                )
+                                if self.e0_spin:
+                                    static_job = update_user_incar_settings(
+                                        static_job, {"ISPIN": 2}
+                                    )
+
+                            except:
+                                raise ValueError(
+                                    "Please define a static energy maker for the isolated species"
+                                )
+                        else:
+                            if self.e0_spin:
+                                static_job = self.static_energy_maker_isolated_species_spin_polarization.make(
+                                    structure=dimer_struct
+                                )
+                            else:
+                                static_job = (
+                                    self.static_energy_maker_isolated_species.make(
+                                        structure=dimer_struct
+                                    )
+                                )
+
+                        static_job.name = f"static_dimer_{dimer_i}"
 
                         dirs["dirs_of_vasp"].append(static_job.output.dir_name)
                         dirs["config_type"].append("dimer")
