@@ -1010,7 +1010,7 @@ class RssConfig(AutoplexBaseModel):
         default=21,
         description="Number of different distances to consider for dimer calculations.",
     )
-    custom_incar: CustomIncar = Field(
+    custom_incar: CustomIncar | None = Field(
         default_factory=CustomIncar,
         description="Custom VASP input parameters. "
         "If provided, will update the default parameters",
