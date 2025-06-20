@@ -937,7 +937,7 @@ class RssConfig(AutoplexBaseModel):
         default_factory=ResumeFromPreviousState
     )
     generated_struct_numbers: list[int, int] = Field(
-        default_factory=lambda: [8000, 2000],
+        default_factory=lambda: [10000],
         description="Expected number of generated "
         "randomized unit cells by buildcell.",
     )
@@ -957,7 +957,7 @@ class RssConfig(AutoplexBaseModel):
         default=128, description="Number of processes for buildcell."
     )
     num_of_initial_selected_structs: list[int, int] = Field(
-        default_factory=lambda: [80, 20],
+        default_factory=lambda: [100],
         description="Number of structures to be sampled directly "
         "from the buildcell-generated randomized cells.",
     )

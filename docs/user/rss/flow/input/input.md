@@ -30,6 +30,7 @@ The section defines the settings for generating initial random structures. These
 generated_struct_numbers:
   - 8000
   - 2000
+cell_seed_paths:
 buildcell_options:
   - NFORM: '1'
     SYMMOPS: '1-4'
@@ -53,11 +54,11 @@ Using the configuration file above, a total of 8000 structures will be generated
 Additionally, 2000 structures will be created with an odd number of atoms. The symmetry operations will vary from 1 to 4. 
 You can supply a single set or multiple sets as needed. 
 This flexibility ensures that the initial structures have sufficient diversity. 
-In principle, any parameter supported by [buildcell](https://airss-docs.github.io/technical-reference/buildcell-manual) can be used in the `buildcell_options` section.
+In principle, any parameter supported by [buildcell](https://airss-docs.github.io/technical-reference/buildcell-manual) can be used in the `buildcell_options` section. In addition to `buildcell_options`, one can also load buildcell parameters from standard `.cell` files (as described in the [buildcell](https://airss-docs.github.io/technical-reference/buildcell-manual) through `cell_seed_paths`. This allows for greater flexibility, especially for defining interface structures and solution systems, as users can rely on well-established input formats.
 
 The `fragment_file` and `fragment_numbers` parameters are used during random structure generation to define specific fragments as the smallest building blocks. For example, you can define an H<sub>2</sub>O molecule as a fragment and use it as the basic unit for generating random structures. This allows for more customized and realistic initial configurations when working with molecular or other complex systems. The `num_processes_buildcell` parameter specifies the number of CPU cores to be used in parallel during random structure generation. Note that this parameter is limited to a single node.
 
-> **Note**: The `generated_struct_numbers` and `buildcell_options` parameters must have the same length. Each entry in `buildcell_options` corresponds to the number of structures specified at the same position in `generated_struct_numbers`.
+> **Note**: The `generated_struct_numbers` and `buildcell_options` parameters must have the same length. Each entry in `buildcell_options` corresponds to the number of structures specified at the same position in `generated_struct_numbers`. If both `cell_seed_paths` and `buildcell_options` are set, only `cell_seed_paths` will take effect.
 
 ## Sampling parameters
 
@@ -112,10 +113,7 @@ dimer_range:
   - 5.0
 dimer_num: 21
 custom_incar:
-  KPAR: 8
   NCORE: 16
-  LSCALAPACK: ".FALSE."
-  LPLANE: ".FALSE."
   ISMEAR: 0
   SIGMA: 0.05
   PREC: "Accurate"
@@ -174,6 +172,7 @@ You can specify the desired model using the `mlip_type` argument and tune hyperp
 ```yaml
 # MLIP Parameters
 mlip_type: 'GAP'
+auto_delta: True
 mlip_hypers:
   GAP:
     general:
@@ -251,12 +250,12 @@ hookean_repul: true
 hookean_paras:
   '(14, 14)': [1000, 1.0]
 keep_symmetry: true
-write_traj: true
+remove_traj_files: true
 num_processes_rss: 128
 device_for_rss: 'cpu'
 ```
 
-The RSS workflow supports searching for structures under high pressure, controlled by the `scalar_pressure_method` parameter. Two methods are available: `exp`, where pressure is sampled based on an exponential distribution with control parameters `scalar_exp_pressure` and `scalar_pressure_exponential_width`, and `uniform`, where pressure is sampled uniformly within a range defined by `scalar_pressure_low` and `scalar_pressure_high`.
+The RSS workflow supports searching for structures under high pressure, controlled by the `scalar_pressure_method` parameter. Two methods are available: `exp`, where pressure is sampled based on an exponential distribution with control parameters `scalar_exp_pressure` and `scalar_pressure_exponential_width`, and `uniform`, where pressure is sampled uniformly within a range defined by `scalar_pressure_low` and `scalar_pressure_high`. One can use `remove_traj_files` to delete all RSS trajectories in order to save storage space.
 
 To terminate the iterative process, two stopping criteria are provided: `stop_criterion` and `max_iteration_number`. The iterations stop when the prediction error falls below the value of `stop_criterion`. Or the iterations stop when the number of iterations exceeds the limit defined by `max_iteration_number`. The workflow will stop when either of the above criteria is satisfied.
 

@@ -69,21 +69,20 @@ As an alternative to using a RssConfig object, the RSS workflow can be initiated
 You can override the default settings by passing them as keyword arguments, offering a more flexible and lightweight way to set up the workflow.
 
 ```python
-rss_job = RssMaker(name="your workflow name").make(tag='Si',
-                                                   buildcell_options=[{'NFORM': '{1,3,5}'},
-                                                                      {'NFORM': '{2,4,6}'}],
-                                                   hookean_repul=True, 
-                                                   hookean_paras={'(14, 14)': (100, 1.2)})
+from autoplex.settings import RssConfig
+from autoplex.auto.rss.flows import RssMaker
+from jobflow_remote import submit_flow
+
+rss_job = RssMaker(name="your workflow name").make(tag='Si')
+resources = {"nodes": N, "partition": "name", "qos": "name", "time": "8:00:00", "mail_user": "your_email", "mail_type": "ALL", "account": "your account"}
+print(submit_flow(rss_job, worker="your worker", resources=resources, project="your project name"))
 ```
 
-If you choose to use the direct parameter specification method, at a minimum, you must provide the following arguments:
+If you choose to use the direct parameter specification method, at a minimum, you must provide the following argument:
 
-- `tag`: defines the system's elements and stoichiometry (only for compounds).  
-- `buildcell_options`: controls the parameters for generating the initial randomized structures.
-- `hookean_repul`: enables a strong repulsive force to avoid physically unrealistic structures.  
-- `hookean_paras`: specifies the Hookean repulsion parameters.
+- `tag`: defines the system's elements and stoichiometry, e.g., `tag='SiO2'` (only for compounds).  
 
-> **Recommendation**: We strongly recommend enabling `hookean_repul`, as it applies a strong repulsive force when the distance between two atoms falls below a certain threshold. This ensures that the generated structures are physically reasonable.
+> **Recommendation**: Although `tag` is the minimal input, we strongly recommend enabling `hookean_repul` as well, as it applies a strong repulsive force when the distance between two atoms falls below a certain threshold. This ensures that the generated structures are physically reasonable.
 
 > **Note**: If both a custom RssConfig object and direct parameter specifications are provided, any overlapping parameters will be overridden by the directly specified values.
 

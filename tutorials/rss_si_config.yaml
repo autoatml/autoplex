@@ -7,6 +7,7 @@ resume_from_previous_state:
   isolated_atom_energies:
 generated_struct_numbers:
   - 200
+cell_seed_paths:
 buildcell_options:
   - NFORM: '1'
     SYMMOPS: '1-4'
@@ -116,7 +117,7 @@ current_iter_index: 1
 hookean_repul: false
 hookean_paras:
 keep_symmetry: false
-write_traj: true
+remove_traj_files: true
 num_processes_rss: 128
 device_for_rss: cpu
 mlip_hypers:
