@@ -68,7 +68,7 @@ workflow-managers = [
 ]
 strict = [
      "calorine==3.0",
-     "pymatgen==2025.2.18",
+     "pymatgen==2025.6.14",
      "atomate2[strict]==0.0.21",
      "matgl==1.2.6",
      "quippy-ase==0.9.14; python_version < '3.12'",
