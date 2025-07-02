@@ -44,8 +44,6 @@ class CustomPotential(quippy.potential.Potential):
             atoms.info["energy"] = self.results["energy"].copy()
         if "stress" in self.results:
             atoms.info["stress"] = self.results["stress"].copy()
-        if "virial" in self.extra_results["config"]:
-            atoms.info["virial"] = self.extra_results["config"]["virial"].copy()
         return res
 
 
