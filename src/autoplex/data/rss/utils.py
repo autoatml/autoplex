@@ -10,7 +10,6 @@ from typing import Literal
 import ase.io
 import matgl
 import numpy as np
-import quippy.potential
 from ase import Atoms
 from ase.constraints import (
     FixConstraint,
@@ -28,23 +27,10 @@ from nequip.ase import NequIPCalculator
 from pymatgen.core import Structure
 from pymatgen.io.ase import AseAtomsAdaptor
 
-from autoplex.fitting.common.utils import extract_gap_label
-
-
-class CustomPotential(quippy.potential.Potential):
-    """A custom potential class that modifies the outputs of potentials."""
-
-    def calculate(self, *args, **kwargs):
-        """Update the atoms object with forces, energy, and virial information."""
-        res = super().calculate(*args, **kwargs)
-        atoms = kwargs["atoms"] if "atoms" in kwargs else args[0]
-        if "forces" in self.results:
-            atoms.arrays["forces"] = self.results["forces"].copy()
-        if "energy" in self.results:
-            atoms.info["energy"] = self.results["energy"].copy()
-        if "stress" in self.results:
-            atoms.info["stress"] = self.results["stress"].copy()
-        return res
+from autoplex.fitting.common.utils import (
+    CustomPotential,
+    extract_gap_label,
+)
 
 
 def extract_pairstyle(

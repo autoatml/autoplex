@@ -18,6 +18,7 @@ import matgl
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import quippy.potential
 import torch
 from ase.atoms import Atoms
 from ase.calculators.singlepoint import SinglePointCalculator
@@ -1844,6 +1845,24 @@ def run_gap(num_processes_fit: int, parameters) -> None:
         open("std_gap_err.log", "w", encoding="utf-8") as file_err,
     ):
         subprocess.call(["gap_fit", *parameters], stdout=file_std, stderr=file_err)
+
+
+class CustomPotential(quippy.potential.Potential):
+    """A custom potential class that modifies the outputs of potentials."""
+
+    def calculate(self, *args, **kwargs):
+        """Update the atoms object with forces, energy, and virial information."""
+        res = super().calculate(*args, **kwargs)
+        atoms = kwargs["atoms"] if "atoms" in kwargs else args[0]
+        if "forces" in self.results:
+            atoms.arrays["forces"] = self.results["forces"].copy()
+        if "energy" in self.results:
+            atoms.info["energy"] = self.results["energy"].copy()
+        if "stress" in self.results:
+            atoms.info["stress"] = self.results["stress"].copy()
+        if "virial" in self.extra_results["config"]:
+            atoms.info["virial"] = self.extra_results["config"]["virial"].copy()
+        return res
 
 
 def run_quip(
