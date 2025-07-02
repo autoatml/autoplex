@@ -926,7 +926,7 @@ class RssConfig(AutoplexBaseModel):
         "and stoichiometry. For example, the tag of 'SiO2' will be recognized "
         "as a 1:2 ratio of Si to O and passed into the parameters of buildcell. "
         "However, note that this will be overwritten if the stoichiometric ratio "
-        "of elements is defined in the 'buildcell_options'",
+        "of elements is defined in the 'cell_seed_paths' or 'buildcell_options'",
     )
     train_from_scratch: bool = Field(
         default=True,
@@ -937,9 +937,12 @@ class RssConfig(AutoplexBaseModel):
         default_factory=ResumeFromPreviousState
     )
     generated_struct_numbers: list[int, int] = Field(
-        default_factory=lambda: [8000, 2000],
+        default_factory=lambda: [10000],
         description="Expected number of generated "
         "randomized unit cells by buildcell.",
+    )
+    cell_seed_paths: list[str] | None = Field(
+        default=None, description="Custom buildcell control files."
     )
     buildcell_options: list[BuildcellOptions] | None = Field(
         default=None, description="Customized parameters for buildcell."
@@ -947,14 +950,14 @@ class RssConfig(AutoplexBaseModel):
     fragment_file: str | None = Field(default=None, description="")
     fragment_numbers: list[int] | None = Field(
         default=None,
-        description=" Numbers of each fragment to be included in the random structures. "
+        description="Numbers of each fragment to be included in the random structures. "
         "Defaults to 1 for all specified.",
     )
     num_processes_buildcell: int = Field(
         default=128, description="Number of processes for buildcell."
     )
     num_of_initial_selected_structs: list[int, int] = Field(
-        default_factory=lambda: [80, 20],
+        default_factory=lambda: [100],
         description="Number of structures to be sampled directly "
         "from the buildcell-generated randomized cells.",
     )
@@ -1142,9 +1145,9 @@ class RssConfig(AutoplexBaseModel):
     keep_symmetry: bool = Field(
         default=False, description="Whether to preserve symmetry during relaxations."
     )
-    write_traj: bool = Field(
-        default=True,
-        description="Bool indicating whether to write the trajectory files.",
+    remove_traj_files: bool = Field(
+        default=False,
+        description="Bool indicating whether to remove the RSS trajectory files.",
     )
     num_processes_rss: int = Field(
         default=128, description="Number of processes used for running RSS."

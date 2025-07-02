@@ -28,6 +28,7 @@ def initial_rss(
     tag: str,
     generated_struct_numbers: list[int],
     num_of_initial_selected_structs: list[int] | None = None,
+    cell_seed_paths: list[str] | None = None,
     buildcell_options: list[dict] | None = None,
     fragment_file: str | None = None,
     fragment_numbers: list[str] | None = None,
@@ -76,11 +77,16 @@ def initial_rss(
     ----------
     tag: str
         Tag of systems. It can also be used for setting up elements and stoichiometry.
-        For example, 'SiO2' will generate structures with a 2:1 ratio of Si to O.
+        For example, the tag of 'SiO2' will be recognized as a 1:2 ratio of Si to O and
+        passed into the parameters of buildcell. However, note that this will be overwritten
+        if the stoichiometric ratio of elements is defined in the 'cell_seed_paths' or 'buildcell_options'.
     generated_struct_numbers: list[int]
         Expected number of generated randomized unit cells.
     num_of_initial_selected_structs: list[int] | None
         Number of structures to be sampled. Default is None.
+    cell_seed_paths: list[str]
+        A list of paths to the custom buildcell control files, which ends with '.cell'. If these files exist,
+        the buildcell_options argument will no longer take effect.
     buildcell_options: list[dict] | None
         Customized parameters for buildcell. Default is None.
     fragment_file: Atoms | list[Atoms] | None
@@ -184,6 +190,7 @@ def initial_rss(
 
     do_randomized_structure_generation = BuildMultiRandomizedStructure(
         generated_struct_numbers=generated_struct_numbers,
+        cell_seed_paths=cell_seed_paths,
         buildcell_options=buildcell_options,
         fragment_file=fragment_file,
         fragment_numbers=fragment_numbers,
@@ -273,6 +280,7 @@ def do_rss_iterations(
     tag: str,
     generated_struct_numbers: list[int],
     num_of_initial_selected_structs: list[int] | None = None,
+    cell_seed_paths: list[str] | None = None,
     buildcell_options: list[dict] | None = None,
     fragment_file: str | None = None,
     fragment_numbers: list[str] | None = None,
@@ -321,7 +329,7 @@ def do_rss_iterations(
     hookean_repul: bool = False,
     hookean_paras: dict[tuple[int, int], tuple[float, float]] | None = None,
     keep_symmetry: bool = False,
-    write_traj: bool = True,
+    remove_traj_files: bool = False,
     num_processes_rss: int = 1,
     device_for_rss: str = "cpu",
     stop_criterion: float = 0.01,
@@ -361,11 +369,16 @@ def do_rss_iterations(
 
     tag: str
         Tag of systems. It can also be used for setting up elements and stoichiometry.
-        For example, 'SiO2' will generate structures with a 2:1 ratio of Si to O.
+        For example, the tag of 'SiO2' will be recognized as a 1:2 ratio of Si to O and
+        passed into the parameters of buildcell. However, note that this will be overwritten
+        if the stoichiometric ratio of elements is defined in the 'cell_seed_paths' or 'buildcell_options'.
     generated_struct_numbers: list[int]
         Expected number of generated randomized unit cells.
     num_of_initial_selected_structs: list[int] | None
         Number of structures to be sampled. Default is None.
+    cell_seed_paths: list[str]
+        A list of paths to the custom buildcell control files, which ends with '.cell'. If these files exist,
+        the buildcell_options argument will no longer take effect.
     buildcell_options: list[dict] | None
         Customized parameters for buildcell. Default is None.
     fragment_file: Atoms | list[Atoms] | None
@@ -471,8 +484,8 @@ def do_rss_iterations(
         Parameters for Hookean repulsion as a dictionary of tuples. Default is None.
     keep_symmetry: bool
         If true, preserve symmetry during relaxation. Default is False.
-    write_traj: bool
-        If true, write trajectory of RSS. Default is True.
+    remove_traj_files: bool
+            If true, remove all trajectory files raised by RSS to save memory. Default is False.
     num_processes_rss: int
         Number of processes used for running RSS. Default is 1.
     device_for_rss: str
@@ -537,6 +550,7 @@ def do_rss_iterations(
 
         do_randomized_structure_generation = BuildMultiRandomizedStructure(
             generated_struct_numbers=generated_struct_numbers,
+            cell_seed_paths=cell_seed_paths,
             buildcell_options=buildcell_options,
             fragment_file=fragment_file,
             fragment_numbers=fragment_numbers,
@@ -563,7 +577,6 @@ def do_rss_iterations(
             hookean_repul=hookean_repul,
             hookean_paras=hookean_paras,
             keep_symmetry=keep_symmetry,
-            write_traj=write_traj,
             num_processes_rss=num_processes_rss,
             device=device_for_rss,
             num_groups=num_groups,
@@ -576,6 +589,7 @@ def do_rss_iterations(
             traj_path=do_rss.output,
             random_seed=random_seed,
             isolated_atom_energies=input["isolated_atom_energies"],
+            remove_traj_files=remove_traj_files,
         )
         do_dft_static = DFTStaticLabelling(
             e0_spin=e0_spin,
@@ -645,6 +659,7 @@ def do_rss_iterations(
             generated_struct_numbers=generated_struct_numbers,
             num_of_initial_selected_structs=num_of_initial_selected_structs,
             tag=tag,
+            cell_seed_paths=cell_seed_paths,
             buildcell_options=buildcell_options,
             fragment_file=fragment_file,
             fragment_numbers=fragment_numbers,
@@ -692,7 +707,7 @@ def do_rss_iterations(
             hookean_repul=hookean_repul,
             hookean_paras=hookean_paras,
             keep_symmetry=keep_symmetry,
-            write_traj=write_traj,
+            remove_traj_files=remove_traj_files,
             num_processes_rss=num_processes_rss,
             device_for_rss=device_for_rss,
             stop_criterion=stop_criterion,

@@ -500,7 +500,6 @@ def test_mock_workflow(test_dir, mock_vasp, memory_jobstore, clean_dir):
                                   force_tol=0.6,
                                   stress_tol=0.6,
                                   Hookean_repul=False,
-                                  write_traj=True,
                                   num_processes_rss=4,
                                   device="cpu",
                                   stop_criterion=0.01,
@@ -650,7 +649,6 @@ def test_mock_workflow_multi_node(test_dir, mock_vasp, memory_jobstore, clean_di
                                              force_tol=0.6,
                                              stress_tol=0.6,
                                              Hookean_repul=False,
-                                             write_traj=True,
                                              num_processes_rss=4,
                                              device="cpu",
                                              stop_criterion=0.01,
@@ -686,4 +684,3 @@ def test_rssmaker_custom_config_file(test_dir):
     assert rss.rss_config.device_for_rss == "cuda"
     assert rss.rss_config.isolatedatom_box == [10, 10, 10]
     assert rss.rss_config.dimer_box == [10, 10, 10]
-

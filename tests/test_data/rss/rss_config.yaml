@@ -138,6 +138,5 @@ current_iter_index: 1
 hookean_repul: false
 hookean_paras:
 keep_symmetry: false
-write_traj: true
 num_processes_rss: 128
 device_for_rss: 'cuda'

@@ -1,6 +1,6 @@
 {
   "name": "DeveloperEnv",
-  "image": "ghcr.io/autoatml/autoplex/autoplex-python-3.10:v0.1.3",
+  "image": "ghcr.io/autoatml/autoplex/autoplex-python-3.10:v0.1.4",
   "initializeCommand": "docker system prune --all --force",
   "hostRequirements": {
    "cpus": 4,

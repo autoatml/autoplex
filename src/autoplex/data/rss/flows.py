@@ -21,11 +21,16 @@ class BuildMultiRandomizedStructure(Maker):
     ----------
     tag: str
         Tag of systems. It can also be used for setting up elements and stoichiometry.
-        For example, 'SiO2' will generate structures with a 2:1 ratio of Si to O.
+        For example, the tag of 'SiO2' will be recognized as a 1:2 ratio of Si to O and
+        passed into the parameters of buildcell. However, note that this will be overwritten
+        if the stoichiometric ratio of elements is defined in the 'cell_seed_paths' or 'buildcell_options'.
     generated_struct_numbers: list[int]
         Expected number of generated randomized unit cells.
-    buildcell_option: dict
-        Customized parameters for buildcell.
+    cell_seed_paths: list[str]
+        A list of paths to the custom buildcell control files, which ends with '.cell'. If these files exist,
+        the buildcell_options argument will no longer take effect.
+    buildcell_options: list[dict]
+        A list of customized buildcell parameters.
     fragment_file: Atoms | list[Atoms] (optional)
         Fragment(s) for random structures, e.g. molecules, to be placed indivudally intact.
         atoms.arrays should have a 'fragment_id' key with unique identifiers for each fragment if in same Atoms.
@@ -51,6 +56,7 @@ class BuildMultiRandomizedStructure(Maker):
 
     tag: str
     generated_struct_numbers: list[int]
+    cell_seed_paths: list[str] | None = None
     buildcell_options: list[dict] | None = None
     fragment_file: str | None = None
     fragment_numbers: list[str] | None = None
@@ -68,14 +74,19 @@ class BuildMultiRandomizedStructure(Maker):
         job_list = []
         final_structures = []
         for i, struct_number in enumerate(self.generated_struct_numbers):
+            cell_seed_path = None
             buildcell_option = None
-            if self.buildcell_options is not None:
+            if self.cell_seed_paths is not None:
+                assert len(self.generated_struct_numbers) == len(self.cell_seed_paths)
+                cell_seed_path = self.cell_seed_paths[i]
+            elif self.buildcell_options is not None:
                 assert len(self.generated_struct_numbers) == len(self.buildcell_options)
                 buildcell_option = self.buildcell_options[i]
             job_struct = RandomizedStructure(
                 tag=self.tag,
                 struct_number=struct_number,
                 remove_tmp_files=self.remove_tmp_files,
+                cell_seed_path=cell_seed_path,
                 buildcell_option=buildcell_option,
                 fragment_file=self.fragment_file,
                 fragment_numbers=self.fragment_numbers,

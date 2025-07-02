@@ -1,18 +1,18 @@
 import os.path
-
+from ase.io import read
 from autoplex import MLIP_HYPERS
 from autoplex.fitting.common.utils import (
     gap_hyperparameter_constructor,
     check_convergence,
     data_distillation,
     prepare_fit_environment,
+    calculate_delta_2b,
+    stratified_dataset_split,
+    compute_num_of_descriptor
 )
 
 def test_stratified_split(test_dir):
-    from autoplex.fitting.common.utils import stratified_dataset_split
-    from ase.io import read
     atoms=read(test_dir / "fitting" / "ref_files" / "vasp_ref.extxyz",':')
-
 
     train, test=stratified_dataset_split(atoms,0.33, energy_label="REF_energy")
 
@@ -232,6 +232,21 @@ def test_data_distillation(test_dir):
     for atom in atoms:
         if (atom.symbols == "Li32Cl32").any() or (atom.symbols == "Li").any() or (atom.symbols == "Cl").any():
             assert True
+
+
+def test_calculate_delta_2b(test_dir):
+    atoms=read(test_dir / "fitting" / "rss_training_dataset"/ "train.extxyz",':')
+    
+    delta = calculate_delta_2b(atoms_db=atoms, cutoff=4.0, e_name='REF_energy')
+    assert (delta-0.7810536) < 1e-6
+    
+    
+def test_calculate_num_of_descriptor(test_dir):
+    atoms=read(test_dir / "fitting" / "rss_training_dataset"/ "train.extxyz",':')
+    num_2b = sum([compute_num_of_descriptor(atom=at, nb=2, cutoff=4) for at in atoms])
+    num_3b = sum([compute_num_of_descriptor(atom=at, nb=3, cutoff=3.25) for at in atoms])
+    assert num_2b == 2370
+    assert num_3b == 2573
 
 
 def test_prepare_fit_environment(test_dir, clean_dir):

@@ -60,7 +60,6 @@ def test_gap_rss(test_dir, memory_jobstore, clean_dir):
                                  force_tol=0.1,
                                  stress_tol=0.1,
                                  hookean_repul=False,
-                                 write_traj=True,
                                  num_processes_rss=4,
                                  device="cpu",
                                  isolated_atom_energies={14: -0.84696938})
@@ -102,7 +101,6 @@ def test_gap_rss_multi_jobs(test_dir, memory_jobstore, clean_dir):
                                 force_tol=0.01,
                                 stress_tol=0.0001,
                                 hookean_repul=False,
-                                write_traj=True,
                                 num_processes_rss=4,
                                 device="cpu",
                                 isolated_atom_energies={14: -0.84696938},
@@ -151,7 +149,6 @@ def test_jace_rss(test_dir, memory_jobstore, clean_dir):
                                  force_tol=0.1,
                                  stress_tol=0.1,
                                  hookean_repul=False,
-                                 write_traj=True,
                                  num_processes_rss=4,
                                  device="cpu",
                                  isolated_atom_energies={14: -0.84696938})
@@ -192,7 +189,6 @@ def test_nequip_rss(test_dir, memory_jobstore, clean_dir):
                                  force_tol=0.1,
                                  stress_tol=0.1,
                                  hookean_repul=False,
-                                 write_traj=True,
                                  num_processes_rss=4,
                                  device="cpu",
                                  isolated_atom_energies={14: -0.84696938})
@@ -233,7 +229,6 @@ def test_m3gnet_rss(test_dir, memory_jobstore, clean_dir):
                                  force_tol=0.1,
                                  stress_tol=0.1,
                                  hookean_repul=False,
-                                 write_traj=True,
                                  num_processes_rss=4,
                                  device="cpu",
                                  isolated_atom_energies={14: -0.84696938})
@@ -274,7 +269,6 @@ def test_mace_rss(test_dir, memory_jobstore, clean_dir):
                                  force_tol=0.1,
                                  stress_tol=0.1,
                                  hookean_repul=False,
-                                 write_traj=True,
                                  num_processes_rss=4,
                                  device="cpu",
                                  isolated_atom_energies={14: -0.84696938})
@@ -346,6 +340,15 @@ def test_output_from_scratch(memory_jobstore, clean_dir):
                                   buildcell_option={'VARVOL': 20,
                                                     'SYMMOPS': '1-2'},
                                   num_processes=4).make()
+
+    responses = run_locally(job_rss, ensure_success=True, create_folders=True, store=memory_jobstore)
+    assert len(read(job_rss.output.resolve(memory_jobstore), index=":")) == 3
+    
+    
+def test_output_from_scratch_wo_buildcell_option(memory_jobstore, clean_dir):
+    from ase.io import read
+    job_rss = RandomizedStructure(struct_number=3,
+                                  tag='Si').make()
 
     responses = run_locally(job_rss, ensure_success=True, create_folders=True, store=memory_jobstore)
     assert len(read(job_rss.output.resolve(memory_jobstore), index=":")) == 3

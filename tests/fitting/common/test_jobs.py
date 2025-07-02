@@ -6,7 +6,30 @@ from jobflow import run_locally
 from tests.auto.phonons.test_jobs import fake_run_vasp_kwargs
 
 
-def test_gap_fit_maker(test_dir, memory_jobstore, clean_dir):
+def test_gap_auto_delta_fit_maker(test_dir, memory_jobstore, clean_dir):
+
+    database_dir = test_dir / "fitting/rss_training_dataset/"
+
+    gapfit = MLIPFitMaker(
+        auto_delta=True,
+        glue_xml=False,
+        apply_data_preprocessing=False,
+    ).make(
+        twob={"delta": 2.0, "cutoff": 4},
+        threeb={"n_sparse": 10},
+        database_dir=database_dir,
+        general={"two_body": True,
+                 "three_body": True}
+        )
+
+    _ = run_locally(
+        gapfit, ensure_success=True, create_folders=True, store=memory_jobstore
+    )
+
+    assert Path(gapfit.output["mlip_path"][0].resolve(memory_jobstore)).exists()
+    
+    
+def test_gap_fixed_delta_fit_maker(test_dir, memory_jobstore, clean_dir):
 
     database_dir = test_dir / "fitting/rss_training_dataset/"
 
@@ -16,8 +39,10 @@ def test_gap_fit_maker(test_dir, memory_jobstore, clean_dir):
         apply_data_preprocessing=False,
     ).make(
         twob={"delta": 2.0, "cutoff": 4},
-        threeb={"n_sparse": 10},
-        database_dir=database_dir
+        threeb={"delta": 1.5, "n_sparse": 10},
+        database_dir=database_dir,
+        general={"two_body": True,
+                 "three_body": True}
         )
 
     _ = run_locally(

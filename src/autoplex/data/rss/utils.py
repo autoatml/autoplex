@@ -3,6 +3,7 @@
 import ast
 import json
 import os
+from functools import partial
 from multiprocessing import Pool
 from pathlib import Path
 from typing import Literal
@@ -26,6 +27,7 @@ from matgl.ext.ase import M3GNetCalculator
 from nequip.ase import NequIPCalculator
 from pymatgen.core import Structure
 from pymatgen.io.ase import AseAtomsAdaptor
+from threadpoolctl import threadpool_limits
 
 from autoplex.fitting.common.utils import (
     CustomPotential,
@@ -625,33 +627,30 @@ def minimize_structures(
     for i, atom in enumerate(atoms):
         atom.info["unique_starting_index"] = iteration_index + f"{i+struct_start_index}"
 
-    args = [
-        (
-            atom,
-            mlip_type,
-            mlip_path,
-            output_file_name,
-            scalar_pressure_method,
-            scalar_exp_pressure,
-            scalar_pressure_exponential_width,
-            scalar_pressure_low,
-            scalar_pressure_high,
-            max_steps,
-            force_tol,
-            stress_tol,
-            hookean_repul,
-            hookean_paras,
-            write_traj,
-            device,
-            isolated_atom_energies,
-            config_type,
-            keep_symmetry,
-        )
-        for atom in atoms
-    ]
+    minimize_worker = partial(
+        process_rss,
+        mlip_type=mlip_type,
+        mlip_path=mlip_path,
+        output_file_name=output_file_name,
+        scalar_pressure_method=scalar_pressure_method,
+        scalar_exp_pressure=scalar_exp_pressure,
+        scalar_pressure_exponential_width=scalar_pressure_exponential_width,
+        scalar_pressure_low=scalar_pressure_low,
+        scalar_pressure_high=scalar_pressure_high,
+        max_steps=max_steps,
+        force_tol=force_tol,
+        stress_tol=stress_tol,
+        hookean_repul=hookean_repul,
+        hookean_paras=hookean_paras,
+        write_traj=write_traj,
+        device=device,
+        isolated_atom_energies=isolated_atom_energies,
+        config_type=config_type,
+        keep_symmetry=keep_symmetry,
+    )
 
-    with Pool(processes=num_processes_rss) as pool:
-        results = pool.starmap(process_rss, args)
+    with threadpool_limits(limits=1), Pool(processes=num_processes_rss) as pool:
+        results = pool.map(minimize_worker, atoms)
 
     return list(results)
 

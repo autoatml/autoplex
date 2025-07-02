@@ -64,7 +64,7 @@ docs = [
 ]
 workflow-managers = [
     "FireWorks==2.0.4",
-    "jobflow-remote==0.1.5"
+    "jobflow-remote==0.1.7"
 ]
 strict = [
      "calorine==3.0",

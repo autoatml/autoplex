@@ -35,7 +35,9 @@ class RandomizedStructure(Maker):
         Expected number of generated randomized unit cells.
     tag: str
         Tag of systems. It can also be used for setting up elements and stoichiometry.
-        For example, 'SiO2' will generate structures with a 2:1 ratio of Si to O.
+        For example, the tag of 'SiO2' will be recognized as a 1:2 ratio of Si to O and
+        passed into the parameters of buildcell. However, note that this will be overwritten
+        if the stoichiometric ratio of elements is defined in the 'cell_seed_paths' or 'buildcell_options'.
     output_file_name: str
         Name of the file to store all generated structures.
     remove_tmp_files: bool
@@ -98,7 +100,11 @@ class RandomizedStructure(Maker):
 
             elements = self._extract_elements(self.tag)  # {"Si":1, "O":2}
 
-            if "SPECIES" in self.buildcell_option and self.fragment_file is not None:
+            if (
+                self.buildcell_option is not None
+                and "SPECIES" in self.buildcell_option
+                and self.fragment_file is not None
+            ):
                 raise ValueError(
                     "Cannot use 'SPECIES' and 'fragment' together in buildcell options.\n"
                     "Specify your fragment only and use NFORM to control their number."
@@ -433,7 +439,6 @@ def do_rss_single_node(
     stress_tol: float = 0.01,
     hookean_repul: bool = False,
     hookean_paras: dict[tuple[int, int], tuple[float, float]] | None = None,
-    write_traj: bool = True,
     num_processes_rss: int = 1,
     device: str = "cpu",
     isolated_atom_energies: dict[int, float] | None = None,
@@ -477,8 +482,6 @@ def do_rss_single_node(
         If true, apply Hookean repulsion. Default is False.
     hookean_paras: dict
         Parameters for Hookean repulsion as a dictionary of tuples. Default is None.
-    write_traj: bool
-        If true, write trajectory of RSS. Default is True.
     num_processes_rss: int
         Number of processes used for running RSS.
     device: str
@@ -513,7 +516,6 @@ def do_rss_single_node(
         stress_tol=stress_tol,
         hookean_repul=hookean_repul,
         hookean_paras=hookean_paras,
-        write_traj=write_traj,
         num_processes_rss=num_processes_rss,
         device=device,
         isolated_atom_energies=isolated_atom_energies,
@@ -541,7 +543,6 @@ def do_rss_multi_node(
     stress_tol: float = 0.01,
     hookean_repul: bool = False,
     hookean_paras: dict[tuple[int, int], tuple[float, float]] | None = None,
-    write_traj: bool = True,
     num_processes_rss: int = 1,
     device: str = "cpu",
     isolated_atom_energies: dict[int, float] | None = None,
@@ -587,8 +588,6 @@ def do_rss_multi_node(
         If true, apply Hookean repulsion. Default is False.
     hookean_paras: dict
         Parameters for Hookean repulsion as a dictionary of tuples. Default is None.
-    write_traj: bool
-        If true, write trajectory of RSS. Default is True.
     num_processes_rss: int
         Number of processes used for running RSS.
     device: str
@@ -646,7 +645,6 @@ def do_rss_multi_node(
             stress_tol=stress_tol,
             hookean_repul=hookean_repul,
             hookean_paras=hookean_paras,
-            write_traj=write_traj,
             num_processes_rss=num_processes_rss,
             device=device,
             isolated_atom_energies=isolated_atom_energies,

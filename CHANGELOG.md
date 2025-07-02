@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.1.4
+
+<!-- Release notes generated using configuration in .github/release.yml at main -->
+
+## What's Changed
+### 🚀 New Features
+* Improve GAP fitting by @YuanbinLiu in https://github.com/autoatml/autoplex/pull/398
+* Improve usability of RSS workflows by @YuanbinLiu in https://github.com/autoatml/autoplex/pull/402
+### 📚 Documentation
+* Improve the documentation for the RSS workflow by @YuanbinLiu in https://github.com/autoatml/autoplex/pull/404
+### 🔄 Other Changes
+* Generalize data creation for phonon workflow and beyond by @JaGeo in https://github.com/autoatml/autoplex/pull/390
+
+
+**Full Changelog**: https://github.com/autoatml/autoplex/compare/v0.1.3...v0.1.4
+
+
 ## v0.1.3
 
 <!-- Release notes generated using configuration in .github/release.yml at main -->

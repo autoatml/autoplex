@@ -47,7 +47,7 @@ class RssMaker(Maker):
             Tag of systems. It can also be used for setting up elements and stoichiometry.
             For example, the tag of 'SiO2' will be recognized as a 1:2 ratio of Si to O and
             passed into the parameters of buildcell. However, note that this will be overwritten
-            if the stoichiometric ratio of elements is defined in the 'buildcell_options'.
+            if the stoichiometric ratio of elements is defined in the 'cell_seed_paths' or 'buildcell_options'.
         train_from_scratch: bool
             If True, it starts the workflow from scratch.
             If False, it resumes from a previous state.
@@ -63,6 +63,9 @@ class RssMaker(Maker):
 
         generated_struct_numbers: list[int]
             Expected number of generated randomized unit cells by buildcell.
+        cell_seed_paths: list[str]
+            A list of paths to the custom buildcell control files, which ends with '.cell'. If these files exist,
+            the buildcell_options argument will no longer take effect.
         buildcell_options: list[dict] | None
             Customized parameters for buildcell. Default is None.
         fragment: Atoms | list[Atoms] | None
@@ -205,8 +208,8 @@ class RssMaker(Maker):
             Parameters for Hookean repulsion as a dictionary of tuples. Default is None.
         keep_symmetry: bool
             If true, preserve symmetry during relaxation. Default is False.
-        write_traj: bool
-            If true, write trajectory of RSS. Default is True.
+        remove_traj_files: bool
+            If true, remove all trajectory files raised by RSS to save memory
         num_processes_rss: int
             Number of processes used for running RSS. Default is 1.
         device_for_rss: str
@@ -283,7 +286,7 @@ class RssMaker(Maker):
                 "hookean_repul",
                 "hookean_paras",
                 "keep_symmetry",
-                "write_traj",
+                "remove_traj_files",
                 "num_processes_rss",
                 "device_for_rss",
             ]

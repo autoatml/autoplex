@@ -8,6 +8,7 @@ resume_from_previous_state:
 generated_struct_numbers:
 - 8000
 - 2000
+cell_seed_paths:
 buildcell_options:
 - ABFIX: false
   NFORM: '{2,4,6,8}'
@@ -150,7 +151,7 @@ hookean_paras:
   - 1000
   - 1.0
 keep_symmetry: false
-write_traj: true
+remove_traj_files: false
 num_processes_rss: 128
 device_for_rss: cpu
 # One needs to define mlip_hypers only for the MLIP one wishes to fit
@@ -189,7 +190,7 @@ mlip_hypers:
       cutoff: 3.25
       n_sparse: 100
       covariance_type: ard_se
-      delta: 2.0
+      delta: 0.01
       theta_uniform: 1.0
       sparse_method: uniform
       compact_clusters: T
@@ -209,8 +210,8 @@ mlip_hypers:
       sparse_method: cur_points
   J-ACE:
     order: 3
-    totaldegree: 6
-    cutoff: 2.0
+    totaldegree: 12
+    cutoff: 5.0
     solver: BLR
   NEQUIP:
     root: results
@@ -221,7 +222,7 @@ mlip_hypers:
     default_dtype: float64
     model_dtype: float64
     allow_tf32: true
-    r_max: 4.0
+    r_max: 6.0
     num_layers: 4
     l_max: 2
     parity: true
@@ -235,7 +236,7 @@ mlip_hypers:
       o: tanh
     num_basis: 8
     BesselBasis_trainable: true
-    PolynomialCutoff_p: 5
+    PolynomialCutoff_p: 6
     invariant_layers: 2
     invariant_neurons: 64
     avg_num_neighbors: auto
@@ -347,7 +348,7 @@ mlip_hypers:
     model: MACE
     name: MACE_model
     amsgrad: true
-    batch_size: 10
+    batch_size: 16
     compute_avg_num_neighbors: true
     compute_forces: true
     config_type_weights: "{'Default':1.0}"

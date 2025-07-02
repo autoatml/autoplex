@@ -2,6 +2,7 @@
 
 import contextlib
 import logging
+import multiprocessing as mp
 import os
 import re
 import shutil
@@ -26,7 +27,6 @@ from ase.constraints import voigt_6_to_full_3x3_stress
 from ase.data import chemical_symbols
 from ase.io import read, write
 from ase.io.extxyz import XYZError
-from ase.neighborlist import NeighborList, natural_cutoffs
 from atomate2.utils.path import strip_hostname
 from calorine.nep import read_loss, write_nepfile, write_structures
 from dgl.data.utils import split_dataset
@@ -42,8 +42,9 @@ from numpy import ndarray
 from pymatgen.core import Structure
 from pymatgen.io.ase import AseAtomsAdaptor
 from pytorch_lightning.loggers import CSVLogger
+from quippy import descriptors
 from scipy.spatial import ConvexHull
-from scipy.special import comb
+from threadpoolctl import threadpool_limits
 
 from autoplex import (
     GAP_HYPERS,
@@ -96,7 +97,7 @@ def gap_fitting(
     auto_delta: bool
         Automatically determine delta for 2b, 3b and soap terms.
     glue_xml: bool
-        use the glue.xml core potential instead of fitting 2b terms.
+        Use the glue.xml core potential instead of fitting 2b terms.
     ref_energy_name: str
         Reference energy name.
     ref_force_name : str
@@ -152,67 +153,109 @@ def gap_fitting(
     include_two_body = gap_default_hyperparameters["general"]["two_body"]
     include_three_body = gap_default_hyperparameters["general"]["three_body"]
     include_soap = gap_default_hyperparameters["general"]["soap"]
+    gap_default_hyperparameters["general"].update({"at_file": train_data_path})
 
-    if include_two_body:
-        gap_default_hyperparameters["general"].update({"at_file": train_data_path})
-        if auto_delta:
-            delta_2b, num_triplet = calculate_delta(db_atoms, ref_energy_name)
+    if auto_delta:
+        if include_two_body and not glue_xml:
+            if include_three_body or include_soap:
+                cutoff_2b = gap_default_hyperparameters["twob"]["cutoff"]
+                delta_2b = calculate_delta_2b(
+                    atoms_db=db_atoms, cutoff=cutoff_2b, e_name=ref_energy_name
+                )
+            else:
+                delta_2b = 1
+
             gap_default_hyperparameters["twob"].update({"delta": delta_2b})
 
-        fit_parameters_list = gap_hyperparameter_constructor(
-            gap_parameter_dict=gap_default_hyperparameters,
-            include_two_body=include_two_body,
-        )
+            fit_parameters_list = gap_hyperparameter_constructor(
+                gap_parameter_dict=gap_default_hyperparameters,
+                include_two_body=include_two_body,
+            )
 
-        run_gap(num_processes_fit, fit_parameters_list)
+            run_gap(num_processes_fit, fit_parameters_list)
 
-        run_quip(num_processes_fit, train_data_path, gap_file_xml, quip_train_file)
+            run_ase_gap(
+                num_processes_fit, train_data_path, gap_file_xml, quip_train_file
+            )
 
-    if include_three_body:
-        gap_default_hyperparameters["general"].update({"at_file": train_data_path})
-        if auto_delta:
-            delta_3b = energy_remain(quip_train_file)
-            delta_3b = delta_3b / num_triplet
+        if include_three_body and not glue_xml:
+            if include_two_body:
+                cutoff_3b = gap_default_hyperparameters["threeb"]["cutoff"]
+                energy_residual = energy_remain(quip_train_file)
+                descriptor_num_list = [
+                    compute_num_of_descriptor(atom=at, nb=3, cutoff=cutoff_3b) / len(at)
+                    for at in db_atoms
+                ]
+                num_of_descriptors = sum(descriptor_num_list) / len(db_atoms)
+                delta_3b = energy_residual / num_of_descriptors
+            else:
+                delta_3b = 1
             gap_default_hyperparameters["threeb"].update({"delta": delta_3b})
 
-        fit_parameters_list = gap_hyperparameter_constructor(
-            gap_parameter_dict=gap_default_hyperparameters,
-            include_two_body=include_two_body,
-            include_three_body=include_three_body,
-        )
+            fit_parameters_list = gap_hyperparameter_constructor(
+                gap_parameter_dict=gap_default_hyperparameters,
+                include_two_body=include_two_body,
+                include_three_body=include_three_body,
+            )
 
-        run_gap(num_processes_fit, fit_parameters_list)
-        run_quip(num_processes_fit, train_data_path, gap_file_xml, quip_train_file)
+            print("fit_parameters_list:", fit_parameters_list)
 
-    if glue_xml:
-        gap_default_hyperparameters["general"].update({"at_file": train_data_path})
-        gap_default_hyperparameters["general"].update({"core_param_file": "glue.xml"})
-        gap_default_hyperparameters["general"].update({"core_ip_args": "{IP Glue}"})
+            run_gap(num_processes_fit, fit_parameters_list)
+            run_ase_gap(
+                num_processes_fit, train_data_path, gap_file_xml, quip_train_file
+            )
 
-        fit_parameters_list = gap_hyperparameter_constructor(
-            gap_parameter_dict=gap_default_hyperparameters,
-            include_two_body=False,
-            include_three_body=False,
-        )
+        if glue_xml:
+            gap_default_hyperparameters["general"].update(
+                {"core_param_file": "glue.xml"}
+            )
+            gap_default_hyperparameters["general"].update({"core_ip_args": "{IP Glue}"})
 
-        run_gap(num_processes_fit, fit_parameters_list)
-        run_quip(
-            num_processes_fit,
-            train_data_path,
-            gap_file_xml,
-            quip_train_file,
-            glue_xml,
-        )
+            fit_parameters_list = gap_hyperparameter_constructor(
+                gap_parameter_dict=gap_default_hyperparameters,
+                include_two_body=False,
+                include_three_body=False,
+            )
 
-    if include_soap:
-        delta_soap = (
-            energy_remain(quip_train_file)
-            if include_two_body or include_three_body
-            else 1
-        )
-        gap_default_hyperparameters["general"].update({"at_file": train_data_path})
-        if auto_delta:
+            run_gap(num_processes_fit, fit_parameters_list)
+            run_ase_gap(
+                num_processes_fit,
+                train_data_path,
+                gap_file_xml,
+                quip_train_file,
+                glue_xml,
+            )
+
+        if include_soap:
+            delta_soap = (
+                energy_remain(quip_train_file)
+                if include_two_body or include_three_body
+                else 1
+            )
             gap_default_hyperparameters["soap"].update({"delta": delta_soap})
+
+            fit_parameters_list = gap_hyperparameter_constructor(
+                gap_parameter_dict=gap_default_hyperparameters,
+                include_two_body=include_two_body,
+                include_three_body=include_three_body,
+                include_soap=include_soap,
+            )
+
+            run_gap(num_processes_fit, fit_parameters_list)
+            run_ase_gap(
+                num_processes_fit,
+                train_data_path,
+                gap_file_xml,
+                quip_train_file,
+                glue_xml,
+            )
+
+    else:
+        if glue_xml:
+            gap_default_hyperparameters["general"].update(
+                {"core_param_file": "glue.xml"}
+            )
+            gap_default_hyperparameters["general"].update({"core_ip_args": "{IP Glue}"})
 
         fit_parameters_list = gap_hyperparameter_constructor(
             gap_parameter_dict=gap_default_hyperparameters,
@@ -222,7 +265,7 @@ def gap_fitting(
         )
 
         run_gap(num_processes_fit, fit_parameters_list)
-        run_quip(
+        run_ase_gap(
             num_processes_fit,
             train_data_path,
             gap_file_xml,
@@ -236,7 +279,9 @@ def gap_fitting(
     logging.info(f"Training error of MLIP (eV/at.): {round(train_error, 7)}")
 
     # Calculate testing error
-    run_quip(num_processes_fit, test_data_path, gap_file_xml, quip_test_file, glue_xml)
+    run_ase_gap(
+        num_processes_fit, test_data_path, gap_file_xml, quip_test_file, glue_xml
+    )
     test_error = energy_remain(quip_test_file)
     logging.info(f"Testing error of MLIP (eV/at.): {round(test_error, 7)}")
 
@@ -1419,6 +1464,7 @@ def gap_hyperparameter_constructor(
             if include_three_body is True
         ]
     )
+
     soap_params = " ".join(
         [
             f"{key}={value}"
@@ -1521,10 +1567,16 @@ def vaspoutput_2_extended_xyz(
         path_without_hostname2 = Path(strip_hostname(path)).joinpath(
             "final_atoms_object.xyz"
         )
+        path_without_hostname2 = Path(strip_hostname(path)).joinpath(
+            "final_atoms_object.xyz"
+        )
         try:
             # read the vasp output
             if path_without_hostname.exists():
+                if path_without_hostname.exists():
                 file = read(path_without_hostname, index=":")
+            elif path_without_hostname2.exists():
+                file = read(path_without_hostname2, index=":")
             elif path_without_hostname2.exists():
                 file = read(path_without_hostname2, index=":")
             for i in file:
@@ -1731,7 +1783,9 @@ def plot_convex_hull(all_points: np.ndarray, hull_points: np.ndarray) -> None:
     plt.savefig("ConvexHull.png")
 
 
-def calculate_delta(atoms_db: list[Atoms], e_name: str) -> tuple[float, ndarray]:
+def calculate_delta_2b(
+    atoms_db: list[Atoms], cutoff: float, e_name: str
+) -> tuple[float, ndarray]:
     """
     Calculate the delta parameter and average number of triplets for gap-fitting.
 
@@ -1739,6 +1793,10 @@ def calculate_delta(atoms_db: list[Atoms], e_name: str) -> tuple[float, ndarray]
     ----------
     atoms_db: list[Atoms]
         list of Ase atoms objects
+    nb: int
+        Two-body or three-body interactions.
+    cutoff: float
+        Cutoff radius used to compute the dimensionality of the descriptor.
     e_name: str
         energy_parameter_name as defined in mlip-phonon-defaults.json
 
@@ -1746,7 +1804,7 @@ def calculate_delta(atoms_db: list[Atoms], e_name: str) -> tuple[float, ndarray]
     -------
     tuple[float, float]
         A tuple containing:
-        - delta parameter used for gap-fit, calculated as (es_var / avg_neigh).
+        - delta parameter used for gap-fit, calculated as (es_var / num_of_descriptors).
         - Average number of triplets per atom.
 
     """
@@ -1765,40 +1823,46 @@ def calculate_delta(atoms_db: list[Atoms], e_name: str) -> tuple[float, ndarray]
         ]
     )
     es_var = np.var(es_visol)
-    avg_neigh = np.mean([compute_pairs_triplets(atom)[0] for atom in atoms_db])
-    num_triplet = np.mean([compute_pairs_triplets(atom)[1] for atom in atoms_db])
+    cutoff = (
+        cutoff * 2 / 3
+    )  # two-thirds of the cutoff is used since two-body interactions are weak near its edge.
+    descriptor_num_list = [
+        compute_num_of_descriptor(atom=at, nb=2, cutoff=cutoff) / len(at)
+        for at in atoms_db
+    ]
+    num_of_descriptors = sum(descriptor_num_list) / len(atoms_db)
+    return es_var / num_of_descriptors
 
-    return es_var / avg_neigh, num_triplet
 
-
-def compute_pairs_triplets(atoms: Atoms) -> list[float]:
+def compute_num_of_descriptor(atom: Atoms, nb: int, cutoff: float) -> list[float]:
     """
-    Calculate the number of pairwise and triplet within a cutoff distance for a given list of atoms.
+    Compute the number of two-body or three-body descriptors within a specified cutoff radius.
 
     Parameters
     ----------
-    atoms : ASE atoms object
+    atom: ASE atoms object
+        The structure to evaluate.
+    nb: int
+        Two-body or three-body interactions.
+    cutoff: float
+        Cutoff radius used to compute the dimensionality of the descriptor.
 
     Returns
     -------
-    list[float, float]
-        Returns a list of the number of pairs or triplets an atom is involved in.
+    list[float]
+        Returns a list of the number of pairs or triplets a structure is involved in.
 
     """
-    cutoffs = natural_cutoffs(atoms)
-    neighbor_list = NeighborList(
-        cutoffs=cutoffs, skin=0.15, self_interaction=False, bothways=True
-    )
-    neighbor_list.update(atoms)
-    counts_list = [
-        len(neighbor_list.get_neighbors(index)[0]) for index in range(len(atoms))
-    ]
-    num_pair = sum(counts_list) / len(atoms)
+    if nb == 2:
+        desc = descriptors.Descriptor(f"distance_2b add_species=T cutoff={cutoff}")
+    elif nb == 3:
+        desc = descriptors.Descriptor(
+            f"distance_Nb order=3 add_species=T cutoff={cutoff}"
+        )
 
-    triplets = [comb(count, 2) for count in counts_list if count > 1]
-    num_triplet = sum(triplets) / len(atoms)
+    n_desc, _ = desc.sizes(atom)
 
-    return [num_pair, num_triplet]
+    return n_desc
 
 
 def run_ace(num_processes_fit: int, script_name: str) -> None:
@@ -1865,7 +1929,63 @@ class CustomPotential(quippy.potential.Potential):
         return res
 
 
-def run_quip(
+class CustomPotential(quippy.potential.Potential):
+    """A custom potential class that modifies the outputs of potentials."""
+
+    def calculate(self, *args, **kwargs):
+        """Update the atoms object with forces, energy, and virial information."""
+        res = super().calculate(*args, **kwargs)
+        atoms = kwargs["atoms"] if "atoms" in kwargs else args[0]
+        if "forces" in self.results:
+            atoms.arrays["forces"] = self.results["forces"].copy()
+        if "energy" in self.results:
+            atoms.info["energy"] = self.results["energy"].copy()
+        if "stress" in self.results:
+            atoms.info["stress"] = self.results["stress"].copy()
+        if "virial" in self.extra_results["config"]:
+            atoms.info["virial"] = self.extra_results["config"]["virial"].copy()
+        return res
+
+
+class CustomPotential(quippy.potential.Potential):
+    """A custom potential class that modifies the outputs of potentials."""
+
+    def calculate(self, *args, **kwargs):
+        """Update the atoms object with forces, energy, and virial information."""
+        res = super().calculate(*args, **kwargs)
+        atoms = kwargs["atoms"] if "atoms" in kwargs else args[0]
+        if "forces" in self.results:
+            atoms.arrays["forces"] = self.results["forces"].copy()
+        if "energy" in self.results:
+            atoms.info["energy"] = self.results["energy"].copy()
+        if "stress" in self.results:
+            atoms.info["stress"] = self.results["stress"].copy()
+        return res
+
+
+def _compute_gap_energy(atom, gap_control: str, gap_label: str):
+    """
+    Compute potential energy of a single ASE Atoms object.
+
+    Parameters
+    ----------
+    atom : ase.Atoms
+        The Atoms object for which to compute the potential energy.
+    gap_control : str
+        Control string specifying the GAP potential configuration
+        (e.g., "Potential xml_label=<label>").
+    gap_label : str
+        The GAP XML potential file.
+    """
+    pot = CustomPotential(args_str=gap_control, param_filename=gap_label)
+    atom.calc = pot
+    atom.info["energy"] = atom.get_potential_energy()
+    atom.arrays["force"] = atom.get_forces()
+    atom.calc = None
+    return atom
+
+
+def run_ase_gap(
     num_processes_fit: int,
     data_path: str,
     xml_file: str,
@@ -1873,32 +1993,27 @@ def run_quip(
     glue_xml: bool = False,
 ) -> None:
     """
-    QUIP runner.
+    ASE-GAP runner.
 
+    Parameters
+    ----------
     num_processes_fit: int
         number of threads to be used for the run.
     data_path:
         Path to the data file.
     filename: str
         Name of the output file.
-
+    glue_xml: bool
+        Use the glue.xml core potential instead of fitting 2b terms.
     """
-    os.environ["OMP_NUM_THREADS"] = str(num_processes_fit)
-    os.environ["OPENBLAS_NUM_THREADS"] = "1"  # blas library
-    os.environ["BLIS_NUM_THREADS"] = "1"  # blas library
-    os.environ["MKL_NUM_THREADS"] = "1"  # blas library
-    os.environ["NETLIB_NUM_THREADS"] = "1"  # blas library
-
-    init_args = "init_args='IP Glue'" if glue_xml else ""
-    quip = (
-        f"quip {init_args} E=T F=T atoms_filename={data_path} param_filename={xml_file}"
+    gap_control = "Potential xml_label=" + extract_gap_label(xml_file)
+    atoms = ase.io.read(data_path, index=":")
+    eval_worker = partial(
+        _compute_gap_energy, gap_control=gap_control, gap_label=xml_file
     )
-    command = f"{quip} | grep AT | sed 's/AT//' > {filename}"
-    with (
-        open("std_quip_out.log", "w", encoding="utf-8") as file_std,
-        open("std_quip_err.log", "w", encoding="utf-8") as file_err,
-    ):
-        subprocess.call(command, stdout=file_std, stderr=file_err, shell=True)
+    with threadpool_limits(limits=1), mp.Pool(processes=num_processes_fit) as pool:
+        atoms_eval = pool.map(eval_worker, atoms)
+    ase.io.write(filename, atoms_eval, format="extxyz")
 
 
 def run_nep(gpu_identifier_indices: list[int]) -> None:
