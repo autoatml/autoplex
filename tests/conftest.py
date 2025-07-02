@@ -21,6 +21,7 @@ import shutil
 from pytest import MonkeyPatch
 from calorine.nep.io import read_nepfile
 from atomate2.utils.testing.vasp import monkeypatch_vasp
+from atomate2.vasp.jobs.base import BaseVaspMaker
 
 from jobflow import Response, job
 
@@ -289,6 +290,9 @@ def mock_rss(input_dir: str = None,
              ref_force_name: str = "REF_forces",
              ref_virial_name: str = "REF_virial",
              num_processes_fit: int = None,
+             static_energy_maker: BaseVaspMaker | None = None,
+             static_energy_maker_isolated_species: BaseVaspMaker | None = None,
+             static_energy_maker_isolated_species_spin_polarization: BaseVaspMaker | None = None,
              kt: float = None,
              **fit_kwargs, ):
     job2 = sample_data(selection_method=selection_method,
@@ -302,6 +306,9 @@ def mock_rss(input_dir: str = None,
                               dimer_range=dimer_range,
                               dimer_num=dimer_num,
                               custom_incar=custom_incar,
+                              static_energy_maker=static_energy_maker,
+                              static_energy_maker_isolated_species=static_energy_maker_isolated_species,
+                              static_energy_maker_isolated_species_spin_polarization=static_energy_maker_isolated_species_spin_polarization,
                               ).make(structures=job2.output)
     job4 = collect_dft_data(vasp_ref_file=vasp_ref_file,
                             rss_group=rss_group,
