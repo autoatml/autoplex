@@ -373,7 +373,6 @@ class DFTStaticLabelling(Maker):
                         "LCHARG": "False",
                         "ENAUG": None,
                         "GGA": None,
-                        "ISPIN": None,
                         "LAECHG": None,
                         "LELF": None,
                         "LORBIT": None,
@@ -511,10 +510,10 @@ class DFTStaticLabelling(Maker):
                                     static_job, {"ISPIN": 2}
                                 )
 
-                        except:
+                        except ValueError as err:
                             raise ValueError(
                                 "Please define a static energy maker for the isolated species"
-                            )
+                            ) from err
                     else:
                         if self.e0_spin:
                             static_job = self.static_energy_maker_isolated_species_spin_polarization.make(
@@ -585,10 +584,10 @@ class DFTStaticLabelling(Maker):
                                         static_job, {"ISPIN": 2}
                                     )
 
-                            except:
+                            except ValueError as err:
                                 raise ValueError(
                                     "Please define a static energy maker for the isolated species"
-                                )
+                                ) from err
                         else:
                             if self.e0_spin:
                                 static_job = self.static_energy_maker_isolated_species_spin_polarization.make(
