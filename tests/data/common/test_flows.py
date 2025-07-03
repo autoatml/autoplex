@@ -69,6 +69,9 @@ def test_vasp_static(test_dir, mock_vasp, memory_jobstore, clean_dir):
                                      "LASPH": None,
                                      "AMIN": None,
                                  },
+                                 static_energy_maker=None,
+                                 static_energy_maker_isolated_species=None,
+                                 static_energy_maker_isolated_species_spin_polarization=None,
                                  ).make(structures=test_structures)
 
     job_collect_data = collect_dft_data(vasp_dirs=job_dft.output)

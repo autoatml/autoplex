@@ -3,6 +3,7 @@ from pathlib import Path
 from jobflow import run_locally, Flow
 from tests.conftest import mock_rss, mock_do_rss_iterations, mock_do_rss_iterations_multi_jobs
 from autoplex.settings import RssConfig
+from atomate2.vasp.jobs.base import BaseVaspMaker
 
 from autoplex.auto.rss.flows import RssMaker
 
