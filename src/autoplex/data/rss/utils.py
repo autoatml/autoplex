@@ -620,7 +620,10 @@ def minimize_structures(
         Output list[str] containing paths for the results of the RSS relaxation.
     """
     atoms = [AseAtomsAdaptor().get_atoms(structure) for structure in structures]
-
+    for at in atoms:
+        if "virial" in at.info:
+            del at.info["virial"]
+    
     if hookean_repul:
         print("Hookean repulsion is used!")
 
