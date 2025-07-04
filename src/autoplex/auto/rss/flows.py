@@ -24,7 +24,9 @@ class RssMaker(Maker):
     rss_config: RssConfig
         Pydantic model that defines the setup parameters for the whole RSS workflow.
         If not explicitly set, the defaults from 'autoplex.settings.RssConfig' will be used.
-
+    static_energy_maker: BaseVaspMaker | ForceFieldStaticMaker
+        Maker for static energy jobs: either BaseVaspMaker (VASP-based) or
+        ForceFieldStaticMaker (force field-based). Defaults to StaticMaker (VASP-based).
 
     """
 

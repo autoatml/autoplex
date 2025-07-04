@@ -263,6 +263,9 @@ class DFTStaticLabelling(Maker):
     custom_potcar: dict
         Dictionary of POTCAR settings to update. Keys are element symbols, values are the desired POTCAR labels.
         Default is None.
+    static_energy_maker: BaseVaspMaker | ForceFieldStaticMaker
+        Maker for static energy jobs: either BaseVaspMaker (VASP-based) or
+        ForceFieldStaticMaker (force field-based). Defaults to StaticMaker (VASP-based).
 
     Returns
     -------

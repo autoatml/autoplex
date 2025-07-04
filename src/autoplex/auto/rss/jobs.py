@@ -204,6 +204,9 @@ def initial_rss(
         Number of processes used for fitting. Default is 1.
     device_for_fitting: str
         Device to be used for model fitting, either "cpu" or "cuda".
+    static_energy_maker: BaseVaspMaker | ForceFieldStaticMaker
+        Maker for static energy jobs: either BaseVaspMaker (VASP-based) or
+        ForceFieldStaticMaker (force field-based). Defaults to StaticMaker (VASP-based).
     fit_kwargs:
         Additional keyword arguments for the MLIP fitting process.
 
@@ -533,6 +536,9 @@ def do_rss_iterations(
         Initial temperature (in eV) for Boltzmann sampling. Default is 0.3.
     current_iter_index: int
         Index for the current RSS iteration. Default is 1.
+    static_energy_maker: BaseVaspMaker | ForceFieldStaticMaker
+        Maker for static energy jobs: either BaseVaspMaker (VASP-based) or
+        ForceFieldStaticMaker (force field-based). Defaults to StaticMaker (VASP-based).
     fit_kwargs:
         Additional keyword arguments for the MLIP fitting process.
 
