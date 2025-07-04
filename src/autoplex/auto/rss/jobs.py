@@ -1,11 +1,12 @@
 """RSS Jobs include the generation of the initial potential model as well as iterative RSS exploration."""
 
 import logging
-from dataclasses import field
 from typing import Literal
 
 from atomate2.forcefields.jobs import ForceFieldStaticMaker
 from atomate2.vasp.jobs.base import BaseVaspMaker
+from atomate2.vasp.jobs.core import StaticMaker
+from atomate2.vasp.sets.core import StaticSetGenerator
 from jobflow import Flow, Response, job
 
 from autoplex.data.common.flows import DFTStaticLabelling
@@ -22,6 +23,38 @@ __all__ = ["do_rss_iterations", "initial_rss"]
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+_DEFAULT_STATIC_ENERGY_MAKER = StaticMaker(
+    input_set_generator=StaticSetGenerator(
+        user_incar_settings={
+            "ADDGRID": "True",
+            "ENCUT": 520,
+            "EDIFF": 1e-06,
+            "ISMEAR": 0,
+            "SIGMA": 0.01,
+            "PREC": "Accurate",
+            "ISYM": None,
+            "KSPACING": 0.2,
+            "NPAR": 8,
+            "LWAVE": "False",
+            "LCHARG": "False",
+            "ENAUG": None,
+            "GGA": None,
+            "ISPIN": None,
+            "LAECHG": None,
+            "LELF": None,
+            "LORBIT": None,
+            "LVTOT": None,
+            "NSW": None,
+            "SYMPREC": None,
+            "NELM": 100,
+            "LMAXMIX": None,
+            "LASPH": None,
+            "AMIN": None,
+        }
+    ),
+    run_vasp_kwargs={"handlers": ()},
 )
 
 
@@ -67,39 +100,9 @@ def initial_rss(
     auto_delta: bool = False,
     num_processes_fit: int = 1,
     device_for_fitting: str = "cpu",
-    static_energy_maker: BaseVaspMaker | ForceFieldStaticMaker = field(
-        default_factory=lambda: StaticMaker(
-            input_set_generator=StaticSetGenerator(
-                user_incar_settings={
-                    "ADDGRID": "True",
-                    "ENCUT": 520,
-                    "EDIFF": 1e-06,
-                    "ISMEAR": 0,
-                    "SIGMA": 0.01,
-                    "PREC": "Accurate",
-                    "ISYM": None,
-                    "KSPACING": 0.2,
-                    "NPAR": 8,
-                    "LWAVE": "False",
-                    "LCHARG": "False",
-                    "ENAUG": None,
-                    "GGA": None,
-                    "ISPIN": None,
-                    "LAECHG": None,
-                    "LELF": None,
-                    "LORBIT": None,
-                    "LVTOT": None,
-                    "NSW": None,
-                    "SYMPREC": None,
-                    "NELM": 100,
-                    "LMAXMIX": None,
-                    "LASPH": None,
-                    "AMIN": None,
-                }
-            ),
-            run_vasp_kwargs={"handlers": ()},
-        )
-    ),
+    static_energy_maker: (
+        BaseVaspMaker | ForceFieldStaticMaker
+    ) = _DEFAULT_STATIC_ENERGY_MAKER,
     **fit_kwargs,
 ):
     """
@@ -367,39 +370,9 @@ def do_rss_iterations(
     num_groups: int = 1,
     initial_kt: float = 0.3,
     current_iter_index: int = 1,
-    static_energy_maker: BaseVaspMaker | ForceFieldStaticMaker = field(
-        default_factory=lambda: StaticMaker(
-            input_set_generator=StaticSetGenerator(
-                user_incar_settings={
-                    "ADDGRID": "True",
-                    "ENCUT": 520,
-                    "EDIFF": 1e-06,
-                    "ISMEAR": 0,
-                    "SIGMA": 0.01,
-                    "PREC": "Accurate",
-                    "ISYM": None,
-                    "KSPACING": 0.2,
-                    "NPAR": 8,
-                    "LWAVE": "False",
-                    "LCHARG": "False",
-                    "ENAUG": None,
-                    "GGA": None,
-                    "ISPIN": None,
-                    "LAECHG": None,
-                    "LELF": None,
-                    "LORBIT": None,
-                    "LVTOT": None,
-                    "NSW": None,
-                    "SYMPREC": None,
-                    "NELM": 100,
-                    "LMAXMIX": None,
-                    "LASPH": None,
-                    "AMIN": None,
-                }
-            ),
-            run_vasp_kwargs={"handlers": ()},
-        )
-    ),
+    static_energy_maker: (
+        BaseVaspMaker | ForceFieldStaticMaker
+    ) = _DEFAULT_STATIC_ENERGY_MAKER,
     **fit_kwargs,
 ):
     """
