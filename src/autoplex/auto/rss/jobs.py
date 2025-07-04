@@ -1,8 +1,10 @@
 """RSS Jobs include the generation of the initial potential model as well as iterative RSS exploration."""
 
 import logging
+from dataclasses import field
 from typing import Literal
 
+from atomate2.forcefields.jobs import ForceFieldStaticMaker
 from atomate2.vasp.jobs.base import BaseVaspMaker
 from jobflow import Flow, Response, job
 
@@ -65,9 +67,39 @@ def initial_rss(
     auto_delta: bool = False,
     num_processes_fit: int = 1,
     device_for_fitting: str = "cpu",
-    static_energy_maker: BaseVaspMaker | None = None,
-    static_energy_maker_isolated_species: BaseVaspMaker | None = None,
-    static_energy_maker_isolated_species_spin_polarization: BaseVaspMaker | None = None,
+    static_energy_maker: BaseVaspMaker | ForceFieldStaticMaker = field(
+        default_factory=lambda: StaticMaker(
+            input_set_generator=StaticSetGenerator(
+                user_incar_settings={
+                    "ADDGRID": "True",
+                    "ENCUT": 520,
+                    "EDIFF": 1e-06,
+                    "ISMEAR": 0,
+                    "SIGMA": 0.01,
+                    "PREC": "Accurate",
+                    "ISYM": None,
+                    "KSPACING": 0.2,
+                    "NPAR": 8,
+                    "LWAVE": "False",
+                    "LCHARG": "False",
+                    "ENAUG": None,
+                    "GGA": None,
+                    "ISPIN": None,
+                    "LAECHG": None,
+                    "LELF": None,
+                    "LORBIT": None,
+                    "LVTOT": None,
+                    "NSW": None,
+                    "SYMPREC": None,
+                    "NELM": 100,
+                    "LMAXMIX": None,
+                    "LASPH": None,
+                    "AMIN": None,
+                }
+            ),
+            run_vasp_kwargs={"handlers": ()},
+        )
+    ),
     **fit_kwargs,
 ):
     """
@@ -215,8 +247,6 @@ def initial_rss(
         custom_incar=custom_incar,
         custom_potcar=custom_potcar,
         static_energy_maker=static_energy_maker,
-        static_energy_maker_isolated_species=static_energy_maker_isolated_species,
-        static_energy_maker_isolated_species_spin_polarization=static_energy_maker_isolated_species_spin_polarization,
     ).make(
         structures=do_randomized_structure_generation.output, config_type=config_type
     )
@@ -337,9 +367,39 @@ def do_rss_iterations(
     num_groups: int = 1,
     initial_kt: float = 0.3,
     current_iter_index: int = 1,
-    static_energy_maker: BaseVaspMaker | None = None,
-    static_energy_maker_isolated_species: BaseVaspMaker | None = None,
-    static_energy_maker_isolated_species_spin_polarization: BaseVaspMaker | None = None,
+    static_energy_maker: BaseVaspMaker | ForceFieldStaticMaker = field(
+        default_factory=lambda: StaticMaker(
+            input_set_generator=StaticSetGenerator(
+                user_incar_settings={
+                    "ADDGRID": "True",
+                    "ENCUT": 520,
+                    "EDIFF": 1e-06,
+                    "ISMEAR": 0,
+                    "SIGMA": 0.01,
+                    "PREC": "Accurate",
+                    "ISYM": None,
+                    "KSPACING": 0.2,
+                    "NPAR": 8,
+                    "LWAVE": "False",
+                    "LCHARG": "False",
+                    "ENAUG": None,
+                    "GGA": None,
+                    "ISPIN": None,
+                    "LAECHG": None,
+                    "LELF": None,
+                    "LORBIT": None,
+                    "LVTOT": None,
+                    "NSW": None,
+                    "SYMPREC": None,
+                    "NELM": 100,
+                    "LMAXMIX": None,
+                    "LASPH": None,
+                    "AMIN": None,
+                }
+            ),
+            run_vasp_kwargs={"handlers": ()},
+        )
+    ),
     **fit_kwargs,
 ):
     """
@@ -602,8 +662,6 @@ def do_rss_iterations(
             custom_incar=custom_incar,
             custom_potcar=custom_potcar,
             static_energy_maker=static_energy_maker,
-            static_energy_maker_isolated_species=static_energy_maker_isolated_species,
-            static_energy_maker_isolated_species_spin_polarization=static_energy_maker_isolated_species_spin_polarization,
         ).make(structures=do_data_sampling.output, config_type=config_type)
         do_data_collection = collect_dft_data(
             vasp_ref_file=vasp_ref_file,
@@ -716,8 +774,6 @@ def do_rss_iterations(
             initial_kt=initial_kt,
             current_iter_index=current_iter_index,
             static_energy_maker=static_energy_maker,
-            static_energy_maker_isolated_species=static_energy_maker_isolated_species,
-            static_energy_maker_isolated_species_isolated=static_energy_maker_isolated_species_spin_polarization,
             **fit_kwargs,
         )
 

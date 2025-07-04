@@ -1,9 +1,11 @@
 import os
+from dataclasses import field
 from pathlib import Path
 from jobflow import run_locally, Flow
 from tests.conftest import mock_rss, mock_do_rss_iterations, mock_do_rss_iterations_multi_jobs
 from autoplex.settings import RssConfig
 from atomate2.vasp.jobs.base import BaseVaspMaker
+from atomate2.forcefields.jobs import ForceFieldStaticMaker
 
 from autoplex.auto.rss.flows import RssMaker
 
@@ -141,8 +143,7 @@ def test_rss_workflow_ml_potentials(test_dir, memory_jobstore, clean_dir):
                            'cutoff_transition_width': 1.0, 'zeta': 4.0, 'average': True, 'species': True},
             'frac_of_bcur': 0.8, 'bolt_max_num': 3000}, 'random_seed': None, 'include_isolated_atom': True,
                   'isolatedatom_box': [20.0, 20.0, 20.0], 'e0_spin': False, 'include_dimer': False,
-                  'dimer_box': [20.0, 20.0, 20.0], 'dimer_range': [1.0, 5.0], 'dimer_num': 21,
-                  'static_energy_maker_isolated_species_spin_polarization': None, 'vasp_ref_file': 'vasp_ref.extxyz',
+                  'dimer_box': [20.0, 20.0, 20.0], 'dimer_range': [1.0, 5.0], 'dimer_num': 21, 'vasp_ref_file': 'vasp_ref.extxyz', 
                   'config_types': ['initial', 'traj_early', 'traj'], 'rss_group': ['traj'], 'test_ratio': 0.0,
                   'regularization': True, 'retain_existing_sigma': False, 'scheme': 'linear-hull',
                   'reg_minmax': [[0.1, 1.0], [0.001, 0.1], [0.0316, 0.316], [0.0632, 0.632]], 'distillation': False,
@@ -361,7 +362,7 @@ def test_rss_workflow_ml_potentials(test_dir, memory_jobstore, clean_dir):
 
     rss_config = RssConfig.from_dict(rss_config)
 
-    rss_job = RssMaker(name="rss", rss_config=rss_config, static_energy_maker=ForceFieldStaticMaker(force_field_name="MACE-MP-0b3"), static_energy_maker_isolated_species=ForceFieldStaticMaker(force_field_name="MACE-MP-0b3")).make()
+    rss_job = RssMaker(name="rss", rss_config=rss_config, static_energy_maker=ForceFieldStaticMaker(force_field_name="MACE-MP-0b3")).make()
 
     responses=run_locally(
         Flow(jobs=[rss_job], output=rss_job.output),

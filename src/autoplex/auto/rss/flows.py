@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass, field
 
+from atomate2.forcefields.jobs import ForceFieldStaticMaker
 from atomate2.vasp.jobs.base import BaseVaspMaker
 from jobflow import Flow, Maker, Response, job
 
@@ -27,9 +28,39 @@ class RssMaker(Maker):
 
     name: str = "ml-driven rss"
     rss_config: RssConfig = field(default_factory=lambda: RssConfig())
-    static_energy_maker: BaseVaspMaker | None = None
-    static_energy_maker_isolated_species: BaseVaspMaker | None = None
-    static_energy_maker_isolated_species_spin_polarization: BaseVaspMaker | None = None
+    static_energy_maker: BaseVaspMaker | ForceFieldStaticMaker = field(
+        default_factory=lambda: StaticMaker(
+            input_set_generator=StaticSetGenerator(
+                user_incar_settings={
+                    "ADDGRID": "True",
+                    "ENCUT": 520,
+                    "EDIFF": 1e-06,
+                    "ISMEAR": 0,
+                    "SIGMA": 0.01,
+                    "PREC": "Accurate",
+                    "ISYM": None,
+                    "KSPACING": 0.2,
+                    "NPAR": 8,
+                    "LWAVE": "False",
+                    "LCHARG": "False",
+                    "ENAUG": None,
+                    "GGA": None,
+                    "ISPIN": None,
+                    "LAECHG": None,
+                    "LELF": None,
+                    "LORBIT": None,
+                    "LVTOT": None,
+                    "NSW": None,
+                    "SYMPREC": None,
+                    "NELM": 100,
+                    "LMAXMIX": None,
+                    "LASPH": None,
+                    "AMIN": None,
+                }
+            ),
+            run_vasp_kwargs={"handlers": ()},
+        )
+    )
 
     @job
     def make(self, **kwargs):
@@ -301,8 +332,6 @@ class RssMaker(Maker):
             )
             initial_rss_job = initial_rss(
                 static_energy_maker=self.static_energy_maker,
-                static_energy_maker_isolated_species=self.static_energy_maker_isolated_species,
-                static_energy_maker_isolated_species_spin_polarization=self.static_energy_maker_isolated_species_spin_polarization,
                 **initial_params,
             )
             rss_flow.append(initial_rss_job)
@@ -339,8 +368,6 @@ class RssMaker(Maker):
             do_rss_job = do_rss_iterations(
                 input=initial_rss_job.output,
                 static_energy_maker=self.static_energy_maker,
-                static_energy_maker_isolated_species=self.static_energy_maker_isolated_species,
-                static_energy_maker_isolated_species_spin_polarization=self.static_energy_maker_isolated_species_spin_polarization,
                 **rss_params,
             )
         else:
@@ -352,8 +379,6 @@ class RssMaker(Maker):
             do_rss_job = do_rss_iterations(
                 input=resume_from_previous_state,
                 static_energy_maker=self.static_energy_maker,
-                static_energy_maker_isolated_species=self.static_energy_maker_isolated_species,
-                static_energy_maker_isolated_species_spin_polarization=self.static_energy_maker_isolated_species_spin_polarization,
                 **rss_params,
             )
 
