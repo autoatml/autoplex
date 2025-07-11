@@ -238,7 +238,7 @@ class DFTStaticLabelling(Maker):
         Name of the flow.
     isolated_atom: bool
         If true, perform single-point calculations for isolated atoms. Default is False.
-    isolated_species: list[str]
+    isolated_species: list[str] | None
         List of species for which to perform isolated atom calculations. If None,
         species will be automatically derived from the 'structures' list. Default is None.
     e0_spin: bool
@@ -250,22 +250,30 @@ class DFTStaticLabelling(Maker):
         If true, perform single-point calculations for dimers. Default is False.
     dimer_box: list[float]
         The lattice constants of a dimer box.
-    dimer_species: list[str]
+    dimer_species: list[str] | None
         List of species for which to perform dimer calculations. If None, species
         will be derived from the 'structures' list. Default is None.
-    dimer_range: list[float]
+    dimer_range: list[float] | None
         Range of distances for dimer calculations.
     dimer_num: int
         Number of different distances to consider for dimer calculations.
-    custom_incar: dict
+    custom_incar: dict | None
         Dictionary of custom VASP input parameters. If provided, will update the
         default parameters. Default is None.
-    custom_potcar: dict
+    custom_potcar: dict | None
         Dictionary of POTCAR settings to update. Keys are element symbols, values are the desired POTCAR labels.
         Default is None.
     static_energy_maker: BaseVaspMaker | ForceFieldStaticMaker
         Maker for static energy jobs: either BaseVaspMaker (VASP-based) or
         ForceFieldStaticMaker (force field-based). Defaults to StaticMaker (VASP-based).
+    static_energy_maker_isolated_atoms: BaseVaspMaker | ForceFieldStaticMaker | None
+        Maker for static energy jobs of isolated atoms: either BaseVaspMaker (VASP-based) or
+        ForceFieldStaticMaker (force field-based) or None. If set to `None`, the parameters 
+        from `static_energy_maker` will be used as the default for isolated atoms. In this case, 
+        if `static_energy_maker` is a `StaticMaker`, all major settings will be inherited, 
+        except that `kspacing` will be automatically set to 100 to enforce a Gamma-point-only calculation. 
+        This is typically suitable for single-atom systems. Default is None. If a non-`StaticMaker` maker 
+        is used here, its output must include a `dir_name` field to ensure compatibility with downstream workflows.
 
     Returns
     -------
@@ -320,6 +328,7 @@ class DFTStaticLabelling(Maker):
             run_vasp_kwargs={"handlers": ()},
         )
     )
+    static_energy_maker_isolated_atoms: BaseVaspMaker | ForceFieldStaticMaker | None = None
 
     @job
     def make(
@@ -388,18 +397,21 @@ class DFTStaticLabelling(Maker):
                         self.isolatedatom_box[2],
                     )
                     isolated_atom_struct = Structure(lattice, [sym], [[0.0, 0.0, 0.0]])
-
-                    static_job = st_m.make(structure=isolated_atom_struct)
-                    if isinstance(self.static_energy_maker, StaticMaker):
-                        static_job = update_user_incar_settings(
-                            static_job,
-                            {"KSPACING": 100.0, "ALGO": "All", "KPAR": 1},
-                        )
-
-                        if self.e0_spin:
+                    
+                    if self.static_energy_maker_isolated_atoms is None:
+                        static_job = st_m.make(structure=isolated_atom_struct)
+                        if isinstance(self.static_energy_maker, StaticMaker):
                             static_job = update_user_incar_settings(
-                                static_job, {"ISPIN": 2}
+                                static_job,
+                                {"KSPACING": 100.0, "KPAR": 1},
                             )
+
+                            if self.e0_spin:
+                                static_job = update_user_incar_settings(
+                                    static_job, {"ISPIN": 2}
+                                )
+                    else:
+                        static_job = self.static_energy_maker_isolated_atoms.make(structure=isolated_atom_struct)
 
                     static_job.name = f"static_isolated_{idx}"
                     dirs["dirs_of_vasp"].append(static_job.output.dir_name)
@@ -444,7 +456,7 @@ class DFTStaticLabelling(Maker):
                         if isinstance(self.static_energy_maker, StaticMaker):
                             static_job = update_user_incar_settings(
                                 static_job,
-                                {"KSPACING": 100.0, "ALGO": "All", "KPAR": 1},
+                                {"KSPACING": 100.0, "KPAR": 1},
                             )
                             if self.e0_spin:
                                 static_job = update_user_incar_settings(
