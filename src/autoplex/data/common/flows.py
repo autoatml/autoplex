@@ -268,11 +268,11 @@ class DFTStaticLabelling(Maker):
         ForceFieldStaticMaker (force field-based). Defaults to StaticMaker (VASP-based).
     static_energy_maker_isolated_atoms: BaseVaspMaker | ForceFieldStaticMaker | None
         Maker for static energy jobs of isolated atoms: either BaseVaspMaker (VASP-based) or
-        ForceFieldStaticMaker (force field-based) or None. If set to `None`, the parameters 
-        from `static_energy_maker` will be used as the default for isolated atoms. In this case, 
-        if `static_energy_maker` is a `StaticMaker`, all major settings will be inherited, 
-        except that `kspacing` will be automatically set to 100 to enforce a Gamma-point-only calculation. 
-        This is typically suitable for single-atom systems. Default is None. If a non-`StaticMaker` maker 
+        ForceFieldStaticMaker (force field-based) or None. If set to `None`, the parameters
+        from `static_energy_maker` will be used as the default for isolated atoms. In this case,
+        if `static_energy_maker` is a `StaticMaker`, all major settings will be inherited,
+        except that `kspacing` will be automatically set to 100 to enforce a Gamma-point-only calculation.
+        This is typically suitable for single-atom systems. Default is None. If a non-`StaticMaker` maker
         is used here, its output must include a `dir_name` field to ensure compatibility with downstream workflows.
 
     Returns
@@ -328,7 +328,9 @@ class DFTStaticLabelling(Maker):
             run_vasp_kwargs={"handlers": ()},
         )
     )
-    static_energy_maker_isolated_atoms: BaseVaspMaker | ForceFieldStaticMaker | None = None
+    static_energy_maker_isolated_atoms: BaseVaspMaker | ForceFieldStaticMaker | None = (
+        None
+    )
 
     @job
     def make(
@@ -397,7 +399,7 @@ class DFTStaticLabelling(Maker):
                         self.isolatedatom_box[2],
                     )
                     isolated_atom_struct = Structure(lattice, [sym], [[0.0, 0.0, 0.0]])
-                    
+
                     if self.static_energy_maker_isolated_atoms is None:
                         static_job = st_m.make(structure=isolated_atom_struct)
                         if isinstance(self.static_energy_maker, StaticMaker):
@@ -411,7 +413,9 @@ class DFTStaticLabelling(Maker):
                                     static_job, {"ISPIN": 2}
                                 )
                     else:
-                        static_job = self.static_energy_maker_isolated_atoms.make(structure=isolated_atom_struct)
+                        static_job = self.static_energy_maker_isolated_atoms.make(
+                            structure=isolated_atom_struct
+                        )
 
                     static_job.name = f"static_isolated_{idx}"
                     dirs["dirs_of_vasp"].append(static_job.output.dir_name)

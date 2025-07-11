@@ -103,7 +103,9 @@ def initial_rss(
     static_energy_maker: (
         BaseVaspMaker | ForceFieldStaticMaker
     ) = _DEFAULT_STATIC_ENERGY_MAKER,
-    static_energy_maker_isolated_atoms: BaseVaspMaker | ForceFieldStaticMaker | None = None,
+    static_energy_maker_isolated_atoms: (
+        BaseVaspMaker | ForceFieldStaticMaker | None
+    ) = None,
     **fit_kwargs,
 ):
     """
@@ -210,11 +212,11 @@ def initial_rss(
         ForceFieldStaticMaker (force field-based). Defaults to StaticMaker (VASP-based).
     static_energy_maker_isolated_atoms: BaseVaspMaker | ForceFieldStaticMaker | None
         Maker for static energy jobs of isolated atoms: either BaseVaspMaker (VASP-based) or
-        ForceFieldStaticMaker (force field-based) or None. If set to `None`, the parameters 
-        from `static_energy_maker` will be used as the default for isolated atoms. In this case, 
-        if `static_energy_maker` is a `StaticMaker`, all major settings will be inherited, 
-        except that `kspacing` will be automatically set to 100 to enforce a Gamma-point-only calculation. 
-        This is typically suitable for single-atom systems. Default is None. If a non-`StaticMaker` maker 
+        ForceFieldStaticMaker (force field-based) or None. If set to `None`, the parameters
+        from `static_energy_maker` will be used as the default for isolated atoms. In this case,
+        if `static_energy_maker` is a `StaticMaker`, all major settings will be inherited,
+        except that `kspacing` will be automatically set to 100 to enforce a Gamma-point-only calculation.
+        This is typically suitable for single-atom systems. Default is None. If a non-`StaticMaker` maker
         is used here, its output must include a `dir_name` field to ensure compatibility with downstream workflows.
     fit_kwargs:
         Additional keyword arguments for the MLIP fitting process.
@@ -386,7 +388,9 @@ def do_rss_iterations(
     static_energy_maker: (
         BaseVaspMaker | ForceFieldStaticMaker
     ) = _DEFAULT_STATIC_ENERGY_MAKER,
-    static_energy_maker_isolated_atoms: BaseVaspMaker | ForceFieldStaticMaker | None = None,
+    static_energy_maker_isolated_atoms: (
+        BaseVaspMaker | ForceFieldStaticMaker | None
+    ) = None,
     **fit_kwargs,
 ):
     """
@@ -552,11 +556,11 @@ def do_rss_iterations(
         ForceFieldStaticMaker (force field-based). Defaults to StaticMaker (VASP-based).
     static_energy_maker_isolated_atoms: BaseVaspMaker | ForceFieldStaticMaker | None
         Maker for static energy jobs of isolated atoms: either BaseVaspMaker (VASP-based) or
-        ForceFieldStaticMaker (force field-based) or None. If set to `None`, the parameters 
-        from `static_energy_maker` will be used as the default for isolated atoms. In this case, 
-        if `static_energy_maker` is a `StaticMaker`, all major settings will be inherited, 
-        except that `kspacing` will be automatically set to 100 to enforce a Gamma-point-only calculation. 
-        This is typically suitable for single-atom systems. Default is None. If a non-`StaticMaker` maker 
+        ForceFieldStaticMaker (force field-based) or None. If set to `None`, the parameters
+        from `static_energy_maker` will be used as the default for isolated atoms. In this case,
+        if `static_energy_maker` is a `StaticMaker`, all major settings will be inherited,
+        except that `kspacing` will be automatically set to 100 to enforce a Gamma-point-only calculation.
+        This is typically suitable for single-atom systems. Default is None. If a non-`StaticMaker` maker
         is used here, its output must include a `dir_name` field to ensure compatibility with downstream workflows.
     fit_kwargs:
         Additional keyword arguments for the MLIP fitting process.
