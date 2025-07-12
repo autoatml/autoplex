@@ -1569,11 +1569,14 @@ def vaspoutput_2_extended_xyz(
         path_without_hostname2 = Path(strip_hostname(path)).joinpath(
             "final_atoms_object.xyz"
         )
+        path_without_hostname2 = Path(strip_hostname(path)).joinpath(
+            "final_atoms_object.xyz"
+        )
         try:
             # read the vasp output
             if path_without_hostname.exists():
                 file = read(path_without_hostname, index=":")
-            elif path_without_hostname2.exists():
+            elif path_without_hostname2.exists() or path_without_hostname2.exists():
                 file = read(path_without_hostname2, index=":")
             for i in file:
                 virial_list = (
@@ -1920,8 +1923,6 @@ class CustomPotential(quippy.potential.Potential):
             atoms.info["energy"] = self.results["energy"].copy()
         if "stress" in self.results:
             atoms.info["stress"] = self.results["stress"].copy()
-        if "virial" in self.extra_results["config"]:
-            atoms.info["virial"] = self.extra_results["config"]["virial"].copy()
         return res
 
 

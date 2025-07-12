@@ -3,6 +3,10 @@
 import logging
 from typing import Literal
 
+from atomate2.forcefields.jobs import ForceFieldStaticMaker
+from atomate2.vasp.jobs.base import BaseVaspMaker
+from atomate2.vasp.jobs.core import StaticMaker
+from atomate2.vasp.sets.core import StaticSetGenerator
 from jobflow import Flow, Response, job
 
 from autoplex.data.common.flows import DFTStaticLabelling
@@ -19,6 +23,38 @@ __all__ = ["do_rss_iterations", "initial_rss"]
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+_DEFAULT_STATIC_ENERGY_MAKER = StaticMaker(
+    input_set_generator=StaticSetGenerator(
+        user_incar_settings={
+            "ADDGRID": "True",
+            "ENCUT": 520,
+            "EDIFF": 1e-06,
+            "ISMEAR": 0,
+            "SIGMA": 0.01,
+            "PREC": "Accurate",
+            "ISYM": None,
+            "KSPACING": 0.2,
+            "NPAR": 8,
+            "LWAVE": "False",
+            "LCHARG": "False",
+            "ENAUG": None,
+            "GGA": None,
+            "ISPIN": None,
+            "LAECHG": None,
+            "LELF": None,
+            "LORBIT": None,
+            "LVTOT": None,
+            "NSW": None,
+            "SYMPREC": None,
+            "NELM": 100,
+            "LMAXMIX": None,
+            "LASPH": None,
+            "AMIN": None,
+        }
+    ),
+    run_vasp_kwargs={"handlers": ()},
 )
 
 
@@ -64,6 +100,12 @@ def initial_rss(
     auto_delta: bool = False,
     num_processes_fit: int = 1,
     device_for_fitting: str = "cpu",
+    static_energy_maker: (
+        BaseVaspMaker | ForceFieldStaticMaker
+    ) = _DEFAULT_STATIC_ENERGY_MAKER,
+    static_energy_maker_isolated_atoms: (
+        BaseVaspMaker | ForceFieldStaticMaker | None
+    ) = None,
     **fit_kwargs,
 ):
     """
@@ -165,6 +207,17 @@ def initial_rss(
         Number of processes used for fitting. Default is 1.
     device_for_fitting: str
         Device to be used for model fitting, either "cpu" or "cuda".
+    static_energy_maker: BaseVaspMaker | ForceFieldStaticMaker
+        Maker for static energy jobs: either BaseVaspMaker (VASP-based) or
+        ForceFieldStaticMaker (force field-based). Defaults to StaticMaker (VASP-based).
+    static_energy_maker_isolated_atoms: BaseVaspMaker | ForceFieldStaticMaker | None
+        Maker for static energy jobs of isolated atoms: either BaseVaspMaker (VASP-based) or
+        ForceFieldStaticMaker (force field-based) or None. If set to `None`, the parameters
+        from `static_energy_maker` will be used as the default for isolated atoms. In this case,
+        if `static_energy_maker` is a `StaticMaker`, all major settings will be inherited,
+        except that `kspacing` will be automatically set to 100 to enforce a Gamma-point-only calculation.
+        This is typically suitable for single-atom systems. Default is None. If a non-`StaticMaker` maker
+        is used here, its output must include a `dir_name` field to ensure compatibility with downstream workflows.
     fit_kwargs:
         Additional keyword arguments for the MLIP fitting process.
 
@@ -210,6 +263,8 @@ def initial_rss(
         dimer_num=dimer_num,
         custom_incar=custom_incar,
         custom_potcar=custom_potcar,
+        static_energy_maker=static_energy_maker,
+        static_energy_maker_isolated_atoms=static_energy_maker_isolated_atoms,
     ).make(
         structures=do_randomized_structure_generation.output, config_type=config_type
     )
@@ -330,6 +385,12 @@ def do_rss_iterations(
     num_groups: int = 1,
     initial_kt: float = 0.3,
     current_iter_index: int = 1,
+    static_energy_maker: (
+        BaseVaspMaker | ForceFieldStaticMaker
+    ) = _DEFAULT_STATIC_ENERGY_MAKER,
+    static_energy_maker_isolated_atoms: (
+        BaseVaspMaker | ForceFieldStaticMaker | None
+    ) = None,
     **fit_kwargs,
 ):
     """
@@ -490,6 +551,17 @@ def do_rss_iterations(
         Initial temperature (in eV) for Boltzmann sampling. Default is 0.3.
     current_iter_index: int
         Index for the current RSS iteration. Default is 1.
+    static_energy_maker: BaseVaspMaker | ForceFieldStaticMaker
+        Maker for static energy jobs: either BaseVaspMaker (VASP-based) or
+        ForceFieldStaticMaker (force field-based). Defaults to StaticMaker (VASP-based).
+    static_energy_maker_isolated_atoms: BaseVaspMaker | ForceFieldStaticMaker | None
+        Maker for static energy jobs of isolated atoms: either BaseVaspMaker (VASP-based) or
+        ForceFieldStaticMaker (force field-based) or None. If set to `None`, the parameters
+        from `static_energy_maker` will be used as the default for isolated atoms. In this case,
+        if `static_energy_maker` is a `StaticMaker`, all major settings will be inherited,
+        except that `kspacing` will be automatically set to 100 to enforce a Gamma-point-only calculation.
+        This is typically suitable for single-atom systems. Default is None. If a non-`StaticMaker` maker
+        is used here, its output must include a `dir_name` field to ensure compatibility with downstream workflows.
     fit_kwargs:
         Additional keyword arguments for the MLIP fitting process.
 
@@ -591,6 +663,8 @@ def do_rss_iterations(
             dimer_num=dimer_num,
             custom_incar=custom_incar,
             custom_potcar=custom_potcar,
+            static_energy_maker=static_energy_maker,
+            static_energy_maker_isolated_atoms=static_energy_maker_isolated_atoms,
         ).make(structures=do_data_sampling.output, config_type=config_type)
         do_data_collection = collect_dft_data(
             vasp_ref_file=vasp_ref_file,
@@ -702,6 +776,8 @@ def do_rss_iterations(
             num_groups=num_groups,
             initial_kt=initial_kt,
             current_iter_index=current_iter_index,
+            static_energy_maker=static_energy_maker,
+            static_energy_maker_isolated_atoms=static_energy_maker_isolated_atoms,
             **fit_kwargs,
         )
 

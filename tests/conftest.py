@@ -21,6 +21,10 @@ import shutil
 from pytest import MonkeyPatch
 from calorine.nep.io import read_nepfile
 from atomate2.utils.testing.vasp import monkeypatch_vasp
+from atomate2.vasp.jobs.base import BaseVaspMaker
+from atomate2.vasp.jobs.core import StaticMaker
+from atomate2.forcefields.jobs import ForceFieldStaticMaker
+from atomate2.vasp.sets.core import StaticSetGenerator
 
 from jobflow import Response, job
 
@@ -38,6 +42,37 @@ _REF_PATHS: Dict[str, Union[str, Path]] = {}
 _NEP_REF_PATHS: Dict[str, str] = {}
 _FAKE_RUN_NEP_KWARGS: Dict[str, dict] = {}
 _FAKE_RUN_VASP_KWARGS: Dict[str, dict] = {}
+_DEFAULT_STATIC_ENERGY_MAKER = StaticMaker(
+    input_set_generator=StaticSetGenerator(
+        user_incar_settings={
+            "ADDGRID": "True",
+            "ENCUT": 520,
+            "EDIFF": 1e-06,
+            "ISMEAR": 0,
+            "SIGMA": 0.01,
+            "PREC": "Accurate",
+            "ISYM": None,
+            "KSPACING": 0.2,
+            "NPAR": 8,
+            "LWAVE": "False",
+            "LCHARG": "False",
+            "ENAUG": None,
+            "GGA": None,
+            "ISPIN": None,
+            "LAECHG": None,
+            "LELF": None,
+            "LORBIT": None,
+            "LVTOT": None,
+            "NSW": None,
+            "SYMPREC": None,
+            "NELM": 100,
+            "LMAXMIX": None,
+            "LASPH": None,
+            "AMIN": None,
+        }
+    ),
+    run_vasp_kwargs={"handlers": ()},
+)
 
 @pytest.fixture(scope="session")
 def test_dir():
@@ -289,6 +324,8 @@ def mock_rss(input_dir: str = None,
              ref_force_name: str = "REF_forces",
              ref_virial_name: str = "REF_virial",
              num_processes_fit: int = None,
+             static_energy_maker: BaseVaspMaker | ForceFieldStaticMaker = _DEFAULT_STATIC_ENERGY_MAKER,
+             static_energy_maker_isolated_atoms: BaseVaspMaker | ForceFieldStaticMaker | None = None,
              kt: float = None,
              **fit_kwargs, ):
     job2 = sample_data(selection_method=selection_method,
@@ -302,6 +339,8 @@ def mock_rss(input_dir: str = None,
                               dimer_range=dimer_range,
                               dimer_num=dimer_num,
                               custom_incar=custom_incar,
+                              static_energy_maker=static_energy_maker,
+                              static_energy_maker_isolated_atoms=static_energy_maker_isolated_atoms,
                               ).make(structures=job2.output)
     job4 = collect_dft_data(vasp_ref_file=vasp_ref_file,
                             rss_group=rss_group,

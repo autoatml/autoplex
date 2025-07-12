@@ -91,9 +91,9 @@ If the RSS workflow starts exploration from scratch, it consists of two stages. 
 
 The `initial_selection_enabled` parameter enables initial structure selection when set to `true`. In this case, the sampling method will be CUR. The `rss_selection_method` defines the strategy for selecting structures during the RSS iteration. In this example, the method `bcur2i` is used, which combines Boltzmann-weighted energy histograms and CUR sampling to select low-energy and diverse structures. The `bcur_params` section provides detailed settings for the `bcur2i` method. The `soap_paras` define the SOAP descriptors used for structure representation.
 
-## DFT labelling parameters
+## Labelling parameters
 
-The section allows you to set up VASP static calculations for accurately labeling training structures, including bulk, isolated atoms, and dimers.
+The section allows you to set up static calculations based on VASP or force fields for accurately labeling training structures, including bulk, isolated atoms, and dimers.
 
 ```yaml
 # DFT Labelling Parameters
