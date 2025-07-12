@@ -158,13 +158,18 @@ def test_mace_fit_maker(test_dir, memory_jobstore, clean_dir):
     assert Path(macefit.output["mlip_path"][0].resolve(memory_jobstore)).exists()
 
 def test_mace_finetuning_maker(test_dir, memory_jobstore, clean_dir):
+
+    # TODO: Replace the finetuning dataset with correct reference keys
+    # as per mace logs using 'energy', 'forces' and 'stress' as ref keys is 
+    # no longer safe when communicating between MACE and ASE
+    
     database_dir = test_dir / "fitting/finetuning_dataset"
 
 
     macefit = MLIPFitMaker(
         mlip_type="MACE",
-        ref_energy_name=None,
-        ref_force_name=None,
+        ref_energy_name="energy",
+        ref_force_name="forces",
         ref_virial_name=None,
         num_processes_fit=1,
         apply_data_preprocessing=False,
@@ -193,6 +198,7 @@ def test_mace_finetuning_maker(test_dir, memory_jobstore, clean_dir):
         device = "cpu",
         save_cpu =True,
         seed = 3,
+        stress_key = "stress",
     )
 
     _ = run_locally(

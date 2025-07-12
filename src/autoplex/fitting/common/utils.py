@@ -1375,7 +1375,9 @@ def mace_fitting(
     last_table = tables[-2]
     try:
         matches = re.findall(
-            r"\|\s*(train_default|valid_default)\s*\|\s*([\d\.]+)\s*\|", last_table
+            r"\|\s*(train_default|valid_default)\s*\|\s*([\d\.]+)\s*\|",
+            last_table,
+            re.IGNORECASE,
         )
 
         return {
