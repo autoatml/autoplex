@@ -601,9 +601,10 @@ def collect_dft_data(
         has_vasp_output = os.path.exists(os.path.join(val, "vasprun.xml.gz"))
         has_ase_output = os.path.exists(os.path.join(val, "final_atoms_object.xyz"))
 
-        if has_vasp_output:
-            converged = check_convergence_vasp(os.path.join(val, "vasprun.xml.gz"))
+
         if has_vasp_output or has_ase_output:
+            if has_vasp_output:
+                converged = check_convergence_vasp(os.path.join(val, "vasprun.xml.gz"))
             if has_vasp_output and converged:
                 at = read(os.path.join(val, "vasprun.xml.gz"), index=":")
             elif has_vasp_output and (not converged):
@@ -620,11 +621,6 @@ def collect_dft_data(
                     )
                 except AssertionError:
                     pass
-                    # logging.info("read ase traj")
-                    # try:
-                    #    at = read(os.path.join(val,"final_atoms_object.traj"), index=":")
-                    # except:
-                    #    pass
             if at is not None:
                 for at_i in at:
 
