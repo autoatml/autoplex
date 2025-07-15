@@ -39,7 +39,7 @@ dependencies = [
      "dgl<=2.4; sys.platform == 'linux'",
      "torchdata<=0.7.1",
      "torch<=2.2.0; sys.platform != 'linux'",
-     "torch<=2.2.1; sys.platform == 'linux'",
+     "torch<=2.7.1; sys.platform == 'linux'",
      # quippy-ase support for py3.12 tracked in https://github.com/libAtoms/QUIP/issues/645
      "quippy-ase==0.9.14; python_version < '3.12'",
 ]
@@ -81,7 +81,7 @@ strict = [
      "dgl<=2.4; sys.platform == 'linux'",
      "torchdata<=0.7.1",
      "torch<=2.2.0; sys.platform != 'linux'",
-     "torch<=2.2.1; sys.platform == 'linux'",
+     "torch<=2.7.1; sys.platform == 'linux'",
      "nequip==0.6.1",
      "hiphive==1.4",
 ]
