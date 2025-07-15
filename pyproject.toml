@@ -70,7 +70,7 @@ strict = [
      "calorine==3.0",
      "pymatgen==2025.2.18",
      "atomate2[strict]==0.0.21",
-     "matgl==1.2.6",
+     "matgl==1.2.7",
      "quippy-ase==0.9.14; python_version < '3.12'",
      "ase==3.24.0",
      "mace-torch==0.3.13",
