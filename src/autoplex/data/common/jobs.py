@@ -611,23 +611,28 @@ def collect_dft_data(
                     f"Calculation did not converge for path: {os.path.join(val, 'vasprun.xml.gz')}"
                 )
             elif has_ase_output:
-                try: 
-                   logging.info("read ase")
-                   at = read(os.path.join(val, "final_atoms_object.xyz"), index=":",format="extxyz")
+                try:
+                    logging.info("read ase")
+                    at = read(
+                        os.path.join(val, "final_atoms_object.xyz"),
+                        index=":",
+                        format="extxyz",
+                    )
                 except AssertionError:
-                   pass
-                   #logging.info("read ase traj")
-                   #try:
-                   #    at = read(os.path.join(val,"final_atoms_object.traj"), index=":")
-                   #except:
-                   #    pass
+                    pass
+                    # logging.info("read ase traj")
+                    # try:
+                    #    at = read(os.path.join(val,"final_atoms_object.traj"), index=":")
+                    # except:
+                    #    pass
             if at is not None:
                 for at_i in at:
-                
+
                     logging.warning(at_i.get_stress())
 
                     virial_list = (
-                        -voigt_6_to_full_3x3_stress(at_i.get_stress()) * at_i.get_volume()
+                        -voigt_6_to_full_3x3_stress(at_i.get_stress())
+                        * at_i.get_volume()
                     )
                     at_i.info["REF_virial"] = " ".join(map(str, virial_list.flatten()))
                     del at_i.calc.results["stress"]
