@@ -596,13 +596,40 @@ def collect_dft_data(
     isolated_atom_energies = {}
 
     for i, val in enumerate(dirs):
-        if os.path.exists(os.path.join(val, "vasprun.xml.gz")):
+        at = None
+        # TODO: think about fall back when we use ml potential outputs instead
+        has_vasp_output = os.path.exists(os.path.join(val, "vasprun.xml.gz"))
+        has_ase_output = os.path.exists(os.path.join(val, "final_atoms_object.xyz"))
 
+        if has_vasp_output:
             converged = check_convergence_vasp(os.path.join(val, "vasprun.xml.gz"))
-
-            if converged:
+        if has_vasp_output or has_ase_output:
+            if has_vasp_output and converged:
                 at = read(os.path.join(val, "vasprun.xml.gz"), index=":")
+            elif has_vasp_output and (not converged):
+                logging.warning(
+                    f"Calculation did not converge for path: {os.path.join(val, 'vasprun.xml.gz')}"
+                )
+            elif has_ase_output:
+                try:
+                    logging.info("read ase")
+                    at = read(
+                        os.path.join(val, "final_atoms_object.xyz"),
+                        index=":",
+                        format="extxyz",
+                    )
+                except AssertionError:
+                    pass
+                    # logging.info("read ase traj")
+                    # try:
+                    #    at = read(os.path.join(val,"final_atoms_object.traj"), index=":")
+                    # except:
+                    #    pass
+            if at is not None:
                 for at_i in at:
+
+                    logging.warning(at_i.get_stress())
+
                     virial_list = (
                         -voigt_6_to_full_3x3_stress(at_i.get_stress())
                         * at_i.get_volume()
@@ -629,11 +656,6 @@ def collect_dft_data(
                         at_ids = at_i.get_atomic_numbers()
                         # array_key = at_ids.tostring()
                         isolated_atom_energies[int(at_ids[0])] = at_i.info["REF_energy"]
-
-            else:
-                logging.warning(
-                    f"Calculation did not converge for path: {os.path.join(val, 'vasprun.xml.gz')}"
-                )
 
     logging.info(f"Total {len(atoms)} structures from VASP are exactly collected.")
 

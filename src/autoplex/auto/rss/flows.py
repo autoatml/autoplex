@@ -2,6 +2,10 @@
 
 from dataclasses import dataclass, field
 
+from atomate2.forcefields.jobs import ForceFieldStaticMaker
+from atomate2.vasp.jobs.base import BaseVaspMaker
+from atomate2.vasp.jobs.core import StaticMaker
+from atomate2.vasp.sets.core import StaticSetGenerator
 from jobflow import Flow, Maker, Response, job
 
 from autoplex.auto.rss.jobs import do_rss_iterations, initial_rss
@@ -20,10 +24,58 @@ class RssMaker(Maker):
     rss_config: RssConfig
         Pydantic model that defines the setup parameters for the whole RSS workflow.
         If not explicitly set, the defaults from 'autoplex.settings.RssConfig' will be used.
+    static_energy_maker: BaseVaspMaker | ForceFieldStaticMaker
+        Maker for static energy jobs: either BaseVaspMaker (VASP-based) or
+        ForceFieldStaticMaker (force field-based). Defaults to StaticMaker (VASP-based).
+    static_energy_maker_isolated_atoms: BaseVaspMaker | ForceFieldStaticMaker | None
+        Maker for static energy jobs of isolated atoms: either BaseVaspMaker (VASP-based) or
+        ForceFieldStaticMaker (force field-based) or None. If set to `None`, the parameters
+        from `static_energy_maker` will be used as the default for isolated atoms. In this case,
+        if `static_energy_maker` is a `StaticMaker`, all major settings will be inherited,
+        except that `kspacing` will be automatically set to 100 to enforce a Gamma-point-only calculation.
+        This is typically suitable for single-atom systems. Default is None. If a non-`StaticMaker` maker
+        is used here, its output must include a `dir_name` field to ensure compatibility with downstream workflows.
+
     """
 
     name: str = "ml-driven rss"
     rss_config: RssConfig = field(default_factory=lambda: RssConfig())
+    static_energy_maker: BaseVaspMaker | ForceFieldStaticMaker = field(
+        default_factory=lambda: StaticMaker(
+            input_set_generator=StaticSetGenerator(
+                user_incar_settings={
+                    "ADDGRID": "True",
+                    "ENCUT": 520,
+                    "EDIFF": 1e-06,
+                    "ISMEAR": 0,
+                    "SIGMA": 0.01,
+                    "PREC": "Accurate",
+                    "ISYM": None,
+                    "KSPACING": 0.2,
+                    "NPAR": 8,
+                    "LWAVE": "False",
+                    "LCHARG": "False",
+                    "ENAUG": None,
+                    "GGA": None,
+                    "ISPIN": None,
+                    "LAECHG": None,
+                    "LELF": None,
+                    "LORBIT": None,
+                    "LVTOT": None,
+                    "NSW": None,
+                    "SYMPREC": None,
+                    "NELM": 100,
+                    "LMAXMIX": None,
+                    "LASPH": None,
+                    "AMIN": None,
+                }
+            ),
+            run_vasp_kwargs={"handlers": ()},
+        )
+    )
+    static_energy_maker_isolated_atoms: BaseVaspMaker | ForceFieldStaticMaker | None = (
+        None
+    )
 
     @job
     def make(self, **kwargs):
@@ -293,7 +345,11 @@ class RssMaker(Maker):
                     "rss_group": config_params["rss_group"][0],
                 }
             )
-            initial_rss_job = initial_rss(**initial_params)
+            initial_rss_job = initial_rss(
+                static_energy_maker=self.static_energy_maker,
+                static_energy_maker_isolated_atoms=self.static_energy_maker_isolated_atoms,
+                **initial_params,
+            )
             rss_flow.append(initial_rss_job)
 
         rss_group = config_params["rss_group"]
@@ -327,6 +383,8 @@ class RssMaker(Maker):
 
             do_rss_job = do_rss_iterations(
                 input=initial_rss_job.output,
+                static_energy_maker=self.static_energy_maker,
+                static_energy_maker_isolated_atoms=self.static_energy_maker_isolated_atoms,
                 **rss_params,
             )
         else:
@@ -337,6 +395,8 @@ class RssMaker(Maker):
             resume_from_previous_state = config_params["resume_from_previous_state"]
             do_rss_job = do_rss_iterations(
                 input=resume_from_previous_state,
+                static_energy_maker=self.static_energy_maker,
+                static_energy_maker_isolated_atoms=self.static_energy_maker_isolated_atoms,
                 **rss_params,
             )
 
