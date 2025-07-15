@@ -67,7 +67,7 @@ workflow-managers = [
     "jobflow-remote==0.1.7"
 ]
 strict = [
-     "calorine==3.0",
+     "calorine==3.1",
      "pymatgen==2025.2.18",
      "atomate2[strict]==0.0.21",
      "matgl==1.2.7",
