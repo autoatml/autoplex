@@ -83,7 +83,7 @@ strict = [
      "torch<=2.2.0; sys.platform != 'linux'",
      "torch<=2.2.1; sys.platform == 'linux'",
      "nequip==0.6.1",
-     "hiphive==1.4",
+     "hiphive==1.5",
 ]
 dev = ["pre-commit>=2.12.1"]
 tests = ["pytest", "pytest-mock", "pytest-split", "pytest-cov", "types-setuptools", "nbmake"]
