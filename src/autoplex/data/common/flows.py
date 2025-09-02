@@ -8,7 +8,15 @@ from atomate2.forcefields.jobs import (
     ForceFieldRelaxMaker,
     ForceFieldStaticMaker,
 )
+
+import sys
+import importlib
+
+import atomate2
+import os
+
 from atomate2.vasp.jobs.base import BaseVaspMaker
+from atomate2.castep.jobs.base import BaseCastepMaker
 from atomate2.vasp.jobs.core import StaticMaker
 from atomate2.vasp.powerups import update_user_incar_settings
 from atomate2.vasp.sets.core import StaticSetGenerator
@@ -274,6 +282,9 @@ class DFTStaticLabelling(Maker):
         except that `kspacing` will be automatically set to 100 to enforce a Gamma-point-only calculation.
         This is typically suitable for single-atom systems. Default is None. If a non-`StaticMaker` maker
         is used here, its output must include a `dir_name` field to ensure compatibility with downstream workflows.
+    
+    Addition:
+    Supoort for CASTEP 
 
     Returns
     -------
@@ -295,7 +306,7 @@ class DFTStaticLabelling(Maker):
     dimer_num: int = 21
     custom_incar: dict | None = None
     custom_potcar: dict | None = None
-    static_energy_maker: BaseVaspMaker | ForceFieldStaticMaker = field(
+    static_energy_maker: BaseCastepMaker | BaseVaspMaker | ForceFieldStaticMaker = field(
         default_factory=lambda: StaticMaker(
             input_set_generator=StaticSetGenerator(
                 user_incar_settings={
@@ -328,7 +339,7 @@ class DFTStaticLabelling(Maker):
             run_vasp_kwargs={"handlers": ()},
         )
     )
-    static_energy_maker_isolated_atoms: BaseVaspMaker | ForceFieldStaticMaker | None = (
+    static_energy_maker_isolated_atoms: BaseCastepMaker| BaseVaspMaker | ForceFieldStaticMaker | None = (
         None
     )
 
@@ -368,8 +379,10 @@ class DFTStaticLabelling(Maker):
                 self.static_energy_maker.input_set_generator.user_potcar_settings.update(
                     self.custom_potcar
                 )
+    
 
         st_m = self.static_energy_maker
+
 
         if structures:
             for idx, struct in enumerate(structures):
