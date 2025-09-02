@@ -1,4 +1,4 @@
-from atomate2.castep.jobs.base import BaseCastepMaker
+from castep.jobs.base import BaseCastepMaker
 from jobflow import run_locally, Flow
 from ase import Atoms
 from pymatgen.io.ase import AseAtomsAdaptor
