@@ -1,5 +1,5 @@
 
-from autoplex.castep.jobs.base import BaseCastepMaker
+from autoplex.castep.jobs import BaseCastepMaker
 from jobflow import run_locally, Flow
 from ase import Atoms
 from pymatgen.io.ase import AseAtomsAdaptor
@@ -57,3 +57,6 @@ def test_castep_with_base_maker():
 
 if __name__ == "__main__":
     test_castep_with_base_maker()
+
+
+

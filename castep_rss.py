@@ -2,7 +2,7 @@ from atomate2.forcefields.jobs import ForceFieldStaticMaker
 from autoplex.settings import RssConfig
 from autoplex.auto.rss.flows import RssMaker
 from jobflow import Flow, run_locally
-from atomate2.castep.jobs.base import BaseCastepMaker
+from autoplex.castep.jobs import BaseCastepMaker
 from ase.calculators.castep import create_castep_keywords
 import logging
 import os

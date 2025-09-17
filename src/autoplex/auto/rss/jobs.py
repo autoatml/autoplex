@@ -2,7 +2,7 @@
 
 import logging
 from typing import Literal
-
+from autoplex.castep.jobs import BaseCastepMaker
 from atomate2.forcefields.jobs import ForceFieldStaticMaker
 from atomate2.vasp.jobs.base import BaseVaspMaker
 from atomate2.vasp.jobs.core import StaticMaker

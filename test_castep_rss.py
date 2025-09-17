@@ -1,8 +1,10 @@
 import pytest
 from unittest.mock import patch, MagicMock, mock_open
 import os
+from autoplex.auto.rss.flows import RssConfig
+from autoplex.auto.rss.flows import RssMaker
 
-from autoplex.data.common.utils import (
+from autoplex.auto.rss.flows import (
     setup_castep_keywords,
     create_castep_makers,
     get_default_rss_config,

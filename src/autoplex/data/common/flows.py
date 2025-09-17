@@ -16,7 +16,7 @@ import atomate2
 import os
 
 from atomate2.vasp.jobs.base import BaseVaspMaker
-from atomate2.castep.jobs.base import BaseCastepMaker
+from autoplex.castep.jobs import BaseCastepMaker
 from atomate2.vasp.jobs.core import StaticMaker
 from atomate2.vasp.powerups import update_user_incar_settings
 from atomate2.vasp.sets.core import StaticSetGenerator
