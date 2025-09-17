@@ -1,4 +1,5 @@
-from castep.jobs.base import BaseCastepMaker
+
+from autoplex.castep.jobs.base import BaseCastepMaker
 from jobflow import run_locally, Flow
 from ase import Atoms
 from pymatgen.io.ase import AseAtomsAdaptor
@@ -32,7 +33,7 @@ def test_castep_with_base_maker():
     # Convert ASE → Pymatgen
     si_pmg = AseAtomsAdaptor.get_structure(si_ase)
 
-    # Create BaseCastepMaker (same as in your RSS workflow)
+    # Create BaseCastepMaker 
     castep_maker = BaseCastepMaker(
         name="castep_test",
         castep_command=castep_command,
