@@ -2,7 +2,6 @@
 
 from dataclasses import dataclass, field
 
-from autoplex.castep.jobs import BaseCastepMaker
 from atomate2.forcefields.jobs import ForceFieldStaticMaker
 from atomate2.vasp.jobs.base import BaseVaspMaker
 from atomate2.vasp.jobs.core import StaticMaker
@@ -10,6 +9,7 @@ from atomate2.vasp.sets.core import StaticSetGenerator
 from jobflow import Flow, Maker, Response, job
 
 from autoplex.auto.rss.jobs import do_rss_iterations, initial_rss
+from autoplex.castep.jobs import BaseCastepMaker
 from autoplex.settings import RssConfig
 
 
@@ -41,42 +41,44 @@ class RssMaker(Maker):
 
     name: str = "ml-driven rss"
     rss_config: RssConfig = field(default_factory=lambda: RssConfig())
-    static_energy_maker: BaseVaspMaker | BaseCastepMaker| ForceFieldStaticMaker = field(
-        default_factory=lambda: StaticMaker(
-            input_set_generator=StaticSetGenerator(
-                user_incar_settings={
-                    "ADDGRID": "True",
-                    "ENCUT": 520,
-                    "EDIFF": 1e-06,
-                    "ISMEAR": 0,
-                    "SIGMA": 0.01,
-                    "PREC": "Accurate",
-                    "ISYM": None,
-                    "KSPACING": 0.2,
-                    "NPAR": 8,
-                    "LWAVE": "False",
-                    "LCHARG": "False",
-                    "ENAUG": None,
-                    "GGA": None,
-                    "ISPIN": None,
-                    "LAECHG": None,
-                    "LELF": None,
-                    "LORBIT": None,
-                    "LVTOT": None,
-                    "NSW": None,
-                    "SYMPREC": None,
-                    "NELM": 100,
-                    "LMAXMIX": None,
-                    "LASPH": None,
-                    "AMIN": None,
-                }
-            ),
-            run_vasp_kwargs={"handlers": ()},
+    static_energy_maker: BaseVaspMaker | BaseCastepMaker | ForceFieldStaticMaker = (
+        field(
+            default_factory=lambda: StaticMaker(
+                input_set_generator=StaticSetGenerator(
+                    user_incar_settings={
+                        "ADDGRID": "True",
+                        "ENCUT": 520,
+                        "EDIFF": 1e-06,
+                        "ISMEAR": 0,
+                        "SIGMA": 0.01,
+                        "PREC": "Accurate",
+                        "ISYM": None,
+                        "KSPACING": 0.2,
+                        "NPAR": 8,
+                        "LWAVE": "False",
+                        "LCHARG": "False",
+                        "ENAUG": None,
+                        "GGA": None,
+                        "ISPIN": None,
+                        "LAECHG": None,
+                        "LELF": None,
+                        "LORBIT": None,
+                        "LVTOT": None,
+                        "NSW": None,
+                        "SYMPREC": None,
+                        "NELM": 100,
+                        "LMAXMIX": None,
+                        "LASPH": None,
+                        "AMIN": None,
+                    }
+                ),
+                run_vasp_kwargs={"handlers": ()},
+            )
         )
     )
-    static_energy_maker_isolated_atoms: BaseVaspMaker | BaseCastepMaker| ForceFieldStaticMaker | None = (
-        None
-    )
+    static_energy_maker_isolated_atoms: (
+        BaseVaspMaker | BaseCastepMaker | ForceFieldStaticMaker | None
+    ) = None
 
     @job
     def make(self, **kwargs):
@@ -295,10 +297,10 @@ class RssMaker(Maker):
 
         config_params = default_config.model_dump(by_alias=True, exclude_none=True)
 
-         # Set default calculator type if not specified
+        # Set default calculator type if not specified
         if "calculator_type" not in config_params:
             # Auto-detect calculator type based on static_energy_maker
-            if hasattr(self.static_energy_maker, '__class__'):
+            if hasattr(self.static_energy_maker, "__class__"):
                 if "Castep" in self.static_energy_maker.__class__.__name__:
                     config_params["calculator_type"] = "castep"
                 else:

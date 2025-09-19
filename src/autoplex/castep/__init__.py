@@ -1,1 +1,1 @@
-"CASTEP module"
+"""CASTEP module"""

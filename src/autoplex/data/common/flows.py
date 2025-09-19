@@ -8,15 +8,7 @@ from atomate2.forcefields.jobs import (
     ForceFieldRelaxMaker,
     ForceFieldStaticMaker,
 )
-
-import sys
-import importlib
-
-import atomate2
-import os
-
 from atomate2.vasp.jobs.base import BaseVaspMaker
-from autoplex.castep.jobs import BaseCastepMaker
 from atomate2.vasp.jobs.core import StaticMaker
 from atomate2.vasp.powerups import update_user_incar_settings
 from atomate2.vasp.sets.core import StaticSetGenerator
@@ -26,6 +18,7 @@ from pymatgen.core import Lattice
 from pymatgen.core.structure import Structure
 from pymatgen.io.ase import AseAtomsAdaptor
 
+from autoplex.castep.jobs import BaseCastepMaker
 from autoplex.data.common.jobs import (
     convert_to_extxyz,
     generate_randomized_structures,
@@ -282,9 +275,9 @@ class DFTStaticLabelling(Maker):
         except that `kspacing` will be automatically set to 100 to enforce a Gamma-point-only calculation.
         This is typically suitable for single-atom systems. Default is None. If a non-`StaticMaker` maker
         is used here, its output must include a `dir_name` field to ensure compatibility with downstream workflows.
-    
+
     Addition:
-    Supoort for CASTEP 
+    Supoort for CASTEP
 
     Returns
     -------
@@ -306,42 +299,44 @@ class DFTStaticLabelling(Maker):
     dimer_num: int = 21
     custom_incar: dict | None = None
     custom_potcar: dict | None = None
-    static_energy_maker: BaseCastepMaker | BaseVaspMaker | ForceFieldStaticMaker = field(
-        default_factory=lambda: StaticMaker(
-            input_set_generator=StaticSetGenerator(
-                user_incar_settings={
-                    "ADDGRID": "True",
-                    "ENCUT": 520,
-                    "EDIFF": 1e-06,
-                    "ISMEAR": 0,
-                    "SIGMA": 0.01,
-                    "PREC": "Accurate",
-                    "ISYM": None,
-                    "KSPACING": 0.2,
-                    "NPAR": 8,
-                    "LWAVE": "False",
-                    "LCHARG": "False",
-                    "ENAUG": None,
-                    "GGA": None,
-                    "ISPIN": None,
-                    "LAECHG": None,
-                    "LELF": None,
-                    "LORBIT": None,
-                    "LVTOT": None,
-                    "NSW": None,
-                    "SYMPREC": None,
-                    "NELM": 100,
-                    "LMAXMIX": None,
-                    "LASPH": None,
-                    "AMIN": None,
-                }
-            ),
-            run_vasp_kwargs={"handlers": ()},
+    static_energy_maker: BaseCastepMaker | BaseVaspMaker | ForceFieldStaticMaker = (
+        field(
+            default_factory=lambda: StaticMaker(
+                input_set_generator=StaticSetGenerator(
+                    user_incar_settings={
+                        "ADDGRID": "True",
+                        "ENCUT": 520,
+                        "EDIFF": 1e-06,
+                        "ISMEAR": 0,
+                        "SIGMA": 0.01,
+                        "PREC": "Accurate",
+                        "ISYM": None,
+                        "KSPACING": 0.2,
+                        "NPAR": 8,
+                        "LWAVE": "False",
+                        "LCHARG": "False",
+                        "ENAUG": None,
+                        "GGA": None,
+                        "ISPIN": None,
+                        "LAECHG": None,
+                        "LELF": None,
+                        "LORBIT": None,
+                        "LVTOT": None,
+                        "NSW": None,
+                        "SYMPREC": None,
+                        "NELM": 100,
+                        "LMAXMIX": None,
+                        "LASPH": None,
+                        "AMIN": None,
+                    }
+                ),
+                run_vasp_kwargs={"handlers": ()},
+            )
         )
     )
-    static_energy_maker_isolated_atoms: BaseCastepMaker| BaseVaspMaker | ForceFieldStaticMaker | None = (
-        None
-    )
+    static_energy_maker_isolated_atoms: (
+        BaseCastepMaker | BaseVaspMaker | ForceFieldStaticMaker | None
+    ) = None
 
     @job
     def make(
@@ -379,10 +374,8 @@ class DFTStaticLabelling(Maker):
                 self.static_energy_maker.input_set_generator.user_potcar_settings.update(
                     self.custom_potcar
                 )
-    
 
         st_m = self.static_energy_maker
-
 
         if structures:
             for idx, struct in enumerate(structures):

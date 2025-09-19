@@ -27,14 +27,6 @@ from quippy import descriptors
 from scipy.sparse.linalg import LinearOperator, svds
 from sklearn.model_selection import StratifiedShuffleSplit
 from threadpoolctl import threadpool_limits
-from atomate2.forcefields.jobs import ForceFieldStaticMaker
-from jobflow import Flow
-from autoplex.castep.jobs import BaseCastepMaker
-from ase.calculators.castep import create_castep_keywords
-import logging
-import os
-import shutil
-from pathlib import Path
 
 from autoplex.fitting.common.regularization import (
     calculate_hull_nd,
@@ -1658,5 +1650,3 @@ def handle_rss_trajectory(
                             os.remove(file_path)
 
     return atoms, pressures
-
-

@@ -2,32 +2,21 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+import os
+from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from emmet.core.tasks import TaskDoc
+from ase.calculators.castep import Castep
 from jobflow import Maker, Response, job
-from monty.serialization import dumpfn
 from pymatgen.core.trajectory import Trajectory
-
-from atomate2 import SETTINGS
-from atomate2.common.files import gzip_output_folder
+from pymatgen.io.ase import AseAtomsAdaptor
 
 from autoplex.castep.utils import CastepTaskDoc
-from datetime import datetime
-
-from ase.calculators.castep import Castep
-import shutil
-import os
-
-from ase.io import write as ase_write
-from pymatgen.io.ase import AseAtomsAdaptor
-import tempfile
-import time
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+
     from pymatgen.core import Structure
 
 # Data objects for CASTEP jobs
@@ -40,7 +29,7 @@ _CASTEP_DATA_OBJECTS = [
 # CASTEP input files
 _CASTEP_INPUT_FILES = [
     "*.cell",
-    "*.param", 
+    "*.param",
     "*.usp",
     "*.recpot",
     "castep_keywords.json",
@@ -71,7 +60,7 @@ def castep_job(method: Callable) -> job:
     Decorate the ``make`` method of CASTEP job makers.
 
     This is a thin wrapper around :obj:`~jobflow.core.job.Job` that configures common
-    settings for all CASTEP jobs. It ensures that trajectory and structure data 
+    settings for all CASTEP jobs. It ensures that trajectory and structure data
     are stored appropriately.
 
     Any makers that return CASTEP jobs should decorate the ``make`` method
@@ -120,6 +109,7 @@ class BaseCastepMaker(Maker):
     task_document_kwargs : dict
         Keyword arguments for creating TaskDoc.
     """
+
     name: str = "castep_job"
     castep_kwargs: dict | None = None
     pspot: string | None = None
@@ -143,12 +133,10 @@ class BaseCastepMaker(Maker):
         Response
             A response object containing the output of the CASTEP run.
         """
-
         # Convert structure to ASE atoms
         adaptor = AseAtomsAdaptor()
         atoms = adaptor.get_atoms(structure)
-    
-        
+
         # Create CASTEP calculator
         atoms.calc = Castep()
 
@@ -159,16 +147,11 @@ class BaseCastepMaker(Maker):
         if self.pspot:
             atoms.set_pspot(self.pspot)
 
-        output = {'energy': atoms.get_potential_energy(),
-        'volume' : atoms.get_volume(),
-        'forces' : atoms.get_forces(),
-        'lattice_parameters' : atoms.get_cell_lengths_and_angles(),
-        'directory' : os.getcwd()
+        output = {
+            "energy": atoms.get_potential_energy(),
+            "volume": atoms.get_volume(),
+            "forces": atoms.get_forces(),
+            "lattice_parameters": atoms.get_cell_lengths_and_angles(),
+            "directory": os.getcwd(),
         }
         return output
-            
-
-
-        
-        
-   

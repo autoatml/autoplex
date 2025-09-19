@@ -543,7 +543,6 @@ def sample_data(
     return selected_atoms
 
 
-
 def collect_castep_data(
     castep_ref_file: str,
     rss_group: str,
@@ -586,22 +585,26 @@ def collect_castep_data(
 
     for i, val in enumerate(dirs):
         logging.info(f"Processing CASTEP directory: {val}")
-        
+
         # Look for CASTEP trajectory file
         castep_traj_file = os.path.join(val, "final_atoms_object.xyz")
-        
+
         if os.path.exists(castep_traj_file):
             try:
                 logging.info(f"Reading CASTEP trajectory: {castep_traj_file}")
                 at = read(castep_traj_file, index=":", format="extxyz")
-                
+
                 for at_i in at:
                     # Process CASTEP-specific data
-                    process_castep_atoms(at_i, config_types[i], rss_group, isolated_atom_energies)
+                    process_castep_atoms(
+                        at_i, config_types[i], rss_group, isolated_atom_energies
+                    )
                     atoms.append(at_i)
-                    
+
             except Exception as e:
-                logging.warning(f"Could not read CASTEP trajectory {castep_traj_file}: {e}")
+                logging.warning(
+                    f"Could not read CASTEP trajectory {castep_traj_file}: {e}"
+                )
         else:
             logging.warning(f"CASTEP trajectory file not found: {castep_traj_file}")
 
@@ -685,7 +688,7 @@ def collect_vasp_data(
 ) -> dict:
     """
     Original VASP data collection function.
-    
+
     This preserves all the existing VASP functionality.
     """
     if vasp_dirs is None:
@@ -734,7 +737,7 @@ def collect_vasp_data(
                     )
                 except AssertionError:
                     pass
-            
+
             if at is not None:
                 for at_i in at:
                     logging.warning(at_i.get_stress())
@@ -804,7 +807,7 @@ def collect_dft_data(
             List of directories containing DFT data.
         - 'config_type': list
             List of configuration types corresponding to each directory.
-    
+
     calculator_type : str
         Type of calculator: "vasp" or "castep". Default is "vasp".
 
@@ -815,8 +818,8 @@ def collect_dft_data(
     """
     if calculator_type.lower() == "castep":
         return collect_castep_data(castep_ref_file, rss_group, vasp_dirs)
-    else:
-        return collect_vasp_data(vasp_ref_file, rss_group, vasp_dirs)
+    return collect_vasp_data(vasp_ref_file, rss_group, vasp_dirs)
+
 
 def check_convergence_vasp(path: str) -> bool:
     """
