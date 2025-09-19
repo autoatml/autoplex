@@ -4,11 +4,10 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
-from pathlib import Path
 from typing import TYPE_CHECKING
 
 from ase.calculators.castep import Castep
-from jobflow import Maker, Response, job
+from jobflow import Maker, job
 from pymatgen.core.trajectory import Trajectory
 from pymatgen.io.ase import AseAtomsAdaptor
 
@@ -141,5 +140,5 @@ class BaseCastepMaker(Maker):
             "lattice_parameters": atoms.get_cell_lengths_and_angles(),
             "directory": os.getcwd(),
         }
-        
+
         return output
