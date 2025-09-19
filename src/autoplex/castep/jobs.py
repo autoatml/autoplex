@@ -99,8 +99,6 @@ class BaseCastepMaker(Maker):
     ----------
     name : str
         The job name.
-    castep_command : str
-        Command to run CASTEP.
     cut_off_energy : float
         Plane wave cutoff energy in eV.
     kspacing : float
@@ -118,7 +116,6 @@ class BaseCastepMaker(Maker):
     """
 
     name: str = "base castep job"
-    castep_command: str = "castep.mpi"
     cut_off_energy: float = 400.0
     kspacing: float = 0.3
     xc_functional: str = "PBE"
@@ -238,7 +235,6 @@ class BaseCastepMaker(Maker):
             calculator = Castep(
                 directory='.',
                 label=f'castep_calc_{os.getpid()}',
-                castep_command=self.castep_command,
                 keyword_tolerance=3,
                 cut_off_energy=self.cut_off_energy,
                 xc_functional=self.xc_functional,
@@ -254,10 +250,8 @@ class BaseCastepMaker(Maker):
             
         except Exception as e:
             print(f"Failed to create CASTEP calculator: {e}")
-            # Fallback to MACE if available
             try:
-                from mace.calculators import mace_mp
-                return mace_mp()
+                pass
             except ImportError:
                 raise e
 
