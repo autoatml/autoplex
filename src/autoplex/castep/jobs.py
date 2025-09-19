@@ -121,7 +121,7 @@ class BaseCastepMaker(Maker):
         """
         atoms = AseAtomsAdaptor().get_atoms(structure)
 
-        atoms.calc = Castep()
+        atoms.calc = Castep(keyword_tolerance=0)
 
         if self.castep_kwargs:
             for key, value in self.castep_kwargs.items():
