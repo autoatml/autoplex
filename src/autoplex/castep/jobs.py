@@ -96,28 +96,18 @@ class BaseCastepMaker(Maker):
     ----------
     name : str
         The job name.
-    cut_off_energy : float
-        Plane wave cutoff energy in eV.
-    kspacing : float
-        K-point spacing.
-    xc_functional : str
-        Exchange-correlation functional.
-    task : str
-        CASTEP task type.
-    run_castep_kwargs : dict
+    castep_kwargs : dict
         Keyword arguments for running CASTEP.
-    task_document_kwargs : dict
-        Keyword arguments for creating TaskDoc.
+    pspot: str | None
+        Path to store pseudopotentials.
     """
 
     name: str = "castep_job"
     castep_kwargs: dict | None = None
-    pspot: string | None = None
+    pspot: str | None = None
 
     @job
-    def make(
-        self, structure: Structure, prev_dir: str | Path | None = None
-    ) -> Response:
+    def make(self, structure: Structure):
         """
         Run a CASTEP calculation.
 
@@ -125,24 +115,21 @@ class BaseCastepMaker(Maker):
         ----------
         structure : Structure
             A pymatgen structure object.
-        prev_dir : str or Path or None
-            A previous CASTEP calculation directory to copy output files from.
 
         Returns
         -------
-        Response
-            A response object containing the output of the CASTEP run.
+        output: dict
         """
-        # Convert structure to ASE atoms
-        adaptor = AseAtomsAdaptor()
-        atoms = adaptor.get_atoms(structure)
+        atoms = AseAtomsAdaptor().get_atoms(structure)
 
-        # Create CASTEP calculator
         atoms.calc = Castep()
 
         if self.castep_kwargs:
             for key, value in self.castep_kwargs.items():
-                setattr(atoms.calc.param, key, value)
+                if key in {"kpoint_mp_grid", "kpoint_mp_offset", "kpoint_mp_spacing"}:
+                    setattr(atoms.calc.cell, key, value)
+                else:
+                    setattr(atoms.calc.param, key, value)
 
         if self.pspot:
             atoms.set_pspot(self.pspot)
@@ -154,4 +141,5 @@ class BaseCastepMaker(Maker):
             "lattice_parameters": atoms.get_cell_lengths_and_angles(),
             "directory": os.getcwd(),
         }
+        
         return output
