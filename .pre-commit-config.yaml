@@ -9,20 +9,18 @@ default_language_version:
   python: python3
 repos:
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.12.11
+  rev: v0.12.3
   hooks:
   - id: ruff
     args: [--fix, --extend-ignore, FA102]
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v6.0.0
+  rev: v5.0.0
   hooks:
   - id: check-yaml
+  - id: fix-encoding-pragma
+    args: [--remove]
   - id: end-of-file-fixer
   - id: trailing-whitespace
-- repo: https://github.com/asottile/pyupgrade
-  rev: v3.20.0
-  hooks:
-  - id: pyupgrade
 - repo: https://github.com/psf/black
   rev: 25.1.0
   hooks:
@@ -41,7 +39,7 @@ repos:
   - id: rst-directive-colons
   - id: rst-inline-touching-normal
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v1.17.1
+  rev: v1.16.1
   hooks:
   - id: mypy
     files: ^autoplex/.*\.py$
@@ -54,5 +52,5 @@ repos:
   hooks:
   - id: codespell
     stages: [pre-commit, pre-commit, commit-msg]
-    args: [--ignore-words-list, 'titel,statics,ba,nd,te,atomate,Mater,Commun']
+    args: [--ignore-words-list, 'titel,statics,ba,nd,te,atomate,Mater']
     types_or: [python, rst, markdown]

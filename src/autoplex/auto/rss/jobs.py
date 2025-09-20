@@ -3,12 +3,14 @@
 import logging
 from typing import Literal
 
+from atomate2.castep.jobs.base import BaseCastepMaker
 from atomate2.forcefields.jobs import ForceFieldStaticMaker
 from atomate2.vasp.jobs.base import BaseVaspMaker
 from atomate2.vasp.jobs.core import StaticMaker
 from atomate2.vasp.sets.core import StaticSetGenerator
 from jobflow import Flow, Response, job
 
+from autoplex.castep.jobs import BaseCastepMaker
 from autoplex.data.common.flows import DFTStaticLabelling
 from autoplex.data.common.jobs import (
     collect_dft_data,
@@ -57,6 +59,15 @@ _DEFAULT_STATIC_ENERGY_MAKER = StaticMaker(
     run_vasp_kwargs={"handlers": ()},
 )
 
+# Add CASTEP default maker
+_DEFAULT_CASTEP_ENERGY_MAKER = BaseCastepMaker(
+    name="castep static",
+    cut_off_energy=400.0,
+    kspacing=0.3,
+    xc_functional="PBE",
+    task="SinglePoint",
+)
+
 
 @job
 def initial_rss(
@@ -82,6 +93,8 @@ def initial_rss(
     custom_potcar: dict | None = None,
     config_type: str | None = None,
     vasp_ref_file: str = "vasp_ref.extxyz",
+    castep_ref_file: str = "castep_ref.extxyz",  # New parameter
+    calculator_type: str = "vasp",  # New parameter
     rss_group: str = "initial",
     test_ratio: float = 0.1,
     regularization: bool = False,
@@ -101,10 +114,10 @@ def initial_rss(
     num_processes_fit: int = 1,
     device_for_fitting: str = "cpu",
     static_energy_maker: (
-        BaseVaspMaker | ForceFieldStaticMaker
+        BaseVaspMaker | BaseCastepMaker | ForceFieldStaticMaker
     ) = _DEFAULT_STATIC_ENERGY_MAKER,
     static_energy_maker_isolated_atoms: (
-        BaseVaspMaker | ForceFieldStaticMaker | None
+        BaseVaspMaker | BaseCastepMaker | ForceFieldStaticMaker | None
     ) = None,
     **fit_kwargs,
 ):
@@ -269,7 +282,11 @@ def initial_rss(
         structures=do_randomized_structure_generation.output, config_type=config_type
     )
     do_data_collection = collect_dft_data(
-        vasp_ref_file=vasp_ref_file, rss_group=rss_group, vasp_dirs=do_dft_static.output
+        vasp_ref_file=vasp_ref_file,
+        castep_ref_file=castep_ref_file,
+        rss_group=rss_group,
+        vasp_dirs=do_dft_static.output,
+        calculator_type=calculator_type,
     )
     do_data_preprocessing = preprocess_data(
         test_ratio=test_ratio,
@@ -349,6 +366,8 @@ def do_rss_iterations(
     custom_potcar: dict | None = None,
     config_types: list[str] | None = None,
     vasp_ref_file: str = "vasp_ref.extxyz",
+    castep_ref_file: str = "castep_ref.extxyz",
+    calculator_type: str = "vasp",
     rss_group: str = "rss",
     test_ratio: float = 0.1,
     regularization: bool = False,
@@ -386,10 +405,10 @@ def do_rss_iterations(
     initial_kt: float = 0.3,
     current_iter_index: int = 1,
     static_energy_maker: (
-        BaseVaspMaker | ForceFieldStaticMaker
+        BaseVaspMaker | BaseCastepMaker | ForceFieldStaticMaker
     ) = _DEFAULT_STATIC_ENERGY_MAKER,
     static_energy_maker_isolated_atoms: (
-        BaseVaspMaker | ForceFieldStaticMaker | None
+        BaseVaspMaker | BaseCastepMaker | ForceFieldStaticMaker | None
     ) = None,
     **fit_kwargs,
 ):
@@ -668,8 +687,10 @@ def do_rss_iterations(
         ).make(structures=do_data_sampling.output, config_type=config_type)
         do_data_collection = collect_dft_data(
             vasp_ref_file=vasp_ref_file,
+            castep_ref_file=castep_ref_file,
             rss_group=rss_group,
             vasp_dirs=do_dft_static.output,
+            calculator_type=calculator_type,
         )
         do_data_preprocessing = preprocess_data(
             test_ratio=test_ratio,
@@ -737,7 +758,8 @@ def do_rss_iterations(
             dimer_box=dimer_box,
             dimer_range=dimer_range,
             dimer_num=dimer_num,
-            custom_incar=custom_incar,
+            castep_ref_file=castep_ref_file,
+            calculator_type=calculator_type,
             custom_potcar=custom_potcar,
             config_types=config_types,
             vasp_ref_file=vasp_ref_file,

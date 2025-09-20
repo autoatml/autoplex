@@ -51,7 +51,7 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 cover/
-job*/
+# job*/
 submit*
 
 # Translations
