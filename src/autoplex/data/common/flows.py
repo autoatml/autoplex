@@ -30,6 +30,8 @@ from autoplex.data.common.utils import (
     flatten,
 )
 
+from autoplex.data.castep_support.utils import CastepStaticMaker, CastepStaticSetGenerator, deepcopy
+
 __all__ = ["DFTStaticLabelling", "GenerateTrainingDataForTesting"]
 
 
@@ -264,12 +266,11 @@ class DFTStaticLabelling(Maker):
     custom_potcar: dict | None
         Dictionary of POTCAR settings to update. Keys are element symbols, values are the desired POTCAR labels.
         Default is None.
-    static_energy_maker: BaseVaspMaker | ForceFieldStaticMaker
-        Maker for static energy jobs: either BaseVaspMaker (VASP-based) or
-        ForceFieldStaticMaker (force field-based). Defaults to StaticMaker (VASP-based).
-    static_energy_maker_isolated_atoms: BaseVaspMaker | ForceFieldStaticMaker | None
-        Maker for static energy jobs of isolated atoms: either BaseVaspMaker (VASP-based) or
-        ForceFieldStaticMaker (force field-based) or None. If set to `None`, the parameters
+    static_energy_maker: BaseVaspMaker | ForceFieldStaticMaker | BaseCastepMaker
+        Maker for static energy jobs: either BaseVaspMaker (VASP-based), ForceFieldStaticMaker (force field-based), or BaseCastepMaker (CASTEP-based). Defaults to StaticMaker (VASP-based).
+        
+    static_energy_maker_isolated_atoms: BaseVaspMaker | ForceFieldStaticMaker | BaseCastepMaker | None
+        Maker for static energy jobs of isolated atoms: either BaseVaspMaker (VASP-based), ForceFieldStaticMaker (force field-based), BaseCastepMaker (CASTEP-based), or None. If set to `None`, the parameters
         from `static_energy_maker` will be used as the default for isolated atoms. In this case,
         if `static_energy_maker` is a `StaticMaker`, all major settings will be inherited,
         except that `kspacing` will be automatically set to 100 to enforce a Gamma-point-only calculation.
@@ -277,7 +278,7 @@ class DFTStaticLabelling(Maker):
         is used here, its output must include a `dir_name` field to ensure compatibility with downstream workflows.
 
     Addition:
-    Supoort for CASTEP
+    Support for CASTEP
 
     Returns
     -------
@@ -298,7 +299,10 @@ class DFTStaticLabelling(Maker):
     dimer_range: list[float] | None = None
     dimer_num: int = 21
     custom_incar: dict | None = None
+    castep_incar: dict | None = None
     custom_potcar: dict | None = None
+
+
     static_energy_maker: BaseCastepMaker | BaseVaspMaker | ForceFieldStaticMaker = (
         field(
             default_factory=lambda: StaticMaker(
@@ -338,6 +342,30 @@ class DFTStaticLabelling(Maker):
         BaseCastepMaker | BaseVaspMaker | ForceFieldStaticMaker | None
     ) = None
 
+    def create_castep_static_maker(self) -> BaseCastepMaker:
+        """Create CASTEP static maker with equivalent settings to VASP default."""
+        return CastepStaticMaker(
+        input_set_generator=CastepStaticSetGenerator(
+            user_param_settings={
+                "task": "singlepoint",
+                "cut_off_energy": "520.0 eV",       
+                "elec_energy_tol": "1e-06 eV",        
+                "basis_precision": "precise",       
+                "xc_functional": "PBE",             
+                "max_scf_cycles": 100,              
+                "smearing_width": "0.01 eV",         
+                "write_checkpoint": "none",          
+                "num_dump_cycles": 0,                
+            },
+            user_cell_settings={
+                "kpoint_mp_grid": "1 1 1",   
+                "fix_all_cell": True,                
+            }
+        ),
+        run_castep_kwargs={"handlers": ()},
+    )
+
+
     @job
     def make(
         self,
@@ -364,16 +392,33 @@ class DFTStaticLabelling(Maker):
         dirs: dict[str, list[str]] = {"dirs_of_vasp": [], "config_type": []}
 
         if isinstance(self.static_energy_maker, StaticMaker):
-
+            # Handle VASP parameters
             if self.custom_incar is not None:
                 self.static_energy_maker.input_set_generator.user_incar_settings.update(
-                    self.custom_incar
-                )
-
+            self.custom_incar
+        )
             if self.custom_potcar is not None:
                 self.static_energy_maker.input_set_generator.user_potcar_settings.update(
                     self.custom_potcar
-                )
+        )
+        
+        elif isinstance(self.static_energy_maker, BaseCastepMaker):
+            # Handle CASTEP parameters
+            if self.castep_incar is not None:
+                # Update both param and cell settings if provided
+                if "param" in self.castep_incar:
+                    self.static_energy_maker.input_set_generator.user_param_settings.update(
+                        self.castep_incar["param"]
+            )
+                if "cell" in self.castep_incar:
+                    self.static_energy_maker.input_set_generator.user_cell_settings.update(
+                self.castep_incar["cell"]
+            )
+            # If castep_incar contains direct parameters (not nested), treat as param settings
+                elif isinstance(self.castep_incar, dict) and "param" not in self.castep_incar:
+                    self.static_energy_maker.input_set_generator.user_param_settings.update(
+                    self.castep_incar
+                )   
 
         st_m = self.static_energy_maker
 
@@ -407,21 +452,38 @@ class DFTStaticLabelling(Maker):
                     isolated_atom_struct = Structure(lattice, [sym], [[0.0, 0.0, 0.0]])
 
                     if self.static_energy_maker_isolated_atoms is None:
-                        static_job = st_m.make(structure=isolated_atom_struct)
                         if isinstance(self.static_energy_maker, StaticMaker):
+                            static_job = st_m.make(structure=isolated_atom_struct)
                             static_job = update_user_incar_settings(
                                 static_job,
                                 {"KSPACING": 100.0, "KPAR": 1},
                             )
-
                             if self.e0_spin:
                                 static_job = update_user_incar_settings(
                                     static_job, {"ISPIN": 2}
                                 )
+                
+    
+                        elif isinstance(self.static_energy_maker, BaseCastepMaker):
+                        # For CASTEP, create a modified maker with gamma-point settings
+         
+                            castep_maker = deepcopy(self.static_energy_maker)
+        
+                        # Update CASTEP settings for isolated atom (gamma-point only)
+                            castep_maker.input_set_generator.user_cell_settings.update({
+                                  "kpoint_mp_grid": "1 1 1"   
+                                    })
+        
+                        if self.e0_spin:
+                            castep_maker.input_set_generator.user_param_settings.update({
+                            "spin_polarized": True
+                        })
+        
+                        static_job = castep_maker.make(structure=isolated_atom_struct)
+    
                     else:
-                        static_job = self.static_energy_maker_isolated_atoms.make(
-                            structure=isolated_atom_struct
-                        )
+                        # For other maker types (ForceField, etc.)
+                        static_job = st_m.make(structure=isolated_atom_struct)
 
                     static_job.name = f"static_isolated_{idx}"
                     dirs["dirs_of_vasp"].append(static_job.output.dir_name)

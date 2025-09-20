@@ -11,7 +11,9 @@ from jobflow import Maker, job
 from pymatgen.core.trajectory import Trajectory
 from pymatgen.io.ase import AseAtomsAdaptor
 
+from atomate2.castep.jobs.base import field
 from autoplex.castep.utils import CastepTaskDoc
+from autoplex.data.castep_support.utils import CastepInputGenerator, Path
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -102,6 +104,7 @@ class BaseCastepMaker(Maker):
     """
 
     name: str = "castep_job"
+    input_set_generator: CastepInputGenerator = field(default_factory=CastepInputGenerator)
     castep_kwargs: dict | None = None
     pspot: str | None = None
 
@@ -119,26 +122,50 @@ class BaseCastepMaker(Maker):
         -------
         output: dict
         """
+        input_set = self.input_set_generator.get_input_set(structure)
+
         atoms = AseAtomsAdaptor().get_atoms(structure)
 
         atoms.calc = Castep(keyword_tolerance=0)
 
-        if self.castep_kwargs:
-            for key, value in self.castep_kwargs.items():
-                if key in {"kpoint_mp_grid", "kpoint_mp_offset", "kpoint_mp_spacing"}:
-                    setattr(atoms.calc.cell, key, value)
-                else:
-                    setattr(atoms.calc.param, key, value)
-
-        if self.pspot:
-            atoms.set_pspot(self.pspot)
-
-        output = {
-            "energy": atoms.get_potential_energy(),
-            "volume": atoms.get_volume(),
-            "forces": atoms.get_forces(),
-            "lattice_parameters": atoms.get_cell_lengths_and_angles(),
-            "directory": os.getcwd(),
+        # Apply param settings
+        for key, value in input_set["param"].items():
+            setattr(atoms.calc.param, key, value)
+            
+        # Apply cell settings  
+        for key, value in input_set["cell"].items():
+            setattr(atoms.calc.cell, key, value)
+            
+        # Run calculation
+        energy = atoms.get_potential_energy()
+        forces = atoms.get_forces()
+        
+        # Return results
+        return {
+            "energy": energy,
+            "forces": forces,
+            "structure": structure,
+            "directory": str(Path.cwd()),
+            "task_label": self.name,
         }
+
+
+        # if self.castep_kwargs:
+        #     for key, value in self.castep_kwargs.items():
+        #         if key in {"kpoint_mp_grid", "kpoint_mp_offset", "kpoint_mp_spacing"}:
+        #             setattr(atoms.calc.cell, key, value)
+        #         else:
+        #             setattr(atoms.calc.param, key, value)
+
+        # if self.pspot:
+        #     atoms.set_pspot(self.pspot)
+
+        # output = {
+        #     "energy": atoms.get_potential_energy(),
+        #     "volume": atoms.get_volume(),
+        #     "forces": atoms.get_forces(),
+        #     "lattice_parameters": atoms.get_cell_lengths_and_angles(),
+        #     "directory": os.getcwd(),
+        # }
 
         return output
