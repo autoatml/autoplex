@@ -1,5 +1,6 @@
 """Jobs to create training data for ML potentials."""
 
+import gzip
 import logging
 import os
 import pickle
@@ -8,7 +9,6 @@ import traceback
 from itertools import chain
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
-import gzip
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -581,9 +581,7 @@ def collect_dft_data(
         )
 
     if "dirs_of_dft" not in dft_dirs or "config_type" not in dft_dirs:
-        raise ValueError(
-            "dft_dirs must contain 'dirs_of_dft' and 'config_type' keys."
-        )
+        raise ValueError("dft_dirs must contain 'dirs_of_dft' and 'config_type' keys.")
 
     dirs = [safe_strip_hostname(value) for value in dft_dirs["dirs_of_dft"]]
     config_types = dft_dirs["config_type"]
@@ -613,7 +611,9 @@ def collect_dft_data(
                         f"Calculation did not converge for path: {os.path.join(val, 'vasprun.xml.gz')}"
                     )
             elif has_castep_output:
-                converged = check_convergence_castep(os.path.join(val, "castep.castep.gz"))
+                converged = check_convergence_castep(
+                    os.path.join(val, "castep.castep.gz")
+                )
                 if converged:
                     at = read(os.path.join(val, "castep.castep.gz"), index=":")
                 else:
@@ -715,7 +715,7 @@ def check_convergence_castep(castep_gz: str) -> bool:
         for line in f:
             if "electronic minimisation did not converge" in line:
                 return False
-    
+
     return True
 
 

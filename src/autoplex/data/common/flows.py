@@ -18,6 +18,7 @@ from pymatgen.core import Lattice
 from pymatgen.core.structure import Structure
 from pymatgen.io.ase import AseAtomsAdaptor
 
+from autoplex.castep.jobs import CastepStaticMaker
 from autoplex.data.common.jobs import (
     convert_to_extxyz,
     generate_randomized_structures,
@@ -28,8 +29,6 @@ from autoplex.data.common.utils import (
     ElementCollection,
     flatten,
 )
-from autoplex.castep.jobs import CastepStaticMaker
-
 
 __all__ = ["DFTStaticLabelling", "GenerateTrainingDataForTesting"]
 
@@ -297,42 +296,44 @@ class DFTStaticLabelling(Maker):
     dimer_num: int = 21
     custom_incar: dict | None = None
     custom_potcar: dict | None = None
-    static_energy_maker: BaseVaspMaker | CastepStaticMaker | ForceFieldStaticMaker = field(
-        default_factory=lambda: StaticMaker(
-            input_set_generator=StaticSetGenerator(
-                user_incar_settings={
-                    "ADDGRID": "True",
-                    "ENCUT": 520,
-                    "EDIFF": 1e-06,
-                    "ISMEAR": 0,
-                    "SIGMA": 0.01,
-                    "PREC": "Accurate",
-                    "ISYM": None,
-                    "KSPACING": 0.2,
-                    "NPAR": 8,
-                    "LWAVE": "False",
-                    "LCHARG": "False",
-                    "ENAUG": None,
-                    "GGA": None,
-                    "ISPIN": None,
-                    "LAECHG": None,
-                    "LELF": None,
-                    "LORBIT": None,
-                    "LVTOT": None,
-                    "NSW": None,
-                    "SYMPREC": None,
-                    "NELM": 100,
-                    "LMAXMIX": None,
-                    "LASPH": None,
-                    "AMIN": None,
-                }
-            ),
-            run_vasp_kwargs={"handlers": ()},
+    static_energy_maker: BaseVaspMaker | CastepStaticMaker | ForceFieldStaticMaker = (
+        field(
+            default_factory=lambda: StaticMaker(
+                input_set_generator=StaticSetGenerator(
+                    user_incar_settings={
+                        "ADDGRID": "True",
+                        "ENCUT": 520,
+                        "EDIFF": 1e-06,
+                        "ISMEAR": 0,
+                        "SIGMA": 0.01,
+                        "PREC": "Accurate",
+                        "ISYM": None,
+                        "KSPACING": 0.2,
+                        "NPAR": 8,
+                        "LWAVE": "False",
+                        "LCHARG": "False",
+                        "ENAUG": None,
+                        "GGA": None,
+                        "ISPIN": None,
+                        "LAECHG": None,
+                        "LELF": None,
+                        "LORBIT": None,
+                        "LVTOT": None,
+                        "NSW": None,
+                        "SYMPREC": None,
+                        "NELM": 100,
+                        "LMAXMIX": None,
+                        "LASPH": None,
+                        "AMIN": None,
+                    }
+                ),
+                run_vasp_kwargs={"handlers": ()},
+            )
         )
     )
-    static_energy_maker_isolated_atoms: BaseVaspMaker | CastepStaticMaker | ForceFieldStaticMaker | None = (
-        None
-    )
+    static_energy_maker_isolated_atoms: (
+        BaseVaspMaker | CastepStaticMaker | ForceFieldStaticMaker | None
+    ) = None
 
     @job
     def make(
@@ -479,4 +480,3 @@ class DFTStaticLabelling(Maker):
                 traceback.print_exc()
 
         return Response(replace=Flow(job_list), output=dirs)
-    
