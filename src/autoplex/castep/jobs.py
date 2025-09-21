@@ -110,4 +110,3 @@ class CastepStaticMaker(BaseCastepMaker):
     input_set_generator: CastepInputGenerator = field(
         default_factory=CastepStaticSetGenerator
     )
-    
