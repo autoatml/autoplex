@@ -12,7 +12,7 @@ from pymatgen.io.ase import AseAtomsAdaptor
 from jobflow import run_locally, Flow
 from autoplex.castep.jobs import BaseCastepMaker
 from ase.calculators.castep import Castep
-from ase.build import bulk
+from autoplex.castep.utils import CastepInputGenerator
 import shutil
 import glob
 
@@ -38,14 +38,18 @@ def test_BaseCastepMaker(memory_jobstore):
     
     castep_job = BaseCastepMaker(
         name="test_castep",
-        castep_kwargs={
+        input_set_generator=CastepInputGenerator(
+            user_param_settings={
             'cut_off_energy': 100.0,
             'xc_functional': 'PBE',
             'task': 'SinglePoint',
             'max_scf_cycles': 100,
+            },
+            ser_cell_settings={
             'kpoint_mp_grid': '1 1 1',
             'kpoint_mp_offset': '0.0 0.0 0.0',
-        }
+            }
+        )
     ).make(structure=pmg_structure)
     
     job_rss = Flow(castep_job, output=castep_job.output)
@@ -58,7 +62,7 @@ def test_BaseCastepMaker(memory_jobstore):
     
     assert abs(ase_energy - dict_castep["energy"]) < 1e-4
     
-    for d in glob.glob("job_*") + glob.glob("CASTEP*"):
-        shutil.rmtree(d, ignore_errors=True)
+    # for d in glob.glob("job_*") + glob.glob("CASTEP*"):
+    #     shutil.rmtree(d, ignore_errors=True)
     
     
