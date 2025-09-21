@@ -9,7 +9,7 @@ from atomate2.vasp.jobs.core import StaticMaker
 from atomate2.vasp.sets.core import StaticSetGenerator
 from jobflow import Flow, Response, job
 
-from autoplex.castep.jobs import CastepStaticMaker  
+from autoplex.castep.jobs import CastepStaticMaker
 from autoplex.data.common.flows import DFTStaticLabelling
 from autoplex.data.common.jobs import (
     collect_dft_data,
@@ -209,7 +209,7 @@ def initial_rss(
     device_for_fitting: str
         Device to be used for model fitting, either "cpu" or "cuda".
     static_energy_maker: BaseVaspMaker | CastepStaticMaker | ForceFieldStaticMaker
-        Maker for static energy jobs: either BaseVaspMaker (VASP-based) or CastepStaticMaker 
+        Maker for static energy jobs: either BaseVaspMaker (VASP-based) or CastepStaticMaker
         (CASTEP-based) or ForceFieldStaticMaker (force field-based). Defaults to StaticMaker (VASP-based).
     static_energy_maker_isolated_atoms: BaseVaspMaker | CastepStaticMaker | ForceFieldStaticMaker
         Maker for static energy jobs of isolated atoms: either BaseVaspMaker (VASP-based) or CastepStaticMaker
@@ -270,9 +270,7 @@ def initial_rss(
         structures=do_randomized_structure_generation.output, config_type=config_type
     )
     do_data_collection = collect_dft_data(
-        dft_ref_file=dft_ref_file, 
-        rss_group=rss_group, 
-        dft_dirs=do_dft_static.output
+        dft_ref_file=dft_ref_file, rss_group=rss_group, dft_dirs=do_dft_static.output
     )
     do_data_preprocessing = preprocess_data(
         test_ratio=test_ratio,
@@ -555,7 +553,7 @@ def do_rss_iterations(
     current_iter_index: int
         Index for the current RSS iteration. Default is 1.
     static_energy_maker: BaseVaspMaker | CastepStaticMaker | ForceFieldStaticMaker
-        Maker for static energy jobs: either BaseVaspMaker (VASP-based) or CastepStaticMaker 
+        Maker for static energy jobs: either BaseVaspMaker (VASP-based) or CastepStaticMaker
         (CASTEP-based) or ForceFieldStaticMaker (force field-based). Defaults to StaticMaker (VASP-based).
     static_energy_maker_isolated_atoms: BaseVaspMaker | CastepStaticMaker | ForceFieldStaticMaker
         Maker for static energy jobs of isolated atoms: either BaseVaspMaker (VASP-based) or CastepStaticMaker

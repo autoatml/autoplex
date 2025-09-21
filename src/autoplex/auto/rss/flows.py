@@ -9,7 +9,7 @@ from atomate2.vasp.sets.core import StaticSetGenerator
 from jobflow import Flow, Maker, Response, job
 
 from autoplex.auto.rss.jobs import do_rss_iterations, initial_rss
-from autoplex.castep.jobs import CastepStaticMaker  
+from autoplex.castep.jobs import CastepStaticMaker
 from autoplex.settings import RssConfig
 
 
@@ -29,7 +29,7 @@ class RssMaker(Maker):
         Maker for static energy jobs: either BaseVaspMaker (VASP-based) or CastepStaticMaker (CASTEP-based) or
         ForceFieldStaticMaker (force field-based). Defaults to StaticMaker (VASP-based).
     static_energy_maker_isolated_atoms: BaseVaspMaker | ForceFieldStaticMaker | None
-        Maker for static energy jobs of isolated atoms: either BaseVaspMaker (VASP-based) or CastepStaticMaker 
+        Maker for static energy jobs of isolated atoms: either BaseVaspMaker (VASP-based) or CastepStaticMaker
         (CASTEP-based) or ForceFieldStaticMaker (force field-based) or None. If set to `None`, the parameters
         from `static_energy_maker` will be used as the default for isolated atoms. In this case,
         if `static_energy_maker` is a `StaticMaker`, all major settings will be inherited,
