@@ -1,4 +1,3 @@
-import pytest
 from autoplex.data.common.flows import DFTStaticLabelling
 from autoplex.castep.jobs import BaseCastepMaker
 from ase import Atoms

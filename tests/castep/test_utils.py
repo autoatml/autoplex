@@ -1,7 +1,5 @@
 import gzip
-from pathlib import Path
 from ase import Atoms
-from ase.calculators.castep import Castep
 from pymatgen.io.ase import AseAtomsAdaptor
 from autoplex.castep.utils import CastepStaticSetGenerator, gzip_castep_outputs
 

@@ -1,12 +1,6 @@
-"""
-Integration test for CASTEP through DFTlabelling workflow.
-Tests that BaseCastepMaker can successfully run a CASTEP calculation.
-"""
-
 import os
 os.environ["CASTEP_COMMAND"] = "/usr/local/CASTEP-20/castep.mpi"
 os.environ["CASTEP_PP_PATH"] = "/usr/local/CASTEP-20/usp"
-import datetime
 from ase import Atoms
 from pymatgen.io.ase import AseAtomsAdaptor
 from jobflow import run_locally, Flow
