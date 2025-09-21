@@ -2,20 +2,19 @@
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass, field
-from pathlib import Path
 
 from ase.calculators.castep import Castep
 from jobflow import Maker, job
+from pymatgen.core import Structure
 from pymatgen.io.ase import AseAtomsAdaptor
+
 from autoplex.castep.utils import (
-    CastepInputGenerator, 
+    CastepInputGenerator,
     CastepStaticSetGenerator,
     gzip_castep_outputs,
 )
-from pymatgen.core import Structure
-from pathlib import Path
-import os
 
 
 @dataclass
@@ -71,8 +70,8 @@ class BaseCastepMaker(Maker):
 
         energy = atoms.get_potential_energy()
         forces = atoms.get_forces()
-        
-        workdir = os.path.join(os.getcwd(), 'CASTEP')
+
+        workdir = os.path.join(os.getcwd(), "CASTEP")
         gzip_castep_outputs(workdir=workdir)
 
         return {

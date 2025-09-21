@@ -226,7 +226,7 @@ def gzip_castep_outputs(
         Whether to remove original files after compression.
     """
     workdir = Path(workdir or os.getcwd())
-    print('workdir', workdir)
+    print("workdir", workdir)
     if glob_patterns is None:
         _CASTEP_INPUT_FILES = [
             "*.cell",

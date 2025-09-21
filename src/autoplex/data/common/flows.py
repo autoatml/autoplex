@@ -2,6 +2,7 @@
 
 import logging
 import traceback
+from copy import deepcopy
 from dataclasses import dataclass, field
 
 from atomate2.forcefields.jobs import (
@@ -20,7 +21,6 @@ from pymatgen.io.ase import AseAtomsAdaptor
 
 from autoplex.castep.jobs import BaseCastepMaker, CastepStaticMaker
 from autoplex.castep.utils import CastepStaticSetGenerator
-from copy import deepcopy
 from autoplex.data.common.jobs import (
     convert_to_extxyz,
     generate_randomized_structures,
