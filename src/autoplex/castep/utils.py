@@ -175,7 +175,6 @@ class CastepStaticSetGenerator(CastepInputGenerator):
         """
         updates = {
             "cut_off_energy": 520.0,
-            "basis_precision": "precise",
             "xc_functional": "PBE",
             "elec_energy_tol": 1e-06,
             "max_scf_cycles": 100,

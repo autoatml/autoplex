@@ -9,13 +9,13 @@ def test_CastepStaticSetGenerator():
     structure = AseAtomsAdaptor.get_structure(atoms)
 
     gen = CastepStaticSetGenerator(
-        user_param_settings={"cut_off_energy": 100.0, "xc_functional": "PBE"},
+        user_param_settings={"cut_off_energy": 320.0, "xc_functional": "PBE"},
         user_cell_settings={"kpoint_mp_grid": "1 1 1"},
     )
 
     input_set = gen.get_input_set(structure=structure)
 
-    assert input_set["param"]["cut_off_energy"] == 100.0
+    assert input_set["param"]["cut_off_energy"] == 320.0
     assert input_set["param"]["xc_functional"] == "PBE"
     assert input_set["param"]["task"] == "SinglePoint"
 
