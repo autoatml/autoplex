@@ -1,20 +1,22 @@
 from __future__ import annotations
+
+import gzip
+import os
+import shutil
 from copy import deepcopy
 from dataclasses import dataclass, field
-from pymatgen.core import Structure
-import os
-import gzip
-import shutil
 from pathlib import Path
 from typing import List
+
+from pymatgen.core import Structure
 
 
 @dataclass
 class CastepInputGenerator:
     """
     Base class for CASTEP input set generation.
-    
-    It is used to manage both .param and .cell file settings for 
+
+    It is used to manage both .param and .cell file settings for
     CASTEP calculations.
 
     Parameters
@@ -33,8 +35,8 @@ class CastepInputGenerator:
 
     structure: Structure | None = None
     config_dict: dict = field(default_factory=dict)
-    user_param_settings: dict = field(default_factory=dict) 
-    user_cell_settings: dict = field(default_factory=dict) 
+    user_param_settings: dict = field(default_factory=dict)
+    user_cell_settings: dict = field(default_factory=dict)
     sort_structure: bool = True
 
     def __post_init__(self) -> None:
@@ -152,6 +154,7 @@ class CastepStaticSetGenerator(CastepInputGenerator):
     **kwargs
         Other keyword arguments passed to CastepInputGenerator
     """
+
     CONFIG = {
         "PARAM": {
             "task": "SinglePoint",
@@ -171,14 +174,14 @@ class CastepStaticSetGenerator(CastepInputGenerator):
             Dictionary of CASTEP .param file parameters for static calculations
         """
         updates = {
-            "cut_off_energy": 520.0,  
-            "basis_precision": "precise",  
-            "xc_functional": "PBE",  
-            "elec_energy_tol": 1e-06, 
-            "max_scf_cycles": 100,  
-            "smearing_width": 0.05, 
-            "write_checkpoint": "none", 
-            "num_dump_cycles": 0, 
+            "cut_off_energy": 520.0,
+            "basis_precision": "precise",
+            "xc_functional": "PBE",
+            "elec_energy_tol": 1e-06,
+            "max_scf_cycles": 100,
+            "smearing_width": 0.05,
+            "write_checkpoint": "none",
+            "num_dump_cycles": 0,
         }
 
         if self.lepsilon:
@@ -258,4 +261,3 @@ def gzip_castep_outputs(
                 shutil.copyfileobj(f_in, f_out)
             if remove_originals and os.path.isfile(filepath):
                 os.remove(filepath)
-                
