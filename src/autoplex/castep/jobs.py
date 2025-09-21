@@ -96,14 +96,9 @@ class CastepStaticMaker(BaseCastepMaker):
     name : str
         The job name (default: "static").
     input_set_generator : CastepInputGenerator
-        A generator used to make the input set
+        Generator used to create the CASTEP input set,
+        including .param and .cell settings.
         (default: CastepStaticSetGenerator()).
-    castep_kwargs : dict | None
-        Additional keyword arguments passed to the ASE CASTEP calculator,
-        e.g., command-line execution options.
-    pspot : str | None
-        Path to the pseudopotential directory. If provided,
-        pseudopotentials will be assigned automatically.
     """
 
     name: str = "static"
