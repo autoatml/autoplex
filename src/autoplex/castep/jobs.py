@@ -7,10 +7,15 @@ from pathlib import Path
 
 from ase.calculators.castep import Castep
 from jobflow import Maker, job
-from pymatgen.core import Structure
 from pymatgen.io.ase import AseAtomsAdaptor
-
-from autoplex.castep.utils import CastepInputGenerator, gzip_castep_outputs
+from autoplex.castep.utils import (
+    CastepInputGenerator, 
+    CastepStaticSetGenerator,
+    gzip_castep_outputs,
+)
+from pymatgen.core import Structure
+from pathlib import Path
+import os
 
 
 @dataclass
@@ -66,8 +71,8 @@ class BaseCastepMaker(Maker):
 
         energy = atoms.get_potential_energy()
         forces = atoms.get_forces()
-
-        workdir = Path.cwd()
+        
+        workdir = os.path.join(os.getcwd(), 'CASTEP')
         gzip_castep_outputs(workdir=workdir)
 
         return {
@@ -77,3 +82,32 @@ class BaseCastepMaker(Maker):
             "directory": workdir,
             "task_label": self.name,
         }
+
+
+@dataclass
+class CastepStaticMaker(BaseCastepMaker):
+    """
+    Maker to create CASTEP static (single-point energy) jobs.
+
+    This class creates static energy calculations using CASTEP,
+    similar to VASP StaticMaker in atomate2.
+
+    Parameters
+    ----------
+    name : str
+        The job name (default: "static").
+    input_set_generator : CastepInputGenerator
+        A generator used to make the input set
+        (default: CastepStaticSetGenerator()).
+    castep_kwargs : dict | None
+        Additional keyword arguments passed to the ASE CASTEP calculator,
+        e.g., command-line execution options.
+    pspot : str | None
+        Path to the pseudopotential directory. If provided,
+        pseudopotentials will be assigned automatically.
+    """
+
+    name: str = "static"
+    input_set_generator: CastepInputGenerator = field(
+        default_factory=CastepStaticSetGenerator
+    )

@@ -18,12 +18,9 @@ from pymatgen.core import Lattice
 from pymatgen.core.structure import Structure
 from pymatgen.io.ase import AseAtomsAdaptor
 
-from autoplex.castep.jobs import BaseCastepMaker
-from autoplex.data.castep_support.utils import (
-    CastepStaticMaker,
-    CastepStaticSetGenerator,
-    deepcopy,
-)
+from autoplex.castep.jobs import BaseCastepMaker, CastepStaticMaker
+from autoplex.castep.utils import CastepStaticSetGenerator
+from copy import deepcopy
 from autoplex.data.common.jobs import (
     convert_to_extxyz,
     generate_randomized_structures,
