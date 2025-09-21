@@ -95,7 +95,7 @@ custom_incar:
   METAGGA: SCAN
   LASPH: .TRUE.
 custom_potcar:
-vasp_ref_file: vasp_ref.extxyz
+dft_ref_file: vasp_ref.extxyz
 config_types:
 - initial
 - traj_early

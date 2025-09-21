@@ -1448,15 +1448,15 @@ def convexhull_cur(
 
 
 def data_distillation(
-    vasp_ref_dir: str, force_max: float, force_label: str
+    dft_ref_dir: str, force_max: float, force_label: str
 ) -> list[Atom | Atoms]:
     """
     For data distillation.
 
     Parameters
     ----------
-    vasp_ref_dir: str
-        VASP reference data directory.
+    dft_ref_dir: str
+        DFT reference data directory.
     force_max: float
         Maximally allowed force.
     force_label: str
@@ -1468,7 +1468,7 @@ def data_distillation(
         List of distilled atoms.
 
     """
-    atoms = ase.io.read(vasp_ref_dir, index=":")
+    atoms = ase.io.read(dft_ref_dir, index=":")
 
     atoms_distilled = []
     for at in atoms:

@@ -87,7 +87,7 @@ custom_incar:
   LPLANE: .FALSE.
   METAGGA: SCAN
   LASPH: .TRUE.
-vasp_ref_file: vasp_ref.extxyz
+dft_ref_file: vasp_ref.extxyz
 
 # Data Preprocessing Parameters
 config_types:

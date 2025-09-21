@@ -9,7 +9,7 @@ from atomate2.vasp.sets.core import StaticSetGenerator
 from jobflow import Flow, Maker, Response, job
 
 from autoplex.auto.rss.jobs import do_rss_iterations, initial_rss
-from autoplex.castep.jobs import BaseCastepMaker
+from autoplex.castep.jobs import CastepStaticMaker  
 from autoplex.settings import RssConfig
 
 
@@ -25,12 +25,12 @@ class RssMaker(Maker):
     rss_config: RssConfig
         Pydantic model that defines the setup parameters for the whole RSS workflow.
         If not explicitly set, the defaults from 'autoplex.settings.RssConfig' will be used.
-    static_energy_maker: BaseVaspMaker | ForceFieldStaticMaker
-        Maker for static energy jobs: either BaseVaspMaker (VASP-based) or
+    static_energy_maker: BaseVaspMaker | CastepStaticMaker | ForceFieldStaticMaker
+        Maker for static energy jobs: either BaseVaspMaker (VASP-based) or CastepStaticMaker (CASTEP-based) or
         ForceFieldStaticMaker (force field-based). Defaults to StaticMaker (VASP-based).
     static_energy_maker_isolated_atoms: BaseVaspMaker | ForceFieldStaticMaker | None
-        Maker for static energy jobs of isolated atoms: either BaseVaspMaker (VASP-based) or
-        ForceFieldStaticMaker (force field-based) or None. If set to `None`, the parameters
+        Maker for static energy jobs of isolated atoms: either BaseVaspMaker (VASP-based) or CastepStaticMaker 
+        (CASTEP-based) or ForceFieldStaticMaker (force field-based) or None. If set to `None`, the parameters
         from `static_energy_maker` will be used as the default for isolated atoms. In this case,
         if `static_energy_maker` is a `StaticMaker`, all major settings will be inherited,
         except that `kspacing` will be automatically set to 100 to enforce a Gamma-point-only calculation.
@@ -41,7 +41,7 @@ class RssMaker(Maker):
 
     name: str = "ml-driven rss"
     rss_config: RssConfig = field(default_factory=lambda: RssConfig())
-    static_energy_maker: BaseVaspMaker | BaseCastepMaker | ForceFieldStaticMaker = (
+    static_energy_maker: BaseVaspMaker | CastepStaticMaker | ForceFieldStaticMaker = (
         field(
             default_factory=lambda: StaticMaker(
                 input_set_generator=StaticSetGenerator(
@@ -77,7 +77,7 @@ class RssMaker(Maker):
         )
     )
     static_energy_maker_isolated_atoms: (
-        BaseVaspMaker | BaseCastepMaker | ForceFieldStaticMaker | None
+        BaseVaspMaker | CastepStaticMaker | ForceFieldStaticMaker | None
     ) = None
 
     @job
@@ -181,15 +181,15 @@ class RssMaker(Maker):
         dimer_num: int
             Number of different distances to consider for dimer calculations. Default is 21.
         custom_incar: dict | None
-            Dictionary of custom VASP input parameters. If provided, will update the
+            Dictionary of custom DFT input parameters. If provided, will update the
             default parameters. Default is None.
         custom_potcar: dict | None
             Dictionary of POTCAR settings to update. Keys are element symbols, values are the desired POTCAR labels.
             Default is None.
-        vasp_ref_file: str
-            Reference file for VASP data. Default is 'vasp_ref.extxyz'.
+        dft_ref_file: str
+            Reference file for DFT data. Default is 'dft_ref.extxyz'.
         config_types: list[str]
-            Configuration types for the VASP calculations. Default is None.
+            Configuration types for the DF calculations. Default is None.
         rss_group: list[str] | str
             Group name for RSS to setting up regularization.
         test_ratio: float
@@ -297,23 +297,6 @@ class RssMaker(Maker):
 
         config_params = default_config.model_dump(by_alias=True, exclude_none=True)
 
-        # Set default calculator type if not specified
-        if "calculator_type" not in config_params:
-            # Auto-detect calculator type based on static_energy_maker
-            if hasattr(self.static_energy_maker, "__class__"):
-                if "Castep" in self.static_energy_maker.__class__.__name__:
-                    config_params["calculator_type"] = "castep"
-                else:
-                    config_params["calculator_type"] = "vasp"
-            else:
-                config_params["calculator_type"] = "vasp"
-
-        # Set default reference files if not specified
-        if "castep_ref_file" not in config_params:
-            config_params["castep_ref_file"] = "castep_ref.extxyz"
-        if "vasp_ref_file" not in config_params:
-            config_params["vasp_ref_file"] = "vasp_ref.extxyz"
-
         # Extract MLIP hyperparameters from the config_params
         mlip_hypers = config_params["mlip_hypers"][config_params["mlip_type"]]
         del config_params["mlip_hypers"]
@@ -363,9 +346,6 @@ class RssMaker(Maker):
                 {
                     "config_type": config_params["config_types"][0],
                     "rss_group": config_params["rss_group"][0],
-                    "calculator_type": config_params["calculator_type"],
-                    "castep_ref_file": config_params["castep_ref_file"],
-                    "vasp_ref_file": config_params["vasp_ref_file"],
                 }
             )
             initial_rss_job = initial_rss(
@@ -397,9 +377,6 @@ class RssMaker(Maker):
                 "initial_selection_enabled": False,
                 "rss_group": do_rss_group,
                 "config_types": rss_config_type,
-                "calculator_type": config_params["calculator_type"],
-                "castep_ref_file": config_params["castep_ref_file"],
-                "vasp_ref_file": config_params["vasp_ref_file"],
             }
         )
 

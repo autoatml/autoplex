@@ -157,7 +157,7 @@ rss_job = RssMaker(name="your workflow name",
                    rss_config=rss_config).make()
 
 data_preprocessing_job = preprocess_data(
-        vasp_ref_dir=rss_job.output["mlip_path"],  # The path to store the RSS dataset can be read from the previous job.
+        dft_ref_dir=rss_job.output["mlip_path"],  # The path to store the RSS dataset can be read from the previous job.
         pre_database_dir='path/to/pre-existing/database',  # The path to store the pre-existing dataset that you'd like to merge.
     )
 

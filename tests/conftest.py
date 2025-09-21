@@ -312,7 +312,7 @@ def mock_rss(input_dir: str = None,
              dimer_range: list = None,
              dimer_num: int = None,
              custom_incar: Optional[str] = None,
-             vasp_ref_file: str = 'vasp_ref.extxyz',
+             dft_ref_file: str = 'vasp_ref.extxyz',
              rss_group: str = 'initial',
              test_ratio: float = 0.1,
              regularization: bool = True,
@@ -342,14 +342,14 @@ def mock_rss(input_dir: str = None,
                               static_energy_maker=static_energy_maker,
                               static_energy_maker_isolated_atoms=static_energy_maker_isolated_atoms,
                               ).make(structures=job2.output)
-    job4 = collect_dft_data(vasp_ref_file=vasp_ref_file,
+    job4 = collect_dft_data(dft_ref_file=dft_ref_file,
                             rss_group=rss_group,
-                            vasp_dirs=job3.output)
+                            dft_dirs=job3.output)
     job5 = preprocess_data(test_ratio=test_ratio,
                            regularization=regularization,
                            distillation=distillation,
                            force_max=f_max,
-                           vasp_ref_dir=job4.output['vasp_ref_dir'], pre_database_dir=pre_database_dir)
+                           dft_ref_dir=job4.output['dft_ref_dir'], pre_database_dir=pre_database_dir)
     job6 = MLIPFitMaker(mlip_type=mlip_type,
                         ref_energy_name=ref_energy_name,
                         ref_force_name=ref_force_name,

@@ -3,14 +3,13 @@
 import logging
 from typing import Literal
 
-from atomate2.castep.jobs.base import BaseCastepMaker
 from atomate2.forcefields.jobs import ForceFieldStaticMaker
 from atomate2.vasp.jobs.base import BaseVaspMaker
 from atomate2.vasp.jobs.core import StaticMaker
 from atomate2.vasp.sets.core import StaticSetGenerator
 from jobflow import Flow, Response, job
 
-from autoplex.castep.jobs import BaseCastepMaker
+from autoplex.castep.jobs import CastepStaticMaker  
 from autoplex.data.common.flows import DFTStaticLabelling
 from autoplex.data.common.jobs import (
     collect_dft_data,
@@ -59,15 +58,6 @@ _DEFAULT_STATIC_ENERGY_MAKER = StaticMaker(
     run_vasp_kwargs={"handlers": ()},
 )
 
-# Add CASTEP default maker
-_DEFAULT_CASTEP_ENERGY_MAKER = BaseCastepMaker(
-    name="castep static",
-    cut_off_energy=400.0,
-    kspacing=0.3,
-    xc_functional="PBE",
-    task="SinglePoint",
-)
-
 
 @job
 def initial_rss(
@@ -92,9 +82,7 @@ def initial_rss(
     custom_incar: dict | None = None,
     custom_potcar: dict | None = None,
     config_type: str | None = None,
-    vasp_ref_file: str = "vasp_ref.extxyz",
-    castep_ref_file: str = "castep_ref.extxyz",  # New parameter
-    calculator_type: str = "vasp",  # New parameter
+    dft_ref_file: str = "dft_ref.extxyz",
     rss_group: str = "initial",
     test_ratio: float = 0.1,
     regularization: bool = False,
@@ -114,10 +102,10 @@ def initial_rss(
     num_processes_fit: int = 1,
     device_for_fitting: str = "cpu",
     static_energy_maker: (
-        BaseVaspMaker | BaseCastepMaker | ForceFieldStaticMaker
+        BaseVaspMaker | CastepStaticMaker | ForceFieldStaticMaker
     ) = _DEFAULT_STATIC_ENERGY_MAKER,
     static_energy_maker_isolated_atoms: (
-        BaseVaspMaker | BaseCastepMaker | ForceFieldStaticMaker | None
+        BaseVaspMaker | CastepStaticMaker | ForceFieldStaticMaker | None
     ) = None,
     **fit_kwargs,
 ):
@@ -175,9 +163,9 @@ def initial_rss(
         Dictionary of POTCAR settings to update. Keys are element symbols, values are the desired POTCAR labels.
         Default is None.
     config_type: str | None
-        Configuration type for the VASP calculations. Default is None.
-    vasp_ref_file: str
-        Reference file for VASP data. Default is 'vasp_ref.extxyz'.
+        Configuration type for the DFT calculations. Default is None.
+    dft_ref_file: str
+        Reference file for DFT-labelled data. Default is 'dft_ref.extxyz'.
     rss_group: str
         Group name for GAP RSS. Default is 'initial'.
     test_ratio: float
@@ -220,12 +208,12 @@ def initial_rss(
         Number of processes used for fitting. Default is 1.
     device_for_fitting: str
         Device to be used for model fitting, either "cpu" or "cuda".
-    static_energy_maker: BaseVaspMaker | ForceFieldStaticMaker
-        Maker for static energy jobs: either BaseVaspMaker (VASP-based) or
-        ForceFieldStaticMaker (force field-based). Defaults to StaticMaker (VASP-based).
-    static_energy_maker_isolated_atoms: BaseVaspMaker | ForceFieldStaticMaker | None
-        Maker for static energy jobs of isolated atoms: either BaseVaspMaker (VASP-based) or
-        ForceFieldStaticMaker (force field-based) or None. If set to `None`, the parameters
+    static_energy_maker: BaseVaspMaker | CastepStaticMaker | ForceFieldStaticMaker
+        Maker for static energy jobs: either BaseVaspMaker (VASP-based) or CastepStaticMaker 
+        (CASTEP-based) or ForceFieldStaticMaker (force field-based). Defaults to StaticMaker (VASP-based).
+    static_energy_maker_isolated_atoms: BaseVaspMaker | CastepStaticMaker | ForceFieldStaticMaker
+        Maker for static energy jobs of isolated atoms: either BaseVaspMaker (VASP-based) or CastepStaticMaker
+        (CASTEP-based) or ForceFieldStaticMaker (force field-based) or None. If set to `None`, the parameters
         from `static_energy_maker` will be used as the default for isolated atoms. In this case,
         if `static_energy_maker` is a `StaticMaker`, all major settings will be inherited,
         except that `kspacing` will be automatically set to 100 to enforce a Gamma-point-only calculation.
@@ -282,11 +270,9 @@ def initial_rss(
         structures=do_randomized_structure_generation.output, config_type=config_type
     )
     do_data_collection = collect_dft_data(
-        dft_ref_file=vasp_ref_file,
-        castep_ref_file=castep_ref_file,
-        rss_group=rss_group,
-        dft_dirs=do_dft_static.output,
-        calculator_type=calculator_type,
+        dft_ref_file=dft_ref_file, 
+        rss_group=rss_group, 
+        dft_dirs=do_dft_static.output
     )
     do_data_preprocessing = preprocess_data(
         test_ratio=test_ratio,
@@ -297,7 +283,7 @@ def initial_rss(
         distillation=distillation,
         force_max=force_max,
         force_label=force_label,
-        dft_ref_dir=do_data_collection.output["vasp_ref_dir"],
+        dft_ref_dir=do_data_collection.output["dft_ref_dir"],
         pre_database_dir=pre_database_dir,
         reg_minmax=reg_minmax,
         isolated_atom_energies=do_data_collection.output["isolated_atom_energies"],
@@ -365,9 +351,7 @@ def do_rss_iterations(
     custom_incar: dict | None = None,
     custom_potcar: dict | None = None,
     config_types: list[str] | None = None,
-    vasp_ref_file: str = "vasp_ref.extxyz",
-    castep_ref_file: str = "castep_ref.extxyz",
-    calculator_type: str = "vasp",
+    dft_ref_file: str = "dft_ref.extxyz",
     rss_group: str = "rss",
     test_ratio: float = 0.1,
     regularization: bool = False,
@@ -405,10 +389,10 @@ def do_rss_iterations(
     initial_kt: float = 0.3,
     current_iter_index: int = 1,
     static_energy_maker: (
-        BaseVaspMaker | BaseCastepMaker | ForceFieldStaticMaker
+        BaseVaspMaker | CastepStaticMaker | ForceFieldStaticMaker
     ) = _DEFAULT_STATIC_ENERGY_MAKER,
     static_energy_maker_isolated_atoms: (
-        BaseVaspMaker | BaseCastepMaker | ForceFieldStaticMaker | None
+        BaseVaspMaker | CastepStaticMaker | ForceFieldStaticMaker | None
     ) = None,
     **fit_kwargs,
 ):
@@ -416,7 +400,7 @@ def do_rss_iterations(
     Perform iterative RSS to improve the accuracy of a MLIP.
 
     Each iteration involves generating new structures, sampling, running
-    VASP calculations, collecting data, preprocessing data, and fitting a new MLIP.
+    DFT calculations, collecting data, preprocessing data, and fitting a new MLIP.
 
     Parameters
     ----------
@@ -490,9 +474,9 @@ def do_rss_iterations(
         Dictionary of POTCAR settings to update. Keys are element symbols, values are the desired POTCAR labels.
         Default is None.
     config_types: list[str] | None
-        Configuration types for the VASP calculations. Default is None.
-    vasp_ref_file: str
-        Reference file for VASP data. Default is 'vasp_ref.extxyz'.
+        Configuration types for the DFT calculations. Default is None.
+    dft_ref_file: str
+        Reference file for DFT-labelled data. Default is 'dft_ref.extxyz'.
     rss_group: str
         Group name for GAP RSS. Default is 'rss'.
     test_ratio: float
@@ -570,12 +554,12 @@ def do_rss_iterations(
         Initial temperature (in eV) for Boltzmann sampling. Default is 0.3.
     current_iter_index: int
         Index for the current RSS iteration. Default is 1.
-    static_energy_maker: BaseVaspMaker | ForceFieldStaticMaker
-        Maker for static energy jobs: either BaseVaspMaker (VASP-based) or
-        ForceFieldStaticMaker (force field-based). Defaults to StaticMaker (VASP-based).
-    static_energy_maker_isolated_atoms: BaseVaspMaker | ForceFieldStaticMaker | None
-        Maker for static energy jobs of isolated atoms: either BaseVaspMaker (VASP-based) or
-        ForceFieldStaticMaker (force field-based) or None. If set to `None`, the parameters
+    static_energy_maker: BaseVaspMaker | CastepStaticMaker | ForceFieldStaticMaker
+        Maker for static energy jobs: either BaseVaspMaker (VASP-based) or CastepStaticMaker 
+        (CASTEP-based) or ForceFieldStaticMaker (force field-based). Defaults to StaticMaker (VASP-based).
+    static_energy_maker_isolated_atoms: BaseVaspMaker | CastepStaticMaker | ForceFieldStaticMaker
+        Maker for static energy jobs of isolated atoms: either BaseVaspMaker (VASP-based) or CastepStaticMaker
+        (CASTEP-based) or ForceFieldStaticMaker (force field-based) or None. If set to `None`, the parameters
         from `static_energy_maker` will be used as the default for isolated atoms. In this case,
         if `static_energy_maker` is a `StaticMaker`, all major settings will be inherited,
         except that `kspacing` will be automatically set to 100 to enforce a Gamma-point-only calculation.
@@ -686,11 +670,9 @@ def do_rss_iterations(
             static_energy_maker_isolated_atoms=static_energy_maker_isolated_atoms,
         ).make(structures=do_data_sampling.output, config_type=config_type)
         do_data_collection = collect_dft_data(
-            dft_ref_file=vasp_ref_file,
-            castep_ref_file=castep_ref_file,
+            dft_ref_file=dft_ref_file,
             rss_group=rss_group,
             dft_dirs=do_dft_static.output,
-            calculator_type=calculator_type,
         )
         do_data_preprocessing = preprocess_data(
             test_ratio=test_ratio,
@@ -701,7 +683,7 @@ def do_rss_iterations(
             distillation=distillation,
             force_max=force_max,
             force_label=force_label,
-            dft_ref_dir=do_data_collection.output["vasp_ref_dir"],
+            dft_ref_dir=do_data_collection.output["dft_ref_dir"],
             pre_database_dir=input["pre_database_dir"],
             reg_minmax=reg_minmax,
             isolated_atom_energies=input["isolated_atom_energies"],
@@ -758,11 +740,10 @@ def do_rss_iterations(
             dimer_box=dimer_box,
             dimer_range=dimer_range,
             dimer_num=dimer_num,
-            castep_ref_file=castep_ref_file,
-            calculator_type=calculator_type,
+            custom_incar=custom_incar,
             custom_potcar=custom_potcar,
             config_types=config_types,
-            vasp_ref_file=vasp_ref_file,
+            dft_ref_file=dft_ref_file,
             rss_group=rss_group,
             test_ratio=test_ratio,
             regularization=regularization,

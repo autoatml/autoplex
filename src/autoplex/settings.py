@@ -1020,8 +1020,8 @@ class RssConfig(AutoplexBaseModel):
         description="POTCAR settings to update. Keys are element symbols, "
         "values are the desired POTCAR labels.",
     )
-    vasp_ref_file: str = Field(
-        default="vasp_ref.extxyz", description="Reference file for VASP data"
+    dft_ref_file: str = Field(
+        default="dft_ref.extxyz", description="Reference file for VASP data"
     )
     config_types: list[str] = Field(
         default_factory=lambda: ["initial", "traj_early", "traj"],
