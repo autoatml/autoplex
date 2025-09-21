@@ -282,10 +282,10 @@ def initial_rss(
         structures=do_randomized_structure_generation.output, config_type=config_type
     )
     do_data_collection = collect_dft_data(
-        vasp_ref_file=vasp_ref_file,
+        dft_ref_file=vasp_ref_file,
         castep_ref_file=castep_ref_file,
         rss_group=rss_group,
-        vasp_dirs=do_dft_static.output,
+        dft_dirs=do_dft_static.output,
         calculator_type=calculator_type,
     )
     do_data_preprocessing = preprocess_data(
@@ -297,7 +297,7 @@ def initial_rss(
         distillation=distillation,
         force_max=force_max,
         force_label=force_label,
-        vasp_ref_dir=do_data_collection.output["vasp_ref_dir"],
+        dft_ref_dir=do_data_collection.output["vasp_ref_dir"],
         pre_database_dir=pre_database_dir,
         reg_minmax=reg_minmax,
         isolated_atom_energies=do_data_collection.output["isolated_atom_energies"],
@@ -686,10 +686,10 @@ def do_rss_iterations(
             static_energy_maker_isolated_atoms=static_energy_maker_isolated_atoms,
         ).make(structures=do_data_sampling.output, config_type=config_type)
         do_data_collection = collect_dft_data(
-            vasp_ref_file=vasp_ref_file,
+            dft_ref_file=vasp_ref_file,
             castep_ref_file=castep_ref_file,
             rss_group=rss_group,
-            vasp_dirs=do_dft_static.output,
+            dft_dirs=do_dft_static.output,
             calculator_type=calculator_type,
         )
         do_data_preprocessing = preprocess_data(
@@ -701,7 +701,7 @@ def do_rss_iterations(
             distillation=distillation,
             force_max=force_max,
             force_label=force_label,
-            vasp_ref_dir=do_data_collection.output["vasp_ref_dir"],
+            dft_ref_dir=do_data_collection.output["vasp_ref_dir"],
             pre_database_dir=input["pre_database_dir"],
             reg_minmax=reg_minmax,
             isolated_atom_energies=input["isolated_atom_energies"],

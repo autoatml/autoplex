@@ -78,7 +78,7 @@ class BaseCastepMaker(Maker):
             "energy": energy,
             "forces": forces,
             "structure": structure,
-            "directory": workdir,
+            "dir_name": workdir,
             "task_label": self.name,
         }
 

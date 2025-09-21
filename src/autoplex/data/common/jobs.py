@@ -8,6 +8,7 @@ import traceback
 from itertools import chain
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
+import gzip
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -543,190 +544,82 @@ def sample_data(
     return selected_atoms
 
 
-def collect_castep_data(
-    castep_ref_file: str,
-    rss_group: str,
-    castep_dirs: dict | None = None,
+@job
+def collect_dft_data(
+    dft_ref_file: str = "dft_ref.extxyz",
+    rss_group: str = "RSS",
+    dft_dirs: dict | None = None,
 ) -> dict:
     """
-    Collect CASTEP data from specified directories.
+    Collect VASP data from specified directories.
 
     Parameters
     ----------
-    castep_ref_file : str
-        Reference file for CASTEP data.
+    dft_ref_file : str
+        Reference file for DFT-labelled data. Default is 'dft_ref.extxyz'.
     rss_group : str
-        Group name for GAP RSS.
-    castep_dirs : dict
-        Dictionary containing CASTEP directories and configuration types.
+        Group name for GAP RSS. Default is 'RSS'.
+    dft_dirs : dict
+        Dictionary containing DFT calculation directories and configuration types. Should have keys:
+
+        - 'dirs_of_dft': list
+            List of directories containing DFT data.
+        - 'config_type': list
+            List of configuration types corresponding to each directory.
 
     Returns
     -------
     dict:
-        A dictionary containing reference file path and isolated atom energies.
+        A dictionary containing
+
+        - 'dft_ref_dir': Directory of the dft reference file.
+        - 'isolated_atom_energies': Isolated energy values.
     """
-    if castep_dirs is None:
+    if dft_dirs is None:
         raise ValueError(
-            "castep_dirs must be provided and should contain 'dirs_of_vasp' and 'config_type' keys."
+            "dft_dirs must be provided and should contain 'dirs_of_dft' and 'config_type' keys."
         )
 
-    if "dirs_of_vasp" not in castep_dirs or "config_type" not in castep_dirs:
+    if "dirs_of_dft" not in dft_dirs or "config_type" not in dft_dirs:
         raise ValueError(
-            "castep_dirs must contain 'dirs_of_vasp' and 'config_type' keys."
+            "dft_dirs must contain 'dirs_of_dft' and 'config_type' keys."
         )
 
-    dirs = [safe_strip_hostname(value) for value in castep_dirs["dirs_of_vasp"]]
-    config_types = castep_dirs["config_type"]
+    dirs = [safe_strip_hostname(value) for value in dft_dirs["dirs_of_dft"]]
+    config_types = dft_dirs["config_type"]
 
-    logging.info("Attempting collecting CASTEP...")
-
-    atoms = []
-    isolated_atom_energies = {}
-
-    for i, val in enumerate(dirs):
-        logging.info(f"Processing CASTEP directory: {val}")
-
-        # Look for CASTEP trajectory file
-        castep_traj_file = os.path.join(val, "final_atoms_object.xyz")
-
-        if os.path.exists(castep_traj_file):
-            try:
-                logging.info(f"Reading CASTEP trajectory: {castep_traj_file}")
-                at = read(castep_traj_file, index=":", format="extxyz")
-
-                for at_i in at:
-                    # Process CASTEP-specific data
-                    process_castep_atoms(
-                        at_i, config_types[i], rss_group, isolated_atom_energies
-                    )
-                    atoms.append(at_i)
-
-            except Exception as e:
-                logging.warning(
-                    f"Could not read CASTEP trajectory {castep_traj_file}: {e}"
-                )
-        else:
-            logging.warning(f"CASTEP trajectory file not found: {castep_traj_file}")
-
-    logging.info(f"Total {len(atoms)} structures from CASTEP are exactly collected.")
-
-    # Write CASTEP reference file
-    write(castep_ref_file, atoms, format="extxyz", parallel=False)
-
-    dir_path = Path.cwd()
-    castep_ref_dir = os.path.join(dir_path, castep_ref_file)
-
-    return {
-        "vasp_ref_dir": castep_ref_dir,  # Keep same key for compatibility
-        "isolated_atom_energies": isolated_atom_energies,
-    }
-
-
-def process_castep_atoms(at_i, config_type, rss_group, isolated_atom_energies):
-    """
-    Process individual CASTEP atoms object.
-
-    Parameters
-    ----------
-    at_i : ase.Atoms
-        Individual atoms object from CASTEP calculation.
-    config_type : str
-        Configuration type for this structure.
-    rss_group : str
-        RSS group name.
-    isolated_atom_energies : dict
-        Dictionary to store isolated atom energies.
-    """
-    # Set configuration type
-    at_i.info["config_type"] = config_type
-
-    # Handle energy - should already be in trajectory from your calculator
-    if "REF_energy" not in at_i.info:
-        try:
-            at_i.info["REF_energy"] = at_i.get_potential_energy()
-        except Exception as e:
-            logging.warning(f"Could not get energy from CASTEP structure: {e}")
-            return
-
-    # Handle forces - should already be in trajectory from your calculator
-    if "REF_forces" not in at_i.arrays:
-        try:
-            at_i.arrays["REF_forces"] = at_i.get_forces()
-        except Exception as e:
-            logging.warning(f"Could not get forces from CASTEP structure: {e}")
-            # Set zero forces as fallback
-            at_i.arrays["REF_forces"] = np.zeros((len(at_i), 3))
-
-    # Handle stress/virial - CASTEP often doesn't provide this
-    if "REF_virial" not in at_i.info:
-        try:
-            stress = at_i.get_stress()
-            virial_list = -voigt_6_to_full_3x3_stress(stress) * at_i.get_volume()
-            at_i.info["REF_virial"] = " ".join(map(str, virial_list.flatten()))
-        except Exception as e:
-            logging.info(f"Stress not available for CASTEP structure, using zeros: {e}")
-            # Set zero virial for CASTEP
-            at_i.info["REF_virial"] = " ".join(map(str, np.zeros(9)))
-
-    # Set periodic boundary conditions and groups
-    if config_type not in ["dimer", "IsolatedAtom"]:
-        at_i.pbc = True
-        at_i.info["rss_group"] = rss_group
-    else:
-        at_i.info["rss_nonperiodic"] = "T"
-
-    # Store isolated atom energies
-    if config_type == "IsolatedAtom":
-        at_ids = at_i.get_atomic_numbers()
-        isolated_atom_energies[int(at_ids[0])] = at_i.info["REF_energy"]
-
-
-def collect_vasp_data(
-    vasp_ref_file: str,
-    rss_group: str,
-    vasp_dirs: dict | None = None,
-) -> dict:
-    """
-    Original VASP data collection function.
-
-    This preserves all the existing VASP functionality.
-    """
-    if vasp_dirs is None:
-        raise ValueError(
-            "vasp_dirs must be provided and should contain 'dirs_of_vasp' and 'config_type' keys."
-        )
-
-    if "dirs_of_vasp" not in vasp_dirs or "config_type" not in vasp_dirs:
-        raise ValueError(
-            "vasp_dirs must contain 'dirs_of_vasp' and 'config_type' keys."
-        )
-
-    dirs = [safe_strip_hostname(value) for value in vasp_dirs["dirs_of_vasp"]]
-    config_types = vasp_dirs["config_type"]
-
-    logging.info("Attempting collecting VASP...")
+    logging.info("Attempting collecting DFT...")
 
     if dirs is None:
-        raise ValueError("dft_dir must be specified if collect_vasp is True")
+        raise ValueError("dft_dir must be specified if collect_dft is True")
 
     atoms = []
     isolated_atom_energies = {}
 
     for i, val in enumerate(dirs):
         at = None
-        # Check for VASP output files
+        # TODO: think about fall back when we use ml potential outputs instead
         has_vasp_output = os.path.exists(os.path.join(val, "vasprun.xml.gz"))
+        has_castep_output = os.path.exists(os.path.join(val, "castep.castep.gz"))
         has_ase_output = os.path.exists(os.path.join(val, "final_atoms_object.xyz"))
 
-        if has_vasp_output or has_ase_output:
+        if has_vasp_output or has_castep_output or has_ase_output:
             if has_vasp_output:
                 converged = check_convergence_vasp(os.path.join(val, "vasprun.xml.gz"))
-            if has_vasp_output and converged:
-                at = read(os.path.join(val, "vasprun.xml.gz"), index=":")
-            elif has_vasp_output and (not converged):
-                logging.warning(
-                    f"Calculation did not converge for path: {os.path.join(val, 'vasprun.xml.gz')}"
-                )
+                if converged:
+                    at = read(os.path.join(val, "vasprun.xml.gz"), index=":")
+                else:
+                    logging.warning(
+                        f"Calculation did not converge for path: {os.path.join(val, 'vasprun.xml.gz')}"
+                    )
+            elif has_castep_output:
+                converged = check_convergence_castep(os.path.join(val, "castep.castep.gz"))
+                if converged:
+                    at = read(os.path.join(val, "castep.castep.gz"), index=":")
+                else:
+                    logging.warning(
+                        f"Calculation did not converge for path: {os.path.join(val, 'castep.castep.gz')}"
+                    )
             elif has_ase_output:
                 try:
                     logging.info("read ase")
@@ -737,9 +630,9 @@ def collect_vasp_data(
                     )
                 except AssertionError:
                     pass
-
             if at is not None:
                 for at_i in at:
+
                     logging.warning(at_i.get_stress())
 
                     virial_list = (
@@ -766,59 +659,21 @@ def collect_vasp_data(
 
                     if at_i.info["config_type"] == "IsolatedAtom":
                         at_ids = at_i.get_atomic_numbers()
+                        # array_key = at_ids.tostring()
                         isolated_atom_energies[int(at_ids[0])] = at_i.info["REF_energy"]
 
     logging.info(f"Total {len(atoms)} structures from VASP are exactly collected.")
 
-    write(vasp_ref_file, atoms, format="extxyz", parallel=False)
+    write(dft_ref_file, atoms, format="extxyz", parallel=False)
 
     dir_path = Path.cwd()
-    vasp_ref_dir = os.path.join(dir_path, vasp_ref_file)
+
+    dft_ref_dir = os.path.join(dir_path, dft_ref_file)
 
     return {
-        "vasp_ref_dir": vasp_ref_dir,
+        "dft_ref_dir": dft_ref_dir,
         "isolated_atom_energies": isolated_atom_energies,
     }
-
-
-@job
-def collect_dft_data(
-    vasp_ref_file: str = "vasp_ref.extxyz",
-    castep_ref_file: str = "castep_ref.extxyz",
-    rss_group: str = "RSS",
-    vasp_dirs: dict | None = None,
-    calculator_type: str = "vasp",
-) -> dict:
-    """
-    Collect DFT data from specified directories (VASP or CASTEP).
-
-    Parameters
-    ----------
-    vasp_ref_file : str
-        Reference file for VASP data. Default is 'vasp_ref.extxyz'.
-    castep_ref_file : str
-        Reference file for CASTEP data. Default is 'castep_ref.extxyz'.
-    rss_group : str
-        Group name for GAP RSS. Default is 'RSS'.
-    vasp_dirs : dict
-        Dictionary containing DFT directories and configuration types. Should have keys:
-
-        - 'dirs_of_vasp': list
-            List of directories containing DFT data.
-        - 'config_type': list
-            List of configuration types corresponding to each directory.
-
-    calculator_type : str
-        Type of calculator: "vasp" or "castep". Default is "vasp".
-
-    Returns
-    -------
-    dict:
-        A dictionary containing reference file path and isolated atom energies.
-    """
-    if calculator_type.lower() == "castep":
-        return collect_castep_data(castep_ref_file, rss_group, vasp_dirs)
-    return collect_vasp_data(vasp_ref_file, rss_group, vasp_dirs)
 
 
 def check_convergence_vasp(path: str) -> bool:
@@ -827,7 +682,7 @@ def check_convergence_vasp(path: str) -> bool:
 
     Parameters
     ----------
-    path: Path
+    path: str
         Path to the vasp output file to check convergence.
 
     Return
@@ -840,6 +695,28 @@ def check_convergence_vasp(path: str) -> bool:
     converged_i = vasprun.converged_ionic
 
     return converged_e and converged_i
+
+
+def check_convergence_castep(castep_gz: str) -> bool:
+    """
+    Check if CASTEP calculation has converged.
+
+    Parameters
+    ----------
+    castep_gz : str
+        Path to the .castep.gz file.
+
+    Returns
+    -------
+    bool
+        True if converged, False otherwise.
+    """
+    with gzip.open(castep_gz, "rt") as f:
+        for line in f:
+            if "electronic minimisation did not converge" in line:
+                return False
+    
+    return True
 
 
 def safe_strip_hostname(value):
@@ -866,7 +743,7 @@ def safe_strip_hostname(value):
 
 @job
 def preprocess_data(
-    vasp_ref_dir: str,
+    dft_ref_dir: str,
     test_ratio: float | None = None,
     regularization: bool = False,
     retain_existing_sigma: bool = False,
@@ -889,8 +766,8 @@ def preprocess_data(
 
     Parameters
     ----------
-    vasp_ref_dir: str
-        Path to the directory containing the reference VASP calculation data.
+    dft_ref_dir: str
+        Path to the directory containing the reference DFT calculation data.
     test_ratio: float
         The proportion of the test set after splitting the data.
         If None, no splitting will be performed.
@@ -929,9 +806,9 @@ def preprocess_data(
         The current working directory.
     """
     atoms = (
-        data_distillation(vasp_ref_dir, force_max, force_label)
+        data_distillation(dft_ref_dir, force_max, force_label)
         if distillation
-        else read(vasp_ref_dir, index=":")
+        else read(dft_ref_dir, index=":")
     )
 
     if test_ratio == 0 or test_ratio is None:

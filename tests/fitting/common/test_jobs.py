@@ -22,7 +22,7 @@ def test_gap_auto_delta_fit_maker(test_dir, memory_jobstore, clean_dir):
                  "three_body": True}
         )
 
-    _ = run_locally(
+    run_locally(
         gapfit, ensure_success=True, create_folders=True, store=memory_jobstore
     )
 
@@ -45,7 +45,7 @@ def test_gap_fixed_delta_fit_maker(test_dir, memory_jobstore, clean_dir):
                  "three_body": True}
         )
 
-    _ = run_locally(
+    run_locally(
         gapfit, ensure_success=True, create_folders=True, store=memory_jobstore
     )
 
@@ -67,7 +67,7 @@ def test_jace_fit_maker(test_dir, memory_jobstore, clean_dir):
         totaldegree=4,
     )
 
-    _ = run_locally(
+    run_locally(
         jacefit, ensure_success=True, create_folders=True, store=memory_jobstore
     )
 
@@ -89,7 +89,7 @@ def test_nequip_fit_maker(test_dir, memory_jobstore, clean_dir):
         device="cpu",
     )
 
-    _ = run_locally(
+    run_locally(
         nequipfit, ensure_success=True, create_folders=True, store=memory_jobstore
     )
 
@@ -120,7 +120,7 @@ def test_m3gnet_fit_maker(test_dir, memory_jobstore, clean_dir):
         test_equal_to_val=True,
     )
 
-    _ = run_locally(
+    run_locally(
         m3gnetfit, ensure_success=True, create_folders=True, store=memory_jobstore
     )
 
@@ -151,7 +151,7 @@ def test_mace_fit_maker(test_dir, memory_jobstore, clean_dir):
         device="cpu",
     )
 
-    _ = run_locally(
+    run_locally(
         macefit, ensure_success=True, create_folders=True, store=memory_jobstore
     )
 
@@ -201,7 +201,7 @@ def test_mace_finetuning_maker(test_dir, memory_jobstore, clean_dir):
         stress_key = "stress",
     )
 
-    _ = run_locally(
+    run_locally(
         macefit, ensure_success=True, create_folders=True, store=memory_jobstore
     )
 
@@ -245,7 +245,7 @@ def test_mace_finetuning_maker2(test_dir, memory_jobstore, clean_dir):
         seed = 3,
     )
 
-    _ = run_locally(
+    run_locally(
         macefit, ensure_success=True, create_folders=True, store=memory_jobstore
     )
 

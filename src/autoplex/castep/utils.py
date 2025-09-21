@@ -182,6 +182,7 @@ class CastepStaticSetGenerator(CastepInputGenerator):
             "smearing_width": 0.05,
             "write_checkpoint": "none",
             "num_dump_cycles": 0,
+            "calculate_stress": "True",
         }
 
         if self.lepsilon:
