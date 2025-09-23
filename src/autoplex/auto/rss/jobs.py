@@ -9,7 +9,6 @@ from atomate2.vasp.jobs.core import StaticMaker
 from atomate2.vasp.sets.core import StaticSetGenerator
 from jobflow import Flow, Response, job
 
-from autoplex.misc.castep.jobs import CastepStaticMaker
 from autoplex.data.common.flows import DFTStaticLabelling
 from autoplex.data.common.jobs import (
     collect_dft_data,
@@ -19,6 +18,7 @@ from autoplex.data.common.jobs import (
 from autoplex.data.rss.flows import BuildMultiRandomizedStructure
 from autoplex.data.rss.jobs import do_rss_multi_node
 from autoplex.fitting.common.flows import MLIPFitMaker
+from autoplex.misc.castep.jobs import CastepStaticMaker
 
 __all__ = ["do_rss_iterations", "initial_rss"]
 
