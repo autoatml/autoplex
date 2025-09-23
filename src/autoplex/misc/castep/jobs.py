@@ -10,7 +10,7 @@ from jobflow import Maker, job
 from pymatgen.core import Structure
 from pymatgen.io.ase import AseAtomsAdaptor
 
-from autoplex.castep.utils import (
+from autoplex.misc.castep.utils import (
     CastepInputGenerator,
     CastepStaticSetGenerator,
     gzip_castep_outputs,

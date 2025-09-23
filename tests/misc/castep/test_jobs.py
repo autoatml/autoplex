@@ -1,12 +1,12 @@
 import os
-os.environ["CASTEP_COMMAND"] = "mpirun -np 6 /usr/local/CASTEP-20/castep.mpi"
+os.environ["CASTEP_COMMAND"] = "/usr/local/CASTEP-20/castep.mpi"
 os.environ["CASTEP_PP_PATH"] = "/usr/local/CASTEP-20/usp"
 from ase import Atoms
 from pymatgen.io.ase import AseAtomsAdaptor
 from jobflow import run_locally, Flow
-from autoplex.castep.jobs import BaseCastepMaker, CastepStaticMaker
+from autoplex.misc.castep.jobs import BaseCastepMaker, CastepStaticMaker
 from ase.calculators.castep import Castep
-from autoplex.castep.utils import CastepInputGenerator, CastepStaticSetGenerator
+from autoplex.misc.castep.utils import CastepInputGenerator, CastepStaticSetGenerator
 import shutil
 import glob
 

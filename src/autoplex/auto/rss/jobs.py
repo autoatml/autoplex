@@ -9,7 +9,7 @@ from atomate2.vasp.jobs.core import StaticMaker
 from atomate2.vasp.sets.core import StaticSetGenerator
 from jobflow import Flow, Response, job
 
-from autoplex.castep.jobs import CastepStaticMaker
+from autoplex.misc.castep.jobs import CastepStaticMaker
 from autoplex.data.common.flows import DFTStaticLabelling
 from autoplex.data.common.jobs import (
     collect_dft_data,

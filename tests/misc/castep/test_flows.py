@@ -5,8 +5,8 @@ from ase.build import bulk
 from ase.io import read
 from jobflow import run_locally, Flow
 from autoplex.data.common.flows import DFTStaticLabelling
-from autoplex.castep.jobs import CastepStaticMaker
-from autoplex.castep.utils import CastepStaticSetGenerator
+from autoplex.misc.castep.jobs import CastepStaticMaker
+from autoplex.misc.castep.utils import CastepStaticSetGenerator
 from autoplex.data.common.jobs import collect_dft_data
 from pymatgen.io.ase import AseAtomsAdaptor
 import shutil

@@ -203,7 +203,7 @@ class CastepStaticSetGenerator(CastepInputGenerator):
             Dictionary of CASTEP .cell file parameters for static calculations
         """
         updates = {
-            "kpoints_mp_spacing": "0.1",
+            "kpoints_mp_spacing": "0.04",
         }
         return updates
 

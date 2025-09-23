@@ -9,7 +9,7 @@ from atomate2.vasp.sets.core import StaticSetGenerator
 from jobflow import Flow, Maker, Response, job
 
 from autoplex.auto.rss.jobs import do_rss_iterations, initial_rss
-from autoplex.castep.jobs import CastepStaticMaker
+from autoplex.misc.castep.jobs import CastepStaticMaker
 from autoplex.settings import RssConfig
 
 
