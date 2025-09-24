@@ -1,17 +1,17 @@
-"""Utilities for testing castep calculations. 
+"""Utilities for testing castep calculations.
 
 This code is adapted from
 `atomate2/src/atomate2/utils/testing/aims.py`.
 
 Reference:
 @article{ganose2025_atomate2,
-	title = {Atomate2: modular workflows for materials science},
-	author = {Ganose, Alex M. and Sahasrabuddhe, Hrushikesh and Asta, Mark and Beck, Kevin and Biswas, Tathagata and Bonkowski, Alexander and Bustamante, Joana and Chen, Xin and Chiang, Yuan and Chrzan, Daryl C. and Clary, Jacob and Cohen, Orion A. and Ertural, Christina and Gallant, Max C. and George, Janine and Gerits, Sophie and Goodall, Rhys E. A. and Guha, Rishabh D. and Hautier, Geoffroy and Horton, Matthew and Inizan, T. J. and Kaplan, Aaron D. and Kingsbury, Ryan S. and Kuner, Matthew C. and Li, Bryant and Linn, Xavier and McDermott, Matthew J. and Mohanakrishnan, Rohith Srinivaas and Naik, Aakash A. and Neaton, Jeffrey B. and Parmar, Shehan M. and Persson, Kristin A. and Petretto, Guido and Purcell, Thomas A. R. and Ricci, Francesco and Rich, Benjamin and Riebesell, Janosh and Rignanese, Gian-Marco and Rosen, Andrew S. and Scheffler, Matthias and Schmidt, Jonathan and Shen, Jimmy-Xuan and Sobolev, Andrei and Sundararaman, Ravishankar and Tezak, Cooper and Trinquet, Victor and Varley, Joel B. and Vigil-Fowler, Derek and Wang, Duo and Waroquiers, David and Wen, Mingjian and Yang, Han and Zheng, Hui and Zheng, Jiongzhi and Zhu, Zhuoying and Jain, Anubhav},
-	year = {2025},
-	journal = {Digital Discovery},
-	doi = {10.1039/D5DD00019J},
-	url = {https://doi.org/10.1039/D5DD00019J},
-	urldate = {2025-07-01},
+        title = {Atomate2: modular workflows for materials science},
+        author = {Ganose, Alex M. and Sahasrabuddhe, Hrushikesh and Asta, Mark and Beck, Kevin and Biswas, Tathagata and Bonkowski, Alexander and Bustamante, Joana and Chen, Xin and Chiang, Yuan and Chrzan, Daryl C. and Clary, Jacob and Cohen, Orion A. and Ertural, Christina and Gallant, Max C. and George, Janine and Gerits, Sophie and Goodall, Rhys E. A. and Guha, Rishabh D. and Hautier, Geoffroy and Horton, Matthew and Inizan, T. J. and Kaplan, Aaron D. and Kingsbury, Ryan S. and Kuner, Matthew C. and Li, Bryant and Linn, Xavier and McDermott, Matthew J. and Mohanakrishnan, Rohith Srinivaas and Naik, Aakash A. and Neaton, Jeffrey B. and Parmar, Shehan M. and Persson, Kristin A. and Petretto, Guido and Purcell, Thomas A. R. and Ricci, Francesco and Rich, Benjamin and Riebesell, Janosh and Rignanese, Gian-Marco and Rosen, Andrew S. and Scheffler, Matthias and Schmidt, Jonathan and Shen, Jimmy-Xuan and Sobolev, Andrei and Sundararaman, Ravishankar and Tezak, Cooper and Trinquet, Victor and Varley, Joel B. and Vigil-Fowler, Derek and Wang, Duo and Waroquiers, David and Wen, Mingjian and Yang, Han and Zheng, Hui and Zheng, Jiongzhi and Zhu, Zhuoying and Jain, Anubhav},
+        year = {2025},
+        journal = {Digital Discovery},
+        doi = {10.1039/D5DD00019J},
+        url = {https://doi.org/10.1039/D5DD00019J},
+        urldate = {2025-07-01},
 }
 """
 
@@ -23,21 +23,23 @@ from typing import TYPE_CHECKING, Any, Final, Literal
 
 from jobflow import CURRENT_JOB
 from monty.os.path import zpath as monty_zpath
-from autoplex.misc.castep.utils import CastepStaticSetGenerator
 
 import autoplex.misc.castep.jobs
+from autoplex.misc.castep.utils import CastepStaticSetGenerator
+
 # import atomate2.castep.run
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator, Sequence
 
-    from autoplex.misc.castep.utils import CastepInputGenerator
     from pytest import MonkeyPatch
+
+    from autoplex.misc.castep.utils import CastepInputGenerator
 
 logger = logging.getLogger("autoplex")
 
 
-_VFILES: Final = ("castep.param", "castep.cell") 
+_VFILES: Final = ("castep.param", "castep.cell")
 _REF_PATHS: dict[str, str | Path] = {}
 _FAKE_RUN_CASTEP_KWARGS: dict[str, dict] = {}
 
@@ -76,7 +78,7 @@ def monkeypatch_castep(
     For examples, see the tests in tests/castep/jobs/core.py.
     """
 
-    def mock_run_castep(*args, **kwargs) -> None:  # noqa: ARG001
+    def mock_run_castep(*args, **kwargs) -> None:
         name = CURRENT_JOB.job.name
         try:
             ref_dir = ref_path / _REF_PATHS[name]
@@ -89,7 +91,9 @@ def monkeypatch_castep(
 
     get_input_set_orig = CastepStaticSetGenerator.get_input_set
 
-    def mock_get_input_set(self: CastepStaticSetGenerator, *args, **kwargs) -> CastepInputGenerator:
+    def mock_get_input_set(
+        self: CastepStaticSetGenerator, *args, **kwargs
+    ) -> CastepInputGenerator:
         return get_input_set_orig(self, *args, **kwargs)
 
     monkeypatch.setattr(autoplex.misc.castep.run, "run_castep", mock_run_castep)
@@ -109,8 +113,8 @@ def monkeypatch_castep(
 
 def fake_run_castep(
     ref_path: str | Path,
-    input_settings: Sequence[str] | None = None,  # noqa: ARG001
-    check_inputs: Sequence[Literal["castep.param", "castep.cell"]] = _VFILES,  # noqa: ARG001
+    input_settings: Sequence[str] | None = None,
+    check_inputs: Sequence[Literal["castep.param", "castep.cell"]] = _VFILES,
     clear_inputs: bool = False,
 ) -> None:
     """
@@ -159,4 +163,3 @@ def copy_castep_outputs(ref_path: str | Path) -> None:
     for output_file in output_path.iterdir():
         if output_file.is_file():
             shutil.copy(output_file, "./CASTEP")
-            

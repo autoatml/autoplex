@@ -6,17 +6,17 @@ import os
 from dataclasses import dataclass, field
 
 from ase.calculators.castep import Castep
+from ase.io import read
 from jobflow import Maker, job
 from pymatgen.core import Structure
 from pymatgen.io.ase import AseAtomsAdaptor
 
+from autoplex.misc.castep.run import run_castep
 from autoplex.misc.castep.utils import (
     CastepInputGenerator,
     CastepStaticSetGenerator,
     gzip_castep_outputs,
 )
-from autoplex.misc.castep.run import run_castep
-from ase.io import read
 
 
 @dataclass
@@ -59,10 +59,12 @@ class BaseCastepMaker(Maker):
 
         atoms = AseAtomsAdaptor().get_atoms(structure)
 
-        calc = Castep(keyword_tolerance=0,
-                            _prepare_input_only=True,
-                            _copy_pspots = True,)
-        
+        calc = Castep(
+            keyword_tolerance=0,
+            _prepare_input_only=True,
+            _copy_pspots=True,
+        )
+
         atoms.calc = calc
 
         for key, value in input_set["param"].items():
@@ -73,12 +75,12 @@ class BaseCastepMaker(Maker):
 
         if self.pspot:
             atoms.set_pspot(self.pspot)
-        
+
         calc.initialize()
         run_castep(calc)
-        
-        workdir = os.path.join(os.getcwd(), 'CASTEP')
-        atoms = read(os.path.join(workdir, 'castep.castep'))
+
+        workdir = os.path.join(os.getcwd(), "CASTEP")
+        atoms = read(os.path.join(workdir, "castep.castep"))
         energy = atoms.get_potential_energy()
         forces = atoms.get_forces()
         gzip_castep_outputs(workdir=workdir)
@@ -114,4 +116,3 @@ class CastepStaticMaker(BaseCastepMaker):
     input_set_generator: CastepInputGenerator = field(
         default_factory=CastepStaticSetGenerator
     )
-

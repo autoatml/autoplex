@@ -1,5 +1,6 @@
 """run CASTEP"""
 
+
 def run_castep(calc):
     """
     Run a CASTEP calculation.
