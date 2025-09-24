@@ -1,6 +1,4 @@
 import os
-os.environ["CASTEP_COMMAND"] = "/usr/local/CASTEP-20/castep.mpi"
-os.environ["CASTEP_PP_PATH"] = "/usr/local/CASTEP-20/usp"
 from ase.build import bulk
 from ase.io import read
 from jobflow import run_locally, Flow
@@ -13,37 +11,40 @@ import shutil
 import glob
 
 
-def test_DFTStaticLabelling_with_castep(memory_jobstore):
-    atoms1 = bulk("Si", "diamond", a=5.43)
-    atoms2 = bulk("Si", "fcc", a=5.43)
+def test_DFTStaticLabelling_with_castep(memory_jobstore, mock_castep):
+    
+    ref_paths = {
+        "static_bulk_0": "CASTEP_bulk1",
+        "static_bulk_1": "CASTEP_bulk2",
+    }
+    
+    mock_castep(ref_paths)
+    
+    atoms1 = bulk("Si", "diamond", a=5.1)
+    atoms2 = bulk("Si", "diamond", a=5.2)
     struct1 = AseAtomsAdaptor.get_structure(atoms1)
     struct2 = AseAtomsAdaptor.get_structure(atoms2)
 
     structures = [struct1, struct2]
     
     castep_maker = CastepStaticMaker(
-        name="static_castep",
+        name="test_castep",
         input_set_generator=CastepStaticSetGenerator(
             user_param_settings={
-                "cut_off_energy": 200.0,
-                "xc_functional": "PBE",
-                "task": "SinglePoint",
-                "max_scf_cycles": 200,
-                "elec_energy_tol": 1e-5,
-                "smearing_width": 0.1,
-                "spin_polarized": False,
+            'cut_off_energy': 100.0,
+            'xc_functional': 'PBE',
+            'task': 'SinglePoint',
+            'max_scf_cycles': 100,
             },
             user_cell_settings={
-                "kpoint_mp_grid": "1 1 1",
-                "kpoint_mp_offset": "0.0 0.0 0.0",
-            },
+            'kpoint_mp_grid': '1 1 1',
+            'kpoint_mp_offset': '0.0 0.0 0.0',
+            }
         ),
     )
 
     job_dft = DFTStaticLabelling(
-        isolated_atom=True,
-        e0_spin=True,
-        isolatedatom_box=[20.0, 20.5, 21.0],
+        isolated_atom=False,
         dimer=False,
         static_energy_maker=castep_maker,
     ).make(structures=structures)
@@ -63,9 +64,8 @@ def test_DFTStaticLabelling_with_castep(memory_jobstore):
     
     atoms = read(path_to_vasp, index=":")
     config_types = [at.info['config_type'] for at in atoms]
-
-    assert abs(isol_energy['14'] - (-165.23)) < 1e-2
-    assert len(config_types) == 3
+    
+    assert len(config_types) == 2
     
     for d in glob.glob("job_*"):
         shutil.rmtree(d, ignore_errors=True)
