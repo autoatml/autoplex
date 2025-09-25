@@ -108,7 +108,7 @@ class BaseCastepMaker(Maker):
         atoms = AseAtomsAdaptor().get_atoms(structure)
         from ase.calculators.castep import CastepKeywords
         import json
-        with open("/home/jgeorge/RZ-Dienste/hpc-user/PycharmProjects/2025_castep_interface/autoplex/src/autoplex/misc/castep_keywords.json") as fd:
+        with open(SETTINGS.castep_keywords) as fd:
             kwdata = json.load(fd)
         from ase.calculators.castep import make_cell_dict, make_param_dict
         # This is a bit awkward, but it's necessary for backwards compatibility
