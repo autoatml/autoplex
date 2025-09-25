@@ -28,7 +28,6 @@ from ase.data import chemical_symbols
 from ase.io import read, write
 from ase.io.extxyz import XYZError
 from atomate2.utils.path import strip_hostname
-from calorine.nep import read_loss, write_nepfile, write_structures
 from dgl.data.utils import split_dataset
 from matgl.apps.pes import Potential
 from matgl.ext.pymatgen import Structure2Graph, get_element_list
@@ -60,6 +59,11 @@ from autoplex.data.common.utils import (
     rms_dict,
     stratified_dataset_split,
 )
+try:
+    from calorine.nep import read_loss, write_nepfile, write_structures
+except SyntaxError:
+    pass
+
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"

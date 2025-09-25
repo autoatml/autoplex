@@ -17,7 +17,7 @@ def test_BaseCastepMaker(test_dir, memory_jobstore, mock_castep):
     }
     
     mock_castep(ref_paths)
-    
+
     atoms = bulk("Si", "diamond", a=5.1)
     pmg_structure = AseAtomsAdaptor.get_structure(atoms)
     
@@ -45,7 +45,7 @@ def test_BaseCastepMaker(test_dir, memory_jobstore, mock_castep):
     
     dict_castep = castep_job.output.resolve(memory_jobstore)
     
-    assert abs(-329.6079168446 - dict_castep["energy"]) < 1e-4
+    assert abs(-329.6079168446 - dict_castep.output.energy) < 1e-4
     
     for d in glob.glob("job_*") + glob.glob("CASTEP*"):
         shutil.rmtree(d, ignore_errors=True)

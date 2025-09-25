@@ -4,14 +4,15 @@ from __future__ import annotations
 
 import logging
 from typing import Any, Literal
-
+from pathlib import Path
 import numpy as np  # noqa: TC002
+from atomate2 import Atomate2Settings
 from monty.json import MontyDecoder, jsanitize
 from monty.serialization import loadfn
 from pydantic import BaseModel, ConfigDict, Field
 from torch.optim import Optimizer  # noqa: TC002
 from torch.optim.lr_scheduler import LRScheduler  # noqa: TC002
-
+from atomate2.settings import Atomate2Settings
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
@@ -26,6 +27,7 @@ __all__ = [
     "NEPSettings",
     "NEQUIPSettings",
     "RssConfig",
+    "AutoplexSettings"
 ]
 
 
@@ -96,6 +98,12 @@ class AutoplexBaseModel(BaseModel):
             if not k.startswith("@")
         }
         return cls(**decoded)
+
+
+class AutoplexSettings(Atomate2Settings):
+    """Model describing the castep-related commands"""
+    castep_cmd: str =Field(default="castep", description="command to run castep.")
+    castep_keywords: Path =Field(default=Path(__file__).parent / "misc"/"castep_keywords.json")
 
 
 class GAPGeneralSettings(AutoplexBaseModel):
@@ -1197,3 +1205,6 @@ class RssConfig(AutoplexBaseModel):
             del config_params[key]
 
         return cls(**config_params)
+
+
+SETTINGS = AutoplexSettings()

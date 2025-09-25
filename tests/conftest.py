@@ -19,7 +19,6 @@ import pytest
 import subprocess
 import shutil
 from pytest import MonkeyPatch
-from calorine.nep.io import read_nepfile
 from atomate2.utils.testing.vasp import monkeypatch_vasp
 from autoplex.misc.utils.mock_castep import monkeypatch_castep
 from atomate2.vasp.jobs.base import BaseVaspMaker
@@ -35,6 +34,11 @@ from autoplex.data.common.jobs import sample_data, collect_dft_data, preprocess_
 from autoplex.data.common.flows import DFTStaticLabelling
 from autoplex.fitting.common.flows import MLIPFitMaker
 from jobflow import Flow
+
+try:
+    from calorine.nep.io import read_nepfile
+except ImportError:
+    pass
 
 logger = logging.getLogger("autoplex")
 
@@ -74,6 +78,7 @@ _DEFAULT_STATIC_ENERGY_MAKER = StaticMaker(
     ),
     run_vasp_kwargs={"handlers": ()},
 )
+
 
 @pytest.fixture(scope="session")
 def test_dir():

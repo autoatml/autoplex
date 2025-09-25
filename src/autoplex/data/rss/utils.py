@@ -23,7 +23,6 @@ from ase.geometry import find_mic
 from ase.optimize.precon import Exp, PreconLBFGS
 from ase.units import GPa
 from mace.calculators import MACECalculator
-from matgl.ext.ase import M3GNetCalculator
 from nequip.ase import NequIPCalculator
 from pymatgen.core import Structure
 from pymatgen.io.ase import AseAtomsAdaptor
@@ -34,6 +33,10 @@ from autoplex.fitting.common.utils import (
     extract_gap_label,
 )
 
+try:
+    from matgl.ext.ase import M3GNetCalculator
+except ImportError:
+    pass
 
 def extract_pairstyle(
     ace_label: str, ace_json: str, ace_table: str
