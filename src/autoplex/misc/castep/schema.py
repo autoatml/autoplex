@@ -1,4 +1,4 @@
-"""Document Schema for CASTEP
+"""Document Schema for CASTEP.
 
 The following code has been taken and modified from
 https://github.com/materialsproject/atomate2/blob/main/src/atomate2/ase/schemas.py

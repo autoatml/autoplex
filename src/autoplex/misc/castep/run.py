@@ -1,4 +1,4 @@
-"""run CASTEP"""
+"""Run CASTEP."""
 
 
 def run_castep(calc):

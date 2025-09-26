@@ -102,13 +102,10 @@ class AutoplexBaseModel(BaseModel):
         return cls(**decoded)
 
 
-class AutoplexSettings(Atomate2Settings):
+class AutoplexSettings(BaseModel):
     """Model describing the castep-related commands"""
-
-    castep_cmd: str = Field(default="castep", description="command to run castep.")
-    castep_keywords: Path = Field(
-        default=Path(__file__).parent / "misc" / "castep_keywords.json"
-    )
+    CASTEP_CMD: str =Field(default="castep", description="command to run castep.")
+    CASTEP_KEYWORDS: Path =Field(default=Path(__file__).parent / "misc"/"castep"/"castep_keywords.json")
 
 
 class GAPGeneralSettings(AutoplexBaseModel):

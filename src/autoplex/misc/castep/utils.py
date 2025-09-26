@@ -1,12 +1,11 @@
+"""Utils for CASTEP."""
 from __future__ import annotations
-
 import gzip
 import os
 import shutil
 from copy import deepcopy
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List
 
 from pymatgen.core import Structure
 
@@ -54,18 +53,6 @@ class CastepInputGenerator:
         else:
             self.structure = self.structure
 
-    @property
-    def structure(self) -> Structure | None:
-        """Get the structure."""
-        return self._structure
-
-    @structure.setter
-    def structure(self, structure: Structure | None) -> None:
-        """Set the structure with optional sorting."""
-        if isinstance(structure, Structure):
-            if self.sort_structure:
-                structure = structure.get_sorted_structure()
-        self._structure = structure
 
     @property
     def param_updates(self) -> dict:
@@ -155,12 +142,12 @@ class CastepStaticSetGenerator(CastepInputGenerator):
         Other keyword arguments passed to CastepInputGenerator
     """
 
-    CONFIG = {
+    CONFIG: dict = field(default_factory=lambda: {
         "PARAM": {
             "task": "SinglePoint",
             "calculate_stress": "True",
         }
-    }
+    })
     lepsilon: bool = False
     lcalcpol: bool = False
 
@@ -202,17 +189,16 @@ class CastepStaticSetGenerator(CastepInputGenerator):
         dict
             Dictionary of CASTEP .cell file parameters for static calculations
         """
-        updates = {
+        return {
             "kpoints_mp_spacing": "0.04",
         }
-        return updates
 
 
 def gzip_castep_outputs(
     workdir: str | Path | None = None,
-    glob_patterns: List[str] | None = None,
+    glob_patterns: list[str] | None = None,
     remove_originals: bool = True,
-) -> List[str]:
+) -> list[str]:
     """
     Gzip CASTEP input/output files to save disk space.
 

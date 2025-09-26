@@ -194,3 +194,6 @@ exclude = ['tutorials']
 [tool.codespell]
 ignore-words-list = "titel,alls,ans,nd,mater,nwo,te,hart,ontop,ist,ot,fo"
 check-filenames = true
+
+[tool.setuptools.package-data]
+"autoplex.misc.castep" = ["*.json"]
