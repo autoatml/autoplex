@@ -12,33 +12,32 @@ All rights reserved.
 """
 
 import logging
-from pathlib import Path
-from typing import Any, Callable, Dict, Final, Generator, Union, Optional, Sequence, Literal
-
-import pytest
-import subprocess
 import shutil
-from pytest import MonkeyPatch
-from atomate2.utils.testing.vasp import monkeypatch_vasp
-from autoplex.misc.utils.mock_castep import monkeypatch_castep
-from atomate2.vasp.jobs.base import BaseVaspMaker
-from atomate2.vasp.jobs.core import StaticMaker
-from atomate2.forcefields.jobs import ForceFieldStaticMaker
-from atomate2.vasp.sets.core import StaticSetGenerator
-
-from jobflow import Response, job
+from pathlib import Path
+from typing import Any, Callable, Dict, Final, Generator, Union, Optional, Sequence
 
 import autoplex.fitting.common.utils
-from autoplex.data.rss.jobs import do_rss_single_node, do_rss_multi_node
-from autoplex.data.common.jobs import sample_data, collect_dft_data, preprocess_data
+import pytest
+from atomate2.forcefields.jobs import ForceFieldStaticMaker
+from atomate2.utils.testing.vasp import monkeypatch_vasp
+from atomate2.vasp.jobs.base import BaseVaspMaker
+from atomate2.vasp.jobs.core import StaticMaker
+from atomate2.vasp.sets.core import StaticSetGenerator
 from autoplex.data.common.flows import DFTStaticLabelling
+from autoplex.data.common.jobs import sample_data, collect_dft_data, preprocess_data
+from autoplex.data.rss.jobs import do_rss_single_node, do_rss_multi_node
 from autoplex.fitting.common.flows import MLIPFitMaker
+from autoplex.misc.utils.mock_castep import monkeypatch_castep
 from jobflow import Flow
+from jobflow import Response, job
+from pytest import MonkeyPatch
 
+# We should make sure that we can use all forcefield installations idependently
+# We need to anticipate version conflicts in the future.
 try:
     from calorine.nep.io import read_nepfile
 except ImportError:
-    pass
+    read_nepfile = None
 
 logger = logging.getLogger("autoplex")
 
