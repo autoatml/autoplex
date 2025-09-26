@@ -34,7 +34,7 @@ from autoplex.fitting.common.utils import (
     extract_gap_label,
 )
 
-    
+
 def extract_pairstyle(
     ace_label: str, ace_json: str, ace_table: str
 ) -> tuple[dict[str, int], list[str]]:

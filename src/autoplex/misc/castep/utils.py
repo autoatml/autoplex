@@ -1,5 +1,7 @@
 """Utils for CASTEP."""
+
 from __future__ import annotations
+
 import gzip
 import os
 import shutil
@@ -52,7 +54,6 @@ class CastepInputGenerator:
             self._structure: Structure | None = None
         else:
             self.structure = self.structure
-
 
     @property
     def param_updates(self) -> dict:
@@ -142,12 +143,14 @@ class CastepStaticSetGenerator(CastepInputGenerator):
         Other keyword arguments passed to CastepInputGenerator
     """
 
-    CONFIG: dict = field(default_factory=lambda: {
-        "PARAM": {
-            "task": "SinglePoint",
-            "calculate_stress": "True",
+    CONFIG: dict = field(
+        default_factory=lambda: {
+            "PARAM": {
+                "task": "SinglePoint",
+                "calculate_stress": "True",
+            }
         }
-    })
+    )
     lepsilon: bool = False
     lcalcpol: bool = False
 

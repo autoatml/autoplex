@@ -2,20 +2,23 @@
 
 from __future__ import annotations
 
+import json
 import os
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 from ase.calculators.calculator import PropertyNotImplementedError
-from ase.calculators.castep import make_cell_dict, make_param_dict
-from ase.calculators.castep import Castep
+from ase.calculators.castep import (
+    Castep,
+    CastepKeywords,
+    make_cell_dict,
+    make_param_dict,
+)
 from ase.io import read
 from ase.stress import voigt_6_to_full_3x3_stress
 from ase.units import GPa
 from jobflow import Maker, job
 from pymatgen.io.ase import AseAtomsAdaptor
-from ase.calculators.castep import CastepKeywords
-import json
 
 from autoplex.misc.castep.run import run_castep
 from autoplex.misc.castep.schema import InputDoc, OutputDoc, TaskDoc
@@ -28,10 +31,12 @@ from autoplex.settings import SETTINGS
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+
     from pymatgen.core import Structure
 
 # add larger objects to the database in the future, e.g., band structures
 _DATA_OBJECTS = []
+
 
 def castep_job(method: Callable) -> job:
     """
@@ -109,7 +114,7 @@ class BaseCastepMaker(Maker):
         atoms = AseAtomsAdaptor().get_atoms(structure)
         """
         The following five lines until 'castep_keywords' are adopted and copied from ASE
-        
+
         References
         ----------
         *    Title: ASE package from ase.calculators.castep
@@ -120,8 +125,8 @@ class BaseCastepMaker(Maker):
         with open(SETTINGS.CASTEP_KEYWORDS) as fd:
             kwdata = json.load(fd)
         # This is a bit awkward, but it's necessary for backwards compatibility
-        param_dict = make_param_dict(kwdata['param'])
-        cell_dict = make_cell_dict(kwdata['cell'])
+        param_dict = make_param_dict(kwdata["param"])
+        cell_dict = make_cell_dict(kwdata["cell"])
 
         # This is a bit awkward, but it's necessary for backwards compatibility
         param_dict = make_param_dict(kwdata["param"])
