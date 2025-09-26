@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+import warnings
 import logging
 from pathlib import Path
 from typing import Any, Literal
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import Field, model_validator
 
 import numpy as np  # noqa: TC002
 from monty.json import MontyDecoder, jsanitize
@@ -12,6 +15,8 @@ from monty.serialization import loadfn
 from pydantic import BaseModel, ConfigDict, Field
 from torch.optim import Optimizer  # noqa: TC002
 from torch.optim.lr_scheduler import LRScheduler  # noqa: TC002
+from atomate2.settings import Atomate2Settings
+
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
@@ -30,6 +35,8 @@ __all__ = [
     "RssConfig",
 ]
 
+_DEFAULT_CONFIG_FILE_PATH="~/.autoplex.yaml"
+_ENV_PREFIX = "autoplex_"
 
 class AutoplexBaseModel(BaseModel):
     """Base class for all models in autoplex."""
@@ -100,13 +107,67 @@ class AutoplexBaseModel(BaseModel):
         return cls(**decoded)
 
 
-class AutoplexSettings(BaseModel):
-    """Model describing the castep-related commands."""
+class AutoplexSettings(BaseSettings):
+    """Model describing the autoplex-related commands.
 
+    The following code has been taken and modified from
+    https://github.com/materialsproject/atomate2/blob/main/src/atomate2/settings.py
+    The code has been released under BSD 3-Clause License
+    and the following copyright applies:
+    atomate2 Copyright (c) 2015, The Regents of the University of
+    California, through Lawrence Berkeley National Laboratory (subject
+    to receipt of any required approvals from the U.S. Dept. of Energy).
+    All rights reserved.
+    """
+
+    CONFIG_FILE: str = Field(
+        _DEFAULT_CONFIG_FILE_PATH, description="File to load alternative defaults from."
+    )
     CASTEP_CMD: str = Field(default="castep", description="command to run castep.")
     CASTEP_KEYWORDS: Path = Field(
         default=Path(__file__).parent / "misc" / "castep" / "castep_keywords.json"
     )
+
+    model_config = SettingsConfigDict(env_prefix=_ENV_PREFIX)
+
+    @model_validator(mode="before")
+    @classmethod
+    def load_default_settings(cls, values: dict[str, Any]) -> dict[str, Any]:
+        """Load settings from file or environment variables.
+
+        Loads settings from a root file if available and uses that as defaults in
+        place of built-in defaults.
+
+        This allows setting of the config file path through environment variables.
+        """
+        from monty.serialization import loadfn
+
+        config_file_path = values.get(key := "CONFIG_FILE", _DEFAULT_CONFIG_FILE_PATH)
+        env_var_name = f"{_ENV_PREFIX.upper()}{key}"
+        config_file_path = Path(config_file_path).expanduser()
+
+        new_values = {}
+        if config_file_path.exists():
+            if config_file_path.stat().st_size == 0:
+                warnings.warn(
+                    f"Using {env_var_name} at {config_file_path} but it's empty",
+                    stacklevel=2,
+                )
+            else:
+                try:
+                    new_values.update(loadfn(config_file_path))
+                except ValueError:
+                    raise SyntaxError(
+                        f"{env_var_name} at {config_file_path} is unparsable"
+                    ) from None
+        # warn if config path is not the default but file doesn't exist
+        elif config_file_path != Path(_DEFAULT_CONFIG_FILE_PATH).expanduser():
+            warnings.warn(
+                f"{env_var_name} at {config_file_path} does not exist", stacklevel=2
+            )
+
+        return new_values | values
+
 
 
 class GAPGeneralSettings(AutoplexBaseModel):
