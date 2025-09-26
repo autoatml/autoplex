@@ -744,7 +744,7 @@
             "keyword": "task",
             "option_type": "String",
             "level": "Basic",
-            "docstring": "Defines the type of calculation to be performed.\nModifiable: restart only\nAllowed values: SINGLEPOINT, BANDSTRUCTURE, GEOMETRYOPTIMIZATION, MOLECULARDYNAMICS, OPTICS, TRANSITIONSTATESEARCH, PHONON, EFIELD, PHONON+EFIELD, THERMODYNAMICS, WANNIER, MAGRES, ELNES, SPECTRAL, EPCOUPLING, GENETICALGOR, SOCKET_DRIVER\nDefault value : SINGLEPOINT"
+            "docstring": "Defines the type of calculation to be performed.\nModifiable: restart only\nAllowed values: SINGLEPOINT, BANDSTRUCTURE, GEOMETRYOPTIMIZATION, MOLECULARDYNAMICS, OPTICS, TRANSITIONSTATESEARCH, PHONON, EFIELD, PHONON+EFIELD, THERMODYNAMICS, WANNIER, MAGRES, ELNES, SPECTRAL, EPCOUPLING, GENETICALGOR\nDefault value : SINGLEPOINT"
         },
         "calculate_stress": {
             "keyword": "calculate_stress",
@@ -1128,7 +1128,7 @@
             "keyword": "sedc_scheme",
             "option_type": "String",
             "level": "Basic",
-            "docstring": "The semi-empirical dispersion/van der Waals correction scheme to use.\nModifiable: restart and on the fly\nAllowed values: NONE; OBS = Phys. Rev. B 73, 205101, (2006); G06 = J. Comput. Chem. 27, 1787, (2006);\nJCHS = J. Comput. Chem. 28, 555, (2007); TS = Phys. Rev. Lett.,102, 073005 (2009);\nTSsurf = Phys. Rev. Lett., 108, 146103 (2012);\n(A)MBD and (A)TSSCS = Phys. Rev. Lett., 108, 236402 (2012);\n(A)MBD* = J. Chem. Phys. 140, 18A508 (2014).\nXDM = J. Chem. Phys. 127, 124108 (2007).\nD3, D3(BJ) and D4 are optional extras that need third-party library support.\nNB Not all XC_FUNCTIONAL values are supported for all schemes - if in doubt use PBE.\nDefault value : NONE (or TS if SEDC_APPLY=TRUE)"
+            "docstring": "The semi-empirical dispersion/van der Waals correction scheme to use.\nModifiable: restart and on the fly\nAllowed values: NONE; OBS = Phys. Rev. B 73, 205101, (2006); G06 = J. Comput. Chem. 27, 1787, (2006);\nJCHS = J. Comput. Chem. 28, 555, (2007); TS = Phys. Rev. Lett.,102, 073005 (2009);\nTSsurf = Phys. Rev. Lett., 108, 146103 (2012);\n(A)MBD and (A)TSSCS = Phys. Rev. Lett., 108, 236402 (2012);\n(A)MBD* = J. Chem. Phys. 140, 18A508 (2014).\nXDM = J. Chem. Phys. 127, 124108 (2007).\nNB Not all XC_FUNCTIONAL values are supported for all schemes - if in doubt use PBE.\nDefault value : NONE (or TS if SEDC_APPLY=TRUE)"
         },
         "sedc_sr_ts": {
             "keyword": "sedc_sr_ts",
@@ -1872,7 +1872,7 @@
             "keyword": "geom_convergence_win",
             "option_type": "Integer",
             "level": "Intermediate",
-            "docstring": "The geometry energy optimization convergence criteria must be met for GEOM_CONVERGENCE_WIN iterations before acceptance.\nModifiable: restart and on the fly\nAllowed values: (any integer) >= 0\nDefault value : 2"
+            "docstring": "The geometry energy optimization convergence criteria must be met for GEOM_CONVERGENCE_WIN iterations before acceptance.\nModifiable: restart and on the fly\nAllowed values: (any integer) > 1\nDefault value : 2"
         },
         "geom_modulus_est": {
             "keyword": "geom_modulus_est",
@@ -2238,7 +2238,7 @@
             "keyword": "tssearch_method",
             "option_type": "String",
             "level": "Basic",
-            "docstring": "The search method used to locate transition states.\nModifiable: restart only\nAllowed values: LSTQST, conNEB, NEB\nDefault value : LSTQST"
+            "docstring": "The search method used to locate transition states.\nModifiable: restart only\nAllowed values: LSTQST,  NEB\nDefault value : LSTQST"
         },
         "tssearch_lstqst_protocol": {
             "keyword": "tssearch_lstqst_protocol",
@@ -2252,17 +2252,11 @@
             "level": "Intermediate",
             "docstring": "The maximum number of QST iterations during an LST/QST search.\nModifiable: restart and on the fly\nAllowed values: (any integer) > 0\nDefault value : 5"
         },
-        "tssearch_lst_max_iter": {
-            "keyword": "tssearch_lst_max_iter",
-            "option_type": "Integer",
-            "level": "Intermediate",
-            "docstring": "This is an OBSOLETE form - please use TSSEARCH_CG_MAX_ITER instead."
-        },
         "tssearch_cg_max_iter": {
             "keyword": "tssearch_cg_max_iter",
             "option_type": "Integer",
             "level": "Intermediate",
-            "docstring": "The maximum number of LST steps during an LST/QST search.\nModifiable: restart and on the fly\nAllowed values: (any integer) > 0\nDefault value : 20"
+            "docstring": "The maximum number of CG steps during an LST/QST search.\nModifiable: restart and on the fly\nAllowed values: (any integer) > 0\nDefault value : 20"
         },
         "tssearch_max_path_points": {
             "keyword": "tssearch_max_path_points",
@@ -2274,55 +2268,19 @@
             "keyword": "tssearch_force_tol",
             "option_type": "Physical",
             "level": "Basic",
-            "docstring": "Tolerance for accepting convergence of the maximum |ionic force| during QST search.\nModifiable: restart and on the fly\nAllowed values: (any) > 0.0\nDefault value : Same as GEOM_FORCE_TOL"
+            "docstring": "Tolerance for accepting convergence of the maximum |ionic force| during QST search.\nModifiable: restart and on the fly\nAllowed values: (any) > 0.0\nDefault value : 0.005 H/BOHR"
         },
         "tssearch_disp_tol": {
             "keyword": "tssearch_disp_tol",
             "option_type": "Physical",
             "level": "Basic",
-            "docstring": "Tolerance for accepting convergence of the maximum |ionic displacement| during QST search.\nModifiable: restart and on the fly\nAllowed values: (any) > 0.0\nDefault value : Same as GEOM_DISP_TOL"
+            "docstring": "Tolerance for accepting convergence of the maximum |ionic displacement| during QST search.\nModifiable: restart and on the fly\nAllowed values: (any) > 0.0\nDefault value : 0.01 BOHR"
         },
         "tssearch_energy_tol": {
             "keyword": "tssearch_energy_tol",
             "option_type": "Physical",
             "level": "Basic",
-            "docstring": "Tolerance for accepting convergence of the maximum energy difference during NEB search.\nModifiable: restart and on the fly\nAllowed values: (any) > 0.0\nDefault value : Same as GEOM_ENERGY_TOL"
-        },
-        "tssearch_neb_spring_constant": {
-            "keyword": "tssearch_neb_spring_constant",
-            "option_type": "Physical",
-            "level": "Basic",
-            "docstring": "Spring constant used between the beads in NEB search.\nModifiable: restart and on the fly\nAllowed values: (any) > 0.0\nDefault value : 0.1 eV/ANG**2"
-        },
-        "tssearch_neb_tangent_mode": {
-            "keyword": "tssearch_neb_tangent_mode",
-            "option_type": "String",
-            "level": "Basic",
-            "docstring": "Method used to calculate the tangents of the NEB.\nModifiable: restart and on the fly\nAllowed values: NONE, BISECT, HIGH_E, SPLINE\nDefault value : SPLINE"
-        },
-        "tssearch_neb_method": {
-            "keyword": "tssearch_neb_method",
-            "option_type": "String",
-            "level": "Intermediate",
-            "docstring": "Method used to optimize the NEB shape.\nModifiable: restart and on the fly\nAllowed values: TPSD, FIRE, ODE12R\nDefault value : ODE12R"
-        },
-        "tssearch_neb_max_iter": {
-            "keyword": "tssearch_neb_max_iter",
-            "option_type": "Integer",
-            "level": "Intermediate",
-            "docstring": "The maximum number of steps during NEB search.\nModifiable: restart and on the fly\nAllowed values: (any integer) > 0\nDefault value : 20"
-        },
-        "tssearch_neb_climbing": {
-            "keyword": "tssearch_neb_climbing",
-            "option_type": "Boolean (Logical)",
-            "level": "Basic",
-            "docstring": "If TRUE  then the central bead in NEB search climbs up the potential and  TSSEARCH_MAX_PATH_POINTS must be odd (may be increased by +1).\nIf FALSE then the central bead in NEB search slides down the potential.\nModifiable: restart only\nAllowed values: TRUE or FALSE\nDefault value: FALSE"
-        },
-        "tssearch_neb_normed": {
-            "keyword": "tssearch_neb_normed",
-            "option_type": "Boolean (Logical)",
-            "level": "Expert",
-            "docstring": "If TRUE  then the spring forces applied along the tangents in the NEB are normed to the displacement between beads.\nIf FALSE then the spring forces are projected along the tangents in the NEB and may result in null forces if  displacements are orthogonal to the NEB tangents.\nModifiable: restart only\nAllowed values: TRUE or FALSE\nDefault value: FALSE if TSSEARCH_NEB_TANGENT_MODE = SPLINE, TRUE otherwise"
+            "docstring": "Tolerance for accepting convergence of the maximum energy difference during NEB search.\nModifiable: restart and on the fly\nAllowed values: (any) > 0.0\nDefault value : 0.00002 HARTREE"
         },
         "phonon_const_basis": {
             "keyword": "phonon_const_basis",
@@ -2376,13 +2334,13 @@
             "keyword": "phonon_dos_spacing",
             "option_type": "Physical",
             "level": "Basic",
-            "docstring": "The resolution at which a phonon density-of-states will be calculated.\nModifiable: restart and on the fly\nAllowed values: (any) > 0.0\nDefault value : 10.0 CM-1"
+            "docstring": "The resolution at which a phonon density-of-states will be calculated.\nModifiable: restart and on the fly\nAllowed values: (any) > 0.0\nDefault value : 10.0 CM^-1"
         },
         "phonon_dos_limit": {
             "keyword": "phonon_dos_limit",
             "option_type": "Physical",
             "level": "Basic",
-            "docstring": "The largest phonon to be included in a phonon density-of-states calculation.\nModifiable: restart and on the fly\nAllowed values: (any) > PHONON_DOS_SPACING\nDefault value : 5000.0 CM-1"
+            "docstring": "The largest phonon to be included in a phonon density-of-states calculation.\nModifiable: restart and on the fly\nAllowed values: (any) > PHONON_DOS_SPACING\nDefault value : 5000.0 CM^-1"
         },
         "phonon_finite_disp": {
             "keyword": "phonon_finite_disp",
@@ -2490,7 +2448,7 @@
             "keyword": "raman_method",
             "option_type": "String",
             "level": "Intermediate",
-            "docstring": "Selects the method for applying 2n+1 solver for Raman tensor calculation.\nModifiable: restart only\nAllowed values: DFPT or FINITEDISPLACEMENT\nDefault value : DFPT"
+            "docstring": "Selects the method for applying 2n+1 solver for Raman tensor calculation.\nModifiable: restart only\nAllowed values: DFPT or FINITEDISPLACEMENT\nDefault value : FINITEDISPLACEMENT"
         },
         "phonon_write_force_constants": {
             "keyword": "phonon_write_force_constants",
@@ -2550,7 +2508,7 @@
             "keyword": "efield_freq_spacing",
             "option_type": "Physical",
             "level": "Intermediate",
-            "docstring": "Spacing of frequencies in calculation of frequency-dependent permittivity.\nModifiable: restart and on the fly\nAllowed values: (any) > 0.0\nDefault value : 1.0 CM-1"
+            "docstring": "Spacing of frequencies in calculation of frequency-dependent permittivity.\nModifiable: restart and on the fly\nAllowed values: (any) > 0.0\nDefault value : 1.0 cm^-1"
         },
         "efield_oscillator_q": {
             "keyword": "efield_oscillator_q",
@@ -2694,13 +2652,13 @@
             "keyword": "magres_convergence_win",
             "option_type": "Integer",
             "level": "Intermediate",
-            "docstring": "This is an OBSOLETE form - please use DFPT_CONVERGENCE_WIN instead."
+            "docstring": "The magres convergence criteria must be met for MAGRES_CONVERGENCE_WIN iterations before acceptance.\nModifiable: restart and on the fly\nAllowed values: (any integer) >= 2\nDefault value : 2"
         },
         "magres_conv_tol": {
             "keyword": "magres_conv_tol",
             "option_type": "Physical",
-            "level": "Intermediate",
-            "docstring": "This is an OBSOLETE form - please use DFPT_EIGENVALUE_TOL instead."
+            "level": "Basic",
+            "docstring": "Energy tolerance for accepting convergence during magres calculation.\nThe difference between max and min energy values over MAGRES_CONVERGENCE_WIN iterations must be less than this.\nModifiable: restart and on the fly\nAllowed values: (any) > 0.0\nDefault value : 10^-12 eV if MAGRES_METHOD=CRYSTAL or 10^-9 eV otherwise"
         },
         "magres_xc_functional": {
             "keyword": "magres_xc_functional",
@@ -2731,18 +2689,6 @@
             "option_type": "Boolean (Logical)",
             "level": "Intermediate",
             "docstring": "Specifies whether or not to write out the induced current to file.\nModifiable: restart and on the fly\nAllowed values: TRUE or FALSE\nDefault value : FALSE"
-        },
-        "dfpt_convergence_win": {
-            "keyword": "dfpt_convergence_win",
-            "option_type": "Integer",
-            "level": "Intermediate",
-            "docstring": "The Sternheimer convergence criteria must be met for DFPT_CONVERGENCE_WIN iterations  before acceptance.\nModifiable: restart and on the fly\nAllowed values: (any integer) >= 2\nDefault value : 2"
-        },
-        "dfpt_eigenvalue_tol": {
-            "keyword": "dfpt_eigenvalue_tol",
-            "option_type": "Physical",
-            "level": "Intermediate",
-            "docstring": "Energy tolerance for accepting convergence during DFPT calculation using Sternheimer solver.\nThe difference between max and min energy values over DFPT_CONVERGENCE_WIN iterations must be less than this.\nModifiable: restart and on the fly\nAllowed values: (any) > 0.0\nDefault value : 10^-12 eV if MAGRES_METHOD=CRYSTAL or 10^-9 eV otherwise"
         },
         "elnes_nextra_bands": {
             "keyword": "elnes_nextra_bands",
@@ -3042,7 +2988,7 @@
             "keyword": "implicit_solvent_surface_tension",
             "option_type": "Physical",
             "level": "Intermediate",
-            "docstring": "Specifies surface tension of the solvent used in apolar term in dielectric embedding / implicit solvent.\nModifiable: restart\nAllowed values: (any) >0.0\nDefault value : 4.7624E-5 Ha/Bohr**2 (RTP water)"
+            "docstring": "Specifies surface tension of the solvent used in apolar term in dielectric embedding / implicit solvent.\nModifiable: restart\nAllowed values: (any) >0.0\nDefault value : 4.7624E-5 Ha/bohr^2 (RTP water)"
         },
         "implicit_solvent_apolar_factor": {
             "keyword": "implicit_solvent_apolar_factor",
@@ -3114,7 +3060,7 @@
             "keyword": "deltascf_excite",
             "option_type": "Boolean (Logical)",
             "level": "Basic",
-            "docstring": "Specify whether to enforce excitaion constraint on top of DFT+U(MO) deltaSCF method.?\nModifiable: restart\nAllowed values: TRUE or FALSE\nDefault value : TRUE"
+            "docstring": "Specify whether to enforce excitaion constraint on top of DFT+U(MO) deltaSCF method.?\nModifiable: restart\nAllowed values: TRUE or FALSE\nDefault value : FALSE"
         },
         "deltascf_smearing": {
             "keyword": "deltascf_smearing",
@@ -3140,18 +3086,6 @@
             "level": "Basic",
             "docstring": "List of Kohn-Sham states contained in DELTASCF_CHECKPOINT file that whose occupation\nwill be constrained to generate deltaSCF state. Multiple states can be constrained.\nFor SIMPLE mode: <# state> <occ> <spin> <from band> <to band>\nFor DFT+U(MO) mode: <# state> <occ> <spin> <U in eV> <excite>\nFor LINEAR EXPANSION mode: <# state> <occ> <spin>\nModifiable: restart\nAllowed values: block keyword: see above for format.\nDefault value : NULL"
         },
-        "socket_host": {
-            "keyword": "socket_host",
-            "option_type": "String",
-            "level": "Basic",
-            "docstring": "Address or IP address of the host to which the socket connection must be established.\nModifiable: restart or on the fly\nAllowed values: up to 255 character address\nDefault value : localhost"
-        },
-        "socket_port": {
-            "keyword": "socket_port",
-            "option_type": "Integer",
-            "level": "Basic",
-            "docstring": "Port on which the socket connection must be established.\nModifiable: restart or on the fly\nAllowed values: 0 < SOCKET_PORT < 65536\nDefault value : 3141"
-        },
         "devel_code": {
             "keyword": "devel_code",
             "option_type": "Block",
@@ -3160,21 +3094,21 @@
         }
     },
     "types": [
-        "Defined",
-        "Boolean (Logical)",
-        "Block",
         "Real",
-        "Integer",
+        "Defined",
         "Real Vector",
+        "Block",
+        "Boolean (Logical)",
         "String",
         "Physical",
-        "Integer Vector"
+        "Integer Vector",
+        "Integer"
     ],
     "levels": [
-        "Dummy",
         "Basic",
         "Expert",
+        "Dummy",
         "Intermediate"
     ],
-    "castep_version": 23.1
+    "castep_version": 21.1
 }

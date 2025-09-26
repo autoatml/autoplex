@@ -8,6 +8,8 @@ from dataclasses import dataclass, field
 from ase.calculators.calculator import PropertyNotImplementedError
 from ase.calculators.castep import Castep
 from ase.io import read
+from ase.stress import voigt_6_to_full_3x3_stress
+from ase.units import GPa
 from autoplex.settings import SETTINGS
 from jobflow import Maker, job
 from pymatgen.core import Structure
@@ -159,7 +161,7 @@ class BaseCastepMaker(Maker):
             forces = None
 
         try:
-            stress = atoms.get_stress()
+            stress = voigt_6_to_full_3x3_stress(atoms.get_stress() * -10 / GPa)
         except PropertyNotImplementedError:
             stress = None
 
@@ -173,7 +175,6 @@ class BaseCastepMaker(Maker):
                              energy=final_energy,
                              forces=forces,
                              stress = stress)
-                             #n_steps=atoms.calc.n_steps)
         )
 
 

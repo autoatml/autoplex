@@ -55,14 +55,6 @@ class OutputDoc(BaseModel):
         None, description="The stress on the cell in units of kbar."
     )
 
-    elapsed_time: float | None = Field(
-        None, description="The time taken to run the CASTEP calculation in seconds."
-    )
-
-    n_steps: int | None = Field(
-        None, description="total number of steps needed in the relaxation."
-    )
-
 
 class TaskDoc(StructureMetadata):
     """Document containing information on structure manipulation using CASTEP."""
