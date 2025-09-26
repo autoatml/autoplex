@@ -38,9 +38,9 @@ Reference:
 from __future__ import annotations
 
 import logging
+import shutil
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Final, Literal
-import shutil
 
 from jobflow import CURRENT_JOB
 from monty.os.path import zpath as monty_zpath
