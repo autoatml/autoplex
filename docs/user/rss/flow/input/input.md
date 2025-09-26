@@ -150,7 +150,7 @@ Please note that the commands to run CASTEP are set via SETTINGS of autoplex as 
 is currently not integrated into atomate2. 
 
 Typically, one uses a `.autoplex.yaml` file to define a `CASTEP_CMD`. 
-Within the `.bashrc`, one then include a `AUTOPLEX_CONFIG_FILE=/yourpath/.autoplex.yaml` statement. 
+Within the `.bashrc`, one then includes a `AUTOPLEX_CONFIG_FILE=/yourpath/.autoplex.yaml` statement. 
 It is also possible to export the `AUTOPLEX_CASTEP_CMD=castep_binary_name` directly.
 
 ```python
