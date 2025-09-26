@@ -189,7 +189,7 @@ class RssMaker(Maker):
         dft_ref_file: str
             Reference file for DFT data. Default is 'dft_ref.extxyz'.
         config_types: list[str]
-            Configuration types for the DF calculations. Default is None.
+            Configuration types for the DFT calculations. Default is None.
         rss_group: list[str] | str
             Group name for RSS to setting up regularization.
         test_ratio: float
