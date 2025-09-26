@@ -40,6 +40,7 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Final, Literal
+import shutil
 
 from jobflow import CURRENT_JOB
 from monty.os.path import zpath as monty_zpath
@@ -177,8 +178,6 @@ def clear_castep_inputs() -> None:
 
 def copy_castep_outputs(ref_path: str | Path) -> None:
     """Copy castep output files from the reference directory."""
-    import shutil
-
     output_path = Path(ref_path) / "outputs"
     for output_file in output_path.iterdir():
         if output_file.is_file():

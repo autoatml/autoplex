@@ -101,12 +101,9 @@ class AutoplexBaseModel(BaseModel):
 
 
 class AutoplexSettings(BaseModel):
-    """Model describing the castep-related commands"""
-
-    CASTEP_CMD: str = Field(default="castep", description="command to run castep.")
-    CASTEP_KEYWORDS: Path = Field(
-        default=Path(__file__).parent / "misc" / "castep" / "castep_keywords.json"
-    )
+    """Model describing the castep-related commands."""
+    CASTEP_CMD: str =Field(default="castep", description="command to run castep.")
+    CASTEP_KEYWORDS: Path =Field(default=Path(__file__).parent / "misc"/"castep"/"castep_keywords.json")
 
 
 class GAPGeneralSettings(AutoplexBaseModel):
