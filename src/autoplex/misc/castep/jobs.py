@@ -49,7 +49,7 @@ def castep_job(method: Callable) -> job:
     :obj:`.TaskDoc`.
 
     Any makers that return CASTEP jobs (not flows) should decorate the ``make`` method
-    with @vasp_job. For example:
+    with @castep_job. For example:
 
     .. code-block:: python
 
