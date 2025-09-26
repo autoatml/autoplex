@@ -2,21 +2,18 @@
 
 from __future__ import annotations
 
-import warnings
 import logging
+import warnings
 from pathlib import Path
 from typing import Any, Literal
-from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import Field, model_validator
 
 import numpy as np  # noqa: TC002
 from monty.json import MontyDecoder, jsanitize
 from monty.serialization import loadfn
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from torch.optim import Optimizer  # noqa: TC002
 from torch.optim.lr_scheduler import LRScheduler  # noqa: TC002
-from atomate2.settings import Atomate2Settings
-
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
@@ -35,8 +32,9 @@ __all__ = [
     "RssConfig",
 ]
 
-_DEFAULT_CONFIG_FILE_PATH="~/.autoplex.yaml"
+_DEFAULT_CONFIG_FILE_PATH = "~/.autoplex.yaml"
 _ENV_PREFIX = "autoplex_"
+
 
 class AutoplexBaseModel(BaseModel):
     """Base class for all models in autoplex."""
@@ -167,7 +165,6 @@ class AutoplexSettings(BaseSettings):
             )
 
         return new_values | values
-
 
 
 class GAPGeneralSettings(AutoplexBaseModel):
