@@ -35,9 +35,9 @@ The documentation also contains tutorials that teach you how to use `autoplex` f
 
 ## What to cite?
 
-Please cite our preprint on the random-structure searches (RSS) performed with `autoplex`:
+Please cite our publication introducing `autoplex`:
 
-[Y. Liu, J. D. Morrow, C. Ertural, N. L. Fragapane, J. L. A. Gardner, A. A. Naik, Y. Zhou, J. George, V. L. Deringer, 2024, DOI 10.48550/arXiv.2412.16736](https://arxiv.org/abs/2412.16736).
+[Y. Liu, J. D. Morrow, C. Ertural, N. L. Fragapane, J. L. A. Gardner, A. A. Naik, Y. Zhou, J. George, V. L. Deringer, Nat Commun 16, 7666 (2025). https://doi.org/10.1038/s41467-025-62510-6](https://doi.org/10.1038/s41467-025-62510-6).
 
 
 Please additionally cite all relevant software we rely on within `autoplex` and specific workflows. Please take a look below and check out the corresponding links.
