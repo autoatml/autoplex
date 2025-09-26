@@ -120,6 +120,12 @@ DFT calculations can be carried out with either VASP or CASTEP. We provide below
 Since VASP is the default DFT code, its parameters only need to be specified with the `BaseVaspMaker` if you want to override the default settings. If you want to use CASTEP, you must specify a `CastepStaticMaker` in the input script.
 
 (i) Example input script using VASP.
+
+Please note that the commands to run VASP are set via SETTINGS of atomate2. 
+Typically, one uses a `.atomate2.yaml` file to define a `VASP_CMD`. 
+Within the `.bashrc`, one then include a `ATOMATE2_CONFIG_FILE=/yourpath/.autoplex.yaml`
+statement. However, one can also directly export the variable `ATOMATE2_VASP_CMD=vasp_binary_name`. 
+
 ```python
 from autoplex.settings import RssConfig
 from autoplex.auto.rss.flows import RssMaker
@@ -138,7 +144,15 @@ vasp_maker = StaticMaker(
 )
 ```
 
-(ii) Example input script using VASP.
+(ii) Example input script using CASTEP.
+
+Please note that the commands to run CASTEP are set via SETTINGS of autoplex as CASTEP
+is currently not integrated into atomate2. 
+
+Typically, one uses a `.autoplex.yaml` file to define a `CASTEP_CMD`. 
+Within the `.bashrc`, one then include a `AUTOPLEX_CONFIG_FILE=/yourpath/.autoplex.yaml` statement. 
+It is also possible to export the `AUTOPLEX_CASTEP_CMD=castep_binary_name` directly.
+
 ```python
 from autoplex.settings import RssConfig
 from autoplex.auto.rss.flows import RssMaker
