@@ -48,8 +48,6 @@ from monty.os.path import zpath as monty_zpath
 import autoplex.misc.castep.jobs
 from autoplex.misc.castep.utils import CastepStaticSetGenerator
 
-# import atomate2.castep.run
-
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator, Sequence
 
