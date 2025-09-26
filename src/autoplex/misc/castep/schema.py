@@ -27,7 +27,9 @@ from pymatgen.core.structure import Structure
 class InputDoc(BaseModel):
     """The inputs used to run this job."""
 
-    input_set: dict | None = Field(None, description="Input set describing the input for CASTEP.")
+    input_set: dict | None = Field(
+        None, description="Input set describing the input for CASTEP."
+    )
 
 
 class OutputDoc(BaseModel):
@@ -38,7 +40,7 @@ class OutputDoc(BaseModel):
     energy_per_atom: float | None = Field(
         None,
         description="Energy per atom of the final molecule or structure "
-                    "in units of eV/atom.",
+        "in units of eV/atom.",
     )
 
     forces: list[Vector3D] | None = Field(

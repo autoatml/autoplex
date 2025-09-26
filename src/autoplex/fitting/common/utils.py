@@ -59,6 +59,7 @@ from autoplex.data.common.utils import (
     rms_dict,
     stratified_dataset_split,
 )
+
 try:
     from calorine.nep import read_loss, write_nepfile, write_structures
 except SyntaxError:

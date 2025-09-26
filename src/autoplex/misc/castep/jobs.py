@@ -4,35 +4,32 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
 
 from ase.calculators.calculator import PropertyNotImplementedError
 from ase.calculators.castep import Castep
 from ase.io import read
 from ase.stress import voigt_6_to_full_3x3_stress
 from ase.units import GPa
-from autoplex.settings import SETTINGS
 from jobflow import Maker, job
 from pymatgen.core import Structure
 from pymatgen.io.ase import AseAtomsAdaptor
 
 from autoplex.misc.castep.run import run_castep
+from autoplex.misc.castep.schema import InputDoc, OutputDoc, TaskDoc
 from autoplex.misc.castep.utils import (
     CastepInputGenerator,
     CastepStaticSetGenerator,
     gzip_castep_outputs,
 )
-from autoplex.misc.castep.schema import TaskDoc, InputDoc, OutputDoc
-from typing import TYPE_CHECKING
-
+from autoplex.settings import SETTINGS
 
 if TYPE_CHECKING:
     from collections.abc import Callable
 
 # add larger objects to the database in the future, e.g., band structures
-_DATA_OBJECTS=[]
+_DATA_OBJECTS = []
 
-
-from ase.calculators.castep import Castep
 
 def castep_job(method: Callable) -> job:
     """
@@ -67,7 +64,6 @@ def castep_job(method: Callable) -> job:
         A decorated version of the make function that will generate Castep jobs.
     """
     return job(method, data=_DATA_OBJECTS, output_schema=TaskDoc)
-
 
 
 @dataclass
@@ -109,18 +105,25 @@ class BaseCastepMaker(Maker):
         input_set = self.input_set_generator.get_input_set(structure)
 
         atoms = AseAtomsAdaptor().get_atoms(structure)
-        from ase.calculators.castep import CastepKeywords
         import json
+
+        from ase.calculators.castep import CastepKeywords
+
         with open(SETTINGS.castep_keywords) as fd:
             kwdata = json.load(fd)
         from ase.calculators.castep import make_cell_dict, make_param_dict
-        # This is a bit awkward, but it's necessary for backwards compatibility
-        param_dict = make_param_dict(kwdata['param'])
-        cell_dict = make_cell_dict(kwdata['cell'])
 
-        castep_keywords = CastepKeywords(param_dict, cell_dict,
-                                         kwdata['types'], kwdata['levels'],
-                                         kwdata['castep_version'])
+        # This is a bit awkward, but it's necessary for backwards compatibility
+        param_dict = make_param_dict(kwdata["param"])
+        cell_dict = make_cell_dict(kwdata["cell"])
+
+        castep_keywords = CastepKeywords(
+            param_dict,
+            cell_dict,
+            kwdata["types"],
+            kwdata["levels"],
+            kwdata["castep_version"],
+        )
 
         calc = Castep(
             keyword_tolerance=0,
@@ -148,12 +151,11 @@ class BaseCastepMaker(Maker):
         atoms = read(os.path.join(workdir, "castep.castep"))
         gzip_castep_outputs(workdir=workdir)
 
-
         # should pass the final structure!
         final_structure = AseAtomsAdaptor().get_structure(atoms)
-        final_energy= atoms.get_potential_energy()
-        #stress= None
-        #atoms.get_stress()
+        final_energy = atoms.get_potential_energy()
+        # stress= None
+        # atoms.get_stress()
 
         try:
             forces = atoms.get_forces()
@@ -170,11 +172,13 @@ class BaseCastepMaker(Maker):
             dir_name=workdir,
             task_label=self.name,
             input=InputDoc(input_set=input_set),
-            output=OutputDoc(structure=final_structure,
-                             energy_per_atom=final_energy / len(final_structure),
-                             energy=final_energy,
-                             forces=forces,
-                             stress = stress)
+            output=OutputDoc(
+                structure=final_structure,
+                energy_per_atom=final_energy / len(final_structure),
+                energy=final_energy,
+                forces=forces,
+                stress=stress,
+            ),
         )
 
 
