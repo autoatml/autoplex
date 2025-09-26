@@ -1,7 +1,7 @@
 """Settings for autoplex."""
 
 from __future__ import annotations
-
+from monty.serialization import loadfn
 import warnings
 import logging
 from pathlib import Path
@@ -140,7 +140,6 @@ class AutoplexSettings(BaseSettings):
 
         This allows setting of the config file path through environment variables.
         """
-        from monty.serialization import loadfn
 
         config_file_path = values.get(key := "CONFIG_FILE", _DEFAULT_CONFIG_FILE_PATH)
         env_var_name = f"{_ENV_PREFIX.upper()}{key}"
