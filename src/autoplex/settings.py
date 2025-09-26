@@ -138,7 +138,6 @@ class AutoplexSettings(BaseSettings):
 
         This allows setting of the config file path through environment variables.
         """
-
         config_file_path = values.get(key := "CONFIG_FILE", _DEFAULT_CONFIG_FILE_PATH)
         env_var_name = f"{_ENV_PREFIX.upper()}{key}"
         config_file_path = Path(config_file_path).expanduser()
