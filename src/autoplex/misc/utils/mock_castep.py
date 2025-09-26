@@ -94,7 +94,7 @@ def monkeypatch_castep(
        ref_paths is the dictionary created in step 3.
     5. Run your castep job after calling `mock_castep`.
 
-    For examples, see the tests in tests/castep/jobs/core.py.
+    For examples, see the tests in tests/misc/castep/test_jobs.py.
     """
 
     def mock_run_castep(*args, **kwargs) -> None:
