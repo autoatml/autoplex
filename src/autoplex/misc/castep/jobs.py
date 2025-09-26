@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass, field
 
+from ase.calculators.calculator import PropertyNotImplementedError
 from ase.calculators.castep import Castep
 from ase.io import read
 from autoplex.settings import SETTINGS
@@ -149,6 +150,18 @@ class BaseCastepMaker(Maker):
         # should pass the final structure!
         final_structure = AseAtomsAdaptor().get_structure(atoms)
         final_energy= atoms.get_potential_energy()
+        #stress= None
+        #atoms.get_stress()
+
+        try:
+            forces = atoms.get_forces()
+        except PropertyNotImplementedError:
+            forces = None
+
+        try:
+            stress = atoms.get_stress()
+        except PropertyNotImplementedError:
+            stress = None
 
         return TaskDoc(
             structure=final_structure,
@@ -158,8 +171,8 @@ class BaseCastepMaker(Maker):
             output=OutputDoc(structure=final_structure,
                              energy_per_atom=final_energy / len(final_structure),
                              energy=final_energy,
-                             forces=atoms.get_forces())
-                             #stress=atoms.get_stress()*-10.0,
+                             forces=forces,
+                             stress = stress)
                              #n_steps=atoms.calc.n_steps)
         )
 

@@ -3,6 +3,14 @@
 This code is adapted from
 `atomate2/src/atomate2/utils/testing/aims.py`.
 
+The code has been released under BSD 3-Clause License
+and the following copyright applies:
+atomate2 Copyright (c) 2015, The Regents of the University of
+California, through Lawrence Berkeley National Laboratory (subject
+to receipt of any required approvals from the U.S. Dept. of Energy).
+All rights reserved.
+
+
 Reference:
 @article{ganose2025_atomate2,
         title = {Atomate2: modular workflows for materials science},

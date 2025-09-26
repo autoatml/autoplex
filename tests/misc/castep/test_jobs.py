@@ -86,7 +86,7 @@ def test_CastepStaticMaker(test_dir, memory_jobstore, mock_castep):
 
     dict_static = static_job.output.resolve(memory_jobstore)
 
-    assert abs(-329.6079168446 - dict_static["energy"]) < 1e-4
+    assert abs(-329.6079168446 - dict_static.output.energy) < 1e-4
 
     for d in glob.glob("job_*") + glob.glob("CASTEP*"):
         shutil.rmtree(d, ignore_errors=True)

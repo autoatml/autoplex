@@ -1,12 +1,34 @@
+"""Document Schema for CASTEP
+
+The following code has been taken and modified from
+https://github.com/materialsproject/atomate2/blob/main/src/atomate2/ase/schemas.py
+
+The code has been released under BSD 3-Clause License
+and the following copyright applies:
+atomate2 Copyright (c) 2015, The Regents of the University of
+California, through Lawrence Berkeley National Laboratory (subject
+to receipt of any required approvals from the U.S. Dept. of Energy).
+All rights reserved.
+
+The original schema definitions there haven been taken and generalized to
+generic ASE calculators from
+https://github.com/materialsvirtuallab/m3gnet
+The code has been released under BSD 3-Clause License
+and the following copyright applies:
+Copyright (c) 2022, Materials Virtual Lab.
+"""
+
+from emmet.core.math import Matrix3D, Vector3D
 from emmet.core.structure import StructureMetadata
 from pydantic import BaseModel, Field
 from pymatgen.core.structure import Structure
-from emmet.core.math import Matrix3D, Vector3D
-from atomate2.ase.schemas import IonicStep
+
+
 class InputDoc(BaseModel):
     """The inputs used to run this job."""
 
-    input_set: dict|None = Field(None, description="Input set describing the input for CASTEP.")
+    input_set: dict | None = Field(None, description="Input set describing the input for CASTEP.")
+
 
 class OutputDoc(BaseModel):
     """The outputs of this job."""
@@ -16,7 +38,7 @@ class OutputDoc(BaseModel):
     energy_per_atom: float | None = Field(
         None,
         description="Energy per atom of the final molecule or structure "
-        "in units of eV/atom.",
+                    "in units of eV/atom.",
     )
 
     forces: list[Vector3D] | None = Field(
@@ -33,21 +55,13 @@ class OutputDoc(BaseModel):
         None, description="The stress on the cell in units of kbar."
     )
 
-    # NOTE: the ionic_steps can also be a dict when these are in blob storage and
-    #       retrieved as objects.
-    ionic_steps: list[IonicStep] | dict | None = Field(
-        None, description="Step-by-step trajectory of the relaxation."
-    )
-
     elapsed_time: float | None = Field(
-        None, description="The time taken to run the ASE calculation in seconds."
+        None, description="The time taken to run the CASTEP calculation in seconds."
     )
 
     n_steps: int | None = Field(
         None, description="total number of steps needed in the relaxation."
     )
-
-
 
 
 class TaskDoc(StructureMetadata):
@@ -71,6 +85,3 @@ class TaskDoc(StructureMetadata):
     dir_name: str | None = Field(
         None, description="Directory where the ASE calculations are performed."
     )
-
-
-
