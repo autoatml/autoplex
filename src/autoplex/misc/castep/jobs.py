@@ -17,15 +17,17 @@ from ase.calculators.castep import (
 from ase.io import read
 from ase.stress import voigt_6_to_full_3x3_stress
 from ase.units import GPa
+from atomate2.common.files import gzip_files
 from jobflow import Maker, job
 from pymatgen.io.ase import AseAtomsAdaptor
 
 from autoplex.misc.castep.run import run_castep
 from autoplex.misc.castep.schema import InputDoc, OutputDoc, TaskDoc
 from autoplex.misc.castep.utils import (
+    CASTEP_INPUT_FILES,
+    CASTEP_OUTPUT_FILES,
     CastepInputGenerator,
     CastepStaticSetGenerator,
-    gzip_castep_outputs,
 )
 from autoplex.settings import SETTINGS
 
@@ -36,6 +38,7 @@ if TYPE_CHECKING:
 
 # add larger objects to the database in the future, e.g., band structures
 _DATA_OBJECTS = []
+_FILES_TO_ZIP = [*CASTEP_INPUT_FILES, *CASTEP_OUTPUT_FILES]
 
 
 def castep_job(method: Callable) -> job:
@@ -164,7 +167,7 @@ class BaseCastepMaker(Maker):
 
         workdir = os.path.join(os.getcwd(), "CASTEP")
         atoms = read(os.path.join(workdir, "castep.castep"))
-        gzip_castep_outputs(workdir=workdir)
+        gzip_files(directory=workdir, include_files=_FILES_TO_ZIP, allow_missing=True)
 
         # should pass the final structure!
         final_structure = AseAtomsAdaptor().get_structure(atoms)

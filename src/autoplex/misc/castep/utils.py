@@ -2,14 +2,37 @@
 
 from __future__ import annotations
 
-import gzip
-import os
-import shutil
 from copy import deepcopy
 from dataclasses import dataclass, field
-from pathlib import Path
 
 from pymatgen.core import Structure
+
+CASTEP_INPUT_FILES = [
+    "*.cell",
+    "*.param",
+    "*.usp",
+    "*.recpot",
+    "castep_keywords.json",
+]
+
+CASTEP_OUTPUT_FILES = [
+    "*.castep",
+    "*.castep_bin",
+    "*.cst_esp",
+    "*.check",
+    "*.geom",
+    "*.md",
+    "*.bands",
+    "*.bib",
+    "*.phonon",
+    "*.elf",
+    "*.chdiff",
+    "*.den_fmt",
+    "*.pot_fmt",
+    "*.wvfn_fmt",
+    "final_atoms_object.xyz",
+    "final_atoms_object.traj",
+]
 
 
 @dataclass
@@ -195,62 +218,3 @@ class CastepStaticSetGenerator(CastepInputGenerator):
         return {
             "kpoints_mp_spacing": "0.04",
         }
-
-
-def gzip_castep_outputs(
-    workdir: str | Path | None = None,
-    glob_patterns: list[str] | None = None,
-    remove_originals: bool = True,
-) -> list[str]:
-    """
-    Gzip CASTEP input/output files to save disk space.
-
-    Parameters
-    ----------
-    workdir : str | Path | None
-        Directory to search for files.
-    glob_patterns : list[str] | None
-        Glob patterns for files to compress.
-    remove_originals : bool
-        Whether to remove original files after compression.
-    """
-    workdir = Path(workdir or os.getcwd())
-    if glob_patterns is None:
-        _CASTEP_INPUT_FILES = [
-            "*.cell",
-            "*.param",
-            "*.usp",
-            "*.recpot",
-            "castep_keywords.json",
-        ]
-
-        _CASTEP_OUTPUT_FILES = [
-            "*.castep",
-            "*.castep_bin",
-            "*.cst_esp",
-            "*.check",
-            "*.geom",
-            "*.md",
-            "*.bands",
-            "*.bib",
-            "*.phonon",
-            "*.elf",
-            "*.chdiff",
-            "*.den_fmt",
-            "*.pot_fmt",
-            "*.wvfn_fmt",
-            "final_atoms_object.xyz",
-            "final_atoms_object.traj",
-        ]
-
-        glob_patterns = _CASTEP_INPUT_FILES + _CASTEP_OUTPUT_FILES
-
-    for pat in glob_patterns:
-        for filepath in workdir.glob(pat):
-            if not filepath.is_file():
-                continue
-            gz_path = filepath.with_suffix(filepath.suffix + ".gz")
-            with open(filepath, "rb") as f_in, gzip.open(gz_path, "wb") as f_out:
-                shutil.copyfileobj(f_in, f_out)
-            if remove_originals and os.path.isfile(filepath):
-                os.remove(filepath)
