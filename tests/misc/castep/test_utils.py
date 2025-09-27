@@ -1,7 +1,7 @@
 import gzip
 from ase import Atoms
 from pymatgen.io.ase import AseAtomsAdaptor
-from autoplex.misc.castep.utils import CastepStaticSetGenerator, gzip_castep_outputs
+from autoplex.misc.castep.utils import CastepStaticSetGenerator
 
 
 def test_CastepStaticSetGenerator():
@@ -23,19 +23,3 @@ def test_CastepStaticSetGenerator():
     assert "kpoints_mp_spacing" in input_set["cell"]
 
     assert input_set["structure"].composition.formula == "Si1"
-
-
-def test_gzip_castep_outputs(tmp_path):
-    test_file = tmp_path / "test.castep"
-    with open(test_file, "w") as f:
-        f.write("dummy CASTEP output")
-
-    gzip_castep_outputs(workdir=tmp_path)
-
-    gz_path = tmp_path / "test.castep.gz"
-
-    assert gz_path.exists()
-
-    with gzip.open(gz_path, "rt") as f:
-        content = f.read()
-    assert "dummy CASTEP output" in content

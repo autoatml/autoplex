@@ -11,7 +11,7 @@ import shutil
 import glob
 
 
-def test_DFTStaticLabelling_with_castep(memory_jobstore, mock_castep):
+def test_DFTStaticLabelling_with_castep(memory_jobstore, mock_castep, clean_dir):
     
     ref_paths = {
         "static_bulk_0": "CASTEP_bulk1",
@@ -66,7 +66,3 @@ def test_DFTStaticLabelling_with_castep(memory_jobstore, mock_castep):
     config_types = [at.info['config_type'] for at in atoms]
     
     assert len(config_types) == 2
-    
-    for d in glob.glob("job_*"):
-        shutil.rmtree(d, ignore_errors=True)
-        

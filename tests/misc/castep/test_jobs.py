@@ -10,7 +10,7 @@ import glob
 from ase.build import bulk
 
 
-def test_BaseCastepMaker(test_dir, memory_jobstore, mock_castep):
+def test_BaseCastepMaker(test_dir, memory_jobstore, mock_castep, clean_dir):
     
     ref_paths = {
         "test_castep": "CASTEP_bulk1"
@@ -47,11 +47,8 @@ def test_BaseCastepMaker(test_dir, memory_jobstore, mock_castep):
     
     assert abs(-329.6080395967 - dict_castep.output.energy) < 1e-4
     
-    for d in glob.glob("job_*") + glob.glob("CASTEP*"):
-        shutil.rmtree(d, ignore_errors=True)
-    
 
-def test_CastepStaticMaker(test_dir, memory_jobstore, mock_castep):
+def test_CastepStaticMaker(test_dir, memory_jobstore, mock_castep, clean_dir):
     
     ref_paths = {
         "test_static": "CASTEP_bulk1"
@@ -88,6 +85,3 @@ def test_CastepStaticMaker(test_dir, memory_jobstore, mock_castep):
 
     assert abs(-329.6080395967 - dict_static.output.energy) < 1e-4
     assert abs(585.86621 - dict_static.output.stress[0][0]) < 1e-4
-    for d in glob.glob("job_*") + glob.glob("CASTEP*"):
-        shutil.rmtree(d, ignore_errors=True)
-        
