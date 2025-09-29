@@ -6,7 +6,7 @@
  tstress = .true.
  outdir = './OUT/'
  disk_io = 'none'
- pseudo_dir = '/path/to/directory/PSEUDO'
+ pseudo_dir = '/leonardo/home/userexternal/apacini0/PSEUDO'
  max_seconds = 86000
 /
 
@@ -43,5 +43,3 @@ C  12.011 C.pbe-n-kjpaw_psl.1.0.0.UPF
 O  15.999 O.pbe-n-kjpaw_psl.1.0.0.UPF
 H  2.016  H.pbe-kjpaw_psl.1.0.0.UPF
 
-K_POINTS automatic
-4 4 4 1 1 1
