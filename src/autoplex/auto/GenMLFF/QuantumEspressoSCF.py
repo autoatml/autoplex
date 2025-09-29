@@ -51,6 +51,81 @@ def qe_params_from_config(config: dict):
 
     return params
 
+
+def run_qe(command, fname_pwi, fname_pwo):
+    """
+    Run the QE command in a subprocess. Execute one QuantumEspresso calculation on the current input file.
+    """
+    #Assemble QE command
+    run_cmd = f"{command} < {fname_pwi} >> {fname_pwo}"
+
+    success = False
+    try:        
+        # Launch QE and wait till ending
+        subprocess.run(run_cmd, shell=True, check=True, executable="/bin/bash")
+        
+        success = True
+    
+    except subprocess.CalledProcessError as e:
+        
+        success = False
+
+    return success
+
+def lock_input(pwi_fname, worker_id):
+    
+    pwi_lock_fname = ""
+    #Check if pwo exists
+    pwo_fname = pwi_fname.replace('.pwi', '.pwo')
+    if os.path.exists(pwo_fname): return pwi_lock_fname, pwo_fname #If exists, skip to next pwi
+
+    # Try to lock the pwi file by renaming it
+    pwi_lock_fname = f'{pwi_fname}.lock_{worker_id}'
+    try:
+        os.rename(f'{pwi_fname}', f'{pwi_lock_fname}')
+    except Exception as e:
+        pwi_lock_fname = ""  
+    
+    return pwi_lock_fname, pwo_fname
+
+@job
+def run_qe_worker( 
+        id,
+        command,
+        work_dir,
+        ):
+    """
+    Run the QE command in a subprocess.
+    """
+    #Get pwi files
+    pwi_files = glob(os.path.join(work_dir, "*.pwi"))
+
+    #Check pwo does not exist
+    worker_output = {'success' : [], 'output' : [], 'outdir' : []}
+    for pwi in pwi_files:
+        #Try locking the pwi file
+        lock_pwi, pwo_fname = lock_input(pwi_fname=pwi, worker_id=id)
+
+        if lock_pwi == "": continue #Skip to next pwi if lock failed
+
+        #Get output directory of this calculation
+        with open(lock_pwi, 'r') as f:
+            pwi_lines = f.readlines()
+        outdir_line = [line.split('=')[1] for line in pwi_lines if 'outdir' in line][0]
+        outdir_line = outdir_line.strip().replace("'", "").replace('"', '')  # Remove quotes
+        outdir = os.getcwd() + f"/{outdir_line}"
+
+        #Launch QE calculation
+        success = run_qe(command=command, fname_pwi=lock_pwi, fname_pwo=pwo_fname)
+
+        #Update output
+        worker_output['success'].append(success)
+        worker_output['output'].append(pwo_fname)
+        worker_output['outdir'].append(outdir)
+
+    return worker_output
+
+
 @dataclass
 class QEstaticLabelling(Maker):
     """
@@ -114,21 +189,21 @@ class QEstaticLabelling(Maker):
         # Launch QE workers            
         outputs = []
         for id_qe_worker in range(num_qe_workers):
-           qe_worker = self.run_qe_worker(
-               id=id_qe_worker,
-               command=self.qe_run_cmd,
-               work_dir=path_to_qe_workdir
-               )
-           
-           qe_worker.name = f"run_qe_worker_{id_qe_worker}"
-           joblist.append(qe_worker)
-           outputs.append(qe_worker.output) #Contains list of dict{'successes', 'pwo_files', 'outdirs'} for each worker
+            worker_job = run_qe_worker(
+                id=id_qe_worker,
+                command=self.qe_run_cmd,
+                work_dir=path_to_qe_workdir,
+            )
+            worker_job.name = f"run_qe_worker_{id_qe_worker}"
+
+            joblist.append(worker_job)
+            outputs.append(worker_job.output)
 
         qe_wrk_flow = Flow(jobs=joblist, output=outputs, name="qe_workers")
 
         # Output is a list of success status, one for each worker
         # The success status is a dictionary with the pwo file name as key and the calculation success status as value (True/False)
-        return Response(replace=qe_wrk_flow, output=qe_wrk_flow.output)
+        return qe_wrk_flow
 
     def load_structures(self,
             fname_structures: str | list[str] | None = None,
@@ -338,77 +413,3 @@ class QEstaticLabelling(Maker):
         print(f"Computed k-points mesh: {mesh} for K-space resolution: {Kspace_resolution} Angstrom^-1") #DEBUG
 
         return mesh
-
-    @job
-    def run_qe_worker(
-            self, 
-            id,
-            command,
-            work_dir,
-            ):
-        """
-        Run the QE command in a subprocess.
-        """
-        #Get pwi files
-        pwi_files = glob(os.path.join(work_dir, "*.pwi"))
-
-        #Check pwo does not exist
-        worker_output = {'success' : [], 'output' : [], 'outdir' : []}
-        for pwi in pwi_files:
-            #Try locking the pwi file
-            lock_pwi, pwo_fname = self.lock_input(pwi_fname=pwi, worker_id=id)
-
-            if lock_pwi == "": continue #Skip to next pwi if lock failed
-
-            #Get output directory of this calculation
-            with open(lock_pwi, 'r') as f:
-                pwi_lines = f.readlines()
-            outdir_line = [line.split('=')[1] for line in pwi_lines if 'outdir' in line][0]
-            outdir_line = outdir_line.strip().replace("'", "").replace('"', '')  # Remove quotes
-            outdir = os.getcwd() + f"/{outdir_line}"
-
-            #Launch QE calculation
-            success = self.run_qe(command=command, fname_pwi=lock_pwi, fname_pwo=pwo_fname)
-
-            #Update output
-            worker_output['success'].append(success)
-            worker_output['output'].append(pwo_fname)
-            worker_output['outdir'].append(outdir)
-
-        return worker_output
-
-    def run_qe(self, command, fname_pwi, fname_pwo):
-        """
-        Run the QE command in a subprocess. Execute one QuantumEspresso calculation on the current input file.
-        """
-        #Assemble QE command
-        run_cmd = f"{command} < {fname_pwi} >> {fname_pwo}"
-
-        success = False
-        try:        
-            # Launch QE and wait till ending
-            subprocess.run(run_cmd, shell=True, check=True, executable="/bin/bash")
-            
-            success = True
-        
-        except subprocess.CalledProcessError as e:
-            
-            success = False
-
-        return success
-    
-    def lock_input(self, pwi_fname, worker_id):
-        
-        pwi_lock_fname = ""
-        #Check if pwo exists
-        pwo_fname = pwi_fname.replace('.pwi', '.pwo')
-        if os.path.exists(pwo_fname): return pwi_lock_fname, pwo_fname #If exists, skip to next pwi
-
-        # Try to lock the pwi file by renaming it
-        pwi_lock_fname = f'{pwi_fname}.lock_{worker_id}'
-        try:
-            os.rename(f'{pwi_fname}', f'{pwi_lock_fname}')
-        except Exception as e:
-            pwi_lock_fname = ""  
-        
-        return pwi_lock_fname, pwo_fname
