@@ -38,7 +38,7 @@ qe_scf_job = qe_scf_maker.make()
 
 # Define flow
 flow = Flow([qe_scf_job])
-set_run_config(flow, name_filter="run_qe_worker", exec_config="qe_config", worker="QuantumEspresso", resources=parallel_gpu_resources)
+set_run_config(flow, name_filter="run_qe_worker", exec_config="qe_config", worker="schedule_worker", resources=parallel_gpu_resources)
 
 # Submit flow
 submit_flow(flow, worker="local_worker", resources={}, project="GenMLFF")
