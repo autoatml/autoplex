@@ -146,12 +146,9 @@ vasp_maker = StaticMaker(
 
 (ii) Example input script using CASTEP.
 
-Please note that the commands to run CASTEP are set via SETTINGS of autoplex as CASTEP
-is currently not integrated into atomate2. 
+Please note that the commands to run CASTEP are set via SETTINGS of autoplex as CASTEP is currently not integrated into atomate2. Typically, one uses a `.autoplex.yaml` file to define a `CASTEP_CMD`. Within the `.bashrc`, one then includes a `AUTOPLEX_CONFIG_FILE=/yourpath/.autoplex.yaml` statement. It is also possible to export the `AUTOPLEX_CASTEP_CMD=castep_binary_name` directly, for example: `export AUTOPLEX_CASTEP_CMD='mpirun -np 64 /yourpath/castep.mpi'`.
 
-Typically, one uses a `.autoplex.yaml` file to define a `CASTEP_CMD`. 
-Within the `.bashrc`, one then includes a `AUTOPLEX_CONFIG_FILE=/yourpath/.autoplex.yaml` statement. 
-It is also possible to export the `AUTOPLEX_CASTEP_CMD=castep_binary_name` directly.
+All allowed CASTEP keywords and definitions for setting up `.param` and `.cell` files can be found in the `autoplex` package at: `/yourpath/autoplex/misc/castep/castep_keywords.json`. Alternatively, ASE will generate the `castep_keywords.json` file automatically the first time you run an `ase.calculators.castep` calculation, although this process may be relatively slow.
 
 ```python
 from autoplex.settings import RssConfig
@@ -175,6 +172,7 @@ castep_maker = CastepStaticMaker(
         },
         user_cell_settings={
             "kpoint_mp_spacing": 0.03, 
+            "symmetry_generate": True,
         },
     ),
 )
