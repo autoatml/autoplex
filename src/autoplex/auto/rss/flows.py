@@ -9,6 +9,7 @@ from atomate2.vasp.sets.core import StaticSetGenerator
 from jobflow import Flow, Maker, Response, job
 
 from autoplex.auto.rss.jobs import do_rss_iterations, initial_rss
+from autoplex.misc.castep.jobs import CastepStaticMaker
 from autoplex.settings import RssConfig
 
 
@@ -24,12 +25,12 @@ class RssMaker(Maker):
     rss_config: RssConfig
         Pydantic model that defines the setup parameters for the whole RSS workflow.
         If not explicitly set, the defaults from 'autoplex.settings.RssConfig' will be used.
-    static_energy_maker: BaseVaspMaker | ForceFieldStaticMaker
-        Maker for static energy jobs: either BaseVaspMaker (VASP-based) or
+    static_energy_maker: BaseVaspMaker | CastepStaticMaker | ForceFieldStaticMaker
+        Maker for static energy jobs: either BaseVaspMaker (VASP-based) or CastepStaticMaker (CASTEP-based) or
         ForceFieldStaticMaker (force field-based). Defaults to StaticMaker (VASP-based).
     static_energy_maker_isolated_atoms: BaseVaspMaker | ForceFieldStaticMaker | None
-        Maker for static energy jobs of isolated atoms: either BaseVaspMaker (VASP-based) or
-        ForceFieldStaticMaker (force field-based) or None. If set to `None`, the parameters
+        Maker for static energy jobs of isolated atoms: either BaseVaspMaker (VASP-based) or CastepStaticMaker
+        (CASTEP-based) or ForceFieldStaticMaker (force field-based) or None. If set to `None`, the parameters
         from `static_energy_maker` will be used as the default for isolated atoms. In this case,
         if `static_energy_maker` is a `StaticMaker`, all major settings will be inherited,
         except that `kspacing` will be automatically set to 100 to enforce a Gamma-point-only calculation.
@@ -40,42 +41,44 @@ class RssMaker(Maker):
 
     name: str = "ml-driven rss"
     rss_config: RssConfig = field(default_factory=lambda: RssConfig())
-    static_energy_maker: BaseVaspMaker | ForceFieldStaticMaker = field(
-        default_factory=lambda: StaticMaker(
-            input_set_generator=StaticSetGenerator(
-                user_incar_settings={
-                    "ADDGRID": "True",
-                    "ENCUT": 520,
-                    "EDIFF": 1e-06,
-                    "ISMEAR": 0,
-                    "SIGMA": 0.01,
-                    "PREC": "Accurate",
-                    "ISYM": None,
-                    "KSPACING": 0.2,
-                    "NPAR": 8,
-                    "LWAVE": "False",
-                    "LCHARG": "False",
-                    "ENAUG": None,
-                    "GGA": None,
-                    "ISPIN": None,
-                    "LAECHG": None,
-                    "LELF": None,
-                    "LORBIT": None,
-                    "LVTOT": None,
-                    "NSW": None,
-                    "SYMPREC": None,
-                    "NELM": 100,
-                    "LMAXMIX": None,
-                    "LASPH": None,
-                    "AMIN": None,
-                }
-            ),
-            run_vasp_kwargs={"handlers": ()},
+    static_energy_maker: BaseVaspMaker | CastepStaticMaker | ForceFieldStaticMaker = (
+        field(
+            default_factory=lambda: StaticMaker(
+                input_set_generator=StaticSetGenerator(
+                    user_incar_settings={
+                        "ADDGRID": "True",
+                        "ENCUT": 520,
+                        "EDIFF": 1e-06,
+                        "ISMEAR": 0,
+                        "SIGMA": 0.01,
+                        "PREC": "Accurate",
+                        "ISYM": None,
+                        "KSPACING": 0.2,
+                        "NPAR": 8,
+                        "LWAVE": "False",
+                        "LCHARG": "False",
+                        "ENAUG": None,
+                        "GGA": None,
+                        "ISPIN": None,
+                        "LAECHG": None,
+                        "LELF": None,
+                        "LORBIT": None,
+                        "LVTOT": None,
+                        "NSW": None,
+                        "SYMPREC": None,
+                        "NELM": 100,
+                        "LMAXMIX": None,
+                        "LASPH": None,
+                        "AMIN": None,
+                    }
+                ),
+                run_vasp_kwargs={"handlers": ()},
+            )
         )
     )
-    static_energy_maker_isolated_atoms: BaseVaspMaker | ForceFieldStaticMaker | None = (
-        None
-    )
+    static_energy_maker_isolated_atoms: (
+        BaseVaspMaker | CastepStaticMaker | ForceFieldStaticMaker | None
+    ) = None
 
     @job
     def make(self, **kwargs):
@@ -178,15 +181,15 @@ class RssMaker(Maker):
         dimer_num: int
             Number of different distances to consider for dimer calculations. Default is 21.
         custom_incar: dict | None
-            Dictionary of custom VASP input parameters. If provided, will update the
+            Dictionary of custom DFT input parameters. If provided, will update the
             default parameters. Default is None.
         custom_potcar: dict | None
             Dictionary of POTCAR settings to update. Keys are element symbols, values are the desired POTCAR labels.
             Default is None.
-        vasp_ref_file: str
-            Reference file for VASP data. Default is 'vasp_ref.extxyz'.
+        dft_ref_file: str
+            Reference file for DFT data. Default is 'dft_ref.extxyz'.
         config_types: list[str]
-            Configuration types for the VASP calculations. Default is None.
+            Configuration types for the DFT calculations. Default is None.
         rss_group: list[str] | str
             Group name for RSS to setting up regularization.
         test_ratio: float

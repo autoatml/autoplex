@@ -14,7 +14,7 @@ os.environ["OMP_NUM_THREADS"] = "1"
 
 
 # test distort_type=0, i.e. volume distortion
-def test_generate_randomized_structures_distort_type_0():
+def test_generate_randomized_structures_distort_type_0(memory_jobstore):
     structure = Structure(
         lattice=[[0, 2.73, 2.73], [2.73, 0, 2.73], [2.73, 2.73, 0]],
         species=["Si", "Si"],
@@ -28,7 +28,10 @@ def test_generate_randomized_structures_distort_type_0():
         volume_scale_factor_range=[0.90, 1.10],
         rattle_type=0)
 
-    responses = run_locally(rattledts_job, create_folders=False, ensure_success=True)
+    responses = run_locally(rattledts_job, 
+                            create_folders=False, 
+                            ensure_success=True,
+                            store=memory_jobstore)
 
     # check if correct number of valid structure objects are generated
     for uuid, response_collection in responses.items():
@@ -41,7 +44,7 @@ def test_generate_randomized_structures_distort_type_0():
 
 
 # test distort_type=1, i.e. angle distortion
-def test_generate_randomized_structures_distort_type_1():
+def test_generate_randomized_structures_distort_type_1(memory_jobstore):
     structure = Structure(
         lattice=[[0, 2.73, 2.73], [2.73, 0, 2.73], [2.73, 2.73, 0]],
         species=["Si", "Si"],
@@ -57,7 +60,10 @@ def test_generate_randomized_structures_distort_type_1():
         angle_max_attempts=1000,
         rattle_type=0)
 
-    responses = run_locally(rattledts_job, create_folders=False, ensure_success=True)
+    responses = run_locally(rattledts_job, 
+                            create_folders=False, 
+                            ensure_success=True,
+                            store=memory_jobstore)
 
     # check if correct number of valid structure objects are generated
     for uuid, response_collection in responses.items():
@@ -70,7 +76,7 @@ def test_generate_randomized_structures_distort_type_1():
 
 
 # test distort_type=2, i.e. simultaneous volume and angle distortion
-def test_generate_randomized_structures_distort_type_2():
+def test_generate_randomized_structures_distort_type_2(memory_jobstore):
     structure = Structure(
         lattice=[[0, 2.73, 2.73], [2.73, 0, 2.73], [2.73, 2.73, 0]],
         species=["Si", "Si"],
@@ -87,7 +93,10 @@ def test_generate_randomized_structures_distort_type_2():
         angle_max_attempts=1000,
         rattle_type=0)
 
-    responses = run_locally(rattledts_job, create_folders=False, ensure_success=True)
+    responses = run_locally(rattledts_job, 
+                            create_folders=False, 
+                            ensure_success=True,
+                            store=memory_jobstore)
 
     # check if correct number of valid structure objects are generated
     for uuid, response_collection in responses.items():

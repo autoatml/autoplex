@@ -71,20 +71,20 @@ def test_vasp_static(test_dir, mock_vasp, memory_jobstore, clean_dir):
                                  },
                                  ).make(structures=test_structures)
 
-    job_collect_data = collect_dft_data(vasp_dirs=job_dft.output)
+    job_collect_data = collect_dft_data(dft_dirs=job_dft.output)
 
-    response = run_locally(
+    run_locally(
         Flow([job_dft, job_collect_data]),
         create_folders=True,
         ensure_success=True,
         store=memory_jobstore
     )
 
-    dict_vasp = job_collect_data.output.resolve(memory_jobstore)
+    dict_dft = job_collect_data.output.resolve(memory_jobstore)
 
-    path_to_vasp, isol_energy = dict_vasp['vasp_ref_dir'], dict_vasp['isolated_atom_energies']
+    path_to_dft, isol_energy = dict_dft['dft_ref_dir'], dict_dft['isolated_atom_energies']
 
-    atoms = read(path_to_vasp, index=":")
+    atoms = read(path_to_dft, index=":")
     config_types = [at.info['config_type'] for at in atoms]
 
     assert isol_energy['14'] == -0.84696938
@@ -109,6 +109,6 @@ def test_generate_training_data_for_testing(
         steps=1,
     )
 
-    responses = run_locally(
+    run_locally(
         generate_data, create_folders=True, ensure_success=False, store=memory_jobstore
     )  # atomate2 switched from pckl to json files for the trajectories --> job fails in its current state

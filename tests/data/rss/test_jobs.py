@@ -14,7 +14,7 @@ def test_vasp_static(test_dir, memory_jobstore, clean_dir):
                               regularization=True,
                               distillation=True,
                               force_max=0.7,
-                              vasp_ref_dir=test_files_dir,
+                              dft_ref_dir=test_files_dir,
                               pre_database_dir=None, )
 
     response = run_locally(

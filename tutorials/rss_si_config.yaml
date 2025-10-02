@@ -70,7 +70,7 @@ custom_incar:
   LSCALAPACK: .FALSE.
   LPLANE: .FALSE.
 custom_potcar:
-vasp_ref_file: vasp_ref.extxyz
+dft_ref_file: vasp_ref.extxyz
 config_types:
   - initial
   - traj_early
