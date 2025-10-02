@@ -1,4 +1,3 @@
-import gzip
 from ase import Atoms
 from pymatgen.io.ase import AseAtomsAdaptor
 from autoplex.misc.castep.utils import CastepStaticSetGenerator

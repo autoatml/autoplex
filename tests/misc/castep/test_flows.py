@@ -1,4 +1,3 @@
-import os
 from ase.build import bulk
 from ase.io import read
 from jobflow import run_locally, Flow
@@ -7,15 +6,13 @@ from autoplex.misc.castep.jobs import CastepStaticMaker
 from autoplex.misc.castep.utils import CastepStaticSetGenerator
 from autoplex.data.common.jobs import collect_dft_data
 from pymatgen.io.ase import AseAtomsAdaptor
-import shutil
-import glob
 
 
 def test_DFTStaticLabelling_with_castep(memory_jobstore, mock_castep, clean_dir):
     
     ref_paths = {
-        "static_bulk_0": "CASTEP_bulk1",
-        "static_bulk_1": "CASTEP_bulk2",
+        "static_bulk_0": "static/CASTEP_bulk1",
+        "static_bulk_1": "static/CASTEP_bulk2",
     }
     
     mock_castep(ref_paths)
@@ -60,7 +57,7 @@ def test_DFTStaticLabelling_with_castep(memory_jobstore, mock_castep, clean_dir)
 
     dict_dft = job_collect_data.output.resolve(memory_jobstore)
     
-    path_to_vasp, isol_energy = dict_dft['dft_ref_dir'], dict_dft['isolated_atom_energies']
+    path_to_vasp, _ = dict_dft['dft_ref_dir'], dict_dft['isolated_atom_energies']
     
     atoms = read(path_to_vasp, index=":")
     config_types = [at.info['config_type'] for at in atoms]

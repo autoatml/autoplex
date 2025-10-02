@@ -168,7 +168,7 @@ def fake_run_castep(
 
 def clear_castep_inputs() -> None:
     """Clean up castep input files."""
-    for castep_file in ("castep.param", "castep.cell", "Si_C19_PBE_OTF.usp.spec"):
+    for castep_file in ("castep.param", "castep.cell"):
         if Path(castep_file).exists():
             Path(castep_file).unlink()
     logger.info("Cleared castep inputs")
