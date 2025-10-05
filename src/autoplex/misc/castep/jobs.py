@@ -47,12 +47,13 @@ def castep_job(method: Callable) -> job:
 
     This is a thin wrapper around :obj:`~jobflow.core.job.Job` that configures common
     settings for all CASTEP jobs. For example, it ensures that large data objects
-     are all stored in the
-    atomate2 data store. It also configures the output schema to be a CASTEP
-    :obj:`.TaskDoc`.
+    are all stored in the atomate2 data store. It also configures the output schema
+    to be a CASTEP :obj:`.TaskDoc`.
 
     Any makers that return CASTEP jobs (not flows) should decorate the ``make`` method
-    with @castep_job. For example:
+    with @castep_job.
+
+    For example:
 
     .. code-block:: python
 
