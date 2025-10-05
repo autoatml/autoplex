@@ -16,4 +16,5 @@ This section gives an overview of the API for autoplex.
     benchmark
     data
     fitting
+    misc
     settings
