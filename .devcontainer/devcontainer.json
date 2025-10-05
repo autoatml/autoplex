@@ -14,5 +14,5 @@
         "ms-azuretools.vscode-docker"]
     },
   },
-  "postCreateCommand": "pip cache purge && uv pip install --prerelease=allow -e .[strict,docs] && uv pip install ase==3.23.0 && pre-commit install",
+  "postCreateCommand": "pip cache purge && uv pip install --prerelease=allow -e .[strict,docs] && pre-commit install",
 }
