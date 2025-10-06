@@ -152,7 +152,7 @@ All allowed CASTEP keywords and definitions for setting up `.param` and `.cell` 
 
 ### Disclaimer
 
-The **CASTEP parameter settings must be carefully adjusted by the user** according to the specific system under study. Using the default parameters provided by `autoplex` may **not guarantee convergence or reliable results**, as the optimal settings — such as **mixing scheme**, **cutoff energy**, **k-point mesh**, and **smearing method** — can vary significantly depending on the material and calculation type. Users are strongly advised to validate, test, and tune these parameters for their specific system before performing large-scale or production-level calculations.
+Please note that the CASTEP interface in `autoplex` is still undergoing testing and refinement. Hence, the **CASTEP parameter settings must be carefully adjusted by the user** according to the specific system under study. Using the default parameters provided by `autoplex` may **not guarantee convergence or reliable results**, as the optimal settings — such as **mixing scheme**, **cutoff energy**, **k-point mesh**, and **smearing method** — can vary significantly depending on the material and calculation type. Users are strongly advised to validate, test, and tune these parameters for their specific system before performing large-scale or production-level calculations.
 
 ```python
 from autoplex.settings import RssConfig
