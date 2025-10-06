@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, List, Optional
+from typing import Dict
 
 from pymatgen.core import Structure
 from emmet.core.structure import StructureMetadata
@@ -28,8 +28,8 @@ class QeRunSettings(BaseModel):
 
 class QeKpointsSettings(BaseModel):
     """
-    K-points use k-space resoultion with automatic Monkhorst-Pack
-    if K_POINTS are not defined in reference 'template.pwi'
+    K-points: use k-space resoultion with automatic Monkhorst-Pack grid
+    k-points offset as in Quantum ESPRESSO manual: 0: False, 1: True
     """
 
     kspace_resolution: float | None = None  # angstrom^-1
@@ -52,6 +52,7 @@ class InputDoc(BaseModel):
     pwi_path: str
     seed: str
     run_settings: QeRunSettings = Field(None, description="QE namelist section with: &control, &system, &electrons")
+    pseudo: Dict[str, str] = Field(None, description="Dictionary of atomic symbols and corresponding pseudopotential files.")
     kpoints: QeKpointsSettings = Field(None, description="QE K_POINTS settings")
 
 
@@ -96,7 +97,7 @@ class TaskDoc(StructureMetadata):
 
     task_label: str = Field(
         None,
-        description="Description of the CASTEP task (e.g., static, relax)",
+        description="Description of the QE task (e.g., static, relax)",
     )
 
     dir_name: str | None = Field(
