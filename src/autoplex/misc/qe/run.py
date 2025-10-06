@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 _ENERGY_RE = re.compile(r"!\s+total energy\s+=\s+([-\d\.Ee+]+)\s+Ry")
 
 
-def _parse_total_energy_ev(pwo_path: str) -> Optional[float]:
+def _parse_total_energy_ev(pwo_path: str) -> float | None:
     """
     Extract and return total energy (eV) if found in QE output (.pwo)
     """
@@ -24,7 +24,7 @@ def _parse_total_energy_ev(pwo_path: str) -> Optional[float]:
         return None
 
     try:
-        with open(pwo_path, "r", errors="ignore") as fh:
+        with open(pwo_path, errors="ignore") as fh:
             for line in fh:
                 m = _ENERGY_RE.search(line)
                 if m:
@@ -56,7 +56,7 @@ def run_qe_static(pwi_path: str, command: str) -> QeRunResult:
     # Return outdir read from .pwi
     outdir = ""
     try:
-        with open(pwi_path, "r") as fh:
+        with open(pwi_path) as fh:
             for line in fh:
                 if "outdir" in line:
                     outdir = line.split("=")[1].strip().strip("'").strip('"')
