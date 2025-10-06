@@ -1,21 +1,20 @@
 from __future__ import annotations
 
-import os
 import logging
+import os
 from dataclasses import dataclass
 
 import numpy as np
-
-from pymatgen.core import Structure
-from pymatgen.io.ase import AseAtomsAdaptor
-
-from ase import Atoms, Atom
+from ase import Atom, Atoms
 from ase.data import atomic_masses, atomic_numbers
 from ase.io import read
+from pymatgen.core import Structure
+from pymatgen.io.ase import AseAtomsAdaptor
 
 from .schema import InputDoc, QeKpointsSettings, QeRunSettings
 
 logger = logging.getLogger(__name__)
+
 
 @dataclass
 class QeStaticInputGenerator:
@@ -60,7 +59,7 @@ class QeStaticInputGenerator:
             Directory used to write input/output files.
         seed_prefix : str
             Prefix for naming input/output QE files.
-        
+
         Returns
         -------
         list[InputDoc]
@@ -85,7 +84,8 @@ class QeStaticInputGenerator:
                     run_settings=self.run_settings,
                     kpoints=self.kpoints,
                     pseudo=self.pseudo,
-            ))
+                )
+            )
         return input_sets
 
     def _write_pwi(
@@ -103,7 +103,7 @@ class QeStaticInputGenerator:
             Path to output .pwi file.
         atoms : Atoms
             ASE Atoms object.
-        
+
         Raises
         ------
         ValueError
@@ -199,6 +199,7 @@ class QeStaticInputGenerator:
             fh.writelines(cell_lines)
             fh.writelines(pos_lines)
 
+
 # --------- Utils ---------
 
 
@@ -213,7 +214,7 @@ def _read_template(path: str | None) -> list[str]:
 
 
 def _load_structures(
-    structures: Atoms | list[Atoms] | Structure | list[Structure] | str | list[str]
+    structures: Atoms | list[Atoms] | Structure | list[Structure] | str | list[str],
 ) -> list[Atoms]:
     """
     Load structures from various input types and return a list of ASE Atoms objects.
@@ -222,13 +223,12 @@ def _load_structures(
     ----------
     structures : Atoms | list[Atoms] | Structure | list[Structure] | str | list[str]
         Single or list of ASE Atoms, pymatgen Structures, or ASE-readable files.
-    
+
     Returns
     -------
     list[Atoms]
         List of ASE Atoms objects.
     """
-
     # ASE readable files
     # Sinlge ASE-readable file
     if isinstance(structures, str):
@@ -238,7 +238,6 @@ def _load_structures(
         atom_list = []
         for fname in structures:
             atoms_list += read(fname, index=":")
-
 
     # ASE Atoms
     elif isinstance(structures, Atoms):
@@ -252,19 +251,19 @@ def _load_structures(
             raise ValueError("Unsupported ASE Atoms input.")
     # List of ASE Atoms objects
     elif isinstance(structures, list) and all(isinstance(s, Atoms) for s in structures):
-        atoms_list = structures    
-                   
+        atoms_list = structures
 
     # Pymatgen Structures
     # Single pymatgen structure
     elif isinstance(structures, Structure):
         atoms_list = [AseAtomsAdaptor().get_atoms(structures)]
     # List of pymatgen structures
-    elif isinstance(structures, list) and all(isinstance(s, Structure) for s in structures):
+    elif isinstance(structures, list) and all(
+        isinstance(s, Structure) for s in structures
+    ):
         adaptor = AseAtomsAdaptor()
         atoms_list = [adaptor.get_atoms(s) for s in structures]
 
-    
     else:
         raise ValueError("Unsupported type for structures input.")
 
@@ -280,7 +279,7 @@ def _render_minimal_namelists(settings: QeRunSettings) -> list[str]:
     ----------
     settings : QeRunSettings
         QE namelist settings.
-    
+
     Returns
     -------
     list[str]
@@ -327,7 +326,7 @@ def _render_kpoints(
         ASE Atoms object.
     kpoints : QeKpointsSettings
         K-points settings.
-    
+
     Returns
     -------
     list[str]
@@ -368,14 +367,14 @@ def _render_kpoints(
 def _compute_kpoints_grid(cell: np.ndarray, kspace_resolution: float) -> list[int]:
     """
     Compute Monkhorst-Pack mesh from cell and kspace_resolution (in angstrom^-1).
-    
+
     Parameters
     ----------
     cell : np.ndarray
         3x3 array with cell vectors in angstrom.
     kspace_resolution : float
         Desired k-space resolution in angstrom^-1.
-    
+
     Returns
     -------
     list[int]

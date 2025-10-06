@@ -2,11 +2,10 @@ from __future__ import annotations
 
 from typing import Dict
 
-from pymatgen.core import Structure
-from emmet.core.structure import StructureMetadata
 from emmet.core.math import Matrix3D, Vector3D
-
+from emmet.core.structure import StructureMetadata
 from pydantic import BaseModel, Field, field_validator
+from pymatgen.core import Structure
 
 
 class QeRunSettings(BaseModel):
@@ -51,8 +50,13 @@ class InputDoc(BaseModel):
     workdir: str
     pwi_path: str
     seed: str
-    run_settings: QeRunSettings = Field(None, description="QE namelist section with: &control, &system, &electrons")
-    pseudo: Dict[str, str] = Field(None, description="Dictionary of atomic symbols and corresponding pseudopotential files.")
+    run_settings: QeRunSettings = Field(
+        None, description="QE namelist section with: &control, &system, &electrons"
+    )
+    pseudo: dict[str, str] = Field(
+        None,
+        description="Dictionary of atomic symbols and corresponding pseudopotential files.",
+    )
     kpoints: QeKpointsSettings = Field(None, description="QE K_POINTS settings")
 
 
@@ -60,6 +64,7 @@ class OutputDoc(BaseModel):
     """
     The outputs of this jobs
     """
+
     energy: float | None = Field(None, description="Total energy in units of eV.")
 
     energy_per_atom: float | None = Field(
@@ -82,6 +87,7 @@ class OutputDoc(BaseModel):
         None, description="The stress on the cell in units of kbar."
     )
 
+
 class TaskDoc(StructureMetadata):
     """Document containing information on structure manipulation using Quantum ESPRESSO."""
 
@@ -102,4 +108,4 @@ class TaskDoc(StructureMetadata):
 
     dir_name: str | None = Field(
         None, description="Directory where the QE calculations are performed."
-    )    
+    )

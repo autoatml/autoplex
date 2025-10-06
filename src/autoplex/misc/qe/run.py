@@ -7,9 +7,8 @@ import subprocess
 
 from ase.io import read
 from ase.units import GPa
-from pymatgen.io.ase import AseAtomsAdaptor
-
 from jobflow import job
+from pymatgen.io.ase import AseAtomsAdaptor
 
 from .schema import InputDoc, OutputDoc, TaskDoc
 
@@ -27,7 +26,7 @@ def _parse_total_energy_ev(pwo_path: str) -> float | None:
     ----------
     pwo_path : str
         Path to QE output file (.pwo)
-    
+
     Returns
     -------
     float | None
@@ -61,7 +60,7 @@ def run_qe_static(input: InputDoc, command: str) -> TaskDoc:
         Input document containing paths and settings for the QE run.
     command : str
         Command to execute QE (e.g. "pw.x" or "mpirun -np 4 pw.x -nk 2").
-    
+
     Returns
     -------
     TaskDoc
@@ -80,12 +79,12 @@ def run_qe_static(input: InputDoc, command: str) -> TaskDoc:
 
     # # Manual parse of total energy in eV from .pwo
     # energy_ev = _parse_total_energy_ev(pwo_path)
-    
+
     # Parse with ASE
     atoms = read(pwo_path)
     energy_ev = atoms.get_total_energy()
     forces_evA = atoms.get_forces()
-    stress_kbar = atoms.get_stress(voigt=False)*(-10/GPa)
+    stress_kbar = atoms.get_stress(voigt=False) * (-10 / GPa)
     final_structure = AseAtomsAdaptor().get_structure(atoms)
 
     output = OutputDoc(

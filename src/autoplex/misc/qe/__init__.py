@@ -3,9 +3,9 @@ from .run import run_qe_static
 from .schema import (
     InputDoc,
     OutputDoc,
-    TaskDoc,
     QeKpointsSettings,
     QeRunSettings,
+    TaskDoc,
 )
 from .utils import QeStaticInputGenerator
 
