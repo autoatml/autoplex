@@ -1,5 +1,7 @@
+from ase.io import read
+from pymatgen.io.ase import AseAtomsAdaptor
 from jobflow_remote import submit_flow, set_run_config
-from autoplex.misc.qe import QEStaticMaker, QeRunSettings, QeKpointsSettings
+from autoplex.misc.qe import QeStaticMaker, QeRunSettings, QeKpointsSettings
 
 # --------- QE namelists dictionaries ---------
 control_dict = {
@@ -65,7 +67,7 @@ parallel_gpu_resources = {
 
 if __name__ == "__main__":
     # QE command
-    qe_command = "mpirun -np 4 pw.x -nk 2"
+    qe_command = "mpirun -np 4 pw.x -nk 4"
 
     # QE run seetings (computational parameters namelist)
     qe_run_settings = QeRunSettings(
@@ -81,11 +83,9 @@ if __name__ == "__main__":
     )
 
     # Instance of QEStaticMaker
-    qe_maker = QEStaticMaker(
+    qe_maker = QeStaticMaker(
         name="static_qe",
         command=qe_command,
-        template_pwi=None,  # Optional if run_settings
-        structures="/leonardo_work/EUHPC_A04_113/Alberto/GenMLFF-progect/Test-QE/initial_dataset.extxyz",
         workdir=None,  # default <cwd>/qe_static
         run_settings=qe_run_settings,
         kpoints=k_points_settings,
@@ -93,10 +93,11 @@ if __name__ == "__main__":
     )    
 
     # Define QE scf workflow
-    qe_workflow = qe_maker.make()
+    structures_path="/leonardo_work/EUHPC_A04_113/Alberto/GenMLFF-progect/autoplex/tests/auto/QE/initial_dataset.extxyz"
+    qe_scf_workflow = qe_maker.make(structures_path)
 
     # Update flow config
-    set_run_config(qe_workflow, name_filter="static_qe", exec_config="qe_config", worker="schedule_worker", resources=parallel_gpu_resources)
+    set_run_config(qe_scf_workflow, name_filter="static_qe", exec_config="qe_config", worker="schedule_worker", resources=parallel_gpu_resources)
 
     # Submit flow
-    submit_flow(qe_workflow, worker="local_worker", resources={}, project="GenMLFF")
+    submit_flow(qe_scf_workflow, worker="local_worker", resources={}, project="GenMLFF")
