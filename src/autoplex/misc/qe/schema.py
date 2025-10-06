@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Dict
-
 from emmet.core.math import Matrix3D, Vector3D
 from emmet.core.structure import StructureMetadata
 from pydantic import BaseModel, Field, field_validator
