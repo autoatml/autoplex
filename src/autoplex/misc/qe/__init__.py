@@ -1,9 +1,10 @@
-from .jobs import QEStaticMaker
+from .jobs import QeStaticMaker
 from .run import run_qe_static
 from .schema import (
-    QeInputSet,
+    InputDoc,
+    OutputDoc,
+    TaskDoc,
     QeKpointsSettings,
-    QeRunResult,
     QeRunSettings,
 )
 from .utils import QeStaticInputGenerator
