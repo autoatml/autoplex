@@ -6,10 +6,10 @@ from typing import List, Optional
 
 import numpy as np
 from ase import Atoms
-from ase.data import atomic_numbers, atomic_masses
+from ase.data import atomic_masses, atomic_numbers
 from ase.io import read
 
-from .schema import QeKpointsSettings, QeInputSet, QeRunSettings
+from .schema import QeInputSet, QeKpointsSettings, QeRunSettings
 
 logger = logging.getLogger(__name__)
 
@@ -26,10 +26,10 @@ class QeStaticInputGenerator:
 
     def __init__(
         self,
-        template_pwi: Optional[str] = None,
-        run_settings: Optional[QeRunSettings] = None,
-        kpoints: Optional[QeKpointsSettings] = None,
-        pseudo: Optional[dict[str, str]] = None,
+        template_pwi: str | None = None,
+        run_settings: QeRunSettings | None = None,
+        kpoints: QeKpointsSettings | None = None,
+        pseudo: dict[str, str] | None = None,
     ) -> None:
         self.template_pwi = template_pwi
         self.run_settings = run_settings or QeRunSettings()
@@ -38,17 +38,19 @@ class QeStaticInputGenerator:
 
     def generate_for_structures(
         self,
-        structures: str | List[str] | None,
+        structures: str | list[str] | None,
         workdir: str,
         seed_prefix: str = "structure",
-    ) -> List[QeInputSet]:
+    ) -> list[QeInputSet]:
         """
         Generate one .pwi for each structure read from ASE-readable files.
         """
         os.makedirs(workdir, exist_ok=True)
         atoms_list = _load_structures(structures)
-        input_sets: List[QeInputSet] = []
-        template_lines = _read_template(self.template_pwi) if self.template_pwi else None
+        input_sets: list[QeInputSet] = []
+        template_lines = (
+            _read_template(self.template_pwi) if self.template_pwi else None
+        )
 
         for i, atoms in enumerate(atoms_list):
             seed = f"{seed_prefix}_{i}"
@@ -68,9 +70,9 @@ class QeStaticInputGenerator:
         *,
         pwi_output: str,
         atoms: Atoms,
-        template_lines: Optional[List[str]],
+        template_lines: list[str] | None,
         kpoints: QeKpointsSettings,
-        pseudo: Optional[dict[str, str]] = None,
+        pseudo: dict[str, str] | None = None,
     ) -> None:
         """
         Write .pwi file using template (if present) + K_POINTS/cell/positions
@@ -118,17 +120,21 @@ class QeStaticInputGenerator:
             if idx_outdir is None:
                 insert_at = (idx_diskio + 1) if idx_diskio is not None else len(pwi)
                 pwi.insert(insert_at, "   outdir = 'OUT'\n")
-        
+
         # ATOMIC_SPECIES
         if pseudo is None:
-            raise ValueError("Pseudo dictionary must be provided to write ATOMIC_SPECIES.")
+            raise ValueError(
+                "Pseudo dictionary must be provided to write ATOMIC_SPECIES."
+            )
         species = set(atoms.get_chemical_symbols())
         ntyp = len(species)
         pwi[idx_ntyp] = f"   ntyp = {ntyp}\n"
         species_lines = ["\nATOMIC_SPECIES\n"]
         for s in sorted(species):
             if s not in pseudo:
-                raise ValueError(f"Missing pseudo for atomic symbol '{s}' in pseudo dictionary.")
+                raise ValueError(
+                    f"Missing pseudo for atomic symbol '{s}' in pseudo dictionary."
+                )
             mass = atomic_masses[atomic_numbers[s]]
             species_lines.append(f"{s}  {mass:.4f} {pseudo[s]}\n")
         species_lines.append("\n")
@@ -143,7 +149,9 @@ class QeStaticInputGenerator:
         cell = atoms.cell
         cell_lines = ["\nCELL_PARAMETERS (angstrom)\n"]
         for i in range(3):
-            cell_lines.append(f"{cell[i, 0]:.10f} {cell[i, 1]:.10f} {cell[i, 2]:.10f}\n")
+            cell_lines.append(
+                f"{cell[i, 0]:.10f} {cell[i, 1]:.10f} {cell[i, 2]:.10f}\n"
+            )
         cell_lines.append("\n")
 
         # ATOMIC_POSITIONS
@@ -164,12 +172,13 @@ class QeStaticInputGenerator:
 
 # --------- Utilities ---------
 
-def _load_structures(paths: str | List[str] | None) -> List[Atoms]:
+
+def _load_structures(paths: str | list[str] | None) -> list[Atoms]:
     if paths is None:
         return []
     if isinstance(paths, str):
         paths = [paths]
-    atoms_list: List[Atoms] = []
+    atoms_list: list[Atoms] = []
     for fname in paths:
         if not os.path.exists(fname):
             raise FileNotFoundError(f"Structure file not found: {fname}")
@@ -177,18 +186,19 @@ def _load_structures(paths: str | List[str] | None) -> List[Atoms]:
     return atoms_list
 
 
-def _read_template(path: Optional[str]) -> List[str]:
+def _read_template(path: str | None) -> list[str]:
     if path is None:
         return []
     if not os.path.exists(path):
         raise FileNotFoundError(f"template_pwi not found: {path}")
-    with open(path, "r") as fh:
+    with open(path) as fh:
         return fh.readlines()
 
 
-def _render_minimal_namelists(settings: QeRunSettings) -> List[str]:
+def _render_minimal_namelists(settings: QeRunSettings) -> list[str]:
     """Create draft lines for namelists &control, &system, &electrons."""
-    def _render_block(name: str, kv: dict) -> List[str]:
+
+    def _render_block(name: str, kv: dict) -> list[str]:
         lines = [f"&{name}\n"]
         for k, v in kv.items():
             if isinstance(v, bool):
@@ -201,7 +211,7 @@ def _render_minimal_namelists(settings: QeRunSettings) -> List[str]:
         lines.append("/\n\n")
         return lines
 
-    out: List[str] = []
+    out: list[str] = []
     out += _render_block("control", settings.control)
     out += _render_block("system", settings.system)
     out += _render_block("electrons", settings.electrons)
@@ -210,13 +220,12 @@ def _render_minimal_namelists(settings: QeRunSettings) -> List[str]:
 
 def _render_kpoints(
     *,
-    template_lines: List[str],
+    template_lines: list[str],
     idx_kpts: int | None,
     atoms: Atoms,
     kpoints: QeKpointsSettings,
-) -> List[str]:
+) -> list[str]:
     """Create lines for K_POINTS section."""
-
     # if K_POINTS in template keep it
     if idx_kpts is not None and idx_kpts >= 0:
         line = template_lines[idx_kpts].lower()
@@ -249,10 +258,12 @@ def _render_kpoints(
     return ["\nK_POINTS automatic\n", f"{line}\n"]
 
 
-def _compute_kpoints_grid(cell: np.ndarray, kspace_resolution: float) -> List[int]:
+def _compute_kpoints_grid(cell: np.ndarray, kspace_resolution: float) -> list[int]:
     """Compute Monkhorst-Pack mesh from cell and kspace_resolution (in angstrom^-1)."""
     rec = 2.0 * np.pi * np.linalg.inv(cell).T
     lengths = np.linalg.norm(rec, axis=1)
     mesh = [max(1, int(np.ceil(L / kspace_resolution))) for L in lengths]
-    logger.debug("QE MP mesh %s using k-resolution %s angstrom^-1", mesh, kspace_resolution)
+    logger.debug(
+        "QE MP mesh %s using k-resolution %s angstrom^-1", mesh, kspace_resolution
+    )
     return mesh

@@ -20,7 +20,7 @@ class QEStaticMaker(Maker):
     - assemble flow with all jobs.
 
     Parameters
-    --------------------
+    ----------
     name : str
         Name of the Flow.
     command : str
@@ -41,12 +41,12 @@ class QEStaticMaker(Maker):
 
     name: str = "qe_static"
     command: str = "pw.x"
-    template_pwi: Optional[str] = None
-    structures: Optional[str | List[str]] = None
-    workdir: Optional[str] = None
-    run_settings: Optional[QeRunSettings] = None
-    kpoints: Optional[QeKpointsSettings] = None
-    pseudo: Optional[dict[str, str]] = None
+    template_pwi: str | None = None
+    structures: str | list[str] | None = None
+    workdir: str | None = None
+    run_settings: QeRunSettings | None = None
+    kpoints: QeKpointsSettings | None = None
+    pseudo: dict[str, str] | None = None
 
     def make(self) -> Flow:
         workdir = self.workdir or os.path.join(os.getcwd(), "qe_static")
