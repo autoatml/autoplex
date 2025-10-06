@@ -4,9 +4,8 @@ import os
 from dataclasses import dataclass
 
 from ase import Atoms
-from pymatgen.core import Structure
-
 from jobflow import Flow, Maker
+from pymatgen.core import Structure
 
 from .run import run_qe_static
 from .schema import QeKpointsSettings, QeRunSettings
@@ -46,8 +45,8 @@ class QeStaticMaker(Maker):
 
     def make(
         self,
-        structures: Atoms | list[Atoms] | Structure | list[Structure] | str | list[str]
-        ) -> Flow:
+        structures: Atoms | list[Atoms] | Structure | list[Structure] | str | list[str],
+    ) -> Flow:
         """
         Create a Flow to run static SCF calculations with QE for given structures.
 
@@ -55,7 +54,7 @@ class QeStaticMaker(Maker):
         ----------
         structures : Atoms | list[Atoms] | Structure | list[Structure] | str | list[str]
             Single or list of ASE Atoms, pymatgen Structures, or ASE-readable files.
-        
+
         Returns
         -------
         Flow
