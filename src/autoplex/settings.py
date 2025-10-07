@@ -1037,7 +1037,7 @@ class RssConfig(AutoplexBaseModel):
         description="If true, sample structures from initially generated "
         "randomized cells using CUR.",
     )
-    rss_selection_method: Literal["bcur1s", "bcur2i", None] = Field(
+    rss_selection_method: Literal["bcur1s", "bcur2i"] | None = Field(
         default="bcur2i",
         description="Method for selecting samples from the RSS trajectories: "
         "Boltzmann flat histogram in enthalpy first, then CUR. Options are as follows",
@@ -1111,7 +1111,7 @@ class RssConfig(AutoplexBaseModel):
         description="Whether to retain the existing sigma values for specific configuration types."
         "If True, existing sigma values for specific configurations will remain unchanged",
     )
-    scheme: Literal["linear-hull", "volume-stoichiometry", None] = Field(
+    scheme: Literal["linear-hull", "volume-stoichiometry"] | None = Field(
         default="linear-hull", description="Method to use for regularization"
     )
     reg_minmax: list[list[float]] = Field(
