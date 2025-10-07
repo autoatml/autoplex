@@ -1,10 +1,12 @@
 """Utilities for testing castep calculations.
 
-This code is adapted from
-`atomate2/src/atomate2/utils/testing/aims.py`.
+License / Copyright
+-------------------
+This code is adapted from `atomate2/src/atomate2/utils/testing/aims.py`.
 
 The code has been released under BSD 3-Clause License
 and the following copyright applies:
+
 atomate2 Copyright (c) 2015, The Regents of the University of
 California, through Lawrence Berkeley National Laboratory (subject
 to receipt of any required approvals from the U.S. Dept. of Energy).
@@ -12,27 +14,18 @@ All rights reserved.
 
 
 Reference:
-@article{ganose2025_atomate2,
-        title = {Atomate2: modular workflows for materials science},
-        author = {Ganose, Alex M. and Sahasrabuddhe, Hrushikesh and Asta, Mark and Beck,
-        Kevin and Biswas, Tathagata and Bonkowski, Alexander and Bustamante, Joana and Chen,
-        Xin and Chiang, Yuan and Chrzan, Daryl C. and Clary, Jacob and Cohen, Orion A. and Ertural,
-        Christina and Gallant, Max C. and George, Janine and Gerits, Sophie and Goodall,
-        Rhys E. A. and Guha, Rishabh D. and Hautier, Geoffroy and Horton, Matthew and Inizan,
-        T. J. and Kaplan, Aaron D. and Kingsbury, Ryan S. and Kuner, Matthew C. and Li,
-        Bryant and Linn, Xavier and McDermott, Matthew J. and Mohanakrishnan, Rohith Srinivaas and Naik,
-        Aakash A. and Neaton, Jeffrey B. and Parmar, Shehan M. and Persson, Kristin A. and Petretto,
-        Guido and Purcell, Thomas A. R. and Ricci, Francesco and Rich, Benjamin and Riebesell,
-        Janosh and Rignanese, Gian-Marco and Rosen, Andrew S. and Scheffler, Matthias and Schmidt,
-        Jonathan and Shen, Jimmy-Xuan and Sobolev, Andrei and Sundararaman, Ravishankar and Tezak,
-        Cooper and Trinquet, Victor and Varley, Joel B. and Vigil-Fowler, Derek and Wang, Duo and Waroquiers,
-        David and Wen, Mingjian and Yang, Han and Zheng, Hui and Zheng, Jiongzhi and Zhu, Zhuoying and Jain, Anubhav},
-        year = {2025},
-        journal = {Digital Discovery},
-        doi = {10.1039/D5DD00019J},
-        url = {https://doi.org/10.1039/D5DD00019J},
-        urldate = {2025-07-01},
-}
+
+Ganose, A. M., Sahasrabuddhe, H., Asta, M., Beck, K., Biswas, T., Bonkowski, A.,
+Bustamante, J., Chen, X., Chiang, Y., Chrzan, D. C., Clary, J., Cohen, O. A.,
+Ertural, C., Gallant, M. C., George, J., Gerits, S., Goodall, R. E. A.,
+Guha, R. D., Hautier, G., Horton, M., Inizan, T. J., Kaplan, A. D., Kingsbury, R. S.,
+Kuner, M. C., Li, B., Linn, X., McDermott, M. J., Mohanakrishnan, R. S., Naik, A. A.,
+Neaton, J. B., Parmar, S. M., Persson, K. A., Petretto, G., Purcell, T. A. R.,
+Ricci, F., Rich, B., Riebesell, J., Rignanese, G.-M., Rosen, A. S., Scheffler, M.,
+Schmidt, J., Shen, J.-X., Sobolev, A., Sundararaman, R., Tezak, C., Trinquet, V.,
+Varley, J. B., Vigil-Fowler, D., Wang, D., Waroquiers, D., Wen, M., Yang, H.,
+Zheng, H., Zheng, J., Zhu, Z., & Jain, A. (2025). Atomate2: modular workflows
+for materials science. Digital Discovery. DOI: 10.1039/D5DD00019J.
 """
 
 from __future__ import annotations
@@ -75,9 +68,10 @@ def zpath(path: str | Path) -> Path:
 def monkeypatch_castep(
     monkeypatch: MonkeyPatch, ref_path: Path
 ) -> Generator[Callable[[Any, Any], Any]]:
-    """Allow one to mock (fake) running castep.
+    """Fixture to mock CASTEP runs for tests.
 
-    To use the fixture successfully, the following steps must be followed:
+    Usage
+    -----
     1. "mock_castep" should be included as an argument to any test that would like to use
        its functionally.
     2. For each job in your workflow, you should prepare a reference directory
@@ -93,8 +87,21 @@ def monkeypatch_castep(
     4. Inside the test function, call `mock_castep(ref_paths, fake_castep_kwargs)`, where
        ref_paths is the dictionary created in step 3.
     5. Run your castep job after calling `mock_castep`.
-
     For examples, see the tests in tests/misc/castep/test_jobs.py.
+
+    Parameters
+    ----------
+    monkeypatch
+        MonkeyPatch fixture used to set attributes.
+    ref_path : Path
+        Path to the root folder containing the ``tests/test_data/castep`` reference data.
+
+    Returns
+    -------
+    Generator[Callable[..., None], None, None]
+        A generator that yields a helper function which accepts the reference
+        mapping and optional kwargs. After the test, the fixture undoes the
+        monkeypatches and clears the internal mappings.
     """
 
     def mock_run_castep(*args, **kwargs) -> None:
@@ -136,8 +143,7 @@ def fake_run_castep(
     check_inputs: Sequence[Literal["castep.param", "castep.cell"]] = _VFILES,
     clear_inputs: bool = False,
 ) -> None:
-    """
-    Emulate running castep and validate castep input files.
+    """Emulate running castep and validate castep input files.
 
     Parameters
     ----------
@@ -175,7 +181,14 @@ def clear_castep_inputs() -> None:
 
 
 def copy_castep_outputs(ref_path: str | Path) -> None:
-    """Copy castep output files from the reference directory."""
+    """Copy castep output files from the reference directory.
+
+    Parameters
+    ----------
+    ref_path : str or Path
+        Path to the reference directory containing an ``outputs`` subfolder
+        with the CASTEP output files to copy.
+    """
     output_path = Path(ref_path) / "outputs"
     for output_file in output_path.iterdir():
         if output_file.is_file():
