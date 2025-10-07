@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 import warnings
 from pathlib import Path
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 
 import numpy as np  # noqa: TC002
 from monty.json import MontyDecoder, jsanitize
