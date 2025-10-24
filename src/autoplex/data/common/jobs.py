@@ -247,7 +247,11 @@ def generate_randomized_structures(
     """
     if supercell_matrix is None:
         supercell_matrix = [[2, 0, 0], [0, 2, 0], [0, 0, 2]]
-    structure = structure * supercell_matrix
+    supercell = get_supercell(
+        unitcell=get_phonopy_structure(structure),
+        supercell_matrix=supercell_matrix,
+    )
+    structure = get_pmg_structure(supercell)
 
     # distort cells by volume or angle
     if distort_type == 0:
