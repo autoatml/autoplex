@@ -386,6 +386,7 @@ def test_dft_random_gen_data_manual_supercell_matrix(
 
     dft_rattled_workflow = dft_random_gen_data(structure=structure, mp_id="test",
                                                volume_custom_scale_factors=[0.95, 1.0, 1.05],
+                                               n_structures=3,
                                                displacement_maker=TightDFTStaticMaker(),
                                                rattled_bulk_relax_maker=relax_maker,
                                                supercell_settings=supercell_settings)

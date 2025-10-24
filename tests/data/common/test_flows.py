@@ -69,6 +69,7 @@ def test_vasp_static(test_dir, mock_vasp, memory_jobstore, clean_dir):
                                      "LASPH": None,
                                      "AMIN": None,
                                  },
+                                 config_type="bulk",
                                  ).make(structures=test_structures)
 
     job_collect_data = collect_dft_data(dft_dirs=job_dft.output)
@@ -105,7 +106,7 @@ def test_generate_training_data_for_testing(
         train_structure_list=[structure],
         cell_factor_sequence=[0.95, 1.0, 1.05],
         potential_filename=potential_file_dir,
-        n_structures=1,
+        n_structures=3,
         steps=1,
     )
 
