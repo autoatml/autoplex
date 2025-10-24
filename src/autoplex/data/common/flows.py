@@ -181,12 +181,12 @@ class DFTStaticLabelling(Maker):
     custom_incar: dict | None = None
     custom_potcar: dict | None = None
     static_energy_maker: BaseVaspMaker | BaseCastepMaker | ForceFieldStaticMaker = (
-        _DEFAULT_STATIC_ENERGY_MAKER
+        field(default_factory=lambda: _DEFAULT_STATIC_ENERGY_MAKER)
     )
     static_energy_maker_isolated_atoms: (
         BaseVaspMaker | BaseCastepMaker | ForceFieldStaticMaker | None
     ) = None
-    config_type: str | None = (None,)
+    config_type: str | None = None
 
     @job
     def make(
