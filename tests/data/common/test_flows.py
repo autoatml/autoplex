@@ -36,10 +36,10 @@ def test_vasp_static(test_dir, mock_vasp, memory_jobstore, clean_dir):
 
     mock_vasp(ref_paths, fake_run_vasp_kwargs)
 
-    job_dft = DFTStaticLabelling(isolated_atom=True,
+    job_dft = DFTStaticLabelling(include_isolated_atom=True,
                                  e0_spin=True,
                                  isolatedatom_box=[20.0, 20.5, 21.0],
-                                 dimer=True,
+                                 include_dimer=True,
                                  dimer_box=[15.0, 15.5, 16.0],
                                  dimer_range=[1.5, 2.0],
                                  dimer_num=3,

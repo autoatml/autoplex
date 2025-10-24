@@ -193,7 +193,7 @@ class CastepStaticSetGenerator(CastepInputGenerator):
             "elec_energy_tol": 1e-06,
             "max_scf_cycles": 100,
             "smearing_width": 0.05,
-            "write_checkpoint": "none",
+            "write_checkpoint": None,
             "num_dump_cycles": 0,
         }
 
@@ -216,5 +216,80 @@ class CastepStaticSetGenerator(CastepInputGenerator):
             Dictionary of CASTEP .cell file parameters for static calculations
         """
         return {
-            "kpoints_mp_spacing": "0.04",
+            "kpoints_mp_spacing": 0.04,
         }
+
+
+@dataclass
+class CastepRelaxSetGenerator(CastepInputGenerator):
+    """
+    Class to generate CASTEP structure relaxation (geometry optimization) input sets.
+
+    This class creates input parameters for CASTEP relax calculations,
+    similar to VASP RelaxSetGenerator in atomate2.
+
+    Parameters
+    ----------
+    tight : bool
+        Whether to use tighter convergence settings (for high-precision relaxation).
+    variable_cell : bool
+        Whether to relax both atomic positions and cell parameters (cell optimization).
+    stress_tol : float
+        Target stress tolerance in GPa.
+    **kwargs
+        Other keyword arguments passed to CastepInputGenerator.
+    """
+
+    CONFIG: dict = field(
+        default_factory=lambda: {
+            "PARAM": {
+                "task": "GeometryOptimization",
+                "calculate_stress": "True",
+            }
+        }
+    )
+    tight: bool = False
+    variable_cell: bool = True
+
+    @property
+    def param_updates(self) -> dict:
+        """Return a dictionary of CASTEP input parameter updates."""
+        updates = {
+            "task": "GeometryOptimization",
+            "cut_off_energy": 520.0,
+            "xc_functional": "PBE",
+            "elec_energy_tol": 1e-05,
+            "geom_energy_tol": 1e-04,
+            "geom_force_tol": 0.05,
+            "geom_stress_tol": 0.1,
+            "max_scf_cycles": 100,
+            "smearing_width": 0.1,
+            "write_checkpoint": None,
+            "num_dump_cycles": None,
+        }
+        if self.tight:
+            updates.update(
+                {
+                    "elec_energy_tol": 1e-06,
+                    "geom_energy_tol": 1e-05,
+                    "geom_force_tol": 0.01,
+                    "geom_stress_tol": 0.005,
+                    "cut_off_energy": 600.0,
+                    "smearing_width": 0.05,
+                }
+            )
+        return updates
+
+    @property
+    def cell_updates(self) -> dict:
+        """Return a dictionary of CASTEP cell parameter updates."""
+        updates = {
+            "kpoints_mp_spacing": 0.04,
+            "symmetry_generate": True,
+            "symmetry_tol": 1.0e-5,
+        }
+        if self.variable_cell:
+            updates.update({"fix_all_cell": None})
+        else:
+            updates.update({"fix_all_cell": True})
+        return updates

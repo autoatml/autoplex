@@ -31,7 +31,6 @@ from autoplex.data.common.utils import (
     cur_select,
     data_distillation,
     flatten,
-    handle_rss_trajectory,
     mc_rattle,
     random_vary_angle,
     scale_cell,
@@ -39,6 +38,8 @@ from autoplex.data.common.utils import (
     stratified_dataset_split,
     to_ase_trajectory,
 )
+from autoplex.data.md.utils import handle_md_trajectory
+from autoplex.data.rss.utils import handle_rss_trajectory
 from autoplex.fitting.common.regularization import set_custom_sigma
 
 if TYPE_CHECKING:
@@ -195,12 +196,20 @@ def generate_randomized_structures(
     distort_type: int.
         0- volume distortion, 1- angle distortion, 2- volume and angle distortion. Default=0.
     n_structures: int.
-        Total number of distorted structures to be generated.
-        Must be provided if distorting volume without specifying a range, or if distorting angles.
-        Default=10.
+        Target total number of structures to generate (after rattling). Default=10.
+        - If `volume_custom_scale_factors` is None:
+            The code generates `n_structures` different volume or angle distortions.
+            Each is rattled once.
+        - If `volume_custom_scale_factors` is defined:
+            Given that the list length equals m, the total `n_structures` is distributed
+            over these m scale factors:
+                base = n_structures // m
+                rem = n_structures % m
+            Note that the last `rem` factors get one extra rattled structure.
+            Example: volume_custom_scale_factors=[0.95,0.97,0.99], n_structures=10 -> counts=[3,3,4].
     volume_scale_factor_range: list[float]
         [min, max] of volume scale factors.
-        e.g. [0.90, 1.10] will distort volume +-10%.
+        e.g. [0.90, 1.10] will distort volume -+10%.
     volume_custom_scale_factors: list[float]
         Specify explicit scale factors (if range is not specified).
         If None, will default to [0.90, 0.95, 0.98, 0.99, 1.01, 1.02, 1.05, 1.10].
@@ -238,11 +247,7 @@ def generate_randomized_structures(
     """
     if supercell_matrix is None:
         supercell_matrix = [[2, 0, 0], [0, 2, 0], [0, 0, 2]]
-    supercell = get_supercell(
-        unitcell=get_phonopy_structure(structure),
-        supercell_matrix=supercell_matrix,
-    )
-    structure = get_pmg_structure(supercell)
+    structure = structure * supercell_matrix
 
     # distort cells by volume or angle
     if distort_type == 0:
@@ -286,35 +291,41 @@ def generate_randomized_structures(
     # distorted_cells=list(chain.from_iterable(distorted_cells))
 
     # rattle cells by standard or mc
-    rattled_cells = (
-        [
-            std_rattle(
-                structure=cell,
-                n_structures=1,
-                rattle_std=rattle_std,
-                rattle_seed=rattle_seed + icell,
-            )
-            for icell, cell in enumerate(distorted_cells)
-        ]
-        if rattle_type == 0
-        else (
-            [
-                mc_rattle(
-                    structure=cell,
-                    n_structures=1,
-                    rattle_std=rattle_std,
-                    min_distance=min_distance,
-                    rattle_seed=rattle_seed + icell,
-                    rattle_mc_n_iter=rattle_mc_n_iter,
-                )
-                for icell, cell in enumerate(distorted_cells)
-            ]
-            if rattle_type == 1
-            else None
-        )
-    )
+    m = len(distorted_cells)
+    if volume_custom_scale_factors is not None:
+        base = n_structures // m
+        rem = n_structures % m
+        counts = [base + (1 if i >= m - rem else 0) for i in range(m)]
+    else:
+        counts = [1] * m
 
-    if rattled_cells is None:
+    rattled_cells = []
+    if rattle_type == 0:
+        for icell, (cell, count) in enumerate(zip(distorted_cells, counts)):
+            seed_for_cell = int(rattle_seed) + icell
+            rattled = std_rattle(
+                structure=cell,
+                n_structures=count,
+                rattle_std=rattle_std,
+                rattle_seed=seed_for_cell,
+            )
+            rattled_cells.append(rattled)
+    elif rattle_type == 1:
+        for icell, (cell, count) in enumerate(zip(distorted_cells, counts)):
+            if count <= 0:
+                continue
+            seed_for_cell = int(rattle_seed) + icell
+            rattled = mc_rattle(
+                structure=cell,
+                n_structures=count,
+                rattle_std=rattle_std,
+                min_distance=min_distance,
+                rattle_seed=seed_for_cell,
+                rattle_mc_n_iter=rattle_mc_n_iter,
+            )
+            rattled_cells.append(rattled)
+    else:
+        rattled_cells = None
         raise TypeError("rattle_type is not recognized")
 
     return list(chain.from_iterable(rattled_cells))
@@ -330,6 +341,7 @@ def sample_data(
     dir: list[str] | str | None = None,
     structure: list[Structure] | list[list[Structure]] | None = None,
     traj_path: list | None = None,
+    traj_type: Literal["rss", "md"] = "rss",
     isolated_atom_energies: dict | None = None,
     random_seed: int = None,
     remove_traj_files: bool = False,
@@ -380,6 +392,8 @@ def sample_data(
         List of structures for sampling. Default is None.
     traj_path: list[list[str]]
         List of lists containing trajectory paths. Default is None.
+    traj_type: Literal["rss", "md"]
+        Specifies the type of trajectory to process, where 'rss' and 'md' represent different trajectory formats.
     isolated_atom_energies: dict
         Dictionary of isolated energy values for species. Required for 'boltzhist_cur'
         selection method. Default is None.
@@ -430,7 +444,11 @@ def sample_data(
         atoms = [AseAtomsAdaptor().get_atoms(at) for at in structure]
 
     else:
-        atoms, pressures = handle_rss_trajectory(traj_path, remove_traj_files)
+        if traj_type == "rss":
+            atoms, pressures = handle_rss_trajectory(traj_path, remove_traj_files)
+        elif traj_type == "md":
+            atoms = handle_md_trajectory(traj_path, remove_traj_files)
+            atoms = flatten(atoms, recursive=True)
 
     if selection_method in {"cur", "bcur1s", "bcur2i"}:
         n_species = ElementCollection(
@@ -541,13 +559,17 @@ def sample_data(
     if selected_atoms is None:
         raise ValueError("Unable to sample correctly. Please recheck the parameters!")
 
+    ase_atoms_list = [AseAtomsAdaptor().get_atoms(struct) for struct in selected_atoms]
+
+    write("selected_structures.extxyz", ase_atoms_list)
+
     return selected_atoms
 
 
 @job
 def collect_dft_data(
     dft_ref_file: str = "dft_ref.extxyz",
-    rss_group: str = "RSS",
+    rss_group: str | None = None,
     dft_dirs: dict | None = None,
 ) -> dict:
     """
@@ -653,7 +675,8 @@ def collect_dft_data(
                         and at_i.info["config_type"] != "IsolatedAtom"
                     ):
                         at_i.pbc = True
-                        at_i.info["rss_group"] = rss_group
+                        if rss_group:
+                            at_i.info["rss_group"] = rss_group
                     else:
                         at_i.info["rss_nonperiodic"] = "T"
 

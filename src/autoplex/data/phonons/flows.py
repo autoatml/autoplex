@@ -268,7 +268,7 @@ class RandomStructuresDataGenerator(Maker):
     angle_max_attempts: int.
         Maximum number of attempts to distort structure before aborting.
         Default=1000.
-    w_angle: list[float]
+    w_angle: list[int]
         List of angle indices to be changed i.e. 0=alpha, 1=beta, 2=gamma.
         Default= [0, 1, 2].
     rattle_type: int.
@@ -326,7 +326,7 @@ class RandomStructuresDataGenerator(Maker):
     rattle_std: float = 0.01
     rattle_seed: int = 42
     rattle_mc_n_iter: int = 10
-    w_angle: list[float] | None = None
+    w_angle: list[int] | None = None
     supercell_settings: dict | None = field(
         default_factory=lambda: {"min_length": 15, "max_length": 20}
     )
