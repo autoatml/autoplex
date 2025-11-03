@@ -196,6 +196,7 @@ class CastepStaticSetGenerator(CastepInputGenerator):
             "finite_basis_corr": "automatic",
             "mixing_scheme": "Pulay",
             "mix_charge_amp": 0.6,
+            "perc_extra_bands": 60.0,
         }
 
         if self.lepsilon:
