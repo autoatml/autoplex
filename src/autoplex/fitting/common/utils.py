@@ -12,6 +12,7 @@ import xml.etree.ElementTree as ET
 from collections.abc import Iterable
 from functools import partial
 from pathlib import Path
+from typing import Literal
 
 import ase
 import lightning as pl
@@ -39,6 +40,7 @@ from monty.dev import requires
 from monty.serialization import dumpfn
 from nequip.ase import NequIPCalculator
 from numpy import ndarray
+from pydantic import Field
 from pymatgen.core import Structure
 from pymatgen.io.ase import AseAtomsAdaptor
 from pytorch_lightning.loggers import CSVLogger
@@ -1228,7 +1230,9 @@ def m3gnet_fitting(
 def mace_fitting(
     db_dir: Path,
     hyperparameters: MACE_HYPERS = MACE_HYPERS,
-    device: str = "cuda",
+    device: Literal["cpu", "cuda", "mps", "xpu"] = Field(
+        default="cpu", description="Device to be used for model fitting"
+    ),
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",

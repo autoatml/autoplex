@@ -685,9 +685,6 @@ class MACESettings(AutoplexBaseModel):
     default_dtype: Literal["float32", "float64"] = Field(
         default="float32", description="Default data type"
     )
-    device: Literal["cpu", "cuda", "mps", "xpu"] = Field(
-        default="cpu", description="Device to be used for model fitting"
-    )
     distributed: bool = Field(
         default=False, description="Train in multi-GPU data parallel mode"
     )
