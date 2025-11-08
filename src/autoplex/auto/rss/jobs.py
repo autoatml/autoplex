@@ -229,7 +229,7 @@ def initial_rss(
 
         - 'test_error': float, The test error of the fitted MLIP.
         - 'pre_database_dir': str, The directory of the preprocessed database.
-        - 'mlip_path': List of path to the fitted MLIP.
+        - 'mlip_path': Path to the fitted MLIP.
         - 'isolated_atom_energies': dict, The isolated energy values.
         - 'current_iter': int, The current iteration index, set to 0.
     """
@@ -315,7 +315,7 @@ def initial_rss(
         output={
             "test_error": do_mlip_fit.output["test_error"],
             "pre_database_dir": do_data_preprocessing.output,
-            "mlip_path": do_mlip_fit.output["mlip_path"],
+            "mlip_path": do_mlip_fit.output["mlip_path"][0],
             "isolated_atom_energies": do_data_collection.output[
                 "isolated_atom_energies"
             ],
@@ -410,8 +410,8 @@ def do_rss_iterations(
                 The test error of the fitted MLIP.
             pre_database_dir: str
                 The directory of the preprocessed database.
-            mlip_path: list[str]
-                List of path to the fitted MLIP.
+            mlip_path: str | path
+                Path to the fitted MLIP.
             isolated_atom_energies: dict
                 The isolated energy values.
             current_iter: int
@@ -573,7 +573,7 @@ def do_rss_iterations(
 
         - 'test_error': float, The test error of the fitted MLIP.
         - 'pre_database_dir': str, The directory of the preprocessed database.
-        - 'mlip_path': List of path to the fitted MLIP.
+        - 'mlip_path': Path to the fitted MLIP.
         - 'isolated_atom_energies': dict, The isolated energy values.
         - 'current_iter': int, The current iteration index.
         - 'kt': float, The temperature (in eV) for Boltzmann sampling.
@@ -713,7 +713,7 @@ def do_rss_iterations(
             input={
                 "test_error": do_mlip_fit.output["test_error"],
                 "pre_database_dir": do_data_preprocessing.output,
-                "mlip_path": do_mlip_fit.output["mlip_path"],
+                "mlip_path": do_mlip_fit.output["mlip_path"][0],
                 "isolated_atom_energies": input["isolated_atom_energies"],
                 "current_iter": current_iter,
                 "kt": kt,
