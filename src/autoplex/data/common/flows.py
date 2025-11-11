@@ -416,8 +416,8 @@ class RattledTrainingDataMaker(DFTStaticLabelling):
     """
 
     name: str = "do_rattling"
-    bulk_relax_maker: BaseVaspMaker | BaseCastepMaker | ForceFieldRelaxMaker = (
-        _DEFAULT_RELAXATION_MAKER
+    bulk_relax_maker: BaseVaspMaker | BaseCastepMaker | ForceFieldRelaxMaker = field(
+        default_factory=lambda: _DEFAULT_RELAXATION_MAKER
     )
     uc: bool = False
     distort_type: int = 0

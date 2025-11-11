@@ -694,7 +694,7 @@ def split_structure_into_groups(structures: list, num_groups: int) -> list[list]
 def handle_rss_trajectory(
     traj_path: list,
     remove_traj_files: bool = False,
-) -> tuple[list[list], list[list]]:
+) -> tuple[list[list[ase.Atoms]], list[list[float]]]:
     """
     Handle trajectory and associated information.
 
@@ -709,9 +709,9 @@ def handle_rss_trajectory(
     Returns
     -------
     tuple:
-        atoms: list
+        atoms: list[list[ase.Atoms]]
             List of ASE Atoms objects read from the trajectory files.
-        pressures: list
+        pressures: list[list[float]]
             List of pressure values corresponding to the atoms.
     """
     atoms = []
