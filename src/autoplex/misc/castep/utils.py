@@ -191,10 +191,14 @@ class CastepStaticSetGenerator(CastepInputGenerator):
             "cut_off_energy": 520.0,
             "xc_functional": "PBE",
             "elec_energy_tol": 1e-06,
-            "max_scf_cycles": 100,
+            "max_scf_cycles": 1000,
             "smearing_width": 0.05,
-            "write_checkpoint": None,
+            "write_checkpoint": "none",
             "num_dump_cycles": 0,
+            "finite_basis_corr": "automatic",
+            "mixing_scheme": "Pulay",
+            "mix_charge_amp": 0.6,
+            "perc_extra_bands": 60.0,
         }
 
         if self.lepsilon:
@@ -216,7 +220,7 @@ class CastepStaticSetGenerator(CastepInputGenerator):
             Dictionary of CASTEP .cell file parameters for static calculations
         """
         return {
-            "kpoints_mp_spacing": 0.04,
+            "kpoints_mp_spacing": "0.03",
         }
 
 

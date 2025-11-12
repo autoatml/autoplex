@@ -1295,7 +1295,7 @@ def mace_fitting(
 
     if ref_virial_name is not None:
         atoms = read(f"{db_dir}/train.extxyz", index=":")
-        mace_virial_format_conversion(
+        mace_convert_virial_to_stress(
             atoms=atoms, ref_virial_name=ref_virial_name, out_file_name="train.extxyz"
         )
 
@@ -1352,7 +1352,11 @@ def mace_fitting(
     if ref_force_name is not None:
         hypers.append(f"--forces_key={ref_force_name}")
     if ref_virial_name is not None:
-        hypers.append(f"--virials_key={ref_virial_name}")
+        hypers.append(
+            "--stress_key={'REF_stress'}"
+        )  # MACE will be trained on stress instead of virial.
+        # They are essentially equivalent, but since the MACE-torch log file directly
+        # reports the stress error, we train on stress for consistency.
     if device is not None:
         hypers.append(f"--device={device}")
 
@@ -2197,11 +2201,11 @@ def write_after_distillation_data_split(
     ase.io.write(test_name, test_structures, format="extxyz", append=True)
 
 
-def mace_virial_format_conversion(
+def mace_convert_virial_to_stress(
     atoms: list[Atoms], ref_virial_name: str, out_file_name: str
 ) -> None:
     """
-    Convert the format of virial vector (9,) into a format (3x3) recognizable by MACE.
+    Convert a virial vector into a stress tensor.
 
     Parameters
     ----------
@@ -2215,7 +2219,8 @@ def mace_virial_format_conversion(
     formatted_atoms = []
     for at in atoms:
         if ref_virial_name in at.info:
-            at.info[ref_virial_name] = at.info[ref_virial_name].reshape(3, 3)
+            at.info["REF_stress"] = -at.info[ref_virial_name] / at.get_volume()
+            del at.info[ref_virial_name]
             formatted_atoms.append(at)
 
     write(out_file_name, formatted_atoms, format="extxyz")

@@ -308,16 +308,25 @@ class DFTStaticLabelling(Maker):
                             coords_are_cartesian=True,
                         )
 
-                        static_job = st_m.make(structure=dimer_struct)
-                        if isinstance(self.static_energy_maker, StaticMaker):
-                            static_job = update_user_incar_settings(
-                                static_job,
-                                {"KSPACING": 100.0, "KPAR": 1},
-                            )
-                            if self.e0_spin:
+                        static_energy_maker_dimer = (
+                            self.static_energy_maker_isolated_atoms
+                        )
+                        if static_energy_maker_dimer is None:
+                            static_job = st_m.make(structure=dimer_struct)
+                            if isinstance(self.static_energy_maker, StaticMaker):
                                 static_job = update_user_incar_settings(
-                                    static_job, {"ISPIN": 2}
+                                    static_job,
+                                    {"KSPACING": 100.0, "KPAR": 1},
                                 )
+
+                                if self.e0_spin:
+                                    static_job = update_user_incar_settings(
+                                        static_job, {"ISPIN": 2}
+                                    )
+                        else:
+                            static_job = static_energy_maker_dimer.make(
+                                structure=dimer_struct
+                            )
 
                         static_job.name = f"static_dimer_{dimer_i}"
                         dirs["dirs_of_dft"].append(static_job.output.dir_name)
