@@ -35,6 +35,10 @@ class InputDoc(BaseModel):
 class OutputDoc(BaseModel):
     """The outputs of this job."""
 
+    structure: Structure | None = Field(
+        None, description="Final output structure from the task."
+    )
+
     energy: float | None = Field(None, description="Total energy in units of eV.")
 
     energy_per_atom: float | None = Field(
