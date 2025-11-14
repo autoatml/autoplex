@@ -1,5 +1,39 @@
 # Changelog
 
+## v0.2.0
+
+# v0.2.0: CASTEP Integration
+
+## [0.2.0]: CASTEP Integration
+
+Previously, **autoplex** supported DFT labelling of structures primarily via **VASP**.  
+
+In this release, we introduce a new **CASTEP interface**, developed based on the [`ase.calculators.castep`](https://ase-lib.org/ase/calculators/castep.html) module.  
+This addition enables CASTEP to be used directly within the **autoplex** workflow, laying the groundwork for high-throughput DFT workflows, such as **Random Structure Searching (RSS)**.  
+
+## What's Changed
+### 🚀 New Features
+- **CASTEP Makers** with the workflow integration in [https://github.com/autoatml/autoplex/pull/436](https://github.com/autoatml/autoplex/pull/436)
+  Developed by @YuanbinLiu, @YutaOkkotsu16, and @JaGeo. Further contributions (documentation and review) by @nfragapane and @naik-aakash 
+
+### 🔄 Other Changes
+- Generalized data creation for the **RSS workflow**, improving flexibility and automation.  
+  Contributed by @JaGeo, @naik-aakash, and @YuanbinLiu. 
+- Updated `index.rst` and added **CASTEP documentation** for better coverage and clarity by @JaGeo. 
+- Upgraded **MACE** version to enhance compatibility and ensure model consistency by @naik-aakash. 
+- Updated **pre-commit hooks** to maintain consistent code formatting and improve CI stability by @naik-aakash. 
+- Expanded and refined **README** documentation and miscellaneous module descriptions by @JaGeo. 
+
+### 🐛 Bug fixes
+- Resolved several **RSS-related issues**, improving overall workflow robustness.  
+  @YuanbinLiu 
+
+### Contributors
+@YuanbinLiu @JaGeo @naik-aakash @nfragapane  @YutaOkkotsu16
+
+**Full Changelog**: https://github.com/autoatml/autoplex/compare/v0.1.4...v0.2.0
+
+
 ## v0.1.4
 
 <!-- Release notes generated using configuration in .github/release.yml at main -->
