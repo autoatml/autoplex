@@ -14,6 +14,5 @@
         "ms-azuretools.vscode-docker"]
     },
   },
-  "features": {"ghcr.io/devcontainers/features/docker-in-docker:2": {} },
   "postCreateCommand": "pip cache purge && uv pip install --prerelease=allow -e .[strict,docs] && pre-commit install",
 }
