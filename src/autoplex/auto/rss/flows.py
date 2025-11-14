@@ -107,7 +107,7 @@ class RssMaker(Maker):
 
             - 'test_error': float, The test error from the last completed training step.
             - 'pre_database_dir': str, Path to the directory containing the pre-existing database for resuming.
-            - 'mlip_path': str, Path to the file of a previous MLIP model.
+            - 'mlip_path': str | Path, Path to the file of a previous MLIP model.
             - 'isolated_atom_energies': dict, A dictionary with isolated atom energy values mapped to atomic numbers.
 
         generated_struct_numbers: list[int]
