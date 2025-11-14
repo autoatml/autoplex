@@ -80,7 +80,10 @@ WORKDIR /workspace
 COPY . /workspace
 
 # Install autoplex, testing dependencies and clear cache
-RUN python -m pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir uv \
-    && uv pip install pre-commit pytest pytest-mock pytest-split pytest-cov types-setuptools \
-    && uv pip install --prerelease=allow .[strict,docs] && uv cache clean && rm -rf /tmp/*
+RUN micromamba run -n base -- python -m pip install --no-cache-dir --upgrade pip \
+ && micromamba run -n base -- pip install --no-cache-dir uv \
+ && micromamba run -n base -- uv pip install pre-commit pytest pytest-mock pytest-split pytest-cov types-setuptools \
+ && micromamba run -n base -- uv pip install --prerelease=allow ".[strict,docs]" \
+ && micromamba run -n base -- uv cache clean \
+ && micromamba clean --all --yes \
+ && rm -rf /tmp/*
