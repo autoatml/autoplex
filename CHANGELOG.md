@@ -2,10 +2,6 @@
 
 ## v0.2.0
 
-# v0.2.0: CASTEP Integration
-
-## [0.2.0]: CASTEP Integration
-
 Previously, **autoplex** supported DFT labelling of structures primarily via **VASP**.  
 
 In this release, we introduce a new **CASTEP interface**, developed based on the [`ase.calculators.castep`](https://ase-lib.org/ase/calculators/castep.html) module.  
@@ -86,6 +82,7 @@ This addition enables CASTEP to be used directly within the **autoplex** workflo
 * small docs extension by @QuantumChemist in https://github.com/autoatml/autoplex/pull/332
 ### 🧹 House-Keeping
 * Update dependencies & CI publish workflow by @naik-aakash in https://github.com/autoatml/autoplex/pull/334
+
 
 
 **Full Changelog**: https://github.com/autoatml/autoplex/compare/v0.1.1...v0.1.2
