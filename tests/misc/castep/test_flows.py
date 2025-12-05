@@ -41,8 +41,8 @@ def test_DFTStaticLabelling_with_castep(memory_jobstore, mock_castep, clean_dir)
     )
 
     job_dft = DFTStaticLabelling(
-        isolated_atom=False,
-        dimer=False,
+        include_isolated_atom=False,
+        include_dimer=False,
         static_energy_maker=castep_maker,
     ).make(structures=structures)
     

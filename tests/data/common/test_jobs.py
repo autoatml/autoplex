@@ -37,7 +37,7 @@ def test_generate_randomized_structures_distort_type_0(memory_jobstore):
     for uuid, response_collection in responses.items():
         for k, response in response_collection.items():
             # check if correct number of structures are generated
-            assert 11 == len(response.output)
+            assert 10 == len(response.output)
             for struct in response.output:
                 # check if all outputs are Structure objects
                 assert isinstance(struct, Structure)
@@ -102,7 +102,7 @@ def test_generate_randomized_structures_distort_type_2(memory_jobstore):
     for uuid, response_collection in responses.items():
         for k, response in response_collection.items():
             # check if correct number of structures are generated
-            assert 11 == len(response.output)
+            assert 10 == len(response.output)
             for struct in response.output:
                 # check if all outputs are Structure objects
                 assert isinstance(struct, Structure)

@@ -257,8 +257,8 @@ def initial_rss(
     do_dft_static = DFTStaticLabelling(
         e0_spin=e0_spin,
         isolatedatom_box=isolatedatom_box,
-        isolated_atom=include_isolated_atom,
-        dimer=include_dimer,
+        include_isolated_atom=include_isolated_atom,
+        include_dimer=include_dimer,
         dimer_box=dimer_box,
         dimer_range=dimer_range,
         dimer_num=dimer_num,
@@ -266,8 +266,9 @@ def initial_rss(
         custom_potcar=custom_potcar,
         static_energy_maker=static_energy_maker,
         static_energy_maker_isolated_atoms=static_energy_maker_isolated_atoms,
+        config_type=config_type,
     ).make(
-        structures=do_randomized_structure_generation.output, config_type=config_type
+        structures=do_randomized_structure_generation.output,
     )
     do_data_collection = collect_dft_data(
         dft_ref_file=dft_ref_file, rss_group=rss_group, dft_dirs=do_dft_static.output
@@ -650,6 +651,7 @@ def do_rss_iterations(
             num_of_selection=num_of_rss_selected_structs,
             bcur_params=bcur_params,
             traj_path=do_rss.output,
+            traj_type="rss",
             random_seed=random_seed,
             isolated_atom_energies=input["isolated_atom_energies"],
             remove_traj_files=remove_traj_files,
@@ -657,8 +659,8 @@ def do_rss_iterations(
         do_dft_static = DFTStaticLabelling(
             e0_spin=e0_spin,
             isolatedatom_box=isolatedatom_box,
-            isolated_atom=include_isolated_atom,
-            dimer=include_dimer,
+            include_isolated_atom=include_isolated_atom,
+            include_dimer=include_dimer,
             dimer_box=dimer_box,
             dimer_range=dimer_range,
             dimer_num=dimer_num,
@@ -666,7 +668,10 @@ def do_rss_iterations(
             custom_potcar=custom_potcar,
             static_energy_maker=static_energy_maker,
             static_energy_maker_isolated_atoms=static_energy_maker_isolated_atoms,
-        ).make(structures=do_data_sampling.output, config_type=config_type)
+            config_type=config_type,
+        ).make(
+            structures=do_data_sampling.output,
+        )
         do_data_collection = collect_dft_data(
             dft_ref_file=dft_ref_file,
             rss_group=rss_group,

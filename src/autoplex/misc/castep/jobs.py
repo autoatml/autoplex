@@ -18,7 +18,7 @@ from ase.io import read
 from ase.stress import voigt_6_to_full_3x3_stress
 from ase.units import GPa
 from atomate2.common.files import gzip_files
-from jobflow import Maker, job
+from jobflow import Flow, Maker, job
 from pymatgen.io.ase import AseAtomsAdaptor
 
 from autoplex.misc.castep.run import run_castep
@@ -27,6 +27,7 @@ from autoplex.misc.castep.utils import (
     CASTEP_INPUT_FILES,
     CASTEP_OUTPUT_FILES,
     CastepInputGenerator,
+    CastepRelaxSetGenerator,
     CastepStaticSetGenerator,
 )
 from autoplex.settings import SETTINGS
@@ -106,7 +107,7 @@ class BaseCastepMaker(Maker):
 
         Parameters
         ----------
-        structure : Structure
+        structure: Structure
             A pymatgen structure object.
 
         Returns
@@ -223,3 +224,62 @@ class CastepStaticMaker(BaseCastepMaker):
     input_set_generator: CastepInputGenerator = field(
         default_factory=CastepStaticSetGenerator
     )
+
+
+@dataclass
+class CastepRelaxMaker(BaseCastepMaker):
+    """
+    Maker to run a single CASTEP geometry optimization.
+
+    Parameters
+    ----------
+    name : str
+        Job name.
+    input_set_generator : CastepRelaxSetGenerator
+        Generator for CASTEP input settings.
+    """
+
+    name: str = "castep_relax"
+    input_set_generator: CastepInputGenerator = field(
+        default_factory=CastepRelaxSetGenerator
+    )
+
+
+@dataclass
+class CastepDoubleRelaxMaker(CastepRelaxMaker):
+    """
+    Maker to run two consecutive CASTEP relaxations.
+
+    The first relaxation runs on the initial structure,
+    and the second uses the first output structure as input
+    to refine the result.
+
+    Parameters
+    ----------
+    name : str
+        Job name.
+    """
+
+    name: str = "castep_double_relax"
+
+    def make(self, structure: Structure):
+        """
+        Run two consecutive CASTEP relaxations.
+
+        Parameters
+        ----------
+        structure: Structure
+            A pymatgen Structure object.
+
+        Returns
+        -------
+        output: dict
+            Output of the second relaxation step.
+        """
+        jobs = []
+        first_job = CastepRelaxMaker.make(self, structure)
+        first_job.name = "relax_1"
+        second_job = CastepRelaxMaker.make(self, first_job.output.structure)
+        second_job.name = "relax_2"
+        jobs = [first_job, second_job]
+        return Flow(jobs=jobs, output=second_job.output, name=self.name)

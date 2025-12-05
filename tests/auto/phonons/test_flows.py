@@ -668,12 +668,14 @@ def test_iterative_complete_dft_vs_ml_benchmark_workflow_gap(vasp_test_dir, mock
                                                                                                               1.0,
                                                                                                               1.025,
                                                                                                               1.05],
+                                                                                 n_structures=4,
                                                                                  supercell_settings={"min_length": 8,
                                                                                                      "min_atoms": 20},
                                                                                  apply_data_preprocessing=True),
         complete_dft_vs_ml_benchmark_workflow_1=CompleteDFTvsMLBenchmarkWorkflow(symprec=1e-2, displacements=[0.01],
                                                                                  split_ratio=0.33,
                                                                                  volume_custom_scale_factors=[0.975],
+                                                                                 n_structures=1,
                                                                                  supercell_settings={"min_length": 8,
                                                                                                      "min_atoms": 20},
                                                                                  apply_data_preprocessing=True,
@@ -718,11 +720,13 @@ def test_iterative_complete_dft_vs_ml_benchmark_workflow_gap_add_phonon_false(va
                                                                                   split_ratio=0.33,
                                                                                   add_dft_phonon_struct=False,
         volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
+        n_structures=4,
         supercell_settings={"min_length": 8, "min_atoms": 20},
         apply_data_preprocessing=True),
         complete_dft_vs_ml_benchmark_workflow_1=CompleteDFTvsMLBenchmarkWorkflow(symprec=1e-2, displacements=[0.01],
                                                                                  split_ratio=0.33,
                                                                                  volume_custom_scale_factors=[0.975],
+                                                                                 n_structures=1,
                                                                                  supercell_settings={"min_length": 8,
                                                                                                      "min_atoms": 20},
                                                                                  apply_data_preprocessing=True,
@@ -763,6 +767,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_gap(
     complete_workflow = CompleteDFTvsMLBenchmarkWorkflow(
         symprec=1e-2, displacements=[0.01],
         volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
+        n_structures=4,
         supercell_settings={"min_length": 8, "min_atoms": 20},
         apply_data_preprocessing=True,
     ).make(
@@ -813,6 +818,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_gap_ml_potential_for_data(
     complete_workflow = CompleteDFTvsMLBenchmarkWorkflow(
         symprec=1e-2, displacements=[0.01],
         volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
+        n_structures=4,
         supercell_settings={"min_length": 8, "min_atoms": 20},
         apply_data_preprocessing=True,
         displacement_maker=ForceFieldStaticMaker(force_field_name="MACE_MP_0B3"),
@@ -863,6 +869,7 @@ def test_complete_dft_vs_gap_benchmark_workflow_database(
     complete_workflow = CompleteDFTvsMLBenchmarkWorkflow(
         symprec=1e-2, displacements=[0.01],
         volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
+        n_structures=4,
         supercell_settings={"min_length": 8, "min_atoms": 20},
         apply_data_preprocessing=True,
         run_fits_on_different_cluster=True,
@@ -911,6 +918,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_m3gnet(
         ml_models=["M3GNET"],
         symprec=1e-2, supercell_settings={"min_length": 8, "min_atoms": 20}, displacements=[0.01],
         volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
+        n_structures=4,
         apply_data_preprocessing=True,
     ).make(
         structure_list=[structure],
@@ -962,6 +970,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_m3gnet_finetuning(
         ml_models=["M3GNET"],
         symprec=1e-2, supercell_settings={"min_length": 8, "min_atoms": 20}, displacements=[0.01],
         volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
+        n_structures=4,
         apply_data_preprocessing=True,
     ).make(
         structure_list=[structure],
@@ -1009,6 +1018,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_nep(
         ml_models=["NEP"],
         symprec=1e-2, supercell_settings={"min_length": 8, "min_atoms": 20}, displacements=[0.01],
         volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
+        n_structures=4,
         apply_data_preprocessing=True,
     ).make(
         structure_list=[structure],
@@ -1056,6 +1066,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_mace(
         ml_models=["MACE"],
         symprec=1e-2, supercell_settings={"min_length": 8, "min_atoms": 20}, displacements=[0.01],
         volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
+        n_structures=4,
         benchmark_kwargs={"calculator_kwargs": {"device": "cpu"}},
         apply_data_preprocessing=True,
     ).make(
@@ -1111,6 +1122,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_mace_finetuning(
         ml_models=["MACE"],
         symprec=1e-2, supercell_settings={"min_length": 8, "min_atoms": 20}, displacements=[0.01],
         volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
+        n_structures=4,
         benchmark_kwargs={"calculator_kwargs": {"device": "cpu"}},
         apply_data_preprocessing=True,
     ).make(
@@ -1176,7 +1188,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_mace_finetuning_mp_settings(
 
     complete_workflow_mace = CompleteDFTvsMLBenchmarkWorkflowMPSettings(
         ml_models=["MACE"],
-        volume_custom_scale_factors=[0.95, 1.00, 1.05], rattle_type=0, distort_type=0,
+        volume_custom_scale_factors=[0.95, 1.00, 1.05], n_structures=3, rattle_type=0, distort_type=0,
         symprec=1e-3, supercell_settings={"min_length": 6, "max_length": 10, "min_atoms": 10, "max_atoms": 300, },
         displacements=[0.01],
         benchmark_kwargs={"calculator_kwargs": {"device": "cpu"}},
@@ -1245,6 +1257,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_nequip(
         ml_models=["NEQUIP"],
         symprec=1e-2, supercell_settings={"min_length": 8, "min_atoms": 20}, displacements=[0.01],
         volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
+        n_structures=4,
         benchmark_kwargs={"calculator_kwargs": {"device": "cpu"}},
         apply_data_preprocessing=True,
     ).make(
@@ -1300,6 +1313,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_two_mpids(
                                                                   displacements=[0.01],
                                                                   volume_custom_scale_factors=[0.975, 1.0, 1.025,
                                                                                                1.05],
+                                                                  n_structures=4,
                                                                   apply_data_preprocessing=True,
                                                                   ).make(
         structure_list=[structure, structure],
@@ -1336,6 +1350,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_with_hploop(
                                                                 supercell_settings={"min_length": 8, "min_atoms": 20},
                                                                 displacements=[0.01],
                                                                 volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
+                                                                n_structures=4,
                                                                 hyper_para_loop=True,
                                                                 atomwise_regularization_list=[0.01],
                                                                 n_sparse_list=[3000, 5000],
@@ -1379,6 +1394,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_with_sigma_regularization_hploop(
                                                                       displacements=[0.01],
                                                                       volume_custom_scale_factors=[0.975, 1.0, 1.025,
                                                                                                    1.05],
+                                                                      n_structures=4,
                                                                       hyper_para_loop=True,
                                                                       atomwise_regularization_list=[0.01],
                                                                       n_sparse_list=[3000, 5000],
@@ -1426,6 +1442,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_with_sigma_regularization(
                                                                supercell_settings={"min_length": 8, "min_atoms": 20},
                                                                displacements=[0.01],
                                                                volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
+                                                               n_structures=4,
                                                                summary_filename_prefix="test_results_",
                                                                apply_data_preprocessing=True,
                                                                regularization=True,
@@ -1480,6 +1497,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_separated(
                                                              displacements=[0.01],
                                                              volume_custom_scale_factors=[0.975, 1.0, 1.025,
                                                                                           1.05],
+                                                             n_structures=4,
                                                              apply_data_preprocessing=True,
                                                              separated=True,
                                                              ).make(
@@ -1522,6 +1540,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_separated_sigma_reg_hploop_three_
                                                                supercell_settings={"min_length": 8, "min_atoms": 20},
                                                                displacements=[0.01],
                                                                volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
+                                                               n_structures=4,
                                                                hyper_para_loop=True,
                                                                atomwise_regularization_list=[0.01],
                                                                n_sparse_list=[3000, 5000],
@@ -1572,6 +1591,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_separated_sigma_reg_hploop(
                                                              supercell_settings={"min_length": 8, "min_atoms": 20},
                                                              displacements=[0.01],
                                                              volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
+                                                             n_structures=4,
                                                              hyper_para_loop=True, atomwise_regularization_list=[0.01],
                                                              n_sparse_list=[3000, 5000], soap_delta_list=[1.0],
                                                              apply_data_preprocessing=True,
@@ -1626,7 +1646,7 @@ class TestCompleteDFTvsMLBenchmarkWorkflow:
         structure = Structure.from_file(path_to_struct)
 
         add_data_workflow = CompleteDFTvsMLBenchmarkWorkflow(
-            n_structures=3,
+            n_structures=12,
             symprec=1e-2,
             supercell_settings={"min_length": 8, "min_atoms": 20},
             displacements=[0.01],
@@ -1678,7 +1698,7 @@ class TestCompleteDFTvsMLBenchmarkWorkflow:
         dft_reference: PhononBSDOSDoc = dft_data["output"]
 
         add_data_workflow_with_dft_reference = CompleteDFTvsMLBenchmarkWorkflow(
-            n_structures=3,
+            n_structures=12,
             symprec=1e-2,
             supercell_settings={"min_length": 8, "min_atoms": 20},
             displacements=[0.01],
@@ -1728,7 +1748,7 @@ class TestCompleteDFTvsMLBenchmarkWorkflow:
         structure = Structure.from_file(path_to_struct)
 
         add_data_workflow_add_phonon_false = CompleteDFTvsMLBenchmarkWorkflow(
-            n_structures=3,
+            n_structures=12,
             symprec=1e-2,
             supercell_settings={"min_length": 8, "min_atoms": 20},
             displacements=[0.01],
@@ -1765,7 +1785,7 @@ class TestCompleteDFTvsMLBenchmarkWorkflow:
         structure = Structure.from_file(path_to_struct)
 
         add_data_workflow_add_random_false = CompleteDFTvsMLBenchmarkWorkflow(
-            n_structures=3,
+            n_structures=12,
             symprec=1e-2,
             supercell_settings={"min_length": 8, "min_atoms": 20},
             displacements=[0.01],
@@ -1802,7 +1822,7 @@ class TestCompleteDFTvsMLBenchmarkWorkflow:
         structure = Structure.from_file(path_to_struct)
 
         add_data_workflow_with_same_mpid = CompleteDFTvsMLBenchmarkWorkflow(
-            n_structures=3,
+            n_structures=12,
             symprec=1e-2,
             supercell_settings={"min_length": 8, "min_atoms": 20},
             displacements=[0.01],
@@ -1910,7 +1930,7 @@ class TestCompleteDFTvsMLBenchmarkWorkflow:
             input_set_generator=test_iso_atom_static_input_set,
         )
         test_different_makers_wf = CompleteDFTvsMLBenchmarkWorkflow(
-            n_structures=3,
+            n_structures=12,
             symprec=1e-2,
             supercell_settings={"min_length": 8, "min_atoms": 20},
             displacements=[0.01],

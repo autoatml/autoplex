@@ -151,7 +151,7 @@ def test_data_generation_distort_type_2(vasp_test_dir, mock_vasp, relax_maker, c
             "check_inputs": ["incar", "potcar"],
         },
     }
-    data_gen_dt_2 = RandomStructuresDataGenerator(distort_type=2, bulk_relax_maker=relax_maker).make(
+    data_gen_dt_2 = RandomStructuresDataGenerator(n_structures=2, distort_type=2, bulk_relax_maker=relax_maker).make(
         structure=structure,
         mp_id=test_mpid,
         volume_custom_scale_factors=[
@@ -211,7 +211,7 @@ def test_data_generation_volume_range(vasp_test_dir, mock_vasp, relax_maker, cle
             "check_inputs": ["incar", "potcar"],
         },
     }
-    data_gen_vol = RandomStructuresDataGenerator(distort_type=0, bulk_relax_maker=relax_maker).make(
+    data_gen_vol = RandomStructuresDataGenerator(n_structures=4, distort_type=0, bulk_relax_maker=relax_maker).make(
         structure=structure,
         mp_id=test_mpid,
         volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
@@ -312,7 +312,7 @@ def test_data_generation_distort_type_0(vasp_test_dir, mock_vasp, relax_maker, c
             "check_inputs": ["incar", "kpoints", "potcar"],
         },
     }
-    data_gen_dt_0 = RandomStructuresDataGenerator(distort_type=0, bulk_relax_maker=relax_maker).make(
+    data_gen_dt_0 = RandomStructuresDataGenerator(n_structures=1, distort_type=0, bulk_relax_maker=relax_maker).make(
         structure=structure,
         mp_id=test_mpid,
         volume_custom_scale_factors=[1.0],
