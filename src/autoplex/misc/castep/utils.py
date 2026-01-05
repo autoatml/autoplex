@@ -268,8 +268,6 @@ class CastepRelaxSetGenerator(CastepInputGenerator):
             "geom_stress_tol": 0.1,
             "max_scf_cycles": 100,
             "smearing_width": 0.1,
-            "write_checkpoint": None,
-            "num_dump_cycles": None,
         }
         if self.tight:
             updates.update(
