@@ -286,7 +286,7 @@ class RssMaker(Maker):
 
             - 'test_error': float, The test error of the fitted MLIP.
             - 'pre_database_dir': str, The directory of the latest RSS database.
-            - 'mlip_path': List of path to the latest fitted MLIP.
+            - 'mlip_path': str | Path, Path to the latest fitted MLIP.
             - 'isolated_atom_energies': dict, The isolated energy values.
             - 'current_iter': int, The current iteration index.
             - 'kb_temp': float, The temperature (in eV) for Boltzmann sampling.

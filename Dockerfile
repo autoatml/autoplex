@@ -80,7 +80,8 @@ WORKDIR /workspace
 COPY . /workspace
 
 # Install autoplex, testing dependencies and clear cache
-RUN python -m pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir uv \
-    && uv pip install pre-commit pytest pytest-mock pytest-split pytest-cov types-setuptools \
-    && uv pip install --prerelease=allow .[strict,docs] && uv cache clean && rm -rf /tmp/*
+RUN python -m pip install --upgrade pip \
+ && pip install uv \
+ && uv pip install --system pre-commit pytest pytest-mock pytest-split pytest-cov types-setuptools \
+ && uv pip install --system --prerelease=allow ".[strict,docs]" \
+ && uv cache clean && rm -rf /tmp/*
