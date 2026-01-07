@@ -29,7 +29,10 @@ from ase.data import chemical_symbols
 from ase.io import read, write
 from ase.io.extxyz import XYZError
 from atomate2.utils.path import strip_hostname
-from calorine.nep import read_loss, write_nepfile, write_structures
+try:
+    from calorine.nep import read_loss, write_nepfile, write_structures
+except ImportError:
+    pass
 from dgl.data.utils import split_dataset
 from matgl.apps.pes import Potential
 from matgl.ext.pymatgen import Structure2Graph, get_element_list
@@ -1236,6 +1239,7 @@ def mace_fitting(
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",
+    ref_stress_name: str = "REF_stress",
     fit_kwargs: dict | None = None,
 ) -> dict:
     """
@@ -1259,6 +1263,8 @@ def mace_fitting(
         Reference force name.
     ref_virial_name : str, optional
         Reference virial name.
+    ref_stress_name : str, optional
+        Reference stress name.
     fit_kwargs: dict.
         optional dictionary with parameters for mace fitting with keys same as
         mlip-rss-defaults.json.
@@ -1293,10 +1299,14 @@ def mace_fitting(
     """
     hyperparameters = hyperparameters.model_copy(deep=True)
 
-    if ref_virial_name is not None:
+    if ref_virial_name is not None or ref_stress_name is not None:
         atoms = read(f"{db_dir}/train.extxyz", index=":")
         mace_convert_virial_to_stress(
             atoms=atoms, ref_virial_name=ref_virial_name, out_file_name="train.extxyz"
+        )
+        atoms = read(f"{db_dir}/test.extxyz", index=":")
+        mace_convert_virial_to_stress(
+            atoms=atoms, ref_virial_name=ref_virial_name, out_file_name="test.extxyz"
         )
 
     hyperparameters.update_parameters(fit_kwargs)
@@ -1344,16 +1354,23 @@ def mace_fitting(
         else:
             hypers.append(f"--{hyper}={mace_hypers[hyper]}")
 
-    hypers.append(f"--train_file={db_dir}/train.extxyz")
-    hypers.append(f"--valid_file={db_dir}/test.extxyz")
+    if ref_virial_name is None:
+        hypers.append(f"--train_file={db_dir}/train.extxyz")
+        hypers.append(f"--valid_file={db_dir}/test.extxyz")
+    else:
+        hypers.append(f"--train_file=./train.extxyz")
+        hypers.append(f"--valid_file=./test.extxyz")
+
 
     if ref_energy_name is not None:
         hypers.append(f"--energy_key={ref_energy_name}")
     if ref_force_name is not None:
         hypers.append(f"--forces_key={ref_force_name}")
-    if ref_virial_name is not None:
+    if ref_virial_name is not None or ref_stress_name is not None:
+        if ref_stress_name is None:
+            ref_stress_name = "REF_stress"
         hypers.append(
-            "--stress_key={'REF_stress'}"
+            f"--stress_key={ref_stress_name}"
         )  # MACE will be trained on stress instead of virial.
         # They are essentially equivalent, but since the MACE-torch log file directly
         # reports the stress error, we train on stress for consistency.
@@ -2219,7 +2236,8 @@ def mace_convert_virial_to_stress(
     formatted_atoms = []
     for at in atoms:
         if ref_virial_name in at.info:
-            at.info["REF_stress"] = -at.info[ref_virial_name] / at.get_volume()
+            stress_list= -at.info[ref_virial_name] / at.get_volume()
+            at.info["REF_stress"] = " ".join(map(str, stress_list.flatten()))
             del at.info[ref_virial_name]
             formatted_atoms.append(at)
 
