@@ -16,11 +16,11 @@ from typing import Literal
 
 import ase
 import lightning as pl
-import matgl
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import quippy.potential
+
 import torch
 from ase.atoms import Atoms
 from ase.calculators.singlepoint import SinglePointCalculator
@@ -29,16 +29,7 @@ from ase.data import chemical_symbols
 from ase.io import read, write
 from ase.io.extxyz import XYZError
 from atomate2.utils.path import strip_hostname
-try:
-    from calorine.nep import read_loss, write_nepfile, write_structures
-except ImportError:
-    pass
 from dgl.data.utils import split_dataset
-from matgl.apps.pes import Potential
-from matgl.ext.pymatgen import Structure2Graph, get_element_list
-from matgl.graph.data import MGLDataLoader, MGLDataset, collate_fn_pes
-from matgl.models import M3GNet
-from matgl.utils.training import PotentialLightningModule
 from monty.dev import requires
 from monty.serialization import dumpfn
 from nequip.ase import NequIPCalculator
@@ -47,7 +38,6 @@ from pydantic import Field
 from pymatgen.core import Structure
 from pymatgen.io.ase import AseAtomsAdaptor
 from pytorch_lightning.loggers import CSVLogger
-from quippy import descriptors
 from scipy.spatial import ConvexHull
 from threadpoolctl import threadpool_limits
 
@@ -125,6 +115,9 @@ def gap_fitting(
         A dictionary with train_error, test_error, path_to_mlip
 
     """
+    import quippy.potential
+    from quippy import descriptors
+
     hyperparameters = hyperparameters.model_copy(deep=True)
     # keep additional pre- and suffixes
     gap_file_xml = train_name.replace("train", "gap_file").replace(".extxyz", ".xml")
@@ -600,6 +593,8 @@ def nep_fitting(
     dict[str, float]
         A dictionary mapping 'train_error', 'test_error', and 'mlip_path'.
     """
+    from calorine.nep import read_loss, write_nepfile, write_structures
+
     hyperparameters = hyperparameters.model_copy(deep=True)
 
     train_data = ase.io.read(os.path.join(db_dir, "train.extxyz"), index=":")
@@ -731,6 +726,7 @@ def nequip_fitting(
     """
     [TODO] train Nequip on virials
     """
+
     hyperparameters = hyperparameters.model_copy(deep=True)
 
     train_data = ase.io.read(os.path.join(db_dir, "train.extxyz"), index=":")
@@ -893,6 +889,14 @@ def m3gnet_fitting(
     *    Availability: https://matgl.ai/tutorials%2FTraining%20a%20M3GNet%20Potential%20with%20PyTorch%20Lightning.html
     *    License: BSD 3-Clause License
     """
+    import matgl
+    from matgl.apps.pes import Potential
+    from matgl.ext.pymatgen import Structure2Graph, get_element_list
+    from matgl.graph.data import MGLDataLoader, MGLDataset, collate_fn_pes
+    from matgl.models import M3GNet
+    from matgl.utils.training import PotentialLightningModule
+
+
     hyperparameters = hyperparameters.model_copy(deep=True)
 
     if fit_kwargs:
