@@ -29,6 +29,7 @@ from ase.data import chemical_symbols
 from ase.io import read, write
 from ase.io.extxyz import XYZError
 from atomate2.utils.path import strip_hostname
+
 try:
     from calorine.nep import read_loss, write_nepfile, write_structures
 except ImportError:
@@ -1358,9 +1359,8 @@ def mace_fitting(
         hypers.append(f"--train_file={db_dir}/train.extxyz")
         hypers.append(f"--valid_file={db_dir}/test.extxyz")
     else:
-        hypers.append(f"--train_file=./train.extxyz")
-        hypers.append(f"--valid_file=./test.extxyz")
-
+        hypers.append("--train_file=./train.extxyz")
+        hypers.append("--valid_file=./test.extxyz")
 
     if ref_energy_name is not None:
         hypers.append(f"--energy_key={ref_energy_name}")
@@ -2236,7 +2236,7 @@ def mace_convert_virial_to_stress(
     formatted_atoms = []
     for at in atoms:
         if ref_virial_name in at.info:
-            stress_list= -at.info[ref_virial_name] / at.get_volume()
+            stress_list = -at.info[ref_virial_name] / at.get_volume()
             at.info["REF_stress"] = " ".join(map(str, stress_list.flatten()))
             del at.info[ref_virial_name]
             formatted_atoms.append(at)
