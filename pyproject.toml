@@ -42,6 +42,7 @@ dependencies = [
      "torch<=2.2.1; sys.platform == 'linux'",
      # quippy-ase support for py3.12 tracked in https://github.com/libAtoms/QUIP/issues/645
      "quippy-ase==0.9.14; python_version < '3.12'",
+     "f90wrap==0.2.16",
 ]
 
 [tool.setuptools.packages.find]
