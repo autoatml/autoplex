@@ -43,7 +43,6 @@ from pytorch_lightning.loggers import CSVLogger
 from scipy.spatial import ConvexHull
 from threadpoolctl import threadpool_limits
 
-
 from autoplex import (
     GAP_HYPERS,
     JACE_HYPERS,
@@ -88,9 +87,15 @@ try:
     from matgl.models import M3GNet
     from matgl.utils.training import PotentialLightningModule
 except ImportError:
-    Potential=Structure2Graph=get_element_list=MGLDataLoader=MGLDataset=collate_fn_pes=M3GNet=PotentialLightningModule=None
+    Potential = Structure2Graph = get_element_list = MGLDataLoader = MGLDataset = (
+        collate_fn_pes
+    ) = M3GNet = PotentialLightningModule = None
 
-@requires(descriptors is None,message="quippy-ase needs to be installed. `pip install quippy-ase`")
+
+@requires(
+    descriptors is None,
+    message="quippy-ase needs to be installed. `pip install quippy-ase`",
+)
 def gap_fitting(
     db_dir: Path,
     species_list: list | None = None,
@@ -145,8 +150,6 @@ def gap_fitting(
         A dictionary with train_error, test_error, path_to_mlip
 
     """
-
-
     hyperparameters = hyperparameters.model_copy(deep=True)
     # keep additional pre- and suffixes
     gap_file_xml = train_name.replace("train", "gap_file").replace(".extxyz", ".xml")
@@ -521,6 +524,7 @@ export2lammps("acemodel.yace", model)
         "mlip_path": Path.cwd(),
     }
 
+
 @requires(read_loss is None, "calorine is required, `pip install calorine`")
 def nep_fitting(
     db_dir: str | Path,
@@ -681,6 +685,7 @@ def nep_fitting(
         "test_error": metrics_df.RMSE_E_test.values[-1],
         "mlip_path": Path.cwd(),
     }
+
 
 @requires(NequIPCalculator is None, "nequip is required, `pip install nequip`")
 def nequip_fitting(
@@ -843,6 +848,7 @@ def nequip_fitting(
         "mlip_path": Path.cwd(),
     }
 
+
 @requires(Potential is None, "matgl is required, `pip install matgl`")
 def m3gnet_fitting(
     db_dir: Path,
@@ -918,8 +924,6 @@ def m3gnet_fitting(
     *    Availability: https://matgl.ai/tutorials%2FTraining%20a%20M3GNet%20Potential%20with%20PyTorch%20Lightning.html
     *    License: BSD 3-Clause License
     """
-
-
     hyperparameters = hyperparameters.model_copy(deep=True)
 
     if fit_kwargs:
@@ -1421,19 +1425,25 @@ def mace_fitting(
                 with open(f"./logs/{fit_kwargs['name']}_run-3.log") as file:
                     log_data = file.read()
 
+    energy_force_stress = check_energy_force_stress_reading(log_data)
 
-    energy_force_stress=check_energy_force_stress_reading(log_data)
-
-    if energy_force_stress["train_energy"] is False or energy_force_stress["valid_energy"] is False:
+    if (
+        energy_force_stress["train_energy"] is False
+        or energy_force_stress["valid_energy"] is False
+    ):
         logging.message("Energies are not used for training or validation.")
 
-    if energy_force_stress["train_forces"] is False or energy_force_stress["valid_forces"] is False:
+    if (
+        energy_force_stress["train_forces"] is False
+        or energy_force_stress["valid_forces"] is False
+    ):
         logging.message("Forces are not used for training or validation.")
 
-    if energy_force_stress["train_stress"] is False or energy_force_stress["valid_stress"] is False:
+    if (
+        energy_force_stress["train_stress"] is False
+        or energy_force_stress["valid_stress"] is False
+    ):
         logging.message("Stresses are not used for training or validation.")
-
-
 
     tables = re.split(r"\+-+\+\n", log_data)
     # if tables:
@@ -1461,18 +1471,26 @@ def mace_fitting(
         }
 
 
-
-def check_energy_force_stress_reading(log_data:str)->dict:
+def check_energy_force_stress_reading(log_data: str) -> dict:
     # Extract counts for training
-    train_match = re.search(r"Training set.*energy:\s*(\d+).*stress:\s*(\d+).*forces:\s*(\d+)", log_data)
-    valid_match = re.search(r"Validation set.*energy:\s*(\d+).*stress:\s*(\d+).*forces:\s*(\d+)", log_data)
+    train_match = re.search(
+        r"Training set.*energy:\s*(\d+).*stress:\s*(\d+).*forces:\s*(\d+)", log_data
+    )
+    valid_match = re.search(
+        r"Validation set.*energy:\s*(\d+).*stress:\s*(\d+).*forces:\s*(\d+)", log_data
+    )
 
     train_energy, train_stress, train_forces = map(int, train_match.groups())
     valid_energy, valid_stress, valid_forces = map(int, valid_match.groups())
 
-
-    return {"train_energy": train_energy > 0, "train_forces": train_forces>0, "train_stress":train_stress>0,
-            "valid_energy": valid_energy > 0, "valid_forces": valid_forces>0, "valid_stress": valid_stress>0}
+    return {
+        "train_energy": train_energy > 0,
+        "train_forces": train_forces > 0,
+        "train_stress": train_stress > 0,
+        "valid_energy": valid_energy > 0,
+        "valid_forces": valid_forces > 0,
+        "valid_stress": valid_stress > 0,
+    }
 
 
 def check_convergence(test_error: float) -> bool:
