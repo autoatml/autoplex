@@ -630,11 +630,13 @@ def nep_fitting(
     zbl : float
         Cutoff to use in universal ZBL potential at short distances.
         Acceptable values are in range 1 to 2.5. Default is 2.
+
     References
     ----------
     * GPUMD & NEP: https://doi.org/10.1063/5.0106617.
     * SNES : https://doi.org/10.1145/2001576.2001692.
     * Parameter defaults taken from SI: https://doi.org/10.1038/s41467-024-54554-x.
+
     Returns
     -------
     dict[str, float]
