@@ -29,6 +29,7 @@ from ase.io import read, write
 from ase.io.extxyz import XYZError
 from atomate2.utils.path import strip_hostname
 from dgl.data.utils import split_dataset
+from monty.dev import requires
 from monty.serialization import dumpfn
 from numpy import ndarray
 from pydantic import Field
@@ -56,8 +57,6 @@ from autoplex.data.common.utils import (
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
-
-from monty.dev import requires
 
 # Capability flags for optional features
 HAS_CALORINE = importlib.util.find_spec("calorine.nep") is not None
