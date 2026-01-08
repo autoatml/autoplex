@@ -16,7 +16,7 @@ from typing import Literal
 
 import ase
 import lightning as pl
-
+import quippy.potential
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -32,7 +32,6 @@ from atomate2.utils.path import strip_hostname
 from dgl.data.utils import split_dataset
 from monty.dev import requires
 from monty.serialization import dumpfn
-from nequip.ase import NequIPCalculator
 from numpy import ndarray
 from pydantic import Field
 from pymatgen.core import Structure
@@ -40,6 +39,7 @@ from pymatgen.io.ase import AseAtomsAdaptor
 from pytorch_lightning.loggers import CSVLogger
 from scipy.spatial import ConvexHull
 from threadpoolctl import threadpool_limits
+
 
 from autoplex import (
     GAP_HYPERS,
@@ -60,7 +60,34 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
+from monty.dev import requires
 
+try:
+    from calorine.nep import read_loss, write_nepfile, write_structures
+except ImportError:
+    read_loss = write_nepfile = write_structures = None
+
+try:
+    from nequip.ase import NequIPCalculator
+except ImportError:
+    NequIPCalculator = None
+
+try:
+    from quippy import descriptors
+except ImportError:
+    descriptors = None
+
+try:
+    import matgl
+    from matgl.apps.pes import Potential
+    from matgl.ext.pymatgen import Structure2Graph, get_element_list
+    from matgl.graph.data import MGLDataLoader, MGLDataset, collate_fn_pes
+    from matgl.models import M3GNet
+    from matgl.utils.training import PotentialLightningModule
+except ImportError:
+    Potential=Structure2Graph=get_element_list=MGLDataLoader=MGLDataset=collate_fn_pes=M3GNet=PotentialLightningModule=None
+
+@requires(descriptors is None,message="quippy-ase needs to be installed. `pip install quippy-ase`")
 def gap_fitting(
     db_dir: Path,
     species_list: list | None = None,
@@ -115,8 +142,7 @@ def gap_fitting(
         A dictionary with train_error, test_error, path_to_mlip
 
     """
-    import quippy.potential
-    from quippy import descriptors
+
 
     hyperparameters = hyperparameters.model_copy(deep=True)
     # keep additional pre- and suffixes
@@ -492,7 +518,7 @@ export2lammps("acemodel.yace", model)
         "mlip_path": Path.cwd(),
     }
 
-
+@requires(read_loss is None, "calorine is required, `pip install calorine`")
 def nep_fitting(
     db_dir: str | Path,
     hyperparameters: NEP_HYPERS = NEP_HYPERS,
@@ -653,7 +679,7 @@ def nep_fitting(
         "mlip_path": Path.cwd(),
     }
 
-
+@requires(NequIPCalculator is None, "nequip is required, `pip install nequip`")
 def nequip_fitting(
     db_dir: Path,
     hyperparameters: NEQUIP_HYPERS = NEQUIP_HYPERS,
@@ -814,7 +840,7 @@ def nequip_fitting(
         "mlip_path": Path.cwd(),
     }
 
-
+@requires(Potential is None, "matgl is required, `pip install matgl`")
 def m3gnet_fitting(
     db_dir: Path,
     hyperparameters: M3GNET_HYPERS = M3GNET_HYPERS,
@@ -889,12 +915,6 @@ def m3gnet_fitting(
     *    Availability: https://matgl.ai/tutorials%2FTraining%20a%20M3GNet%20Potential%20with%20PyTorch%20Lightning.html
     *    License: BSD 3-Clause License
     """
-    import matgl
-    from matgl.apps.pes import Potential
-    from matgl.ext.pymatgen import Structure2Graph, get_element_list
-    from matgl.graph.data import MGLDataLoader, MGLDataset, collate_fn_pes
-    from matgl.models import M3GNet
-    from matgl.utils.training import PotentialLightningModule
 
 
     hyperparameters = hyperparameters.model_copy(deep=True)
@@ -1399,6 +1419,20 @@ def mace_fitting(
                 with open(f"./logs/{fit_kwargs['name']}_run-3.log") as file:
                     log_data = file.read()
 
+
+    energy_force_stress=check_energy_force_stress_reading(log_data)
+
+    if energy_force_stress["train_energy"] is False or energy_force_stress["valid_energy"] is False:
+        logging.message("Energies are not used for training or validation.")
+
+    if energy_force_stress["train_forces"] is False or energy_force_stress["valid_forces"] is False:
+        logging.message("Forces are not used for training or validation.")
+
+    if energy_force_stress["train_stress"] is False or energy_force_stress["valid_stress"] is False:
+        logging.message("Stresses are not used for training or validation.")
+
+
+
     tables = re.split(r"\+-+\+\n", log_data)
     # if tables:
     last_table = tables[-2]
@@ -1423,6 +1457,20 @@ def mace_fitting(
             "test_error": float(matches[1][1]),
             "mlip_path": Path.cwd(),
         }
+
+
+
+def check_energy_force_stress_reading(log_data:str)->dict:
+    # Extract counts for training
+    train_match = re.search(r"Training set.*energy:\s*(\d+).*stress:\s*(\d+).*forces:\s*(\d+)", log_data)
+    valid_match = re.search(r"Validation set.*energy:\s*(\d+).*stress:\s*(\d+).*forces:\s*(\d+)", log_data)
+
+    train_energy, train_stress, train_forces = map(int, train_match.groups())
+    valid_energy, valid_stress, valid_forces = map(int, valid_match.groups())
+
+
+    return {"train_energy": train_energy > 0, "train_forces": train_forces>0, "train_stress":train_stress>0,
+            "valid_energy": valid_energy > 0, "valid_forces": valid_forces>0, "valid_stress": valid_stress>0}
 
 
 def check_convergence(test_error: float) -> bool:
