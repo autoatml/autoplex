@@ -16,11 +16,10 @@ from typing import Literal
 
 import ase
 import lightning as pl
-import quippy.potential
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-
+import quippy.potential
 import torch
 from ase.atoms import Atoms
 from ase.calculators.singlepoint import SinglePointCalculator
@@ -29,16 +28,12 @@ from ase.data import chemical_symbols
 from ase.io import read, write
 from ase.io.extxyz import XYZError
 from atomate2.utils.path import strip_hostname
-<<<<<<< HEAD
-=======
 
 try:
     from calorine.nep import read_loss, write_nepfile, write_structures
 except ImportError:
     pass
->>>>>>> db3aeaae50c70b3cd57e0c3e616458393f542f18
 from dgl.data.utils import split_dataset
-from monty.dev import requires
 from monty.serialization import dumpfn
 from numpy import ndarray
 from pydantic import Field
