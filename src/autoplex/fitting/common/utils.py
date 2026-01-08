@@ -720,6 +720,7 @@ def nequip_fitting(
     This function sets up and executes a python script to perform NequIP fitting using specified parameters
     and input data located in the provided directory. It handles the input/output of atomic configurations,
     sets up the NequIP model, and calculates training and testing errors after fitting.
+
     Parameters
     ----------
     db_dir: Path
@@ -761,10 +762,12 @@ def nequip_fitting(
         learning rate
     default_dtype: str
         type of float to use, e.g. float32 and float64
+
     Returns
     -------
     dict[str, float]
         A dictionary containing train_error, test_error, and the path to the fitted MLIP.
+
     Raises
     ------
     - ValueError: If the `isolated_atom_energies` dictionary is empty or not provided when required.
