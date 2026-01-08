@@ -1,6 +1,7 @@
 """Utility functions for fitting jobs."""
 
 import contextlib
+import importlib.util
 import logging
 import multiprocessing as mp
 import os
@@ -27,12 +28,12 @@ from ase.data import chemical_symbols
 from ase.io import read, write
 from ase.io.extxyz import XYZError
 from atomate2.utils.path import strip_hostname
-import importlib.util
 
 # Guarded import for quippy.potential (used by CustomPotential)
 _quippy_potential = None
 with contextlib.suppress(ImportError):
     import quippy.potential as _qp
+
     _quippy_potential = _qp
 
 from dgl.data.utils import split_dataset
@@ -104,7 +105,10 @@ if not HAS_MATGL:
 BasePotential = _quippy_potential.Potential if _quippy_potential is not None else object
 
 
-@requires(HAS_QUIPPY, "This feature requires `quippy-ase`. Install with `pip install quippy-ase`.")
+@requires(
+    HAS_QUIPPY,
+    "This feature requires `quippy-ase`. Install with `pip install quippy-ase`.",
+)
 def gap_fitting(
     db_dir: Path,
     species_list: list | None = None,
@@ -344,12 +348,11 @@ def gap_fitting(
     }
 
 
-
 @requires(
     (
         subprocess.run(
             'julia -e "using Pkg; println(haskey(Pkg.dependencies(), '
-            'Base.UUID(\"3b96b61c-0fcc-4693-95ed-1ef9f35fcc53\")))"',
+            'Base.UUID("3b96b61c-0fcc-4693-95ed-1ef9f35fcc53")))"',
             shell=True,
             capture_output=True,
             text=True,
@@ -535,7 +538,10 @@ export2lammps("acemodel.yace", model)
     }
 
 
-@requires(HAS_CALORINE, "This feature requires `calorine`. Install with `pip install calorine`.")
+@requires(
+    HAS_CALORINE,
+    "This feature requires `calorine`. Install with `pip install calorine`.",
+)
 def nep_fitting(
     db_dir: str | Path,
     hyperparameters: NEP_HYPERS = NEP_HYPERS,
@@ -636,7 +642,9 @@ def nep_fitting(
     }
 
 
-@requires(HAS_NEQUIP, "This feature requires `nequip`. Install with `pip install nequip`.")
+@requires(
+    HAS_NEQUIP, "This feature requires `nequip`. Install with `pip install nequip`."
+)
 def nequip_fitting(
     db_dir: Path,
     hyperparameters: NEQUIP_HYPERS = NEQUIP_HYPERS,
@@ -1480,8 +1488,6 @@ def gap_hyperparameter_constructor(
     gap_hyperparameters = f"gap={{{two_body_params}{three_body_params}{soap_params}}}"
 
     return [*general, gap_hyperparameters]
-
-
 
 
 def get_list_of_vasp_calc_dirs(flow_output) -> list[str]:
