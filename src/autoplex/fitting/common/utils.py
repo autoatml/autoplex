@@ -622,8 +622,6 @@ def nep_fitting(
     dict[str, float]
         A dictionary mapping 'train_error', 'test_error', and 'mlip_path'.
     """
-    from calorine.nep import read_loss, write_nepfile, write_structures
-
     hyperparameters = hyperparameters.model_copy(deep=True)
 
     train_data = ase.io.read(os.path.join(db_dir, "train.extxyz"), index=":")
