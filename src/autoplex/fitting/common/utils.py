@@ -352,7 +352,7 @@ def gap_fitting(
     (
         subprocess.run(
             'julia -e "using Pkg; println(haskey(Pkg.dependencies(), '
-            'Base.UUID("3b96b61c-0fcc-4693-95ed-1ef9f35fcc53")))"',
+            'Base.UUID(\\"3b96b61c-0fcc-4693-95ed-1ef9f35fcc53\\")))"',
             shell=True,
             capture_output=True,
             text=True,
