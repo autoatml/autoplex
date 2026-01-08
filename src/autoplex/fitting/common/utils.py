@@ -1486,7 +1486,7 @@ def mace_fitting(
 
 def check_energy_force_stress_reading(log_data: str) -> dict:
     """
-    Extracts and analyzes energy, force, and stress readings from log data.
+    Extract and analyze energy, force, and stress readings from log data.
 
     The function parses the provided log data to identify whether energy,
     stress, and force readings exist for both training and validation sets
