@@ -28,14 +28,6 @@ from ase.data import chemical_symbols
 from ase.io import read, write
 from ase.io.extxyz import XYZError
 from atomate2.utils.path import strip_hostname
-
-# Guarded import for quippy.potential (used by CustomPotential)
-_quippy_potential = None
-with contextlib.suppress(ImportError):
-    import quippy.potential as _qp
-
-    _quippy_potential = _qp
-
 from dgl.data.utils import split_dataset
 from monty.serialization import dumpfn
 from numpy import ndarray
@@ -72,6 +64,13 @@ HAS_CALORINE = importlib.util.find_spec("calorine.nep") is not None
 HAS_NEQUIP = importlib.util.find_spec("nequip.ase") is not None
 HAS_QUIPPY = importlib.util.find_spec("quippy") is not None
 HAS_MATGL = importlib.util.find_spec("matgl") is not None
+
+
+_quippy_potential = None
+with contextlib.suppress(ImportError):
+    import quippy.potential as _qp
+
+    _quippy_potential = _qp
 
 # Lint-friendly conditional imports
 with contextlib.suppress(ImportError):
