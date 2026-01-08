@@ -717,7 +717,57 @@ def nequip_fitting(
     """
     Perform the NequIP potential fitting.
 
-    ... (rest of original function body unchanged) ...
+    This function sets up and executes a python script to perform NequIP fitting using specified parameters
+    and input data located in the provided directory. It handles the input/output of atomic configurations,
+    sets up the NequIP model, and calculates training and testing errors after fitting.
+    Parameters
+    ----------
+    db_dir: Path
+        directory containing the training and testing data files.
+    hyperparameters: MLIP_HYPERS.NEQUIP
+        Fit hyperparameters.
+    isolated_atom_energies: dict
+        mandatory dictionary mapping element numbers to isolated energies.
+    ref_energy_name : str, optional
+        Reference energy name.
+    ref_force_name : str, optional
+        Reference force name.
+    ref_virial_name : str, optional
+        Reference virial name.
+    device: str
+        specify device to use cuda or cpu
+    fit_kwargs: dict.
+        optional dictionary with parameters for nequip fitting with keys same as
+        mlip-rss-defaults.json.
+    Keyword Arguments
+    -----------------
+    r_max: float
+        cutoff radius in length units
+    num_layers: int
+        number of interaction blocks
+    l_max: int
+        maximum irrep order (rotation order) for the network's features
+    num_features: int
+        multiplicity of the features
+    num_basis: int
+        number of basis functions used in the radial basis
+    invariant_layers: int
+        number of radial layers
+    invariant_neurons: int
+        number of hidden neurons in radial function
+    batch_size: int
+        batch size
+    learning_rate: float
+        learning rate
+    default_dtype: str
+        type of float to use, e.g. float32 and float64
+    Returns
+    -------
+    dict[str, float]
+        A dictionary containing train_error, test_error, and the path to the fitted MLIP.
+    Raises
+    ------
+    - ValueError: If the `isolated_atom_energies` dictionary is empty or not provided when required.
     """
     """
     [TODO] train Nequip on virials
