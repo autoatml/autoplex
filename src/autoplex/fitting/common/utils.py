@@ -1444,19 +1444,19 @@ def mace_fitting(
         energy_force_stress["train_energy"] is False
         or energy_force_stress["valid_energy"] is False
     ):
-        logging.message("Energies are not used for training or validation.")
+        logging.warning("Energies are not used for training or validation.")
 
     if (
         energy_force_stress["train_forces"] is False
         or energy_force_stress["valid_forces"] is False
     ):
-        logging.message("Forces are not used for training or validation.")
+        logging.warning("Forces are not used for training or validation.")
 
     if (
         energy_force_stress["train_stress"] is False
         or energy_force_stress["valid_stress"] is False
     ):
-        logging.message("Stresses are not used for training or validation.")
+        logging.warning("Stresses are not used for training or validation.")
 
     tables = re.split(r"\+-+\+\n", log_data)
     # if tables:
