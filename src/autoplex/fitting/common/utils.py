@@ -579,7 +579,7 @@ def nep_fitting(
         NEP model version to train can be 3 or 4. Default is 4.
     type: list[int, str]
         Number of atom types and list of chemical species. Number
-            of atom types must be an integer, followed by chemical
+        of atom types must be an integer, followed by chemical
         symbols of species as in periodic table for which model
         needs to be trained, separated by comma.
         Default is [1, "X"] as a placeholder. Example:
