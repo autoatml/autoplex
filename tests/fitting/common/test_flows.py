@@ -390,7 +390,7 @@ def test_mlip_fit_maker_mace(
     run_locally(
         macefit, ensure_success=True, create_folders=True, store=memory_jobstore
     )
-
+    print(Path(macefit.output["mlip_path"][0].resolve(memory_jobstore)))
     # check if MACE potential file is generated
     assert Path(macefit.output["mlip_path"][0].resolve(memory_jobstore)).exists()
 

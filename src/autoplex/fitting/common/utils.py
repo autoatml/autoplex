@@ -1,6 +1,7 @@
 """Utility functions for fitting jobs."""
 
 import contextlib
+import importlib.util
 import logging
 import multiprocessing as mp
 import os
@@ -16,11 +17,9 @@ from typing import Literal
 
 import ase
 import lightning as pl
-import matgl
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import quippy.potential
 import torch
 from ase.atoms import Atoms
 from ase.calculators.singlepoint import SinglePointCalculator
@@ -29,22 +28,14 @@ from ase.data import chemical_symbols
 from ase.io import read, write
 from ase.io.extxyz import XYZError
 from atomate2.utils.path import strip_hostname
-from calorine.nep import read_loss, write_nepfile, write_structures
 from dgl.data.utils import split_dataset
-from matgl.apps.pes import Potential
-from matgl.ext.pymatgen import Structure2Graph, get_element_list
-from matgl.graph.data import MGLDataLoader, MGLDataset, collate_fn_pes
-from matgl.models import M3GNet
-from matgl.utils.training import PotentialLightningModule
 from monty.dev import requires
 from monty.serialization import dumpfn
-from nequip.ase import NequIPCalculator
 from numpy import ndarray
 from pydantic import Field
 from pymatgen.core import Structure
 from pymatgen.io.ase import AseAtomsAdaptor
 from pytorch_lightning.loggers import CSVLogger
-from quippy import descriptors
 from scipy.spatial import ConvexHull
 from threadpoolctl import threadpool_limits
 
@@ -67,7 +58,55 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
+# Capability flags for optional features
+HAS_CALORINE = importlib.util.find_spec("calorine.nep") is not None
+HAS_NEQUIP = importlib.util.find_spec("nequip.ase") is not None
+HAS_QUIPPY = importlib.util.find_spec("quippy") is not None
+HAS_MATGL = importlib.util.find_spec("matgl") is not None
 
+
+_quippy_potential = None
+with contextlib.suppress(ImportError):
+    import quippy.potential as _qp
+
+    _quippy_potential = _qp
+
+# Lint-friendly conditional imports
+with contextlib.suppress(ImportError):
+    from calorine.nep import read_loss, write_nepfile, write_structures
+if not HAS_CALORINE:
+    read_loss = write_nepfile = write_structures = None
+
+with contextlib.suppress(ImportError):
+    from nequip.ase import NequIPCalculator
+if not HAS_NEQUIP:
+    NequIPCalculator = None
+
+with contextlib.suppress(ImportError):
+    from quippy import descriptors
+if not HAS_QUIPPY:
+    descriptors = None
+
+with contextlib.suppress(ImportError):
+    import matgl
+    from matgl.apps.pes import Potential
+    from matgl.ext.pymatgen import Structure2Graph, get_element_list
+    from matgl.graph.data import MGLDataLoader, MGLDataset, collate_fn_pes
+    from matgl.models import M3GNet
+    from matgl.utils.training import PotentialLightningModule
+if not HAS_MATGL:
+    Potential = Structure2Graph = get_element_list = MGLDataLoader = MGLDataset = (
+        collate_fn_pes
+    ) = M3GNet = PotentialLightningModule = None
+
+# Provide a base for CustomPotential even if quippy is not installed (functions gated with @requires)
+BasePotential = _quippy_potential.Potential if _quippy_potential is not None else object
+
+
+@requires(
+    HAS_QUIPPY,
+    "This feature requires `quippy-ase`. Install with `pip install quippy-ase`.",
+)
 def gap_fitting(
     db_dir: Path,
     species_list: list | None = None,
@@ -497,6 +536,10 @@ export2lammps("acemodel.yace", model)
     }
 
 
+@requires(
+    HAS_CALORINE,
+    "This feature requires `calorine`. Install with `pip install calorine`.",
+)
 def nep_fitting(
     db_dir: str | Path,
     hyperparameters: NEP_HYPERS = NEP_HYPERS,
@@ -656,6 +699,9 @@ def nep_fitting(
     }
 
 
+@requires(
+    HAS_NEQUIP, "This feature requires `nequip`. Install with `pip install nequip`."
+)
 def nequip_fitting(
     db_dir: Path,
     hyperparameters: NEQUIP_HYPERS = NEQUIP_HYPERS,
@@ -692,7 +738,6 @@ def nequip_fitting(
     fit_kwargs: dict.
         optional dictionary with parameters for nequip fitting with keys same as
         mlip-rss-defaults.json.
-
     Keyword Arguments
     -----------------
     r_max: float
@@ -728,6 +773,7 @@ def nequip_fitting(
     """
     [TODO] train Nequip on virials
     """
+
     hyperparameters = hyperparameters.model_copy(deep=True)
 
     train_data = ase.io.read(os.path.join(db_dir, "train.extxyz"), index=":")
@@ -816,6 +862,7 @@ def nequip_fitting(
     }
 
 
+@requires(HAS_MATGL, "This feature requires `matgl`. Install with `pip install matgl`.")
 def m3gnet_fitting(
     db_dir: Path,
     hyperparameters: M3GNET_HYPERS = M3GNET_HYPERS,
@@ -1236,6 +1283,7 @@ def mace_fitting(
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",
+    ref_stress_name: str = "REF_stress",
     fit_kwargs: dict | None = None,
 ) -> dict:
     """
@@ -1259,6 +1307,8 @@ def mace_fitting(
         Reference force name.
     ref_virial_name : str, optional
         Reference virial name.
+    ref_stress_name : str, optional
+        Reference stress name.
     fit_kwargs: dict.
         optional dictionary with parameters for mace fitting with keys same as
         mlip-rss-defaults.json.
@@ -1293,10 +1343,14 @@ def mace_fitting(
     """
     hyperparameters = hyperparameters.model_copy(deep=True)
 
-    if ref_virial_name is not None:
+    if ref_virial_name is not None or ref_stress_name is not None:
         atoms = read(f"{db_dir}/train.extxyz", index=":")
         mace_convert_virial_to_stress(
             atoms=atoms, ref_virial_name=ref_virial_name, out_file_name="train.extxyz"
+        )
+        atoms = read(f"{db_dir}/test.extxyz", index=":")
+        mace_convert_virial_to_stress(
+            atoms=atoms, ref_virial_name=ref_virial_name, out_file_name="test.extxyz"
         )
 
     hyperparameters.update_parameters(fit_kwargs)
@@ -1344,16 +1398,22 @@ def mace_fitting(
         else:
             hypers.append(f"--{hyper}={mace_hypers[hyper]}")
 
-    hypers.append(f"--train_file={db_dir}/train.extxyz")
-    hypers.append(f"--valid_file={db_dir}/test.extxyz")
+    if ref_virial_name is None:
+        hypers.append(f"--train_file={db_dir}/train.extxyz")
+        hypers.append(f"--valid_file={db_dir}/test.extxyz")
+    else:
+        hypers.append("--train_file=./train.extxyz")
+        hypers.append("--valid_file=./test.extxyz")
 
     if ref_energy_name is not None:
         hypers.append(f"--energy_key={ref_energy_name}")
     if ref_force_name is not None:
         hypers.append(f"--forces_key={ref_force_name}")
-    if ref_virial_name is not None:
+    if ref_virial_name is not None or ref_stress_name is not None:
+        if ref_stress_name is None:
+            ref_stress_name = "REF_stress"
         hypers.append(
-            "--stress_key={'REF_stress'}"
+            f"--stress_key={ref_stress_name}"
         )  # MACE will be trained on stress instead of virial.
         # They are essentially equivalent, but since the MACE-torch log file directly
         # reports the stress error, we train on stress for consistency.
@@ -1377,6 +1437,26 @@ def mace_fitting(
             except FileNotFoundError:
                 with open(f"./logs/{fit_kwargs['name']}_run-3.log") as file:
                     log_data = file.read()
+
+    energy_force_stress = check_energy_force_stress_reading(log_data)
+
+    if (
+        energy_force_stress["train_energy"] is False
+        or energy_force_stress["valid_energy"] is False
+    ):
+        logging.info("Energies are not used for training or validation.")
+
+    if (
+        energy_force_stress["train_forces"] is False
+        or energy_force_stress["valid_forces"] is False
+    ):
+        logging.info("Forces are not used for training or validation.")
+
+    if (
+        energy_force_stress["train_stress"] is False
+        or energy_force_stress["valid_stress"] is False
+    ):
+        logging.info("Stresses are not used for training or validation.")
 
     tables = re.split(r"\+-+\+\n", log_data)
     # if tables:
@@ -1402,6 +1482,48 @@ def mace_fitting(
             "test_error": float(matches[1][1]),
             "mlip_path": Path.cwd(),
         }
+
+
+def check_energy_force_stress_reading(log_data: str) -> dict:
+    """
+    Extract and analyze energy, force, and stress readings from log data.
+
+    The function parses the provided log data to identify whether energy,
+    stress, and force readings exist for both training and validation sets
+    and confirms their presence based on their numerical values.
+
+    Parameters
+    ----------
+    log_data : str
+        A string containing the log information to be analyzed.
+
+    Returns
+    -------
+    dict
+        A dictionary indicating the presence of energy, force, and stress readings.
+        Each key corresponds to a specific category, and its value is a boolean
+        representing whether the reading is greater than zero.
+
+    """
+    # Extract counts for training
+    train_match = re.search(
+        r"Training set.*energy:\s*(\d+).*stress:\s*(\d+).*forces:\s*(\d+)", log_data
+    )
+    valid_match = re.search(
+        r"Validation set.*energy:\s*(\d+).*stress:\s*(\d+).*forces:\s*(\d+)", log_data
+    )
+
+    train_energy, train_stress, train_forces = map(int, train_match.groups())
+    valid_energy, valid_stress, valid_forces = map(int, valid_match.groups())
+
+    return {
+        "train_energy": train_energy > 0,
+        "train_forces": train_forces > 0,
+        "train_stress": train_stress > 0,
+        "valid_energy": valid_energy > 0,
+        "valid_forces": valid_forces > 0,
+        "valid_stress": valid_stress > 0,
+    }
 
 
 def check_convergence(test_error: float) -> bool:
@@ -1918,7 +2040,7 @@ def run_gap(num_processes_fit: int, parameters) -> None:
         subprocess.call(["gap_fit", *parameters], stdout=file_std, stderr=file_err)
 
 
-class CustomPotential(quippy.potential.Potential):
+class CustomPotential(BasePotential):
     """A custom potential class that modifies the outputs of potentials."""
 
     def calculate(self, *args, **kwargs):
@@ -2219,7 +2341,8 @@ def mace_convert_virial_to_stress(
     formatted_atoms = []
     for at in atoms:
         if ref_virial_name in at.info:
-            at.info["REF_stress"] = -at.info[ref_virial_name] / at.get_volume()
+            stress_list = -at.info[ref_virial_name] / at.get_volume()
+            at.info["REF_stress"] = " ".join(map(str, stress_list.flatten()))
             del at.info[ref_virial_name]
             formatted_atoms.append(at)
 

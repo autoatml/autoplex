@@ -34,6 +34,7 @@ def machine_learning_fit(
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",
+    ref_stress_name: str = "REF_stress",
     device: str = "cuda",
     database_dict: dict | None = None,
     hyperpara_opt: bool = False,
@@ -72,6 +73,8 @@ def machine_learning_fit(
         Reference force name.
     ref_virial_name: str
         Reference virial name.
+    ref_stress_name: str
+        Reference stress name (used for MACE fitting only at the moment)
     device: str
         Device to be used for model fitting, either "cpu" or "cuda".
     database_dict: dict
@@ -206,6 +209,7 @@ def machine_learning_fit(
             ref_energy_name=ref_energy_name,
             ref_force_name=ref_force_name,
             ref_virial_name=ref_virial_name,
+            ref_stress_name=ref_stress_name,
             device=device,
             fit_kwargs=fit_kwargs,
         )
