@@ -175,10 +175,10 @@ def test_scale_cell(vasp_test_dir):
     scaled_cell = scale_cell(structure=structure, volume_scale_factor_range=[0.95, 1.05])
     scaled_cell_1 = scale_cell(structure=structure, volume_scale_factor_range=[0.95, 1.0])
     scaled_cell_1_2 = scale_cell(structure=structure, volume_scale_factor_range=[0.95, 1])
-    scaled_cell_2 = scale_cell(structure=structure, volume_custom_scale_factors=[0.95, 1.05, 1.10])
-    scaled_cell_2_2 = scale_cell(structure=structure, volume_custom_scale_factors=[0.95, 1.0, 1.05, 1.10])
+    scaled_cell_2 = scale_cell(structure=structure, volume_custom_scale_factors=[0.95, 1.05, 1.10], n_structures=3)
+    scaled_cell_2_2 = scale_cell(structure=structure, volume_custom_scale_factors=[0.95, 1.0, 1.05, 1.10], n_structures=4)
 
-    assert len(scaled_cell) == 11
+    assert len(scaled_cell) == 10
     assert len(scaled_cell_1) == 10
     assert len(scaled_cell_1_2) == 10
     assert len(scaled_cell_2) == 3

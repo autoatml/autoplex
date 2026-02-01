@@ -2,6 +2,7 @@
 
 import ast
 import json
+import logging
 import os
 from functools import partial
 from multiprocessing import Pool
@@ -29,9 +30,14 @@ from pymatgen.core import Structure
 from pymatgen.io.ase import AseAtomsAdaptor
 from threadpoolctl import threadpool_limits
 
+from autoplex.data.common.utils import flatten_list
 from autoplex.fitting.common.utils import (
     CustomPotential,
     extract_gap_label,
+)
+
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
 
@@ -225,10 +231,9 @@ class HookeanRepulsion(FixConstraint):
         bondlength = np.linalg.norm(displace)
 
         if bondlength < self.threshold:
-            print(
-                "Hookean adjusting forces, bondlength: ",
+            logging.info(
+                "Hookean adjusting forces, bondlength: %.6f < threshold: %.6f",
                 bondlength,
-                " < ",
                 self.threshold,
             )
             self.used = True
@@ -475,7 +480,9 @@ def process_rss(
                     )
 
     if keep_symmetry:
-        print("Creating FixSymmetry calculator and maintaining initial symmetry!")
+        logging.info(
+            "Creating FixSymmetry calculator and maintaining initial symmetry!"
+        )
         constraint_list.append(FixSymmetry(atom, symprec=1.0e-4))
 
     if constraint_list:
@@ -534,7 +541,7 @@ def process_rss(
         return None
 
     except RuntimeError:
-        print("RuntimeError occurred during optimization! Return none!")
+        logging.info("RuntimeError occurred during optimization! Return none!")
         return None
 
 
@@ -623,7 +630,7 @@ def minimize_structures(
             del at.info["virial"]
 
     if hookean_repul:
-        print("Hookean repulsion is used!")
+        logging.info("Hookean repulsion is used!")
 
     for i, atom in enumerate(atoms):
         atom.info["unique_starting_index"] = iteration_index + f"{i+struct_start_index}"
@@ -682,3 +689,58 @@ def split_structure_into_groups(structures: list, num_groups: int) -> list[list]
         start_index += group_size
 
     return structure_groups
+
+
+def handle_rss_trajectory(
+    traj_path: list,
+    remove_traj_files: bool = False,
+) -> tuple[list[list[ase.Atoms]], list[list[float]]]:
+    """
+    Handle trajectory and associated information.
+
+    Parameters
+    ----------
+    traj_path: list
+        List of paths pointing to trajectory files to be processed.
+    remove_traj_files: bool
+        Whether to remove the directories containing trajectory files
+        after processing them. Default is False.
+
+    Returns
+    -------
+    tuple:
+        atoms: list[list[ase.Atoms]]
+            List of ASE Atoms objects read from the trajectory files.
+        pressures: list[list[float]]
+            List of pressure values corresponding to the atoms.
+    """
+    atoms = []
+    pressures = []
+    traj_path = [] if traj_path is None else flatten_list(traj_path)
+    traj_dirs = []
+
+    if all(i is None for i in traj_path):
+        raise ValueError("No valid RSS trajectory path was obtained!")
+
+    for traj in traj_path:
+        if traj is not None and Path(traj).exists():
+            logging.info(f"Processing RSS trajectory:, {traj}")
+            at = ase.io.read(traj, index=":")
+            atoms.append(at)
+            pressure = [i.info["RSS_applied_pressure"] for i in at]
+            pressures.append(pressure)
+            traj_dirs.append(os.path.dirname(traj))
+
+    if remove_traj_files and traj_dirs:
+        traj_dirs = list(set(traj_dirs))
+        for dir_path in traj_dirs:
+            if os.path.exists(dir_path) and os.path.isdir(dir_path):
+                for root, _, files in os.walk(dir_path):
+                    for name in files:
+                        if "RSS_relax_results" in name:
+                            file_path = os.path.join(root, name)
+                            os.remove(file_path)
+
+        logging.warning(f"All RSS trajectory files have been deleted: {traj}")
+
+    return atoms, pressures

@@ -165,7 +165,6 @@ def scale_cell(
     """
     atoms = AseAtomsAdaptor.get_atoms(structure)
     distorted_cells = []
-
     if volume_custom_scale_factors is not None:
         scale_factors_defined = volume_custom_scale_factors
         warnings.warn("Using your custom lattice scale factors", stacklevel=2)
@@ -181,10 +180,6 @@ def scale_cell(
             (volume_scale_factor_range[1] - volume_scale_factor_range[0])
             / (n_structures - 1),
         )
-
-        if not np.isclose(scale_factors_defined, 1.0).any():
-            scale_factors_defined = np.append(scale_factors_defined, 1)
-            scale_factors_defined = np.sort(scale_factors_defined)
 
         warnings.warn(
             f"Generated lattice scale factors {scale_factors_defined} within your range",
@@ -366,7 +361,7 @@ def std_rattle(
             copy.rattle(stdev=rattle_std, seed=rattle_seed)
             rattled_xtals.append(AseAtomsAdaptor.get_structure(copy))
         if i > 0:
-            rattle_seed = rattle_seed + 1
+            rattle_seed += 1000
             copy = atoms.copy()
             copy.rattle(stdev=rattle_std, seed=rattle_seed)
             rattled_xtals.append(AseAtomsAdaptor.get_structure(copy))
@@ -1596,57 +1591,3 @@ def flatten_list(input_list: list | list[list]) -> list:
         return list(chain.from_iterable(input_list))
 
     return input_list
-
-
-def handle_rss_trajectory(
-    traj_path, remove_traj_files
-) -> tuple[list[list], list[list]]:
-    """
-    Handle trajectory and associated information.
-
-    Parameters
-    ----------
-    traj_path: list | None
-        List of dictionaries containing trajectory information.
-        Each dictionary should have keys 'traj_path' and 'pressure'.
-        If None, an empty list will be used.
-    remove_traj_files: bool
-        Whether to remove the directories containing trajectory files
-        after processing them. Default is False.
-
-    Returns
-    -------
-    tuple:
-        atoms: list
-            List of ASE Atoms objects read from the trajectory files.
-        pressures: list
-            List of pressure values corresponding to the atoms.
-    """
-    atoms = []
-    pressures = []
-    traj_path = [] if traj_path is None else flatten_list(traj_path)
-    traj_dirs = []
-
-    if all(i is None for i in traj_path):
-        raise ValueError("No valid trajectory path was obtained!")
-
-    for traj in traj_path:
-        if traj is not None and Path(traj).exists():
-            print("Processing trajectory:", traj)
-            at = ase.io.read(traj, index=":")
-            atoms.append(at)
-            pressure = [i.info["RSS_applied_pressure"] for i in at]
-            pressures.append(pressure)
-            traj_dirs.append(os.path.dirname(traj))
-
-    if remove_traj_files and traj_dirs:
-        traj_dirs = list(set(traj_dirs))
-        for dir_path in traj_dirs:
-            if os.path.exists(dir_path) and os.path.isdir(dir_path):
-                for root, _, files in os.walk(dir_path):
-                    for name in files:
-                        if "RSS_relax_results" in name:
-                            file_path = os.path.join(root, name)
-                            os.remove(file_path)
-
-    return atoms, pressures
