@@ -2193,7 +2193,7 @@ def write_after_distillation_data_split(
     )
 
     # split dataset into training and test datasets
-    (train_structures, test_structures) = stratified_dataset_split(
+    train_structures, test_structures = stratified_dataset_split(
         atoms=atoms, split_ratio=split_ratio, energy_label=energy_label
     )
 
