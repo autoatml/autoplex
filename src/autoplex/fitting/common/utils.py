@@ -47,6 +47,7 @@ from pytorch_lightning.loggers import CSVLogger
 from quippy import descriptors
 from scipy.spatial import ConvexHull
 from threadpoolctl import threadpool_limits
+from pyace.asecalc import PyACECalculator
 
 from autoplex import (
     GAP_HYPERS,
@@ -55,7 +56,9 @@ from autoplex import (
     MACE_HYPERS,
     NEP_HYPERS,
     NEQUIP_HYPERS,
+    PACEMAKER_HYPERS,
 )
+from autoplex.settings import PacemakerSettings
 from autoplex.data.common.utils import (
     data_distillation,
     plot_energy_forces,
@@ -1933,6 +1936,30 @@ class CustomPotential(quippy.potential.Potential):
             atoms.info["stress"] = self.results["stress"].copy()
         return res
 
+class AutoplexPyACECalculator(PyACECalculator):
+    """
+    A specific wrapper for PyACECalculator to sync results back to atoms object.
+    Required for Autoplex workflows which inspect atoms.info/arrays directly.
+    """
+    def calculate(self, *args, **kwargs):
+        # Call the base PyACECalculator calculate which populates self.results
+        res = super().calculate(*args, **kwargs)
+        
+        # Retrieve the atoms object
+        if "atoms" in kwargs:
+            atoms_obj = kwargs["atoms"]
+        else:
+            atoms_obj = args[0]
+        
+        # Sync standard properties back to atoms object containers
+        if "forces" in self.results:
+            atoms_obj.arrays["forces"] = self.results["forces"].copy()
+        if "energy" in self.results:
+            atoms_obj.info["energy"] = self.results["energy"]
+        if "stress" in self.results:
+            atoms_obj.info["stress"] = self.results["stress"].copy()
+        
+        return res
 
 def _compute_gap_energy(atom, gap_control: str, gap_label: str):
     """
@@ -2224,3 +2251,470 @@ def mace_convert_virial_to_stress(
             formatted_atoms.append(at)
 
     write(out_file_name, formatted_atoms, format="extxyz")
+
+
+def convert_to_pacemaker_pickle(
+    atoms_list: list[Atoms],
+    output_filename: str,
+    isolated_atom_energies: dict | None = None,
+    ref_energy_name: str = "REF_energy",
+    ref_force_name: str = "REF_forces",
+) -> None:
+    """
+    Convert a list of ASE atoms to a pickled pandas DataFrame for Pacemaker.
+    Strictly follows Pacemaker requirements:
+    Columns: energy, forces, ase_atoms, energy_corrected
+    """
+    data = []
+    
+    # Pre-fetch E0 map
+    e0_map = {}
+    if isolated_atom_energies:
+        for k, v in isolated_atom_energies.items():
+            # Handle atomic number (int) or symbol (str) keys
+            if isinstance(k, int):
+                sym = chemical_symbols[k]
+                e0_map[sym] = v
+            else:
+                e0_map[k] = v
+
+    for at in atoms_list:
+        # 1. Total Energy (eV)
+        if ref_energy_name not in at.info:
+            logging.warning(f"Energy key '{ref_energy_name}' missing in structure. Setting to 0.0")
+        energy = at.info.get(ref_energy_name, 0.0)
+        
+        # 2. Forces (eV/A) - Must be 2D array
+        if ref_force_name in at.arrays:
+            forces = np.array(at.arrays[ref_force_name])
+        else:
+            # Fallback only if strictly necessary, but ideally should exist
+            logging.warning(f"Force key '{ref_force_name}' missing. Setting zeros.")
+            forces = np.zeros((len(at), 3))
+
+        # 3. Energy Corrected (Cohesive Energy)
+        # energy_corrected = E_total - sum(E_isolated)
+        energy_corrected = energy
+        if e0_map:
+            symbols = at.get_chemical_symbols()
+            for s in symbols:
+                if s in e0_map:
+                    energy_corrected -= e0_map[s]
+                # If symbol not in e0_map, assume 0.0 or warn? For now assume 0.0
+        
+        # 4. ASE Atoms Object (Clean copy preferred, but simple copy works)
+        # Pacemaker needs positions, numbers/symbols, cell, pbc. 
+        # We strip calculator/info to keep pickle clean and avoid confusion.
+        at_clean = at.copy()
+        at_clean.calc = None
+        # We keep info/arrays empty to save space, Pacemaker relies on the DF columns
+        at_clean.info = {} 
+        at_clean.arrays = {'numbers': at.arrays['numbers'], 'positions': at.arrays['positions']} 
+        # Restore PBC/Cell
+        at_clean.set_pbc(at.get_pbc())
+        at_clean.set_cell(at.get_cell())
+
+        record = {
+            'energy': energy,
+            'forces': forces,
+            'ase_atoms': at_clean,
+            'energy_corrected': energy_corrected
+        }
+        data.append(record)
+
+    df = pd.DataFrame(data)
+    # Ensure column order matches Pacemaker expectations (though dict order usually doesn't matter, visual consistency helps)
+    df = df[['energy', 'forces', 'ase_atoms', 'energy_corrected']]
+    
+    # Save as compressed pickle, Protocol 4 is safe default
+    df.to_pickle(output_filename, compression='gzip', protocol=4)
+    logging.info(f"Converted {len(atoms_list)} structures to Pacemaker binary: {output_filename}")
+
+
+@requires(
+    shutil.which("pacemaker") is not None,
+    "Pacemaker fitting requires the 'pacemaker' executable to be in PATH.",
+)
+def pace_fitting(
+    db_dir: Path | str,
+    species_list: list[str] | None = None,
+    hyperparameters: PacemakerSettings = PACEMAKER_HYPERS,
+    fit_kwargs: dict | None = None,
+    isolated_atom_energies: dict | None = None, 
+    ref_energy_name: str = "REF_energy",
+    ref_force_name: str = "REF_forces",
+    ref_virial_name: str = "REF_virial",
+    num_processes_fit: int = 32,
+    train_name: str = "train.extxyz",
+    test_name: str = "test.extxyz",
+) -> dict:
+    """
+    Perform the ACE potential fitting using Pacemaker.
+
+    It creates the input.yaml configuration file for Pacemaker using the provided
+    hyperparameters and executes the fitting process via the 'pacemaker' command line tool.
+
+    Parameters
+    ----------
+    db_dir: Path or str
+        Directory containing the training and testing data files.
+    species_list: list[str] | None = None
+        List of chemical symbols (strings) involved in the system.
+    hyperparameters: PacemakerSettings
+        Fit hyperparameters defined in autoplex settings.
+    fit_kwargs: dict
+        Additional keyword arguments to override hyperparameters.
+    ref_energy_name: str
+        Name of the energy property in the dataset.
+    ref_force_name: str
+        Name of the force property in the dataset.
+    ref_virial_name: str
+        Name of the virial property in the dataset.
+    num_processes_fit: int
+        Number of processes/threads to use.
+    train_name: str
+        Name of the training dataset file.
+    test_name: str
+        Name of the test dataset file.
+
+    Returns
+    -------
+    dict
+        A dictionary containing 'train_error', 'test_error', and 'mlip_path'.
+    """
+    # Defensive copy of hyperparameters
+    try:
+        hyperparameters = hyperparameters.model_copy(deep=True)
+    except AttributeError:
+        if isinstance(hyperparameters, dict):
+            hyperparameters = hyperparameters.copy()
+        else:
+            hyperparameters = PacemakerSettings()
+    # 1. Prepare Data Conversion
+    train_bin_name = "train.pckl.gzip"
+    test_bin_name = "test.pckl.gzip"
+
+    src_train = Path(db_dir) / train_name
+    src_test = Path(db_dir) / test_name
+    
+    if not src_train.exists():
+        raise FileNotFoundError(f"Training data not found: {src_train}")
+        
+    logging.info(f"Loading training data from {src_train}...")
+    train_atoms = read(src_train, index=":")
+
+    # 2. Determine species_list with priority:
+    #    (1) User-provided species_list argument
+    #    (2) User-provided fit_kwargs["potential"]["elements"]
+    #    (3) Auto-infer from training data
+    
+    final_species_list = None
+    
+    # Priority 1: Direct argument
+    if species_list and len(species_list) > 0:
+        final_species_list = species_list
+        logging.info(f"Using species_list from argument: {final_species_list}")
+    
+    # Priority 2: From fit_kwargs
+    if final_species_list is None and fit_kwargs:
+        potential_kwargs = fit_kwargs.get("potential", {})
+        if "elements" in potential_kwargs and potential_kwargs["elements"]:
+            final_species_list = potential_kwargs["elements"]
+            logging.info(f"Using species_list from fit_kwargs['potential']['elements']: {final_species_list}")
+    
+    # Priority 3: Auto-infer from training data
+    if final_species_list is None:
+        logging.info("species_list not provided. Inferring from training data...")
+        all_symbols = set()
+        for at in train_atoms:
+            # Skip isolated atoms for inference (they might have special treatment)
+            if "config_type" in at.info and "IsolatedAtom" in at.info.get("config_type", ""):
+                continue
+            all_symbols.update(at.get_chemical_symbols())
+        
+        if not all_symbols:
+            # If all structures are isolated atoms, get species from them too
+            for at in train_atoms:
+                all_symbols.update(at.get_chemical_symbols())
+        
+        final_species_list = sorted(list(all_symbols))
+        logging.info(f"Inferred species_list from training data: {final_species_list}")
+    
+    if not final_species_list:
+        raise ValueError(
+            "Could not determine species list for Pacemaker fitting. "
+            "Please provide 'species_list' argument or set 'potential.elements' in fit_kwargs."
+        )
+    
+    convert_to_pacemaker_pickle(
+        train_atoms, 
+        train_bin_name, 
+        isolated_atom_energies, 
+        ref_energy_name, 
+        ref_force_name
+    )
+
+    has_test = src_test.exists()
+    if has_test:
+        logging.info(f"Loading test data from {src_test}...")
+        test_atoms = read(src_test, index=":")
+        convert_to_pacemaker_pickle(
+            test_atoms, 
+            test_bin_name, 
+            isolated_atom_energies, 
+            ref_energy_name, 
+            ref_force_name
+        )
+
+    # 2. Configure Hyperparameters
+    if fit_kwargs:
+        try:
+            hyperparameters.update_parameters(fit_kwargs)
+        except AttributeError:
+             try:
+                hyperparameters.update(fit_kwargs)
+             except AttributeError:
+                 pass
+
+    try:
+        pace_config = hyperparameters.model_dump(by_alias=True, exclude_none=True)
+    except AttributeError:
+        pace_config = hyperparameters
+
+    # 4. Set species list in potential section
+    if "potential" not in pace_config:
+        pace_config["potential"] = {}
+    pace_config["potential"]["elements"] = final_species_list
+
+    # 5. Ensure data section points to BINARY files
+    if "data" not in pace_config:
+        pace_config["data"] = {}
+    
+    pace_config["data"]["filename"] = train_bin_name
+    if has_test:
+        pace_config["data"]["test_filename"] = test_bin_name
+    
+    pace_config["data"]["energy_key"] = "energy_corrected"
+    pace_config["data"]["forces_key"] = "forces"
+    
+    # Write input.yaml
+    dumpfn(pace_config, "input.yaml")
+
+    # Run Pacemaker
+    run_pacemaker("input.yaml", "pacemaker.log")
+
+    # Locate the output potential file
+    potential_yaml_name = "output_potential.yaml"
+    potential_yaml_path = Path.cwd() / potential_yaml_name
+    
+    # Fallback: search for alternative .yaml potential files if default not found
+    if not potential_yaml_path.exists():
+        yaml_candidates = [
+            f for f in Path.cwd().glob("*.yaml") 
+            if f.name != "input.yaml"
+        ]
+        if yaml_candidates:
+            potential_yaml_path = max(yaml_candidates, key=os.path.getctime)
+            potential_yaml_name = potential_yaml_path.name
+            logging.info(f"Using detected potential file: {potential_yaml_name}")
+    
+    if not potential_yaml_path.exists():
+        logging.warning(
+            "No output potential .yaml file found. "
+            "Fitting may have failed or produced unexpected output."
+        )
+    
+    # Optional: Convert to .yace format for LAMMPS compatibility
+    # This is not required for autoplex workflows (which use PyACE with .yaml directly)
+    output_yace_path = Path.cwd() / "output_potential.yace"
+    if potential_yaml_path.exists() and shutil.which("pace_yaml2yace"):
+        try:
+            subprocess.run(
+                ["pace_yaml2yace", str(potential_yaml_path), "-o", str(output_yace_path)],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            logging.info(f"Created {output_yace_path.name} for LAMMPS compatibility.")
+        except subprocess.CalledProcessError as e:
+            logging.warning(f"Optional .yace conversion failed: {e.stderr or e.stdout}")
+    elif not shutil.which("pace_yaml2yace"):
+        logging.debug("pace_yaml2yace not found. Skipping optional .yace conversion.")
+
+    # Parse errors from the pacemaker log file
+    # Default to high values to ensure RSS loops continue if parsing fails
+    train_error = 1.0  # eV/atom
+    test_error = 1.0   # eV/atom
+    
+    try:
+        log_path = Path("pacemaker.log")
+        if log_path.exists():
+            log_content = log_path.read_text()
+            
+            # Pacemaker logs RMSE in meV/at format in statistics tables
+            # We look for the final "Cycle last iteration" sections which contain the final metrics
+            # Pattern: "RMSE:          431.29" in the table after "Energy/at, meV/at"
+            
+            # Strategy: Find the last occurrence of "Cycle last iteration:" for TRAIN
+            # and "TEST Cycle last iteration:" for TEST
+            
+            # Parse TRAIN error from "----Cycle last iteration:----" section
+            train_section_match = re.search(
+                r"-+Cycle last iteration:-+\s*\n(.*?)(?=-{40,}|$)", 
+                log_content, 
+                re.DOTALL
+            )
+            if train_section_match:
+                train_section = train_section_match.group(1)
+                train_rmse_match = re.search(
+                    r"RMSE:\s+([\d.]+)", 
+                    train_section
+                )
+                if train_rmse_match:
+                    # Convert from meV/at to eV/at
+                    train_error = float(train_rmse_match.group(1)) / 1000.0
+                    logging.info(f"Parsed train energy RMSE: {train_error:.6f} eV/at")
+            
+            # Parse TEST error from "----TEST Cycle last iteration:----" section
+            test_section_match = re.search(
+                r"-+TEST Cycle last iteration:-+\s*\n(.*?)(?=-{40,}|$)", 
+                log_content, 
+                re.DOTALL
+            )
+            if test_section_match:
+                test_section = test_section_match.group(1)
+                # Look for RMSE line
+                test_rmse_match = re.search(
+                    r"RMSE:\s+([\d.]+)", 
+                    test_section
+                )
+                if test_rmse_match:
+                    # Convert from meV/at to eV/at
+                    test_error = float(test_rmse_match.group(1)) / 1000.0
+                    logging.info(f"Parsed test energy RMSE: {test_error:.6f} eV/at")
+            
+            # Fallback: if specific sections not found, try to find the last TEST STATS
+            if test_error == 1.0:
+                # Find all TEST STATS sections and get the last one
+                test_stats_matches = list(re.finditer(
+                    r"-+TEST STATS-+\s*\n.*?RMSE:\s+([\d.]+)",
+                    log_content,
+                    re.DOTALL
+                ))
+                if test_stats_matches:
+                    last_match = test_stats_matches[-1]
+                    test_error = float(last_match.group(1)) / 1000.0
+                    logging.info(f"Parsed test energy RMSE (fallback): {test_error:.6f} eV/at")
+            
+            # Fallback for train error
+            if train_error == 1.0:
+                # Find all FIT STATS sections and get the last one
+                fit_stats_matches = list(re.finditer(
+                    r"-+FIT STATS-+\s*\n.*?RMSE:\s+([\d.]+)",
+                    log_content,
+                    re.DOTALL
+                ))
+                if fit_stats_matches:
+                    last_match = fit_stats_matches[-1]
+                    train_error = float(last_match.group(1)) / 1000.0
+                    logging.info(f"Parsed train energy RMSE (fallback): {train_error:.6f} eV/at")
+                    
+        else:
+            logging.warning("pacemaker.log not found. Using default error values.")
+            
+    except Exception as e:
+        logging.warning(f"Could not parse RMSE from pacemaker.log: {e}. Using default values.")
+
+    logging.info(f"Final errors - Train: {train_error:.6f} eV/at, Test: {test_error:.6f} eV/at")
+
+    return {
+        "train_error": train_error,
+        "test_error": test_error,
+        "mlip_path": Path.cwd(),
+    }
+
+
+def run_pacemaker(input_file: str = "input.yaml", log_file: str = "pacemaker.log") -> None:
+    """
+    Pacemaker runner.
+
+    Parameters
+    ----------
+    input_file: str
+        Name of the input YAML configuration file.
+    log_file: str
+        Name of the log file to capture stdout/stderr.
+    """
+
+    with open(log_file, "w") as f_log:
+        try:
+            subprocess.run(
+                ["pacemaker", input_file],
+                check=True,
+                stdout=f_log,
+                stderr=subprocess.STDOUT,  # Redirect stderr to stdout so it goes to log
+            )
+        except subprocess.CalledProcessError as e:
+            # Read and print the log file content for debugging
+            log_path = Path(log_file)
+            if log_path.exists():
+                print(f"\n{'='*60}")
+                print(f"PACEMAKER FAILED! Log file content ({log_file}):")
+                print('='*60)
+                print(log_path.read_text())
+                print('='*60 + "\n")
+            
+            # Also print input.yaml for debugging
+            input_path = Path(input_file)
+            if input_path.exists():
+                print(f"\n{'='*60}")
+                print(f"Input YAML content ({input_file}):")
+                print('='*60)
+                print(input_path.read_text())
+                print('='*60 + "\n")
+            
+            raise  
+
+
+
+    # ##if need to print real-time output to console and log file simultaneously | for debugging
+
+    # with open(log_file, "w") as f_log:
+    #     process = subprocess.Popen(
+    #         ["pacemaker", input_file],
+    #         stdout=subprocess.PIPE,
+    #         stderr=subprocess.STDOUT,  # Merge stderr into stdout
+    #         text=True,
+    #         bufsize=1,  # Line buffered
+    #     )
+        
+    #     # Real-time output: read line by line
+    #     for line in process.stdout:
+    #         sys.stdout.write(line)  # Print to console in real-time
+    #         sys.stdout.flush()
+    #         f_log.write(line)       # Also write to log file
+    #         f_log.flush()
+        
+    #     # Wait for process to complete
+    #     return_code = process.wait()
+        
+    #     if return_code != 0:
+    #         # Read and print the log file content for debugging
+    #         log_path = Path(log_file)
+    #         if log_path.exists():
+    #             print(f"\n{'='*60}")
+    #             print(f"PACEMAKER FAILED! Log file content ({log_file}):")
+    #             print('='*60)
+    #             print(log_path.read_text())
+    #             print('='*60 + "\n")
+            
+    #         # Also print input.yaml for debugging
+    #         input_path = Path(input_file)
+    #         if input_path.exists():
+    #             print(f"\n{'='*60}")
+    #             print(f"Input YAML content ({input_file}):")
+    #             print('='*60)
+    #             print(input_path.read_text())
+    #             print('='*60 + "\n")
+            
+    #         raise subprocess.CalledProcessError(return_code, ["pacemaker", input_file])

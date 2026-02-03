@@ -217,7 +217,7 @@ class RssMaker(Maker):
         pre_database_dir: str | None
             Directory where the previous database was saved.
         mlip_type: str
-            Choose one specific MLIP type to be fitted: 'GAP' | 'J-ACE' | 'NEQUIP' | 'M3GNET' | 'MACE'.
+            Choose one specific MLIP type to be fitted: 'GAP' | 'J-ACE' | 'P-ACE' | 'NEQUIP' | 'M3GNET' | 'MACE'.
             Default is 'GAP'.
         ref_energy_name: str
             Reference energy name. Default is 'REF_energy'.

@@ -840,6 +840,104 @@ class NEPSettings(AutoplexBaseModel):
     )
 
 
+class PacemakerSettings(AutoplexBaseModel):
+    """
+    Model describing the hyperparameters for the Pacemaker (P-ACE) fits.
+    
+    Structure matches the input.yaml sections of Pacemaker.
+    Dictionary-based fields provide flexibility and allow any valid Pacemaker input.
+    """
+    seed: int | None = Field(default=42, description="Random seed")
+    metadata: dict[str, Any] | None = Field(default=None, description="Metadata dictionary")
+    
+    # --- Cutoff Section ---
+    cutoff: float | int | dict[str, Any] = Field(
+        default=7.0, 
+        description="Cutoff radius (float) or dict config (e.g. {name: hard, r_cut: 7.0})"
+    )
+    
+    # --- Data Section ---
+    data: dict[str, Any] = Field(
+        default_factory=lambda: {
+            "filename": "train.pckl.gzip",
+            "test_filename": None,
+            "energy_key": "REF_energy",
+            "forces_key": "REF_forces",
+            "virial_key": "REF_virial",
+            "energy_unit": "eV",
+            "distance_unit": "Ang",
+            "reference_energy": None # Supports "auto" or dict
+        },
+        description="Data configuration block"
+    )
+
+    # --- Potential Section ---
+    potential: dict[str, Any] = Field(
+        default_factory=lambda: {
+            "deltaSplineBins": 0.001,
+            "elements": None, # Will be filled automatically by autoplex if None
+            # General safe defaults using 'ALL'
+            "embeddings": {
+                "ALL": {
+                    "npot": "FinnisSinclairShiftedScaled",
+                    "fs_parameters": [1, 1, 1, 0.5],
+                    "ndensity": 2,
+                }
+            },
+            "bonds": {
+                "ALL": {
+                    "radbase": "ChebExpCos",
+                    "radparameters": [5.25],
+                    "rcut": 7.0,
+                    "dcut": 0.01,
+                    "r_in": 1.0,
+                    "delta_in": 0.5
+                }
+            },
+            "functions": {
+                "ALL": {
+                    "nradmax_by_orders": [15, 3, 2, 2],
+                    "lmax_by_orders": [0, 2, 2, 1]
+                },
+                "number_of_functions_per_element": 200
+            }
+        },
+        description="Potential configuration block (embeddings, bonds, functions)"
+    )
+
+    # --- Fit Section ---
+    fit: dict[str, Any] = Field(
+        default_factory=lambda: {
+            # Flattened structure easier for user overrides
+            "optimizer": "BFGS",
+            "maxiter": 100, 
+            "loss": {
+                "kappa": 0.8, 
+                "w_energy": 1.0, 
+                "w_forces": 1.0, 
+                "w_stress": 0.1
+            },
+            "weighting": {
+                "type": "EnergyBasedWeightingPolicy", 
+                "nfit": 10000
+            },
+            "repulsion": "auto",
+            "trainable_parameters": "ALL"
+        },
+        description="Fitting configuration block (optimizer, loss, maxiter)"
+    )
+    
+    # --- Backend Section ---
+    backend: dict[str, Any] = Field(
+        default_factory=lambda: {
+            "evaluator": "tensorpot", 
+            "batch_size_evaluation": 1000, 
+            "batch_size_training": 100
+        },
+        description="Backend execution settings"
+    )
+
+
 class MLIPHypers(AutoplexBaseModel):
     """Model containing the hyperparameter defaults for supported MLIPs in autoplex."""
 
@@ -864,6 +962,11 @@ class MLIPHypers(AutoplexBaseModel):
     )
     NEP: NEPSettings = Field(
         default_factory=NEPSettings, description="Hyperparameters for the NEP model"
+    )
+
+    P_ACE: PacemakerSettings = Field(
+        default_factory=PacemakerSettings, description="Hyperparameters for the P-ACE model",
+        alias="P-ACE"
     )
 
 
@@ -1133,7 +1236,7 @@ class RssConfig(AutoplexBaseModel):
     pre_database_dir: str | None = Field(
         default=None, description="Directory where the previous database was saved."
     )
-    mlip_type: Literal["GAP", "J-ACE", "NEQUIP", "M3GNET", "MACE"] = Field(
+    mlip_type: Literal["GAP", "J-ACE", "P-ACE", "NEQUIP", "M3GNET", "MACE"] = Field(
         default="GAP", description="MLIP to be fitted"
     )
     ref_energy_name: str = Field(

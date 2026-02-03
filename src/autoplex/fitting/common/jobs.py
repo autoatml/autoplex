@@ -16,6 +16,7 @@ from autoplex.fitting.common.utils import (
     mace_fitting,
     nep_fitting,
     nequip_fitting,
+    pace_fitting,
 )
 
 
@@ -65,7 +66,7 @@ def machine_learning_fit(
         List of GPU indices to be used for fitting. Only used for NEP fitting.
     mlip_type: str
         Choose one specific MLIP type to be fitted:
-        'GAP' | 'J-ACE' | 'NEQUIP' | 'NEP' | 'M3GNET' | 'MACE'
+        'GAP' | 'J-ACE' | 'P-ACE' | 'NEQUIP' | 'NEP' | 'M3GNET' | 'MACE'
     ref_energy_name: str
         Reference energy name.
     ref_force_name: str
@@ -154,6 +155,20 @@ def machine_learning_fit(
             ref_virial_name=ref_virial_name,
             num_processes_fit=num_processes_fit,
             fit_kwargs=fit_kwargs,
+        )
+        mlip_paths.append(train_test_error["mlip_path"])
+
+    elif mlip_type == "P-ACE":
+        train_test_error = pace_fitting(
+            db_dir=database_dir,
+            species_list=species_list,
+            hyperparameters=hyperparameters.P_ACE, 
+            fit_kwargs=fit_kwargs,
+            isolated_atom_energies=isolated_atom_energies,
+            ref_energy_name=ref_energy_name,
+            ref_force_name=ref_force_name,
+            ref_virial_name=ref_virial_name,
+            num_processes_fit=num_processes_fit,
         )
         mlip_paths.append(train_test_error["mlip_path"])
 

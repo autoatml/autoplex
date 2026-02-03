@@ -31,6 +31,7 @@ from threadpoolctl import threadpool_limits
 
 from autoplex.fitting.common.utils import (
     CustomPotential,
+    AutoplexPyACECalculator,
     extract_gap_label,
 )
 
@@ -333,7 +334,7 @@ def process_rss(
         ASE Atoms object representing the atomic configuration.
     mlip_type: str
         Choose one specific MLIP type:
-        'GAP' | 'J-ACE' | 'NequIP' | 'M3GNet' | 'MACE'.
+        'GAP' | 'J-ACE' | 'P-ACE' | 'NequIP' | 'M3GNet' | 'MACE'.
     mlip_path: str | Path
         Path to the MLIP model.
     output_file_name: str
@@ -419,6 +420,32 @@ def process_rss(
         pot = LAMMPSlib(
             lmpcmds=cmds, atom_types=atom_types, log_file="test.log", keep_alive=True
         )
+
+    elif mlip_type == "P-ACE":
+        try:
+            from pyace.asecalc import PyACECalculator
+        except ImportError as exc:
+            raise RuntimeError(
+                "To use RSS flow with P-ACE via the native ASE interface, 'pyace' "
+                "(Pacemaker) must be installed."
+            ) from exc
+
+        # Determine potential file path
+        mlip_path_obj = Path(mlip_path)
+        potential_file = None
+
+        if mlip_path_obj.is_file():
+            potential_file = mlip_path_obj
+        else:
+            target_file = mlip_path_obj / "output_potential.yaml"
+            if target_file.exists():
+                potential_file = target_file
+
+        if potential_file is None:
+             raise FileNotFoundError(f"Could not find 'output_potential.yaml' in {mlip_path} for P-ACE.")
+
+        # Initialize directly using imported class
+        pot = AutoplexPyACECalculator(basis_set=str(potential_file.resolve()))
 
     elif mlip_type == "NEQUIP":
         nequip_label = os.path.join(mlip_path, "deployed_nequip_model.pth")
@@ -539,7 +566,7 @@ def process_rss(
 
 
 def minimize_structures(
-    mlip_type: Literal["GAP", "J-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"],
+    mlip_type: Literal["GAP", "J-ACE", "P-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"],
     mlip_path: str | Path,
     iteration_index: str,
     structures: list[Structure],
@@ -566,7 +593,7 @@ def minimize_structures(
 
     Parameters
     ----------
-    mlip_type: Literal["GAP", "J-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"]
+    mlip_type: Literal["GAP", "J-ACE", "P-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"]
         Choose one specific MLIP type to be fitted.
     mlip_path: str | Path
         Path to the MLIP model.

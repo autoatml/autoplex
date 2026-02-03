@@ -288,6 +288,50 @@ def test_mace_rss(test_dir, memory_jobstore, clean_dir):
 
     assert len(output_filter) == 1
 
+
+def test_pace_rss(test_dir, memory_jobstore, clean_dir):
+
+    np.random.seed(42)
+    
+    test_files_dir = test_dir / "data/rss.extxyz"
+    atoms = read(test_files_dir, index="0:5:1")
+    structures = [AseAtomsAdaptor.get_structure(atom) for atom in atoms]
+    mlip_path = test_dir / "fitting/PACE"
+
+    job_rss = do_rss_single_node(
+        mlip_type='P-ACE',          
+        iteration_index='0',
+        mlip_path=mlip_path,        
+        structures=structures,
+        scalar_pressure_method='exp',
+        scalar_exp_pressure=100,
+        scalar_pressure_exponential_width=0.2,
+        scalar_pressure_low=0,
+        scalar_pressure_high=50,
+        max_steps=10,               
+        force_tol=0.1,
+        stress_tol=0.1,
+        hookean_repul=False,
+        num_processes_rss=4,
+        device="cpu",
+        isolated_atom_energies={14: -0.84696938}
+    )
+
+    response = run_locally(
+        job_rss,
+        create_folders=True,
+        ensure_success=True,
+        store=memory_jobstore
+    )
+
+    output = job_rss.output.resolve(memory_jobstore)
+    output_filter = []
+    for i in output:
+        if i is not None:
+            output_filter.append(i)
+
+    assert len(output_filter) >= 1
+
 def test_extract_elements():
     rs = RandomizedStructure()
     elements = rs._extract_elements("SiO2")
