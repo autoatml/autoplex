@@ -636,7 +636,7 @@ def test_mock_workflow_for_PACE(test_dir, mock_vasp, memory_jobstore, clean_dir)
                     ref_energy_name="REF_energy",
                     ref_force_name="REF_forces",
                     ref_virial_name="REF_virial",
-                    num_processes_fit=1,
+                    num_processes_fit=4,
                     kt=0.6,
                     
                     fit=custom_fit_settings,

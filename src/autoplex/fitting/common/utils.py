@@ -2501,7 +2501,7 @@ def pace_fitting(
     dumpfn(pace_config, "input.yaml")
 
     # Run Pacemaker
-    run_pacemaker("input.yaml", "pacemaker.log")
+    run_pacemaker("input.yaml", "pacemaker.log", num_processes=num_processes_fit)
 
     # Locate the output potential file
     potential_yaml_name = "output_potential.yaml"
@@ -2634,7 +2634,11 @@ def pace_fitting(
     }
 
 
-def run_pacemaker(input_file: str = "input.yaml", log_file: str = "pacemaker.log") -> None:
+def run_pacemaker(
+    input_file: str = "input.yaml", 
+    log_file: str = "pacemaker.log", 
+    num_processes: int = 1
+) -> None:    
     """
     Pacemaker runner.
 
@@ -2645,6 +2649,14 @@ def run_pacemaker(input_file: str = "input.yaml", log_file: str = "pacemaker.log
     log_file: str
         Name of the log file to capture stdout/stderr.
     """
+    # Set environment variables for parallelism
+    env = os.environ.copy()
+    env["OMP_NUM_THREADS"] = str(num_processes)
+    env["MKL_NUM_THREADS"] = str(num_processes)
+    env["OPENBLAS_NUM_THREADS"] = str(num_processes)
+    env["VECLIB_MAXIMUM_THREADS"] = str(num_processes)
+    env["NUMEXPR_NUM_THREADS"] = str(num_processes)
+    
 
     with open(log_file, "w") as f_log:
         try:

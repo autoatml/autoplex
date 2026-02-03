@@ -260,6 +260,7 @@ def test_pace_fit_maker_defaults(test_dir, memory_jobstore, clean_dir):
     
     pacefit = MLIPFitMaker(
         mlip_type="P-ACE",
+        num_processes_fit=4,
         apply_data_preprocessing=False, 
     ).make(
         database_dir=database_dir,
@@ -331,6 +332,7 @@ def test_pace_fit_maker_custom(test_dir, memory_jobstore, clean_dir):
 
     pacefit = MLIPFitMaker(
         mlip_type="P-ACE",
+        num_processes_fit=4,
         apply_data_preprocessing=False, 
     ).make(
         database_dir=database_dir,

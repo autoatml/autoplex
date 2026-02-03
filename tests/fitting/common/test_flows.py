@@ -409,6 +409,7 @@ def test_mlip_fit_maker_pace(
         pre_database_dir=str(test_files_dir),
         pre_xyz_files=["pre_xyz_train.extxyz", "pre_xyz_test.extxyz"],
         apply_data_preprocessing=True,
+        num_processes_fit=4,
     ).make(
         fit_input=fit_input_dict,
         species_list=["Li", "Cl"],
