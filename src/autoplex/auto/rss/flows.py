@@ -309,6 +309,11 @@ class RssMaker(Maker):
                 "'train_from_scratch' must be set in the configuration file or passed as a keyword argument!!"
             )
 
+        if config_params["train_from_scratch"] and config_params["test_ratio"] == 0.0:
+            raise ValueError(
+                "A prebuilt test set should be present if `test_ratio` is set to 0."
+            )
+
         rss_flow = []
 
         if config_params["train_from_scratch"]:

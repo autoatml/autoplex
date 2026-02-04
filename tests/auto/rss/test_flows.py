@@ -1,5 +1,7 @@
 import os
 from pathlib import Path
+
+import pytest
 from jobflow import run_locally, Flow
 from tests.conftest import mock_rss, mock_do_rss_iterations, mock_do_rss_iterations_multi_jobs
 from autoplex.settings import RssConfig
@@ -840,3 +842,9 @@ def test_rssmaker_custom_config_file(test_dir):
     assert rss.rss_config.device_for_rss == "cuda"
     assert rss.rss_config.isolatedatom_box == [10, 10, 10]
     assert rss.rss_config.dimer_box == [10, 10, 10]
+
+
+def test_keyword_sanity_checks(test_dir):
+    rss_job = RssMaker().make(train_from_scratch=True, test_ratio=0.0)
+    with pytest.raises(ValueError):
+        run_locally(rss_job)
