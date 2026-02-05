@@ -812,7 +812,7 @@ def preprocess_data(
     )
 
     if test_ratio == 0 or test_ratio is None:
-        train_structures, test_structures = atoms, atoms
+        train_structures, test_structures = atoms, []
     else:
         train_structures, test_structures = stratified_dataset_split(
             atoms, test_ratio, energy_label
