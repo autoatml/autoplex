@@ -856,28 +856,25 @@ class PacemakerSettings(AutoplexBaseModel):
     seed: int | None = Field(default=42, description="Random seed")
     metadata: dict[str, Any] | None = Field(default=None, description="Metadata dictionary")
     
-    # --- Cutoff Section ---
     cutoff: float | int | dict[str, Any] = Field(
-        default=7.0, 
+        default=5.0, 
         description="Cutoff radius (float) or dict config (e.g. {name: hard, r_cut: 7.0})"
     )
     
-    # --- Data Section ---
     data: dict[str, Any] = Field(
         default_factory=lambda: {
             "filename": "train.pckl.gzip",
             "test_filename": None,
-            "energy_key": "REF_energy",
-            "forces_key": "REF_forces",
-            "virial_key": "REF_virial",
-            "energy_unit": "eV",
-            "distance_unit": "Ang",
-            "reference_energy": None # Supports "auto" or dict
+            # "energy_key": "REF_energy",
+            # "forces_key": "REF_forces",
+            # "virial_key": "REF_virial",
+            # "energy_unit": "eV",
+            # "distance_unit": "Ang",
+            # "reference_energy": None
         },
         description="Data configuration block. If provided by user, completely replaces default."
     )
 
-    # --- Potential Section ---
     potential: dict[str, Any] = Field(
         default_factory=lambda: {
             "deltaSplineBins": 0.001,
@@ -910,7 +907,6 @@ class PacemakerSettings(AutoplexBaseModel):
         description="Potential configuration block. If provided by user, completely replaces default."
     )
 
-    # --- Fit Section ---
     fit: dict[str, Any] = Field(
         default_factory=lambda: {
             "optimizer": "BFGS",
