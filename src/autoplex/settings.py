@@ -15,6 +15,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from torch.optim import Optimizer  # noqa: TC002
 from torch.optim.lr_scheduler import LRScheduler  # noqa: TC002
 
+import copy
+
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
@@ -846,6 +848,10 @@ class PacemakerSettings(AutoplexBaseModel):
     
     Structure matches the input.yaml sections of Pacemaker.
     Dictionary-based fields provide flexibility and allow any valid Pacemaker input.
+    
+    Note: If user provides a value for any nested dict field (e.g., 'fit', 'potential'),
+    it will COMPLETELY REPLACE the default value, not merge with it.
+    Users should provide complete configurations for any field they customize.
     """
     seed: int | None = Field(default=42, description="Random seed")
     metadata: dict[str, Any] | None = Field(default=None, description="Metadata dictionary")
@@ -868,15 +874,14 @@ class PacemakerSettings(AutoplexBaseModel):
             "distance_unit": "Ang",
             "reference_energy": None # Supports "auto" or dict
         },
-        description="Data configuration block"
+        description="Data configuration block. If provided by user, completely replaces default."
     )
 
     # --- Potential Section ---
     potential: dict[str, Any] = Field(
         default_factory=lambda: {
             "deltaSplineBins": 0.001,
-            "elements": None, # Will be filled automatically by autoplex if None
-            # General safe defaults using 'ALL'
+            "elements": None,
             "embeddings": {
                 "ALL": {
                     "npot": "FinnisSinclairShiftedScaled",
@@ -902,13 +907,12 @@ class PacemakerSettings(AutoplexBaseModel):
                 "number_of_functions_per_element": 200
             }
         },
-        description="Potential configuration block (embeddings, bonds, functions)"
+        description="Potential configuration block. If provided by user, completely replaces default."
     )
 
     # --- Fit Section ---
     fit: dict[str, Any] = Field(
         default_factory=lambda: {
-            # Flattened structure easier for user overrides
             "optimizer": "BFGS",
             "maxiter": 100, 
             "loss": {
@@ -924,7 +928,7 @@ class PacemakerSettings(AutoplexBaseModel):
             "repulsion": "auto",
             "trainable_parameters": "ALL"
         },
-        description="Fitting configuration block (optimizer, loss, maxiter)"
+        description="Fitting configuration block. If provided by user, completely replaces default."
     )
     
     # --- Backend Section ---
@@ -934,7 +938,7 @@ class PacemakerSettings(AutoplexBaseModel):
             "batch_size_evaluation": 1000, 
             "batch_size_training": 100
         },
-        description="Backend execution settings"
+        description="Backend execution settings. If provided by user, completely replaces default."
     )
 
 
@@ -967,6 +971,13 @@ class MLIPHypers(AutoplexBaseModel):
     P_ACE: PacemakerSettings = Field(
         default_factory=PacemakerSettings, description="Hyperparameters for the P-ACE model",
         alias="P-ACE"
+    )
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+        validate_assignment=True,
+        extra="forbid",
+        revalidate_instances='never',
     )
 
 

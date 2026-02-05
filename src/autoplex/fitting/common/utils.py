@@ -2497,6 +2497,13 @@ def pace_fitting(
     pace_config["data"]["energy_key"] = "energy_corrected"
     pace_config["data"]["forces_key"] = "forces"
     
+    allowed_top_level_keys = {
+        "cutoff", "seed", "metadata", "potential", "data", "fit", "backend"
+    }
+    pace_config = {
+        k: v for k, v in pace_config.items() if k in allowed_top_level_keys
+    }
+
     # Write input.yaml
     dumpfn(pace_config, "input.yaml")
 
