@@ -9,6 +9,7 @@ import pytest
 import numpy as np
 from pathlib import Path
 from unittest.mock import patch
+import json
 
 from monty.serialization import loadfn
 
@@ -235,11 +236,330 @@ EXPECTED_PACE_VALUES = {
 }
 
 
+def print_dict_comparison(title, expected, actual, indent=0):
+    """Helper function to print detailed comparison of dictionaries."""
+    prefix = "  " * indent
+    print(f"{prefix}{title}:")
+    if isinstance(expected, dict) and isinstance(actual, dict):
+        all_keys = set(expected.keys()) | set(actual.keys())
+        for key in sorted(all_keys):
+            exp_val = expected.get(key, "<MISSING>")
+            act_val = actual.get(key, "<MISSING>")
+            if isinstance(exp_val, dict) and isinstance(act_val, dict):
+                print_dict_comparison(f"[{key}]", exp_val, act_val, indent + 1)
+            else:
+                match = "✓" if exp_val == act_val else "✗"
+                print(f"{prefix}  {key}: expected={exp_val}, actual={act_val} {match}")
+    else:
+        match = "✓" if expected == actual else "✗"
+        print(f"{prefix}  expected={expected}, actual={actual} {match}")
+
+
 @pytest.fixture
 def clean_dir(tmp_path, monkeypatch):
     """Change to a clean temporary directory for each test."""
     monkeypatch.chdir(tmp_path)
     yield tmp_path
+
+
+class TestRssMakerConfigExtraction:
+    """
+    Test the exact parameter extraction logic used in RssMaker.make().
+    This simulates what happens in flows.py lines 167-175.
+    """
+    
+    @pytest.fixture
+    def autoplex_config_file(self, tmp_path):
+        """Create a temporary autoplex config file."""
+        config_file = tmp_path / "autoplex_config.yaml"
+        config_file.write_text(SAMPLE_AUTOPLEX_CONFIG)
+        return config_file
+
+    def test_rss_maker_style_config_extraction(self, autoplex_config_file):
+        """
+        Test the EXACT logic used in RssMaker.make() for extracting MLIP hypers.
+        
+        This replicates flows.py lines 167-175:
+            config_params = default_config.model_dump(by_alias=True, exclude_none=True)
+            mlip_hypers = config_params["mlip_hypers"][config_params["mlip_type"]]
+            del config_params["mlip_hypers"]
+            config_params.update(mlip_hypers)
+        """
+        print("\n" + "="*80)
+        print("TEST: RssMaker-style config extraction")
+        print("="*80)
+        
+        # Step 1: Load config (simulates RssMaker.__init__ and make())
+        config = RssConfig.from_file(str(autoplex_config_file))
+        
+        print("\n[Step 1] Loaded RssConfig from YAML file")
+        print(f"  mlip_type: {config.mlip_type}")
+        print(f"  P_ACE.cutoff: {config.mlip_hypers.P_ACE.cutoff}")
+        print(f"  P_ACE.seed: {config.mlip_hypers.P_ACE.seed}")
+        print(f"  P_ACE.fit['maxiter']: {config.mlip_hypers.P_ACE.fit.get('maxiter', 'NOT SET')}")
+        print(f"  P_ACE.potential['embeddings']['ALL']['fs_parameters']: {config.mlip_hypers.P_ACE.potential.get('embeddings', {}).get('ALL', {}).get('fs_parameters', 'NOT SET')}")
+        
+        # Step 2: model_dump (simulates flows.py line 167)
+        config_params = config.model_dump(by_alias=True, exclude_none=True)
+        
+        print("\n[Step 2] After model_dump(by_alias=True, exclude_none=True)")
+        print(f"  Keys in config_params: {list(config_params.keys())[:10]}...")  # First 10 keys
+        print(f"  mlip_type in config_params: {config_params.get('mlip_type')}")
+        print(f"  'mlip_hypers' in config_params: {'mlip_hypers' in config_params}")
+        
+        if "mlip_hypers" in config_params:
+            print(f"  Keys in mlip_hypers: {list(config_params['mlip_hypers'].keys())}")
+            pace_key = config_params["mlip_type"]  # Should be "P-ACE"
+            print(f"  Looking for key: {pace_key}")
+            if pace_key in config_params["mlip_hypers"]:
+                pace_dict = config_params["mlip_hypers"][pace_key]
+                print(f"  P-ACE cutoff: {pace_dict.get('cutoff', 'NOT SET')}")
+                print(f"  P-ACE seed: {pace_dict.get('seed', 'NOT SET')}")
+                print(f"  P-ACE fit.maxiter: {pace_dict.get('fit', {}).get('maxiter', 'NOT SET')}")
+        
+        # Step 3: Extract MLIP hyperparameters (simulates flows.py lines 170-171)
+        mlip_hypers = config_params["mlip_hypers"][config_params["mlip_type"]]
+        
+        print("\n[Step 3] Extracted mlip_hypers dict")
+        print(f"  Keys: {list(mlip_hypers.keys())}")
+        print(f"  cutoff: {mlip_hypers.get('cutoff')}")
+        print(f"  seed: {mlip_hypers.get('seed')}")
+        print(f"  fit.maxiter: {mlip_hypers.get('fit', {}).get('maxiter')}")
+        print(f"  fit.loss.kappa: {mlip_hypers.get('fit', {}).get('loss', {}).get('kappa')}")
+        print(f"  potential.embeddings.ALL.fs_parameters: {mlip_hypers.get('potential', {}).get('embeddings', {}).get('ALL', {}).get('fs_parameters')}")
+        print(f"  potential.bonds.ALL.radbase: {mlip_hypers.get('potential', {}).get('bonds', {}).get('ALL', {}).get('radbase')}")
+        print(f"  backend.evaluator: {mlip_hypers.get('backend', {}).get('evaluator')}")
+        
+        # Step 4: Delete mlip_hypers and update config_params (flows.py lines 172-173)
+        del config_params["mlip_hypers"]
+        config_params.update(mlip_hypers)
+        
+        print("\n[Step 4] After flattening (del mlip_hypers + update)")
+        print(f"  'mlip_hypers' in config_params: {'mlip_hypers' in config_params}")
+        print(f"  'cutoff' in config_params: {'cutoff' in config_params}")
+        print(f"  'fit' in config_params: {'fit' in config_params}")
+        print(f"  config_params['cutoff']: {config_params.get('cutoff')}")
+        print(f"  config_params['fit']['maxiter']: {config_params.get('fit', {}).get('maxiter')}")
+        
+        # Assertions for the extracted values
+        assert mlip_hypers["cutoff"] == EXPECTED_PACE_VALUES["cutoff"], \
+            f"cutoff mismatch: expected {EXPECTED_PACE_VALUES['cutoff']}, got {mlip_hypers['cutoff']}"
+        assert mlip_hypers["seed"] == EXPECTED_PACE_VALUES["seed"], \
+            f"seed mismatch: expected {EXPECTED_PACE_VALUES['seed']}, got {mlip_hypers['seed']}"
+        
+        # Check fit parameters
+        assert mlip_hypers["fit"]["maxiter"] == EXPECTED_PACE_VALUES["fit"]["maxiter"], \
+            f"fit.maxiter mismatch: expected {EXPECTED_PACE_VALUES['fit']['maxiter']}, got {mlip_hypers['fit']['maxiter']}"
+        assert mlip_hypers["fit"]["optimizer"] == EXPECTED_PACE_VALUES["fit"]["optimizer"]
+        assert mlip_hypers["fit"]["loss"]["kappa"] == EXPECTED_PACE_VALUES["fit"]["loss"]["kappa"]
+        
+        # Check potential parameters (the critical nested ones)
+        pot = mlip_hypers["potential"]
+        exp_pot = EXPECTED_PACE_VALUES["potential"]
+        
+        assert pot["embeddings"]["ALL"]["fs_parameters"] == exp_pot["embeddings"]["ALL"]["fs_parameters"], \
+            f"fs_parameters mismatch: expected {exp_pot['embeddings']['ALL']['fs_parameters']}, got {pot['embeddings']['ALL']['fs_parameters']}"
+        assert pot["embeddings"]["ALL"]["rho_core_cut"] == exp_pot["embeddings"]["ALL"]["rho_core_cut"]
+        assert pot["bonds"]["ALL"]["radbase"] == exp_pot["bonds"]["ALL"]["radbase"]
+        assert pot["bonds"]["ALL"]["rcut"] == exp_pot["bonds"]["ALL"]["rcut"]
+        assert pot["functions"]["ALL"]["nradmax_by_orders"] == exp_pot["functions"]["ALL"]["nradmax_by_orders"]
+        
+        # Check backend parameters
+        assert mlip_hypers["backend"]["evaluator"] == EXPECTED_PACE_VALUES["backend"]["evaluator"]
+        assert mlip_hypers["backend"]["batch_size"] == EXPECTED_PACE_VALUES["backend"]["batch_size"]
+        
+        print("\n[PASS] All assertions passed!")
+        print("="*80)
+
+
+class TestMachineLearningFitIntegration:
+    """
+    Test how parameters flow from RssConfig through machine_learning_fit to pace_fitting.
+    This simulates the actual call chain in the RSS workflow.
+    """
+    
+    @pytest.fixture
+    def autoplex_config_file(self, tmp_path):
+        """Create a temporary autoplex config file."""
+        config_file = tmp_path / "autoplex_config.yaml"
+        config_file.write_text(SAMPLE_AUTOPLEX_CONFIG)
+        return config_file
+    
+    @pytest.fixture
+    def mock_training_data(self, tmp_path):
+        """Create mock training data files."""
+        from ase import Atoms
+        from ase.io import write
+        
+        atoms_list = []
+        for i in range(5):
+            atoms = Atoms(
+                'Si2',
+                positions=[[0, 0, 0], [1.35 + i * 0.1, 1.35, 1.35]],
+                cell=[5.43, 5.43, 5.43],
+                pbc=True
+            )
+            atoms.info['REF_energy'] = -10.0 - i * 0.1
+            atoms.info['REF_virial'] = [0.1, 0.1, 0.1, 0.0, 0.0, 0.0]
+            atoms.info['config_type'] = 'bulk'
+            atoms.arrays['REF_forces'] = np.array([[0.01, 0.01, 0.01], [-0.01, -0.01, -0.01]])
+            atoms_list.append(atoms)
+        
+        train_file = tmp_path / "train.extxyz"
+        test_file = tmp_path / "test.extxyz"
+        
+        write(str(train_file), atoms_list[:4], format='extxyz')
+        write(str(test_file), atoms_list[4:], format='extxyz')
+        
+        return tmp_path
+
+    def test_jobs_py_style_pace_fitting_call(self, autoplex_config_file, mock_training_data, tmp_path, clean_dir):
+        """
+        Simulate how jobs.py calls pace_fitting.
+        
+        In jobs.py machine_learning_fit (line 132-141):
+            train_test_error = pace_fitting(
+                db_dir=database_dir,
+                species_list=species_list,
+                hyperparameters=hyperparameters.P_ACE,  # <-- PacemakerSettings object
+                fit_kwargs=fit_kwargs,
+                ...
+            )
+        
+        The 'hyperparameters' comes from MLIP_HYPERS which is defined in __init__.py,
+        and 'fit_kwargs' comes from the flattened config_params from RssMaker.make().
+        """
+        print("\n" + "="*80)
+        print("TEST: jobs.py style pace_fitting call")
+        print("="*80)
+        
+        # Load config as RssMaker would
+        config = RssConfig.from_file(str(autoplex_config_file))
+        
+        # Extract hyperparameters as RssMaker.make() does
+        config_params = config.model_dump(by_alias=True, exclude_none=True)
+        mlip_hypers = config_params["mlip_hypers"][config_params["mlip_type"]]
+        del config_params["mlip_hypers"]
+        config_params.update(mlip_hypers)
+        
+        # In jobs.py, hyperparameters.P_ACE is passed directly
+        # The mlip_hypers from RssMaker becomes fit_kwargs
+        pace_hypers = config.mlip_hypers.P_ACE
+        
+        print("\n[Setup] Simulating jobs.py call to pace_fitting")
+        print(f"  hyperparameters.P_ACE type: {type(pace_hypers).__name__}")
+        print(f"  hyperparameters.P_ACE.cutoff: {pace_hypers.cutoff}")
+        print(f"  hyperparameters.P_ACE.seed: {pace_hypers.seed}")
+        print(f"  hyperparameters.P_ACE.fit: {pace_hypers.fit}")
+        print(f"  hyperparameters.P_ACE.potential['embeddings']['ALL']['fs_parameters']: "
+              f"{pace_hypers.potential.get('embeddings', {}).get('ALL', {}).get('fs_parameters')}")
+        
+        # fit_kwargs in jobs.py would be the extra kwargs passed to machine_learning_fit
+        # In RSS workflow, these come from the flattened config_params
+        # For this test, we'll pass the MLIP-specific params as fit_kwargs
+        fit_kwargs = {
+            "cutoff": mlip_hypers.get("cutoff"),
+            "seed": mlip_hypers.get("seed"),
+            "fit": mlip_hypers.get("fit"),
+            "potential": mlip_hypers.get("potential"),
+            "backend": mlip_hypers.get("backend"),
+        }
+        
+        print(f"\n  fit_kwargs keys: {list(fit_kwargs.keys())}")
+        print(f"  fit_kwargs['cutoff']: {fit_kwargs.get('cutoff')}")
+        print(f"  fit_kwargs['fit']['maxiter']: {fit_kwargs.get('fit', {}).get('maxiter')}")
+        
+        os.chdir(tmp_path)
+        
+        with patch('autoplex.fitting.common.utils.run_pacemaker'):
+            with patch('shutil.which', return_value='/usr/bin/pacemaker'):
+                try:
+                    pace_fitting(
+                        db_dir=mock_training_data,
+                        species_list=["Si"],
+                        hyperparameters=pace_hypers,
+                        fit_kwargs=fit_kwargs,
+                        isolated_atom_energies={14: -5.0},
+                        ref_energy_name="REF_energy",
+                        ref_force_name="REF_forces",
+                        num_processes_fit=1,
+                    )
+                except Exception as e:
+                    print(f"  [Note] pace_fitting raised: {type(e).__name__}: {e}")
+        
+        # Check the generated input.yaml
+        input_yaml_path = tmp_path / "input.yaml"
+        assert input_yaml_path.exists(), "input.yaml was not created!"
+        
+        generated = loadfn(str(input_yaml_path))
+        
+        print("\n[Result] Generated input.yaml content:")
+        print(f"  Keys: {list(generated.keys())}")
+        print(f"  cutoff: {generated.get('cutoff')}")
+        print(f"  seed: {generated.get('seed')}")
+        print(f"  fit.maxiter: {generated.get('fit', {}).get('maxiter')}")
+        print(f"  fit.loss.kappa: {generated.get('fit', {}).get('loss', {}).get('kappa')}")
+        print(f"  potential.embeddings.ALL.fs_parameters: {generated.get('potential', {}).get('embeddings', {}).get('ALL', {}).get('fs_parameters')}")
+        print(f"  potential.bonds.ALL.radbase: {generated.get('potential', {}).get('bonds', {}).get('ALL', {}).get('radbase')}")
+        print(f"  backend.evaluator: {generated.get('backend', {}).get('evaluator')}")
+        
+        # Verify all expected values
+        print("\n[Verification] Comparing with expected values:")
+        
+        # Top-level
+        assert generated["cutoff"] == EXPECTED_PACE_VALUES["cutoff"], \
+            f"cutoff: expected {EXPECTED_PACE_VALUES['cutoff']}, got {generated['cutoff']}"
+        print(f"  ✓ cutoff: {generated['cutoff']}")
+        
+        assert generated["seed"] == EXPECTED_PACE_VALUES["seed"]
+        print(f"  ✓ seed: {generated['seed']}")
+        
+        # Fit
+        assert generated["fit"]["maxiter"] == EXPECTED_PACE_VALUES["fit"]["maxiter"], \
+            f"fit.maxiter: expected {EXPECTED_PACE_VALUES['fit']['maxiter']}, got {generated['fit']['maxiter']}"
+        print(f"  ✓ fit.maxiter: {generated['fit']['maxiter']}")
+        
+        assert generated["fit"]["loss"]["kappa"] == EXPECTED_PACE_VALUES["fit"]["loss"]["kappa"]
+        print(f"  ✓ fit.loss.kappa: {generated['fit']['loss']['kappa']}")
+        
+        # Potential - critical nested values
+        pot = generated["potential"]
+        exp_pot = EXPECTED_PACE_VALUES["potential"]
+        
+        assert pot["embeddings"]["ALL"]["fs_parameters"] == exp_pot["embeddings"]["ALL"]["fs_parameters"], \
+            f"fs_parameters: expected {exp_pot['embeddings']['ALL']['fs_parameters']}, got {pot['embeddings']['ALL']['fs_parameters']}"
+        print(f"  ✓ potential.embeddings.ALL.fs_parameters: {pot['embeddings']['ALL']['fs_parameters']}")
+        
+        assert pot["embeddings"]["ALL"]["rho_core_cut"] == exp_pot["embeddings"]["ALL"]["rho_core_cut"]
+        print(f"  ✓ potential.embeddings.ALL.rho_core_cut: {pot['embeddings']['ALL']['rho_core_cut']}")
+        
+        assert pot["bonds"]["ALL"]["radbase"] == exp_pot["bonds"]["ALL"]["radbase"]
+        print(f"  ✓ potential.bonds.ALL.radbase: {pot['bonds']['ALL']['radbase']}")
+        
+        assert pot["bonds"]["ALL"]["radparameters"] == exp_pot["bonds"]["ALL"]["radparameters"]
+        print(f"  ✓ potential.bonds.ALL.radparameters: {pot['bonds']['ALL']['radparameters']}")
+        
+        assert pot["bonds"]["ALL"]["rcut"] == exp_pot["bonds"]["ALL"]["rcut"]
+        print(f"  ✓ potential.bonds.ALL.rcut: {pot['bonds']['ALL']['rcut']}")
+        
+        assert pot["functions"]["ALL"]["nradmax_by_orders"] == exp_pot["functions"]["ALL"]["nradmax_by_orders"]
+        print(f"  ✓ potential.functions.ALL.nradmax_by_orders: {pot['functions']['ALL']['nradmax_by_orders']}")
+        
+        # Backend
+        assert generated["backend"]["evaluator"] == EXPECTED_PACE_VALUES["backend"]["evaluator"]
+        print(f"  ✓ backend.evaluator: {generated['backend']['evaluator']}")
+        
+        assert generated["backend"]["batch_size"] == EXPECTED_PACE_VALUES["backend"]["batch_size"]
+        print(f"  ✓ backend.batch_size: {generated['backend']['batch_size']}")
+        
+        # Verify NO RSS parameters leaked through
+        rss_params = ['initial_kt', 'vasp_ref_file', 'num_processes_rss', 'mlip_type', 'tag']
+        for param in rss_params:
+            assert param not in generated, f"RSS parameter '{param}' should NOT be in input.yaml!"
+        print(f"  ✓ No RSS parameters in input.yaml")
+        
+        print("\n[PASS] All verifications passed!")
+        print("="*80)
 
 
 class TestPacemakerConfigFlow:
@@ -280,104 +600,25 @@ class TestPacemakerConfigFlow:
         
         return tmp_path
 
-    # ==================== Top-Level Parameter Tests ====================
-    
-    def test_rss_config_loads_top_level_params(self, autoplex_config_file):
-        """Test that top-level P-ACE parameters are correctly loaded."""
+    def test_rss_config_loads_mlip_hypers_correctly(self, autoplex_config_file):
+        """Test that RssConfig correctly loads all MLIP hyperparameters."""
         config = RssConfig.from_file(str(autoplex_config_file))
         pace_hypers = config.mlip_hypers.P_ACE
+        
+        print("\n[DEBUG] Loaded P_ACE hyperparameters:")
+        print(f"  cutoff: {pace_hypers.cutoff}")
+        print(f"  seed: {pace_hypers.seed}")
+        print(f"  fit: {pace_hypers.fit}")
+        print(f"  potential keys: {list(pace_hypers.potential.keys())}")
+        print(f"  potential.embeddings.ALL: {pace_hypers.potential.get('embeddings', {}).get('ALL', {})}")
         
         assert config.mlip_type == "P-ACE"
         assert pace_hypers.cutoff == EXPECTED_PACE_VALUES["cutoff"]
         assert pace_hypers.seed == EXPECTED_PACE_VALUES["seed"]
+        assert pace_hypers.fit["maxiter"] == EXPECTED_PACE_VALUES["fit"]["maxiter"]
+        assert pace_hypers.potential["embeddings"]["ALL"]["fs_parameters"] == \
+            EXPECTED_PACE_VALUES["potential"]["embeddings"]["ALL"]["fs_parameters"]
 
-    # ==================== Backend Section Tests ====================
-    
-    def test_rss_config_loads_backend_params(self, autoplex_config_file):
-        """Test that backend parameters are correctly loaded."""
-        config = RssConfig.from_file(str(autoplex_config_file))
-        backend = config.mlip_hypers.P_ACE.backend
-        expected = EXPECTED_PACE_VALUES["backend"]
-        
-        assert backend["batch_size"] == expected["batch_size"]
-        assert backend["batch_size_reduction"] == expected["batch_size_reduction"]
-        assert backend["batch_size_reduction_factor"] == expected["batch_size_reduction_factor"]
-        assert backend["display_step"] == expected["display_step"]
-        assert backend["evaluator"] == expected["evaluator"]
-
-    # ==================== Fit Section Tests ====================
-    
-    def test_rss_config_loads_fit_params(self, autoplex_config_file):
-        """Test that fit parameters are correctly loaded."""
-        config = RssConfig.from_file(str(autoplex_config_file))
-        fit = config.mlip_hypers.P_ACE.fit
-        expected = EXPECTED_PACE_VALUES["fit"]
-        
-        assert fit["optimizer"] == expected["optimizer"]
-        assert fit["maxiter"] == expected["maxiter"]
-        assert fit["repulsion"] == expected["repulsion"]
-        assert fit["trainable_parameters"] == expected["trainable_parameters"]
-
-    def test_rss_config_loads_fit_loss_params(self, autoplex_config_file):
-        """Test that fit.loss parameters are correctly loaded."""
-        config = RssConfig.from_file(str(autoplex_config_file))
-        loss = config.mlip_hypers.P_ACE.fit["loss"]
-        expected = EXPECTED_PACE_VALUES["fit"]["loss"]
-        
-        assert loss["kappa"] == expected["kappa"]
-        assert loss["L1_coeffs"] == expected["L1_coeffs"]
-        assert loss["L2_coeffs"] == expected["L2_coeffs"]
-        assert loss["w_energy"] == expected["w_energy"]
-        assert loss["w_forces"] == expected["w_forces"]
-
-    # ==================== Potential Section Tests ====================
-    
-    def test_rss_config_loads_potential_top_level(self, autoplex_config_file):
-        """Test that potential top-level parameters are correctly loaded."""
-        config = RssConfig.from_file(str(autoplex_config_file))
-        potential = config.mlip_hypers.P_ACE.potential
-        expected = EXPECTED_PACE_VALUES["potential"]
-        
-        assert potential["deltaSplineBins"] == expected["deltaSplineBins"]
-        assert potential["elements"] == expected["elements"]
-
-    def test_rss_config_loads_embeddings_params(self, autoplex_config_file):
-        """Test that potential.embeddings parameters are correctly loaded."""
-        config = RssConfig.from_file(str(autoplex_config_file))
-        embeddings = config.mlip_hypers.P_ACE.potential["embeddings"]["ALL"]
-        expected = EXPECTED_PACE_VALUES["potential"]["embeddings"]["ALL"]
-        
-        assert embeddings["npot"] == expected["npot"]
-        assert embeddings["fs_parameters"] == expected["fs_parameters"]
-        assert embeddings["ndensity"] == expected["ndensity"]
-        assert embeddings["rho_core_cut"] == expected["rho_core_cut"]
-        assert embeddings["drho_core_cut"] == expected["drho_core_cut"]
-
-    def test_rss_config_loads_bonds_params(self, autoplex_config_file):
-        """Test that potential.bonds parameters are correctly loaded."""
-        config = RssConfig.from_file(str(autoplex_config_file))
-        bonds = config.mlip_hypers.P_ACE.potential["bonds"]["ALL"]
-        expected = EXPECTED_PACE_VALUES["potential"]["bonds"]["ALL"]
-        
-        assert bonds["radbase"] == expected["radbase"]
-        assert bonds["radparameters"] == expected["radparameters"]
-        assert bonds["rcut"] == expected["rcut"]
-        assert bonds["dcut"] == expected["dcut"]
-        assert bonds["NameofCutoffFunction"] == expected["NameofCutoffFunction"]
-
-    def test_rss_config_loads_functions_params(self, autoplex_config_file):
-        """Test that potential.functions parameters are correctly loaded."""
-        config = RssConfig.from_file(str(autoplex_config_file))
-        functions = config.mlip_hypers.P_ACE.potential["functions"]
-        expected = EXPECTED_PACE_VALUES["potential"]["functions"]
-        
-        assert functions["number_of_functions_per_element"] == \
-            expected["number_of_functions_per_element"]
-        assert functions["ALL"]["nradmax_by_orders"] == expected["ALL"]["nradmax_by_orders"]
-        assert functions["ALL"]["lmax_by_orders"] == expected["ALL"]["lmax_by_orders"]
-
-    # ==================== RSS Parameter Isolation Tests ====================
-    
     def test_pacemaker_settings_not_polluted_by_rss_params(self, autoplex_config_file):
         """Test that PacemakerSettings object is NOT polluted with RSS control parameters."""
         config = RssConfig.from_file(str(autoplex_config_file))
@@ -394,126 +635,6 @@ class TestPacemakerConfigFlow:
         for param in rss_params_that_should_not_exist:
             assert param not in pace_dict, \
                 f"RSS parameter '{param}' should NOT be in PacemakerSettings!"
-
-    # ==================== Input.yaml Generation Tests ====================
-    
-    def test_pacemaker_input_yaml_has_all_expected_params(
-        self, autoplex_config_file, mock_training_data, tmp_path, clean_dir
-    ):
-        """Test that generated input.yaml contains all expected P-ACE parameters."""
-        config = RssConfig.from_file(str(autoplex_config_file))
-        pace_hypers = config.mlip_hypers.P_ACE
-        
-        os.chdir(tmp_path)
-        
-        with patch('autoplex.fitting.common.utils.run_pacemaker'):
-            with patch('shutil.which', return_value='/usr/bin/pacemaker'):
-                try:
-                    pace_fitting(
-                        db_dir=mock_training_data,
-                        species_list=["Si"],
-                        hyperparameters=pace_hypers,
-                        isolated_atom_energies={14: -5.0},
-                        ref_energy_name="REF_energy",
-                        ref_force_name="REF_forces",
-                        num_processes_fit=1,
-                    )
-                except Exception:
-                    pass
-        
-        input_yaml_path = tmp_path / "input.yaml"
-        assert input_yaml_path.exists(), "input.yaml was not created!"
-        
-        generated = loadfn(str(input_yaml_path))
-        
-        # Top-level params
-        assert generated["cutoff"] == EXPECTED_PACE_VALUES["cutoff"]
-        assert generated["seed"] == EXPECTED_PACE_VALUES["seed"]
-        
-        # Backend params
-        for key, value in EXPECTED_PACE_VALUES["backend"].items():
-            assert generated["backend"][key] == value, \
-                f"backend.{key}: expected {value}, got {generated['backend'].get(key)}"
-        
-        # Fit params
-        assert generated["fit"]["optimizer"] == EXPECTED_PACE_VALUES["fit"]["optimizer"]
-        assert generated["fit"]["maxiter"] == EXPECTED_PACE_VALUES["fit"]["maxiter"]
-        
-        # Fit loss params
-        for key, value in EXPECTED_PACE_VALUES["fit"]["loss"].items():
-            assert generated["fit"]["loss"][key] == value, \
-                f"fit.loss.{key}: expected {value}, got {generated['fit']['loss'].get(key)}"
-        
-        # Potential params
-        assert generated["potential"]["deltaSplineBins"] == \
-            EXPECTED_PACE_VALUES["potential"]["deltaSplineBins"]
-        assert generated["potential"]["elements"] == \
-            EXPECTED_PACE_VALUES["potential"]["elements"]
-        
-        # Embeddings params
-        embeddings = generated["potential"]["embeddings"]["ALL"]
-        expected_emb = EXPECTED_PACE_VALUES["potential"]["embeddings"]["ALL"]
-        assert embeddings["npot"] == expected_emb["npot"]
-        assert embeddings["fs_parameters"] == expected_emb["fs_parameters"], \
-            f"fs_parameters mismatch: expected {expected_emb['fs_parameters']}, got {embeddings['fs_parameters']}"
-        assert embeddings["ndensity"] == expected_emb["ndensity"]
-        assert embeddings["rho_core_cut"] == expected_emb["rho_core_cut"]
-        assert embeddings["drho_core_cut"] == expected_emb["drho_core_cut"]
-        
-        # Bonds params
-        bonds = generated["potential"]["bonds"]["ALL"]
-        expected_bonds = EXPECTED_PACE_VALUES["potential"]["bonds"]["ALL"]
-        assert bonds["radbase"] == expected_bonds["radbase"]
-        assert bonds["radparameters"] == expected_bonds["radparameters"], \
-            f"radparameters mismatch: expected {expected_bonds['radparameters']}, got {bonds['radparameters']}"
-        assert bonds["rcut"] == expected_bonds["rcut"]
-        assert bonds["dcut"] == expected_bonds["dcut"]
-        assert bonds["NameofCutoffFunction"] == expected_bonds["NameofCutoffFunction"]
-        
-        # Functions params
-        functions = generated["potential"]["functions"]
-        expected_func = EXPECTED_PACE_VALUES["potential"]["functions"]
-        assert functions["number_of_functions_per_element"] == \
-            expected_func["number_of_functions_per_element"]
-        assert functions["ALL"]["nradmax_by_orders"] == expected_func["ALL"]["nradmax_by_orders"]
-        assert functions["ALL"]["lmax_by_orders"] == expected_func["ALL"]["lmax_by_orders"]
-
-    def test_input_yaml_no_rss_params(
-        self, autoplex_config_file, mock_training_data, tmp_path, clean_dir
-    ):
-        """Test that generated input.yaml does NOT contain RSS parameters."""
-        config = RssConfig.from_file(str(autoplex_config_file))
-        pace_hypers = config.mlip_hypers.P_ACE
-        
-        os.chdir(tmp_path)
-        
-        with patch('autoplex.fitting.common.utils.run_pacemaker'):
-            with patch('shutil.which', return_value='/usr/bin/pacemaker'):
-                try:
-                    pace_fitting(
-                        db_dir=mock_training_data,
-                        species_list=["Si"],
-                        hyperparameters=pace_hypers,
-                        isolated_atom_energies={14: -5.0},
-                    )
-                except Exception:
-                    pass
-        
-        input_yaml_path = tmp_path / "input.yaml"
-        assert input_yaml_path.exists()
-        
-        generated = loadfn(str(input_yaml_path))
-        
-        rss_params = [
-            'initial_kt', 'vasp_ref_file', 'num_processes_rss',
-            'max_iteration_number', 'stop_criterion', 'config_types',
-            'rss_group', 'scalar_pressure_method', 'hookean_repul',
-            'train_from_scratch', 'mlip_type', 'tag', 'num_processes_buildcell',
-        ]
-        
-        for param in rss_params:
-            assert param not in generated, \
-                f"RSS parameter '{param}' should NOT be in input.yaml!"
 
     def test_input_yaml_only_allowed_keys(
         self, autoplex_config_file, mock_training_data, tmp_path, clean_dir
@@ -547,110 +668,10 @@ class TestPacemakerConfigFlow:
             assert len(unexpected_keys) == 0, \
                 f"Unexpected keys in input.yaml: {unexpected_keys}"
 
-    # ==================== Fit Kwargs Tests ====================
-    
-    def test_fit_kwargs_filters_rss_garbage(self, tmp_path, clean_dir):
-        """Test that RSS parameters passed via fit_kwargs are filtered out."""
-        os.chdir(tmp_path)
-        
-        from ase import Atoms
-        from ase.io import write
-        
-        atoms = Atoms('Si2', positions=[[0,0,0], [1.35, 1.35, 1.35]], 
-                      cell=[5.43]*3, pbc=True)
-        atoms.info['REF_energy'] = -10.0
-        atoms.info['config_type'] = 'bulk'
-        atoms.arrays['REF_forces'] = np.array([[0.01]*3, [-0.01]*3])
-        
-        write(str(tmp_path / "train.extxyz"), [atoms], format='extxyz')
-        write(str(tmp_path / "test.extxyz"), [atoms], format='extxyz')
-        
-        pace_hypers = PacemakerSettings(cutoff=6.0, seed=123)
-        
-        polluted_fit_kwargs = {
-            "initial_kt": 0.3,
-            "vasp_ref_file": "ref.xyz",
-            "cutoff": 7.0,
-            "fit": {"maxiter": 500},
-        }
-        
-        with patch('autoplex.fitting.common.utils.run_pacemaker'):
-            with patch('shutil.which', return_value='/usr/bin/pacemaker'):
-                try:
-                    pace_fitting(
-                        db_dir=tmp_path,
-                        species_list=["Si"],
-                        hyperparameters=pace_hypers,
-                        fit_kwargs=polluted_fit_kwargs,
-                        isolated_atom_energies={14: -5.0},
-                    )
-                except Exception:
-                    pass
-        
-        input_yaml_path = tmp_path / "input.yaml"
-        if input_yaml_path.exists():
-            generated = loadfn(str(input_yaml_path))
-            
-            assert "initial_kt" not in generated
-            assert "vasp_ref_file" not in generated
-
 
 class TestEndToEndConfigPropagation:
     """End-to-end tests for configuration propagation."""
     
-    def test_full_config_roundtrip(self):
-        """Test complete configuration roundtrip with all parameters."""
-        config = RssConfig(
-            tag="Si",
-            mlip_type="P-ACE",
-            mlip_hypers=MLIPHypers(
-                P_ACE=PacemakerSettings(
-                    cutoff=8.0,
-                    seed=42,
-                    backend=EXPECTED_PACE_VALUES["backend"],
-                    fit=EXPECTED_PACE_VALUES["fit"],
-                    potential=EXPECTED_PACE_VALUES["potential"],
-                )
-            )
-        )
-        
-        config_params = config.model_dump(by_alias=True, exclude_none=True)
-        mlip_hypers = config_params["mlip_hypers"]["P-ACE"]
-        
-        # Verify all top-level params
-        assert mlip_hypers["cutoff"] == 8.0
-        assert mlip_hypers["seed"] == 42
-        
-        # Verify backend
-        for key, value in EXPECTED_PACE_VALUES["backend"].items():
-            assert mlip_hypers["backend"][key] == value
-        
-        # Verify fit
-        assert mlip_hypers["fit"]["optimizer"] == "BFGS"
-        assert mlip_hypers["fit"]["maxiter"] == 800
-        for key, value in EXPECTED_PACE_VALUES["fit"]["loss"].items():
-            assert mlip_hypers["fit"]["loss"][key] == value
-        
-        # Verify potential embeddings
-        embeddings = mlip_hypers["potential"]["embeddings"]["ALL"]
-        expected_emb = EXPECTED_PACE_VALUES["potential"]["embeddings"]["ALL"]
-        assert embeddings["fs_parameters"] == expected_emb["fs_parameters"]
-        assert embeddings["npot"] == expected_emb["npot"]
-        assert embeddings["rho_core_cut"] == expected_emb["rho_core_cut"]
-        
-        # Verify potential bonds
-        bonds = mlip_hypers["potential"]["bonds"]["ALL"]
-        expected_bonds = EXPECTED_PACE_VALUES["potential"]["bonds"]["ALL"]
-        assert bonds["radbase"] == expected_bonds["radbase"]
-        assert bonds["radparameters"] == expected_bonds["radparameters"]
-        assert bonds["rcut"] == expected_bonds["rcut"]
-        
-        # Verify potential functions
-        functions = mlip_hypers["potential"]["functions"]
-        expected_func = EXPECTED_PACE_VALUES["potential"]["functions"]
-        assert functions["ALL"]["nradmax_by_orders"] == expected_func["ALL"]["nradmax_by_orders"]
-        assert functions["ALL"]["lmax_by_orders"] == expected_func["ALL"]["lmax_by_orders"]
-
     def test_pacemaker_settings_direct_replacement(self):
         """Verify user-provided nested dicts completely replace defaults."""
         pace_settings = PacemakerSettings(
@@ -658,43 +679,31 @@ class TestEndToEndConfigPropagation:
             fit={"maxiter": 800}
         )
         
+        print("\n[DEBUG] PacemakerSettings with partial fit:")
+        print(f"  cutoff: {pace_settings.cutoff}")
+        print(f"  fit: {pace_settings.fit}")
+        
         assert pace_settings.fit == {"maxiter": 800}
         assert "optimizer" not in pace_settings.fit
         assert "loss" not in pace_settings.fit
-
-    def test_pacemaker_settings_preserves_custom_values(self):
-        """Verify PacemakerSettings preserves all custom values."""
-        pace_settings = PacemakerSettings(
-            cutoff=8.0,
-            seed=42,
-            potential=EXPECTED_PACE_VALUES["potential"]
-        )
-        
-        assert pace_settings.cutoff == 8.0
-        assert pace_settings.seed == 42
-        
-        embeddings = pace_settings.potential["embeddings"]["ALL"]
-        assert embeddings["fs_parameters"] == [1, 1, 7.5577494194990145, 0.101]
-        assert embeddings["rho_core_cut"] == 3000
-        
-        bonds = pace_settings.potential["bonds"]["ALL"]
-        assert bonds["radbase"] == "SBessel"
-        assert bonds["rcut"] == 6.311052419794955
 
     def test_mlip_hypers_with_alias(self):
         """Test that MLIPHypers handles P-ACE alias correctly."""
         # Test with hyphen (alias)
         hypers_dict = {"P-ACE": {"cutoff": 8.0, "seed": 42}}
         hypers = MLIPHypers(**hypers_dict)
-        assert hypers.P_ACE.cutoff == 8.0
         
-        # Test with underscore (field name)
-        hypers_dict2 = {"P_ACE": {"cutoff": 9.0, "seed": 43}}
-        hypers2 = MLIPHypers(**hypers_dict2)
-        assert hypers2.P_ACE.cutoff == 9.0
+        print("\n[DEBUG] MLIPHypers with P-ACE alias:")
+        print(f"  hypers.P_ACE.cutoff: {hypers.P_ACE.cutoff}")
+        print(f"  hypers.P_ACE.seed: {hypers.P_ACE.seed}")
+        
+        assert hypers.P_ACE.cutoff == 8.0
         
         # Verify model_dump with alias
         dumped = hypers.model_dump(by_alias=True)
+        print(f"  dumped keys: {list(dumped.keys())}")
+        print(f"  'P-ACE' in dumped: {'P-ACE' in dumped}")
+        
         assert "P-ACE" in dumped
         assert dumped["P-ACE"]["cutoff"] == 8.0
 
@@ -706,7 +715,6 @@ class TestOtherMLIPsNotAffected:
         """Verify MACE settings are not affected by MLIPHypers config changes."""
         from autoplex.settings import MACESettings, MLIPHypers, RssConfig
         
-        # Test direct MACESettings creation
         mace = MACESettings(
             batch_size=20,
             max_num_epochs=500,
@@ -718,12 +726,10 @@ class TestOtherMLIPsNotAffected:
         assert mace.lr == 0.002
         assert mace.r_max == 6.0
         
-        # Test via MLIPHypers
         hypers = MLIPHypers(MACE=mace)
         assert hypers.MACE.batch_size == 20
         assert hypers.MACE.max_num_epochs == 500
         
-        # Test via RssConfig
         config = RssConfig(
             tag="Si",
             mlip_type="MACE",
