@@ -74,7 +74,7 @@ config_types:
   - traj
 rss_group:
   - traj
-test_ratio: 0
+test_ratio: 0.1
 regularization: true
 retain_existing_sigma: false
 scheme: linear-hull

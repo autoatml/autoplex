@@ -142,7 +142,7 @@ def test_rss_workflow_ml_potentials(test_dir, memory_jobstore, clean_dir):
             'frac_of_bcur': 0.8, 'bolt_max_num': 3000}, 'random_seed': None, 'include_isolated_atom': True,
                   'isolatedatom_box': [20.0, 20.0, 20.0], 'e0_spin': False, 'include_dimer': False,
                   'dimer_box': [20.0, 20.0, 20.0], 'dimer_range': [1.0, 5.0], 'dimer_num': 21, 'dft_ref_file': 'vasp_ref.extxyz', 
-                  'config_types': ['initial', 'traj_early', 'traj'], 'rss_group': ['traj'], 'test_ratio': 0.0,
+                  'config_types': ['initial', 'traj_early', 'traj'], 'rss_group': ['traj'], 'test_ratio': 0.1,
                   'regularization': True, 'retain_existing_sigma': False, 'scheme': 'linear-hull',
                   'reg_minmax': [[0.1, 1.0], [0.001, 0.1], [0.0316, 0.316], [0.0632, 0.632]], 'distillation': False,
                   'force_max': None, 'force_label': None, 'pre_database_dir': None, 'mlip_type': 'GAP',
