@@ -94,7 +94,9 @@ def initial_rss(
     force_max: float | None = None,
     force_label: str = "REF_forces",
     pre_database_dir: str | None = None,
-    mlip_type: Literal["GAP", "J-ACE", "P-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"] = "GAP",
+    mlip_type: Literal[
+        "GAP", "J-ACE", "P-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"
+    ] = "GAP",
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",
@@ -360,7 +362,9 @@ def do_rss_iterations(
     distillation: bool = True,
     force_max: float = 200,
     force_label: str = "REF_forces",
-    mlip_type: Literal["GAP", "J-ACE", "P-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"] = "GAP",
+    mlip_type: Literal[
+        "GAP", "J-ACE", "P-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"
+    ] = "GAP",
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",

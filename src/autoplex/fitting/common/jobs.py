@@ -18,6 +18,7 @@ from autoplex.fitting.common.utils import (
     nequip_fitting,
     pace_fitting,
 )
+from autoplex.settings import PacemakerSettings
 
 
 @job
@@ -159,26 +160,30 @@ def machine_learning_fit(
         mlip_paths.append(train_test_error["mlip_path"])
 
     elif mlip_type == "P-ACE":
-        # For P-ACE, we need to reconstruct PacemakerSettings from fit_kwargs
-        # because the hyperparameters passed here are the global defaults,
-        # while the actual user config is in fit_kwargs (flattened from RssMaker)
-        from autoplex.settings import PacemakerSettings
-        
-        # Extract P-ACE specific parameters from fit_kwargs
-        pace_specific_keys = {"cutoff", "seed", "metadata", "potential", "data", "fit", "backend"}
+
+        pace_specific_keys = {
+            "cutoff",
+            "seed",
+            "metadata",
+            "potential",
+            "data",
+            "fit",
+            "backend",
+        }
         pace_kwargs = {k: v for k, v in fit_kwargs.items() if k in pace_specific_keys}
-        
-        # If user provided P-ACE params via fit_kwargs, use them to create PacemakerSettings
-        if pace_kwargs:
-            # Create a new PacemakerSettings with user's config
-            pace_hypers = PacemakerSettings(**pace_kwargs)
-        else:
-            # Fall back to the hyperparameters.P_ACE (default or user-provided via hyperparameters arg)
-            pace_hypers = hyperparameters.P_ACE
-        
-        # Filter out P-ACE specific keys from fit_kwargs to avoid double-processing
-        remaining_fit_kwargs = {k: v for k, v in fit_kwargs.items() if k not in pace_specific_keys}
-        
+
+        # if pace_kwargs:
+        #     pace_hypers = PacemakerSettings(**pace_kwargs)
+        # else:
+        #     pace_hypers = hyperparameters.P_ACE
+        pace_hypers = (
+            PacemakerSettings(**pace_kwargs) if pace_kwargs else hyperparameters.P_ACE
+        )
+
+        remaining_fit_kwargs = {
+            k: v for k, v in fit_kwargs.items() if k not in pace_specific_keys
+        }
+
         train_test_error = pace_fitting(
             db_dir=database_dir,
             species_list=species_list,

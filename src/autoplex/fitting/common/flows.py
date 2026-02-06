@@ -89,7 +89,9 @@ class MLIPFitMaker(Maker):
     """
 
     name: str = "MLpotentialFit"
-    mlip_type: Literal["GAP", "J-ACE", "P-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"] = "GAP"
+    mlip_type: Literal["GAP", "J-ACE", "P-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"] = (
+        "GAP"
+    )
     hyperpara_opt: bool = False
     ref_energy_name: str = "REF_energy"
     ref_force_name: str = "REF_forces"
@@ -143,10 +145,19 @@ class MLIPFitMaker(Maker):
         fit_kwargs: dict
             Additional keyword arguments for MLIP fitting.
         """
-        if self.mlip_type not in ["GAP", "J-ACE", "P-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"]:
+        if self.mlip_type not in [
+            "GAP",
+            "J-ACE",
+            "P-ACE",
+            "NEP",
+            "NEQUIP",
+            "M3GNET",
+            "MACE",
+        ]:
             raise ValueError(
                 "Please correct the MLIP name!"
-                "The current version ONLY supports the following models: GAP, J-ACE, P-ACE, NEP, NEQUIP, M3GNET, and MACE."
+                "The current version ONLY supports the following models: "
+                "GAP, J-ACE, P-ACE, NEP, NEQUIP, M3GNET, and MACE."
             )
 
         if self.apply_data_preprocessing:

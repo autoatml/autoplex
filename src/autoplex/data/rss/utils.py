@@ -30,8 +30,8 @@ from pymatgen.io.ase import AseAtomsAdaptor
 from threadpoolctl import threadpool_limits
 
 from autoplex.fitting.common.utils import (
-    CustomPotential,
     AutoplexPyACECalculator,
+    CustomPotential,
     extract_gap_label,
 )
 
@@ -422,15 +422,7 @@ def process_rss(
         )
 
     elif mlip_type == "P-ACE":
-        try:
-            from pyace.asecalc import PyACECalculator
-        except ImportError as exc:
-            raise RuntimeError(
-                "To use RSS flow with P-ACE via the native ASE interface, 'pyace' "
-                "(Pacemaker) must be installed."
-            ) from exc
 
-        # Determine potential file path
         mlip_path_obj = Path(mlip_path)
         potential_file = None
 
@@ -442,9 +434,10 @@ def process_rss(
                 potential_file = target_file
 
         if potential_file is None:
-             raise FileNotFoundError(f"Could not find 'output_potential.yaml' in {mlip_path} for P-ACE.")
+            raise FileNotFoundError(
+                f"Could not find 'output_potential.yaml' in {mlip_path} for P-ACE."
+            )
 
-        # Initialize directly using imported class
         pot = AutoplexPyACECalculator(basis_set=str(potential_file.resolve()))
 
     elif mlip_type == "NEQUIP":
