@@ -2272,6 +2272,7 @@ def convert_to_pacemaker_pickle(
     Columns: energy, forces, ase_atoms, energy_corrected.
     """
     data = []
+    atoms_for_export = []
 
     # Pre-fetch E0 map
     e0_map = {}
@@ -2310,6 +2311,15 @@ def convert_to_pacemaker_pickle(
                     energy_corrected -= e0_map[s]
                 # If symbol not in e0_map, assume 0.0 or warn? For now assume 0.0
 
+        # Prepare atom for export
+        at_export = at.copy()
+
+        at_export.info["energy_corrected"] = energy_corrected
+        at_export.info[ref_energy_name] = energy
+        at_export.arrays[ref_force_name] = forces
+
+        atoms_for_export.append(at_export)
+
         # 4. ASE Atoms Object (Clean copy preferred, but simple copy works)
         # Pacemaker needs positions, numbers/symbols, cell, pbc.
         # We strip calculator/info to keep pickle clean and avoid confusion.
@@ -2339,8 +2349,19 @@ def convert_to_pacemaker_pickle(
 
     # Save as compressed pickle, Protocol 4 is safe default
     df.to_pickle(output_filename, compression="gzip", protocol=4)
+
+    # Save as .extxyz for users to check the actual data going into Pacemaker
+    extxyz_filename = output_filename.replace(".pckl.gzip", ".extxyz")
+    if extxyz_filename == output_filename:
+        extxyz_filename = f"{output_filename}.extxyz"
+
+    write(extxyz_filename, atoms_for_export, format="extxyz")
+
     logging.info(
         f"Converted {len(atoms_list)} structures to Pacemaker binary: {output_filename}"
+    )
+    logging.info(
+        f"Saved extxyz to: {extxyz_filename} (contains energy_corrected, {ref_energy_name}, {ref_force_name})"
     )
 
 
