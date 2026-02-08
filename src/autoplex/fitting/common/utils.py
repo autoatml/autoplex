@@ -2275,15 +2275,33 @@ def convert_to_pacemaker_pickle(
     atoms_for_export = []
 
     # Pre-fetch E0 map
+    # e0_map = {}
+    # if isolated_atom_energies:
+    #     for k, v in isolated_atom_energies.items():
+    #         # Handle atomic number (int) or symbol (str) keys
+    #         if isinstance(k, int):
+    #             sym = chemical_symbols[k]
+    #             e0_map[sym] = v
+    #         else:
+    #             e0_map[k] = v
+
     e0_map = {}
     if isolated_atom_energies:
         for k, v in isolated_atom_energies.items():
-            # Handle atomic number (int) or symbol (str) keys
+            # Handle atomic number: int (14) OR string ("14") which often comes from JSON/YAML
             if isinstance(k, int):
                 sym = chemical_symbols[k]
                 e0_map[sym] = v
+            elif isinstance(k, str) and k.isdigit():
+                sym = chemical_symbols[int(k)]
+                e0_map[sym] = v
             else:
+                # Assume it's already a symbol like "Si"
                 e0_map[k] = v
+        logging.info(f"Isolated atom energy map prepared for correction: {e0_map}")
+    else:
+        logging.warning("isolated_atom_energies is None or Empty! Energy correction will NOT be applied.")
+
 
     for at in atoms_list:
         # 1. Total Energy (eV)
@@ -2304,12 +2322,25 @@ def convert_to_pacemaker_pickle(
         # 3. Energy Corrected (Cohesive Energy)
         # energy_corrected = E_total - sum(E_isolated)
         energy_corrected = energy
+
+        # if e0_map:
+        #     symbols = at.get_chemical_symbols()
+        #     for s in symbols:
+        #         if s in e0_map:
+        #             energy_corrected -= e0_map[s]
+
+        # Track if correction actually happened for at least one atom
+        correction_applied = False
+        
         if e0_map:
             symbols = at.get_chemical_symbols()
             for s in symbols:
                 if s in e0_map:
                     energy_corrected -= e0_map[s]
-                # If symbol not in e0_map, assume 0.0 or warn? For now assume 0.0
+                    correction_applied = True
+                else:
+                    # Optional: Log warning if element missing in isolated energies?
+                    pass
 
         # Prepare atom for export
         at_export = at.copy()
