@@ -2300,8 +2300,9 @@ def convert_to_pacemaker_pickle(
                 e0_map[k] = v
         logging.info(f"Isolated atom energy map prepared for correction: {e0_map}")
     else:
-        logging.warning("isolated_atom_energies is None or Empty! Energy correction will NOT be applied.")
-
+        logging.warning(
+            "isolated_atom_energies is None or Empty! Energy correction will NOT be applied."
+        )
 
     for at in atoms_list:
         # 1. Total Energy (eV)
@@ -2330,17 +2331,16 @@ def convert_to_pacemaker_pickle(
         #             energy_corrected -= e0_map[s]
 
         # Track if correction actually happened for at least one atom
-        correction_applied = False
-        
+
         if e0_map:
             symbols = at.get_chemical_symbols()
             for s in symbols:
                 if s in e0_map:
                     energy_corrected -= e0_map[s]
-                    correction_applied = True
                 else:
-                    # Optional: Log warning if element missing in isolated energies?
-                    pass
+                    logging.warning(
+                        f"Element '{s}' in structure not found in isolated_atom_energies."
+                    )
 
         # Prepare atom for export
         at_export = at.copy()
@@ -2518,7 +2518,7 @@ def pace_fitting(
     if not final_species_list:
         raise ValueError(
             "Could not determine species list for Pacemaker fitting. "
-            "Please provide 'species_list' argument or set 'potential.elements' in fit_kwargs."
+            "Please set 'potential.elements' in fit_kwargs."
         )
 
     convert_to_pacemaker_pickle(
