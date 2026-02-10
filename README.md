@@ -91,7 +91,25 @@ Once installed in the terminal, run the following commands to get Julia ACEpoten
 julia -e 'using Pkg; Pkg.Registry.add("General"); Pkg.Registry.add(Pkg.Registry.RegistrySpec(url="https://github.com/ACEsuit/ACEregistry")); Pkg.add(Pkg.PackageSpec(;name="ACEpotentials", version="0.6.7")); Pkg.add("DataFrames"); Pkg.add("CSV")'
 ```
 
+> ℹ️ To fit and validate `Pacemaker ACE` potentials, please refer to the official [Pacemaker](https://pacemaker.readthedocs.io/en/latest/pacemaker/install/) installation guide.
+> Below is a summary of the installation steps for tensorpotential (GPU-accelerated optimization) and pyace.
+> Please note that Pacemaker ACE fitting can be run on both CPU and GPU. 
+
+First install `TensorFlow` (with CUDA support recommended), and then install `TensorPotential`:
+
+```bash
+pip install tensorflow[and-cuda]
+git clone https://github.com/ICAMS/TensorPotential.git
+pip install --upgrade ./TensorPotential
+```
+Install `pyace`:
+```bash
+git clone https://github.com/ICAMS/python-ace.git
+pip install --upgrade ./python-ace
+```
+
 > ℹ️ To fit and validate NEP potentials, one requires an Nvidia GPU card with compute capability no less than 3.5 and CUDA toolkit 9.0 or newer. This potential can only be trained on GPU only and currently interface to NEP potential training is provided via [calorine](https://calorine.materialsmodeling.org/) package that uses `nep` executable from the [GPUMD](https://gpumd.org/index.html) package. To get this executable please follow the compilation instructions [here](https://gpumd.org/installation.html) and add this executable to the system path.
+
 
 ## Enabling RSS workflows
 
