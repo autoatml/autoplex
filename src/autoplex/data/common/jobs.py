@@ -540,7 +540,7 @@ def sample_data(
             )
             traceback.print_exc()
 
-    logging.info("XXX selected atoms len: {}".format(len(selected_atoms)))
+    logging.info(f"XXX selected atoms len: {len(selected_atoms)}")
     if selected_atoms is None:
         raise ValueError("Unable to sample correctly. Please recheck the parameters!")
 
@@ -605,7 +605,6 @@ def collect_dft_data(
         has_ase_output = os.path.exists(os.path.join(val, "final_atoms_object.xyz"))
         has_aims_output = os.path.exists(os.path.join(val, "aims.out.gz"))
 
-
         if has_vasp_output or has_castep_output or has_ase_output or has_aims_output:
             if has_vasp_output:
                 converged = check_convergence_vasp(os.path.join(val, "vasprun.xml.gz"))
@@ -629,7 +628,9 @@ def collect_dft_data(
                 converged = check_convergence_aims(os.path.join(val, "aims.out.gz"))
                 if converged:
                     with gzip.open(os.path.join(val, "aims.out.gz"), "rt") as f:
-                        at = [read_aims_output(f), ]
+                        at = [
+                            read_aims_output(f),
+                        ]
                 else:
                     logging.warning(
                         f"Calculation did not converge for path: {os.path.join(val, 'aims.out.gz')}"
@@ -749,7 +750,6 @@ def check_convergence_aims(aims_gz: str) -> bool:
         True if converged, False otherwise.
     """
     return AimsStdout(aims_gz).get_image(-1).converged
-
 
 
 def safe_strip_hostname(value):
