@@ -80,6 +80,7 @@ def gap_fitting(
     ref_virial_name: str = "REF_virial",
     train_name: str = "train.extxyz",
     test_name: str = "test.extxyz",
+    disable_testing: bool = False,
     glue_file_path: str = "glue.xml",
     fit_kwargs: dict | None = None,  # pylint: disable=E3701
 ) -> dict:
@@ -110,6 +111,8 @@ def gap_fitting(
         Name of the training set file.
     test_name: str
         Name of the test set file.
+    disable_testing: bool
+        Whether to disable running the model on test data.
     glue_file_path: str
         Name of the glue.xml file path.
     fit_kwargs: dict
@@ -128,7 +131,13 @@ def gap_fitting(
     quip_train_file = train_name.replace("train", "quip_train")
     quip_test_file = test_name.replace("test", "quip_test")
     mlip_path: Path = prepare_fit_environment(
-        db_dir, Path.cwd(), glue_xml, train_name, test_name, glue_file_path
+        db_dir,
+        Path.cwd(),
+        glue_xml,
+        disable_testing,
+        train_name,
+        test_name,
+        glue_file_path,
     )
 
     db_atoms = ase.io.read(os.path.join(db_dir, train_name), index=":")
@@ -281,11 +290,14 @@ def gap_fitting(
     logging.info(f"Training error of MLIP (eV/at.): {round(train_error, 7)}")
 
     # Calculate testing error
-    run_ase_gap(
-        num_processes_fit, test_data_path, gap_file_xml, quip_test_file, glue_xml
-    )
-    test_error = energy_remain(quip_test_file)
-    logging.info(f"Testing error of MLIP (eV/at.): {round(test_error, 7)}")
+    if disable_testing:
+        test_error = None
+    else:
+        run_ase_gap(
+            num_processes_fit, test_data_path, gap_file_xml, quip_test_file, glue_xml
+        )
+        test_error = energy_remain(quip_test_file)
+        logging.info(f"Testing error of MLIP (eV/at.): {round(test_error, 7)}")
 
     if not glue_xml and species_list:
         try:
@@ -2046,6 +2058,7 @@ def prepare_fit_environment(
     database_dir: Path,
     mlip_path: Path,
     glue_xml: bool,
+    disable_testing: bool,
     train_name: str = "train.extxyz",
     test_name: str = "test.extxyz",
     glue_name: str = "glue.xml",
@@ -2061,6 +2074,8 @@ def prepare_fit_environment(
         Path to the MLIP fit run (cwd).
     glue_xml: bool
             use the glue.xml core potential instead of fitting 2b terms.
+    disable_testing: bool
+        Whether to disable running the model on test data.
     train_name: str
         name of the training data file.
     test_name: str
@@ -2075,7 +2090,7 @@ def prepare_fit_environment(
     os.makedirs(
         os.path.join(mlip_path, train_name.replace("train.extxyz", "")), exist_ok=True
     )
-    if not Path(mlip_path / test_name).exists():
+    if not (disable_testing or Path(mlip_path / test_name).exists()):
         shutil.copy(
             os.path.join(database_dir, test_name),
             os.path.join(mlip_path, test_name),
