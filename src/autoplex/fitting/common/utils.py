@@ -2097,7 +2097,7 @@ def prepare_fit_environment(
     database_dir: Path,
     mlip_path: Path,
     glue_xml: bool,
-    disable_testing: bool,
+    disable_testing: bool = False,
     train_name: str = "train.extxyz",
     test_name: str = "test.extxyz",
     glue_name: str = "glue.xml",
