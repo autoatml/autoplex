@@ -1,5 +1,6 @@
 """RSS (random structure searching) flow for exploring and learning potential energy surfaces from scratch."""
 
+import logging
 from dataclasses import dataclass, field
 
 from atomate2.forcefields.jobs import ForceFieldStaticMaker
@@ -11,6 +12,10 @@ from jobflow import Flow, Maker, Response, job
 from autoplex.auto.rss.jobs import do_rss_iterations, initial_rss
 from autoplex.misc.castep.jobs import CastepStaticMaker
 from autoplex.settings import RssConfig
+
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 
 @dataclass
@@ -309,9 +314,17 @@ class RssMaker(Maker):
                 "'train_from_scratch' must be set in the configuration file or passed as a keyword argument!!"
             )
 
-        if config_params["train_from_scratch"] and config_params["test_ratio"] == 0.0:
+        if config_params["disable_testing"] and config_params["test_ratio"] != 0.0:
+            logging.warning("Testing disabled. Setting test_ratio to 0.0.")
+            config_params["test_ratio"] = 0.0
+
+        if (
+            config_params["train_from_scratch"]
+            and config_params["test_ratio"] == 0.0
+            and not config_params["disable_testing"]
+        ):
             raise ValueError(
-                "A prebuilt test set should be present if `test_ratio` is set to 0."
+                "A prebuilt test set should be present if testing is enabled and `test_ratio` is set to 0."
             )
 
         rss_flow = []
