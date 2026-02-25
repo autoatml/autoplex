@@ -1,0 +1,1 @@
+{"xc": "pbe", "relativistic": "atomic_zora scalar", "species_dir": "light", "compute_forces": true, "compute_analytical_stress": true, "override_kgrid_checks": true, "k_grid": [12, 12, 12]}
