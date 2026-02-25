@@ -58,6 +58,11 @@ University of Oxford
 [MorrowChem]: https://github.com/morrowchem
 [0000-0002-3441-8646]: https://orcid.org/0000-0002-3441-8646
 
+**Andrei Sobolev** [![gh]][ansobolev] [![orc]][0000-0001-5086-6601] (FHI-aims support)\
+MS1P e.V., Berlin
+
+[ansobolev]: https://github.com/ansobolev
+[0000-0001-5086-6601]: https://orcid.org/0000-0001-5086-6601
 
 We welcome contributions from other researchers! If you would like to contribute, please see the `How to contribute` guidelines.
 
