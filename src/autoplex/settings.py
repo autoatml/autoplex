@@ -1099,6 +1099,10 @@ class RssConfig(AutoplexBaseModel):
         default=0.1,
         description="The proportion of the test set after splitting the data",
     )
+    disable_testing: bool = Field(
+        default=False,
+        description="Whether to disable running the model on test set for the run.",
+    )
     regularization: bool = Field(
         default=True,
         description="Whether to apply regularization. This only works for GAP to date.",

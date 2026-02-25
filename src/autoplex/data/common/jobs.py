@@ -745,6 +745,7 @@ def safe_strip_hostname(value):
 def preprocess_data(
     dft_ref_dir: str,
     test_ratio: float | None = None,
+    disable_testing: bool = False,
     regularization: bool = False,
     retain_existing_sigma: bool = False,
     scheme: str = "linear-hull",
@@ -758,7 +759,7 @@ def preprocess_data(
     isolated_atom_energies: dict | None = None,
 ) -> Path:
     """
-    Preprocesse data to before fiting machine learning models.
+    Preprocess data to before fitting machine learning models.
 
     This function handles tasks such as splitting the dataset,
     applying regularization, accumulating database, and filtering
@@ -771,6 +772,8 @@ def preprocess_data(
     test_ratio: float
         The proportion of the test set after splitting the data.
         If None, no splitting will be performed.
+    disable_testing: bool
+        Whether to disable running the model on test data. Default is False.
     regularization: bool
         If true, apply regularization. This only works for GAP.
     retain_existing_sigma: bool
@@ -812,14 +815,20 @@ def preprocess_data(
     )
 
     if test_ratio == 0 or test_ratio is None:
-        train_structures, test_structures = atoms, atoms
+        train_structures, test_structures = atoms, []
     else:
         train_structures, test_structures = stratified_dataset_split(
             atoms, test_ratio, energy_label
         )
 
     if pre_database_dir and os.path.exists(pre_database_dir):
-        files_to_copy = ["train.extxyz", "test.extxyz"]
+        files_to_copy = [
+            "train.extxyz",
+        ]
+        if not disable_testing:
+            files_to_copy += [
+                "test.extxyz",
+            ]
         current_working_directory = os.getcwd()
 
         for file_name in files_to_copy:
@@ -830,7 +839,8 @@ def preprocess_data(
                 print(f"File {file_name} has been copied to {destination_file_path}")
 
     write("train.extxyz", train_structures, format="extxyz", append=True)
-    write("test.extxyz", test_structures, format="extxyz", append=True)
+    if not disable_testing:
+        write("test.extxyz", test_structures, format="extxyz", append=True)
 
     if regularization:
         atoms_reg: list[Atoms] = read("train.extxyz", index=":")

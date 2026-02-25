@@ -85,6 +85,7 @@ def initial_rss(
     dft_ref_file: str = "dft_ref.extxyz",
     rss_group: str = "initial",
     test_ratio: float = 0.1,
+    disable_testing: bool = False,
     regularization: bool = False,
     retain_existing_sigma: bool = False,
     scheme: str | None = None,
@@ -171,6 +172,8 @@ def initial_rss(
     test_ratio: float
         The proportion of the test set after splitting the data.
         If None, no splitting will be performed. Default is 0.1.
+    disable_testing: bool
+        Whether to disable running the model on test data. Default is False.
     regularization: bool
         If true, apply regularization. This only works for GAP. Default is False.
     retain_existing_sigma: bool
@@ -274,6 +277,7 @@ def initial_rss(
     )
     do_data_preprocessing = preprocess_data(
         test_ratio=test_ratio,
+        disable_testing=disable_testing,
         regularization=regularization,
         retain_existing_sigma=retain_existing_sigma,
         scheme=scheme,
@@ -295,6 +299,7 @@ def initial_rss(
         apply_data_preprocessing=False,
         auto_delta=auto_delta,
         glue_xml=False,
+        disable_testing=disable_testing,
     ).make(
         isolated_atom_energies=do_data_collection.output["isolated_atom_energies"],
         database_dir=do_data_preprocessing.output,
@@ -352,6 +357,7 @@ def do_rss_iterations(
     dft_ref_file: str = "dft_ref.extxyz",
     rss_group: str = "rss",
     test_ratio: float = 0.1,
+    disable_testing: bool = False,
     regularization: bool = False,
     retain_existing_sigma: bool = False,
     scheme: str | None = None,
@@ -479,6 +485,8 @@ def do_rss_iterations(
         Group name for GAP RSS. Default is 'rss'.
     test_ratio: float
         The proportion of the test set after splitting the data. Default is 0.1.
+    disable_testing: bool
+        Whether to disable running the model on test data. Default is False.
     regularization: bool
         If true, apply regularization. This only works for GAP. Default is False.
     retain_existing_sigma: bool
@@ -674,6 +682,7 @@ def do_rss_iterations(
         )
         do_data_preprocessing = preprocess_data(
             test_ratio=test_ratio,
+            disable_testing=disable_testing,
             regularization=regularization,
             retain_existing_sigma=retain_existing_sigma,
             scheme=scheme,
@@ -695,6 +704,7 @@ def do_rss_iterations(
             apply_data_preprocessing=False,
             auto_delta=auto_delta,
             glue_xml=False,
+            disable_testing=disable_testing,
         ).make(
             database_dir=do_data_preprocessing.output,
             isolated_atom_energies=input["isolated_atom_energies"],
@@ -744,6 +754,7 @@ def do_rss_iterations(
             dft_ref_file=dft_ref_file,
             rss_group=rss_group,
             test_ratio=test_ratio,
+            disable_testing=disable_testing,
             regularization=regularization,
             retain_existing_sigma=retain_existing_sigma,
             scheme=scheme,
