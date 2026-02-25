@@ -1,10 +1,12 @@
 """Jobs to create training data for ML potentials."""
 
+import contextlib
 import gzip
 import logging
 import os
 import pickle
 import shutil
+import sys
 import traceback
 from itertools import chain
 from pathlib import Path
@@ -19,7 +21,9 @@ from atomate2.utils.path import strip_hostname
 from emmet.core.math import Matrix3D
 from jobflow.core.job import job
 from phonopy.structure.cells import get_supercell
-from pyfhiaims import AimsStdout
+
+with contextlib.suppress(ImportError):
+    from pyfhiaims import AimsStdout
 from pymatgen.core.structure import Structure
 from pymatgen.io.ase import AseAtomsAdaptor
 from pymatgen.io.phonopy import get_phonopy_structure, get_pmg_structure
@@ -749,6 +753,12 @@ def check_convergence_aims(aims_gz: str) -> bool:
     bool
         True if converged, False otherwise.
     """
+    # check for import at runtime
+    if "pyfhiaims" not in sys.modules:
+        logging.error(
+            "Pyfhiaims not installed. Install by running `pip install pyfhiaims`."
+        )
+        raise ModuleNotFoundError("No module named 'pyfhiaims'")
     return AimsStdout(aims_gz).get_image(-1).converged
 
 

@@ -46,7 +46,7 @@ jobs:
           bash -c "
           python -m pip install --upgrade pip && \
           python -m uv cache clean
-          python -m uv pip install --prerelease=allow .[strict,tests,aims] && \
+          python -m uv pip install --prerelease=allow .[strict,tests] && \
           OMP_NUM_THREADS=1 pytest -vv --cache-clear  --nbmake  --nbmake-timeout=-1 ./tutorials 
         "
 
