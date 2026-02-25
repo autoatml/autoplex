@@ -4,6 +4,7 @@ import logging
 import traceback
 from dataclasses import dataclass, field
 
+from atomate2.aims.jobs.base import BaseAimsMaker
 from atomate2.forcefields.jobs import (
     ForceFieldRelaxMaker,
     ForceFieldStaticMaker,
@@ -296,39 +297,39 @@ class DFTStaticLabelling(Maker):
     dimer_num: int = 21
     custom_incar: dict | None = None
     custom_potcar: dict | None = None
-    static_energy_maker: BaseVaspMaker | CastepStaticMaker | ForceFieldStaticMaker = (
-        field(
-            default_factory=lambda: StaticMaker(
-                input_set_generator=StaticSetGenerator(
-                    user_incar_settings={
-                        "ADDGRID": "True",
-                        "ENCUT": 520,
-                        "EDIFF": 1e-06,
-                        "ISMEAR": 0,
-                        "SIGMA": 0.01,
-                        "PREC": "Accurate",
-                        "ISYM": None,
-                        "KSPACING": 0.2,
-                        "NPAR": 8,
-                        "LWAVE": "False",
-                        "LCHARG": "False",
-                        "ENAUG": None,
-                        "GGA": None,
-                        "ISPIN": None,
-                        "LAECHG": None,
-                        "LELF": None,
-                        "LORBIT": None,
-                        "LVTOT": None,
-                        "NSW": None,
-                        "SYMPREC": None,
-                        "NELM": 100,
-                        "LMAXMIX": None,
-                        "LASPH": None,
-                        "AMIN": None,
-                    }
-                ),
-                run_vasp_kwargs={"handlers": ()},
-            )
+    static_energy_maker: (
+        BaseVaspMaker | CastepStaticMaker | ForceFieldStaticMaker | BaseAimsMaker
+    ) = field(
+        default_factory=lambda: StaticMaker(
+            input_set_generator=StaticSetGenerator(
+                user_incar_settings={
+                    "ADDGRID": "True",
+                    "ENCUT": 520,
+                    "EDIFF": 1e-06,
+                    "ISMEAR": 0,
+                    "SIGMA": 0.01,
+                    "PREC": "Accurate",
+                    "ISYM": None,
+                    "KSPACING": 0.2,
+                    "NPAR": 8,
+                    "LWAVE": "False",
+                    "LCHARG": "False",
+                    "ENAUG": None,
+                    "GGA": None,
+                    "ISPIN": None,
+                    "LAECHG": None,
+                    "LELF": None,
+                    "LORBIT": None,
+                    "LVTOT": None,
+                    "NSW": None,
+                    "SYMPREC": None,
+                    "NELM": 100,
+                    "LMAXMIX": None,
+                    "LASPH": None,
+                    "AMIN": None,
+                }
+            ),
+            run_vasp_kwargs={"handlers": ()},
         )
     )
     static_energy_maker_isolated_atoms: (

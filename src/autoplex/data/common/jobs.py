@@ -1,10 +1,12 @@
 """Jobs to create training data for ML potentials."""
 
+import contextlib
 import gzip
 import logging
 import os
 import pickle
 import shutil
+import sys
 import traceback
 from itertools import chain
 from pathlib import Path
@@ -14,10 +16,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 from ase.constraints import voigt_6_to_full_3x3_stress
 from ase.io import read, write
+from ase.io.aims import read_aims_output
 from atomate2.utils.path import strip_hostname
 from emmet.core.math import Matrix3D
 from jobflow.core.job import job
 from phonopy.structure.cells import get_supercell
+
+with contextlib.suppress(ImportError):
+    from pyfhiaims import AimsStdout
 from pymatgen.core.structure import Structure
 from pymatgen.io.ase import AseAtomsAdaptor
 from pymatgen.io.phonopy import get_phonopy_structure, get_pmg_structure
@@ -538,6 +544,7 @@ def sample_data(
             )
             traceback.print_exc()
 
+    logging.info(f"XXX selected atoms len: {len(selected_atoms)}")
     if selected_atoms is None:
         raise ValueError("Unable to sample correctly. Please recheck the parameters!")
 
@@ -600,8 +607,9 @@ def collect_dft_data(
         has_vasp_output = os.path.exists(os.path.join(val, "vasprun.xml.gz"))
         has_castep_output = os.path.exists(os.path.join(val, "castep.castep.gz"))
         has_ase_output = os.path.exists(os.path.join(val, "final_atoms_object.xyz"))
+        has_aims_output = os.path.exists(os.path.join(val, "aims.out.gz"))
 
-        if has_vasp_output or has_castep_output or has_ase_output:
+        if has_vasp_output or has_castep_output or has_ase_output or has_aims_output:
             if has_vasp_output:
                 converged = check_convergence_vasp(os.path.join(val, "vasprun.xml.gz"))
                 if converged:
@@ -620,6 +628,18 @@ def collect_dft_data(
                     logging.warning(
                         f"Calculation did not converge for path: {os.path.join(val, 'castep.castep.gz')}"
                     )
+            elif has_aims_output:
+                converged = check_convergence_aims(os.path.join(val, "aims.out.gz"))
+                if converged:
+                    with gzip.open(os.path.join(val, "aims.out.gz"), "rt") as f:
+                        at = [
+                            read_aims_output(f),
+                        ]
+                else:
+                    logging.warning(
+                        f"Calculation did not converge for path: {os.path.join(val, 'aims.out.gz')}"
+                    )
+
             elif has_ase_output:
                 try:
                     logging.info("read ase")
@@ -719,6 +739,29 @@ def check_convergence_castep(castep_gz: str) -> bool:
     return True
 
 
+def check_convergence_aims(aims_gz: str) -> bool:
+    """
+    Check if FHI-aims calculation has converged.
+
+    Parameters
+    ----------
+    aims_gz : str
+        Path to the aims.out.gz file.
+
+    Returns
+    -------
+    bool
+        True if converged, False otherwise.
+    """
+    # check for import at runtime
+    if "pyfhiaims" not in sys.modules:
+        logging.error(
+            "Pyfhiaims not installed. Install by running `pip install pyfhiaims`."
+        )
+        raise ModuleNotFoundError("No module named 'pyfhiaims'")
+    return AimsStdout(aims_gz).get_image(-1).converged
+
+
 def safe_strip_hostname(value):
     """
     Strip the hostname from a given path or URL.
@@ -745,6 +788,7 @@ def safe_strip_hostname(value):
 def preprocess_data(
     dft_ref_dir: str,
     test_ratio: float | None = None,
+    disable_testing: bool = False,
     regularization: bool = False,
     retain_existing_sigma: bool = False,
     scheme: str = "linear-hull",
@@ -758,7 +802,7 @@ def preprocess_data(
     isolated_atom_energies: dict | None = None,
 ) -> Path:
     """
-    Preprocesse data to before fiting machine learning models.
+    Preprocess data to before fitting machine learning models.
 
     This function handles tasks such as splitting the dataset,
     applying regularization, accumulating database, and filtering
@@ -771,6 +815,8 @@ def preprocess_data(
     test_ratio: float
         The proportion of the test set after splitting the data.
         If None, no splitting will be performed.
+    disable_testing: bool
+        Whether to disable running the model on test data. Default is False.
     regularization: bool
         If true, apply regularization. This only works for GAP.
     retain_existing_sigma: bool
@@ -812,14 +858,20 @@ def preprocess_data(
     )
 
     if test_ratio == 0 or test_ratio is None:
-        train_structures, test_structures = atoms, atoms
+        train_structures, test_structures = atoms, []
     else:
         train_structures, test_structures = stratified_dataset_split(
             atoms, test_ratio, energy_label
         )
 
     if pre_database_dir and os.path.exists(pre_database_dir):
-        files_to_copy = ["train.extxyz", "test.extxyz"]
+        files_to_copy = [
+            "train.extxyz",
+        ]
+        if not disable_testing:
+            files_to_copy += [
+                "test.extxyz",
+            ]
         current_working_directory = os.getcwd()
 
         for file_name in files_to_copy:
@@ -830,7 +882,8 @@ def preprocess_data(
                 print(f"File {file_name} has been copied to {destination_file_path}")
 
     write("train.extxyz", train_structures, format="extxyz", append=True)
-    write("test.extxyz", test_structures, format="extxyz", append=True)
+    if not disable_testing:
+        write("test.extxyz", test_structures, format="extxyz", append=True)
 
     if regularization:
         atoms_reg: list[Atoms] = read("train.extxyz", index=":")

@@ -86,6 +86,8 @@ class MLIPFitMaker(Maker):
         Determine whether to preprocess the data.
     run_fits_on_different_cluster: bool
         If true, run fits on different clusters.
+    disable_testing: bool
+        Whether to disable running the model on test data.
     """
 
     name: str = "MLpotentialFit"
@@ -110,6 +112,7 @@ class MLIPFitMaker(Maker):
     num_processes_fit: int | None = None
     apply_data_preprocessing: bool = True
     run_fits_on_different_cluster: bool = False
+    disable_testing: bool = False
 
     def make(
         self,
@@ -188,6 +191,7 @@ class MLIPFitMaker(Maker):
                 device=device,
                 species_list=species_list,
                 database_dict=data_prep_job.output["database_dict"],
+                disable_testing=self.disable_testing,
                 **fit_kwargs,
             )
             jobs.append(mlip_fit_job)
@@ -221,6 +225,7 @@ class MLIPFitMaker(Maker):
             ref_virial_name=self.ref_virial_name,
             device=device,
             species_list=species_list,
+            disable_testing=self.disable_testing,
             **fit_kwargs,
         )
 

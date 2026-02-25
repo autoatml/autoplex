@@ -119,6 +119,7 @@ def gap_fitting(
     ref_virial_name: str = "REF_virial",
     train_name: str = "train.extxyz",
     test_name: str = "test.extxyz",
+    disable_testing: bool = False,
     glue_file_path: str = "glue.xml",
     fit_kwargs: dict | None = None,  # pylint: disable=E3701
 ) -> dict:
@@ -149,6 +150,8 @@ def gap_fitting(
         Name of the training set file.
     test_name: str
         Name of the test set file.
+    disable_testing: bool
+        Whether to disable running the model on test data.
     glue_file_path: str
         Name of the glue.xml file path.
     fit_kwargs: dict
@@ -167,7 +170,13 @@ def gap_fitting(
     quip_train_file = train_name.replace("train", "quip_train")
     quip_test_file = test_name.replace("test", "quip_test")
     mlip_path: Path = prepare_fit_environment(
-        db_dir, Path.cwd(), glue_xml, train_name, test_name, glue_file_path
+        db_dir,
+        Path.cwd(),
+        glue_xml,
+        disable_testing,
+        train_name,
+        test_name,
+        glue_file_path,
     )
 
     db_atoms = ase.io.read(os.path.join(db_dir, train_name), index=":")
@@ -320,11 +329,14 @@ def gap_fitting(
     logging.info(f"Training error of MLIP (eV/at.): {round(train_error, 7)}")
 
     # Calculate testing error
-    run_ase_gap(
-        num_processes_fit, test_data_path, gap_file_xml, quip_test_file, glue_xml
-    )
-    test_error = energy_remain(quip_test_file)
-    logging.info(f"Testing error of MLIP (eV/at.): {round(test_error, 7)}")
+    if disable_testing:
+        test_error = None
+    else:
+        run_ase_gap(
+            num_processes_fit, test_data_path, gap_file_xml, quip_test_file, glue_xml
+        )
+        test_error = energy_remain(quip_test_file)
+        logging.info(f"Testing error of MLIP (eV/at.): {round(test_error, 7)}")
 
     if not glue_xml and species_list:
         try:
@@ -371,6 +383,7 @@ def jace_fitting(
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",
     num_processes_fit: int = 32,
+    disable_testing: bool = False,
     fit_kwargs: dict | None = None,
 ) -> dict:
     """
@@ -396,6 +409,8 @@ def jace_fitting(
         Reference virial name.
     num_processes_fit: int
         number of processes to use for parallel computation.
+    disable_testing: bool
+        Whether to disable running the model on test data.
     fit_kwargs: dict.
         optional dictionary with parameters for ace fitting with keys same as
         mlip-rss-defaults.json.
@@ -423,8 +438,9 @@ def jace_fitting(
     """
     hyperparameters = hyperparameters.model_copy(deep=True)
     train_atoms = ase.io.read(os.path.join(db_dir, "train.extxyz"), index=":")
-    source_file_path = os.path.join(db_dir, "test.extxyz")
-    shutil.copy(source_file_path, ".")
+    if not disable_testing:
+        source_file_path = os.path.join(db_dir, "test.extxyz")
+        shutil.copy(source_file_path, ".")
     isolated_atom_energies_update = {}
 
     if isolated_atom_energies:
@@ -464,6 +480,7 @@ def jace_fitting(
     cutoff = jace_hypers["cutoff"]
     solver = jace_hypers["solver"]
 
+    nl = "\n"
     ace_text = f"""using ACEpotentials
 using LinearAlgebra: norm, Diagonal
 using CSV, DataFrames
@@ -473,8 +490,8 @@ addprocs({num_processes_fit - 1}, exeflags="--project=$(Base.active_project())")
 
 data_file = "train_ace.extxyz"
 data = read_extxyz(data_file)
-test_data_file = "test.extxyz"
-test_data = read_extxyz(test_data_file)
+{f'test_data_file = "test.extxyz"{nl}test_data = read_extxyz(test_data_file){nl}'
+    if not disable_testing else f"test_data{nl}"}\
 data_keys = (energy_key = "{ref_energy_name}", force_key = "{ref_force_name}", virial_key = "{ref_virial_name}")
 
 model = acemodel(elements={formatted_species},
@@ -511,7 +528,8 @@ model_energies_train = [energy(potential, at) / length(at) for at in data]
 rmse_energy_train = norm(train_energies - model_energies_train) / sqrt(length(data))
 test_energies = [ JuLIP.get_data(at, "{ref_energy_name}") / length(at) for at in test_data]
 model_energies_pred = [energy(potential, at) / length(at) for at in test_data]
-rmse_energy_test = norm(test_energies - model_energies_pred) / sqrt(length(test_data))
+{f'rmse_energy_test = norm(test_energies - model_energies_pred) / sqrt(length(test_data)){nl}'
+    if not disable_testing else f'rmse_energy_test = missing{nl}'}\
 
 df = DataFrame(rmse_energy_train = rmse_energy_train, rmse_energy_test = rmse_energy_test)
 CSV.write("rmse_energies.csv", df)
@@ -526,6 +544,8 @@ export2lammps("acemodel.yace", model)
     os.system(f"export OMP_NUM_THREADS={num_processes_fit} && julia ace.jl")
 
     energy_err = pd.read_csv("rmse_energies.csv")
+    # Convert NaNs to None
+    energy_err = energy_err.where(pd.notna(energy_err), None)
     train_error = energy_err["rmse_energy_train"][0]
     test_error = energy_err["rmse_energy_test"][0]
 
@@ -548,6 +568,7 @@ def nep_fitting(
     ref_virial_name: str = "REF_virial",
     species_list: list | None = None,
     gpu_identifier_indices: list[int] = list[0],
+    disable_testing: bool = False,
     fit_kwargs: dict | None = None,
 ) -> dict:
     """
@@ -569,6 +590,8 @@ def nep_fitting(
         List of element names (strings)
     gpu_identifier_indices: list[int]
         Indices that identifies the GPU that NEP should be run with
+    disable_testing: bool
+        Whether to disable running the model on test data.
     fit_kwargs: dict.
         optional dictionary with parameters for NEP fitting with keys same as
         mlip-rss-defaults.json.
@@ -643,7 +666,12 @@ def nep_fitting(
     hyperparameters = hyperparameters.model_copy(deep=True)
 
     train_data = ase.io.read(os.path.join(db_dir, "train.extxyz"), index=":")
-    test_data = ase.io.read(os.path.join(db_dir, "test.extxyz"), index=":")
+    # AFAIK, NEP explicitly requires test set
+    test_data = (
+        ase.io.read(os.path.join(db_dir, "test.extxyz"), index=":")
+        if not disable_testing
+        else train_data
+    )
 
     try:
         train_nep = [
@@ -694,7 +722,9 @@ def nep_fitting(
 
     return {
         "train_error": metrics_df.RMSE_E_train.values[-1],
-        "test_error": metrics_df.RMSE_E_test.values[-1],
+        "test_error": (
+            metrics_df.RMSE_E_test.values[-1] if not disable_testing else None
+        ),
         "mlip_path": Path.cwd(),
     }
 
@@ -709,6 +739,7 @@ def nequip_fitting(
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",
+    disable_testing: bool = False,
     fit_kwargs: dict | None = None,
     device: str = "cuda",
 ) -> dict:
@@ -733,6 +764,8 @@ def nequip_fitting(
         Reference force name.
     ref_virial_name : str, optional
         Reference virial name.
+    disable_testing: bool
+        Whether to disable running the model on test data. Default is False.
     device: str
         specify device to use cuda or cpu
     fit_kwargs: dict.
@@ -781,8 +814,13 @@ def nequip_fitting(
         at for at in train_data if "IsolatedAtom" not in at.info["config_type"]
     ]
     ase.io.write("train_nequip.extxyz", train_nequip, format="extxyz")
+    # AFAIK, NEQUIP also requires validation set
+    test_data = (
+        ase.io.read(os.path.join(db_dir, "test.extxyz"), index=":")
+        if not disable_testing
+        else train_data
+    )
 
-    test_data = ase.io.read(os.path.join(db_dir, "test.extxyz"), index=":")
     num_of_train = len(train_nequip)
     num_of_val = len(test_data)
 
@@ -853,7 +891,9 @@ def nequip_fitting(
         at.info["REF_energy"] / len(at.get_chemical_symbols()) for at in test_data
     ]
 
-    test_error = rms_dict(ener_in_test, ener_out_test)["rmse"]
+    test_error = (
+        rms_dict(ener_in_test, ener_out_test)["rmse"] if not disable_testing else None
+    )
 
     return {
         "train_error": train_error,
@@ -871,6 +911,7 @@ def m3gnet_fitting(
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",
     test_equal_to_val: bool = True,
+    disable_testing: bool = False,
     fit_kwargs: dict | None = None,
 ) -> dict:
     """
@@ -892,6 +933,8 @@ def m3gnet_fitting(
         Reference virial name.
     test_equal_to_val: bool
         If True, the testing dataset will be the same as the validation dataset.
+    disable_testing: bool
+        Whether to disable running the model on test data. Default is False.
     fit_kwargs: dict.
         optional dictionary with parameters for M3GNET fitting.
 
@@ -1269,7 +1312,9 @@ def m3gnet_fitting(
 
     return {
         "train_error": extracted_values["train_Energy_RMSE"],
-        "test_error": extracted_values["test_Energy_RMSE"],
+        "test_error": (
+            extracted_values["test_Energy_RMSE"] if not disable_testing else None
+        ),
         "mlip_path": mlip_path,
     }
 
@@ -1284,6 +1329,7 @@ def mace_fitting(
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",
     ref_stress_name: str = "REF_stress",
+    disable_testing: bool = False,
     fit_kwargs: dict | None = None,
 ) -> dict:
     """
@@ -1309,6 +1355,8 @@ def mace_fitting(
         Reference virial name.
     ref_stress_name : str, optional
         Reference stress name.
+    disable_testing: bool
+        Whether to disable running the model on test data.
     fit_kwargs: dict.
         optional dictionary with parameters for mace fitting with keys same as
         mlip-rss-defaults.json.
@@ -1398,13 +1446,17 @@ def mace_fitting(
         else:
             hypers.append(f"--{hyper}={mace_hypers[hyper]}")
 
-    if ref_virial_name is None:
+  if ref_virial_name is None:
         hypers.append(f"--train_file={db_dir}/train.extxyz")
-        hypers.append(f"--valid_file={db_dir}/test.extxyz")
+        if not disable_testing:
+          hypers.append(f"--valid_file={db_dir}/test.extxyz")
     else:
         hypers.append("--train_file=./train.extxyz")
-        hypers.append("--valid_file=./test.extxyz")
-
+        if not disable_testing:
+          hypers.append("--valid_file=./test.extxyz")
+    hypers.append(f"--train_file={db_dir}/train.extxyz")
+    if disable_testing:
+        hypers.append("--valid_fraction=1")
     if ref_energy_name is not None:
         hypers.append(f"--energy_key={ref_energy_name}")
     if ref_force_name is not None:
@@ -1470,7 +1522,7 @@ def mace_fitting(
 
         return {
             "train_error": float(matches[0][1]),
-            "test_error": float(matches[1][1]),
+            "test_error": float(matches[1][1]) if not disable_testing else None,
             "mlip_path": Path.cwd(),
         }
     except IndexError:
@@ -1479,7 +1531,7 @@ def mace_fitting(
 
         return {
             "train_error": float(matches[0][1]),
-            "test_error": float(matches[1][1]),
+            "test_error": float(matches[1][1]) if not disable_testing else None,
             "mlip_path": Path.cwd(),
         }
 
@@ -2168,6 +2220,7 @@ def prepare_fit_environment(
     database_dir: Path,
     mlip_path: Path,
     glue_xml: bool,
+    disable_testing: bool = False,
     train_name: str = "train.extxyz",
     test_name: str = "test.extxyz",
     glue_name: str = "glue.xml",
@@ -2183,6 +2236,8 @@ def prepare_fit_environment(
         Path to the MLIP fit run (cwd).
     glue_xml: bool
             use the glue.xml core potential instead of fitting 2b terms.
+    disable_testing: bool
+        Whether to disable running the model on test data.
     train_name: str
         name of the training data file.
     test_name: str
@@ -2197,7 +2252,7 @@ def prepare_fit_environment(
     os.makedirs(
         os.path.join(mlip_path, train_name.replace("train.extxyz", "")), exist_ok=True
     )
-    if not Path(mlip_path / test_name).exists():
+    if not (disable_testing or Path(mlip_path / test_name).exists()):
         shutil.copy(
             os.path.join(database_dir, test_name),
             os.path.join(mlip_path, test_name),
