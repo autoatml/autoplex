@@ -1,5 +1,7 @@
 """Utility functions for fitting jobs."""
+from __future__ import annotations
 
+import re
 import contextlib
 import logging
 import multiprocessing as mp
@@ -1502,9 +1504,6 @@ def mace_fitting(
             "test_error": float(matches[1][1]) if not disable_testing else None,
             "mlip_path": Path.cwd(),
         }
-
-import re
-from __future__ import annotations
 
 
 def _extract_counts_from_line(line: str) -> Optional[tuple[int, int, int]]:
