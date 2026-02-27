@@ -65,8 +65,9 @@ from autoplex.data.common.utils import (
 )
 
 if TYPE_CHECKING:
-    from autoplex.settings import AutoplexBaseModel
     from pymatgen.core import Structure
+
+    from autoplex.settings import AutoplexBaseModel
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
