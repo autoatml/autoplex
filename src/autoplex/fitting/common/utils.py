@@ -1527,8 +1527,12 @@ def _extract_counts_from_line(line: str) -> tuple[int, int, int] | None:
 # --- helper: choose the “best” line for a split (prefer 'Total ... set') ---
 def _pick_line_for_split(lines, split_label: str) -> str | None:
     """
-    split_label is 'Training' or 'Validation'.
+    Split_label is 'Training' or 'Validation'.
+
+    Perform the splitting.
     Prefer 'Total <split> set ...' line; fall back to '<split> set ...'.
+
+    Return split line or None.
     """
     total = None
     fallback = None
@@ -1545,6 +1549,9 @@ def _pick_line_for_split(lines, split_label: str) -> str | None:
 
 def check_energy_force_stress_reading(log_data: str) -> dict[str, bool]:
     """
+    Check if energies, forces, and stresses were read and parsed. 
+    
+    
     Return booleans indicating whether energies, forces, and stresses were used
     (i.e., dataset summary counts > 0) for both Training and Validation.
 
