@@ -1549,9 +1549,8 @@ def _pick_line_for_split(lines, split_label: str) -> str | None:
 
 def check_energy_force_stress_reading(log_data: str) -> dict[str, bool]:
     """
-    Check if energies, forces, and stresses were read and parsed. 
-    
-    
+    Check if energies, forces, and stresses were read and parsed.
+
     Return booleans indicating whether energies, forces, and stresses were used
     (i.e., dataset summary counts > 0) for both Training and Validation.
 
