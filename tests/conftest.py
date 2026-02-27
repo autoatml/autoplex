@@ -79,6 +79,7 @@ _DEFAULT_STATIC_ENERGY_MAKER = StaticMaker(
 )
 
 
+
 @pytest.fixture(scope="session")
 def test_dir():
     from pathlib import Path
@@ -205,11 +206,11 @@ def clean_dir(debug_mode):
     new_path = tempfile.mkdtemp()
     os.chdir(new_path)
     yield
-    if debug_mode:
-        print(f"Tests ran in {new_path}")
-    else:
-        os.chdir(old_cwd)
-        shutil.rmtree(new_path)
+    #if debug_mode:
+    print(f"Tests ran in {new_path}")
+    #else:
+    #    os.chdir(old_cwd)
+    #    shutil.rmtree(new_path)
 
 
 @pytest.fixture(scope="session")

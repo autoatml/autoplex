@@ -1047,7 +1047,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_nep(
 
 
 def test_complete_dft_vs_ml_benchmark_workflow_mace(
-        vasp_test_dir, mock_vasp, test_dir, memory_jobstore, ref_paths4_mpid, fake_run_vasp_kwargs4_mpid, clean_dir
+        vasp_test_dir, mock_vasp, test_dir, clean_dir, memory_jobstore, ref_paths4_mpid, fake_run_vasp_kwargs4_mpid
 ):
     path_to_struct = vasp_test_dir / "dft_ml_data_generation" / "POSCAR"
     structure = Structure.from_file(path_to_struct)
@@ -1078,6 +1078,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_mace(
             "loss": "huber",
             "default_dtype": "float32",
             "device": "cpu",
+            "name": "MACE",
         }]
     )
 

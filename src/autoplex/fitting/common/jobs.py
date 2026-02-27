@@ -34,6 +34,7 @@ def machine_learning_fit(
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",
+    ref_stress_name: str = "REF_stress",
     device: str = "cuda",
     database_dict: dict | None = None,
     hyperpara_opt: bool = False,
