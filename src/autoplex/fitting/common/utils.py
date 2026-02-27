@@ -1508,7 +1508,7 @@ def mace_fitting(
         }
 
 def _extract_counts_from_line(line: str) -> tuple[int, int, int] | None:
-   """
+    """
     Extract (energy, stress, forces) counts from a single summary line.
 
     The line should look like:
@@ -1516,6 +1516,7 @@ def _extract_counts_from_line(line: str) -> tuple[int, int, int] | None:
 
     Returns None if the pattern is not found on this line.
     """
+   
     m = re.search(r"energy:\s*(\d+)[^\n]*?stress:\s*(\d+)[^\n]*?forces:\s*(\d+)", line)
     if not m:
         return None
