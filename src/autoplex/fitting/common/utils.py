@@ -1503,7 +1503,7 @@ def mace_fitting(
             "mlip_path": Path.cwd(),
         }
 
-import re
+
 from __future__ import annotations
 
 
