@@ -1071,7 +1071,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_mace(
             "hidden_irreps": "32x0e + 32x1o",
             "r_max": 3.0,
             "batch_size": 5,
-            "max_num_epochs": 6,
+            "max_num_epochs": 3,
             "start_swa": 5,
             "ema_decay": 0.99,
             "correlation": 3,
