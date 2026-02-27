@@ -1505,13 +1505,6 @@ def mace_fitting(
             "mlip_path": Path.cwd(),
         }
 
-<<<<<<< HEAD
-=======
-
-from __future__ import annotations
-
->>>>>>> 0cc7ef8a60e999c6f4f7a92d99eaa1e54bf8b81d
-
 def _extract_counts_from_line(line: str) -> Optional[tuple[int, int, int]]:
     """
     Extract (energy, stress, forces) counts from a single summary line like:
