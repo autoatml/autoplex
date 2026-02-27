@@ -1,7 +1,7 @@
 """Utility functions for fitting jobs."""
+
 from __future__ import annotations
 
-import re
 import contextlib
 import logging
 import multiprocessing as mp
@@ -1507,7 +1507,12 @@ def mace_fitting(
             "mlip_path": Path.cwd(),
         }
 
+<<<<<<< HEAD
 def _extract_counts_from_line(line: str) -> tuple[int, int, int] | None:
+=======
+
+def _extract_counts_from_line(line: str) -> Optional[tuple[int, int, int]]:
+>>>>>>> fb6fd65158122b42d809179ff7b612a9be37d10c
     """
     Extract (energy, stress, forces) counts from a single summary line.
 
