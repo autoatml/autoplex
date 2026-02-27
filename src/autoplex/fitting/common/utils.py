@@ -1502,10 +1502,10 @@ def mace_fitting(
         }
 
 import re
-from typing import Optional, Tuple, Dict
+from __future__ import annotations
 
 # --- helper: extract (energy, stress, forces) from a single summary line ---
-def _extract_counts_from_line(line: str) -> Optional[Tuple[int, int, int]]:
+def _extract_counts_from_line(line: str) -> Optional[tuple[int, int, int]]:
     """
     Extract (energy, stress, forces) counts from a single summary line like:
       "Total Training set [energy: 8, stress: 0, ..., forces: 8, ...]"
@@ -1535,7 +1535,7 @@ def _pick_line_for_split(lines, split_label: str) -> Optional[str]:
             fallback = ln
     return total or fallback
 
-def check_energy_force_stress_reading(log_data: str) -> Dict[str, bool]:
+def check_energy_force_stress_reading(log_data: str) -> dict[str, bool]:
     """
     Return booleans indicating whether energies, forces, and stresses were used
     (i.e., dataset summary counts > 0) for both Training and Validation.
