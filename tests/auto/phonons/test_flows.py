@@ -1071,14 +1071,17 @@ def test_complete_dft_vs_ml_benchmark_workflow_mace(
             "hidden_irreps": "32x0e + 32x1o",
             "r_max": 3.0,
             "batch_size": 5,
-            "max_num_epochs": 10,
+            "max_num_epochs": 6,
             "start_swa": 5,
             "ema_decay": 0.99,
             "correlation": 3,
             "loss": "huber",
             "default_dtype": "float32",
             "device": "cpu",
-            "name": "MACE",
+            #"name": "MACE",
+            "name": "MACE_final",
+            "foundation_model": "small",
+            "multiheads_finetuning": False,
         }]
     )
 
@@ -1096,7 +1099,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_mace(
     assert complete_workflow_mace.jobs[5].name == "complete_benchmark_mp-22905"
     assert responses[complete_workflow_mace.jobs[-1].output.uuid][1].output["metrics"][0][0][
                "benchmark_phonon_rmse"] == pytest.approx(
-        5.391879137001022, abs=3.0
+        0.8, abs=3.0
         # result is so bad because hyperparameter quality is reduced to a minimum to save time
         # and too little data
     )

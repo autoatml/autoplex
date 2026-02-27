@@ -256,7 +256,7 @@ def test_mlip_fit_maker_nep(
 
     test_files_dir = Path(test_dir / "fitting").resolve()
 
-    # Test NEQUIP fit runs with pre_database_dir
+    # Test NEP fit runs with pre_database_dir
     nepfit = MLIPFitMaker(
         mlip_type="NEP",
         pre_database_dir=str(test_files_dir),
