@@ -1411,7 +1411,8 @@ def mace_fitting(
         else:
             hypers.append(f"--{hyper}={mace_hypers[hyper]}")
 
-    # we have now saved the train and test files in the current directory with default names "train.extxyz" and "test.extxyz"
+    # we have now saved the train and test files in the current directory
+    # with default names "train.extxyz" and "test.extxyz"
     hypers.append("--train_file=./train.extxyz")
     if not disable_testing:
         hypers.append("--valid_file=./test.extxyz")
@@ -1505,7 +1506,7 @@ def mace_fitting(
 import re
 from __future__ import annotations
 
-- helper: extract (energy, stress, forces) from a single summary line ---
+
 def _extract_counts_from_line(line: str) -> Optional[tuple[int, int, int]]:
     """
     Extract (energy, stress, forces) counts from a single summary line like:
