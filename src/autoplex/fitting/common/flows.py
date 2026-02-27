@@ -396,7 +396,6 @@ class DataPreprocessing(Maker):
             ref_force_name=self.ref_force_name,
             ref_energy_name=self.ref_energy_name,
             ref_virial_name=self.ref_virial_name,
-            
         )
 
         write_after_distillation_data_split(
