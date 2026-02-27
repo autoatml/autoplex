@@ -1512,10 +1512,17 @@ def _extract_counts_from_line(line: str) -> tuple[int, int, int] | None:
     """
     Extract (energy, stress, forces) counts from a single summary line.
 
-    The line should look like:
-    "Total Training set [energy: 8, stress: 0, ..., forces: 8, ...]"
+    Parameters
+    ----------
+    line : str
+        A line from the log file, potentially containing dataset summary counts.
+        Should look like: "Total Training set [energy: 8, stress: 0, ..., forces: 8, ...]"
 
-    Returns None if the pattern is not found on this line.
+    Returns
+    -------
+    tuple[int, int, int] or None
+        A tuple of (energy_count, stress_count, forces_count) if the pattern is found,
+        or None if the pattern is not found on this line.
     """
     m = re.search(r"energy:\s*(\d+)[^\n]*?stress:\s*(\d+)[^\n]*?forces:\s*(\d+)", line)
     if not m:
@@ -1527,12 +1534,21 @@ def _extract_counts_from_line(line: str) -> tuple[int, int, int] | None:
 # --- helper: choose the “best” line for a split (prefer 'Total ... set') ---
 def _pick_line_for_split(lines, split_label: str) -> str | None:
     """
-    Split_label is 'Training' or 'Validation'.
+    Pick the best line for a given split (Training or Validation).
 
-    Perform the splitting.
-    Prefer 'Total <split> set ...' line; fall back to '<split> set ...'.
+    Prefers 'Total <split_label> set' line; falls back to '<split_label> set'.
 
-    Return split line or None.
+    Parameters
+    ----------
+    lines : list[str]
+        Lines from the log file to search.
+    split_label : str
+        The split identifier ('Training' or 'Validation').
+
+    Returns
+    -------
+    str or None
+        The best matching line, or None if no match found.
     """
     total = None
     fallback = None
@@ -1551,18 +1567,22 @@ def check_energy_force_stress_reading(log_data: str) -> dict[str, bool]:
     """
     Check if energies, forces, and stresses were read and parsed.
 
-    Return booleans indicating whether energies, forces, and stresses were used
-    (i.e., dataset summary counts > 0) for both Training and Validation.
+    Parameters
+    ----------
+    log_data : str
+        The MACE log file content as a string.
 
-    Output format:
-        {
-            "train_energy":  bool,
-            "train_forces":  bool,
-            "train_stress":  bool,
-            "valid_energy":  bool,
-            "valid_forces":  bool,
-            "valid_stress":  bool,
-        }
+    Returns
+    -------
+    dict[str, bool]
+        A dictionary with keys indicating whether energies, forces, and stresses
+        were used (i.e., dataset summary counts > 0) for both Training and Validation:
+        - "train_energy": bool
+        - "train_forces": bool
+        - "train_stress": bool
+        - "valid_energy": bool
+        - "valid_forces": bool
+        - "valid_stress": bool
     """
     lines = log_data.splitlines()
 

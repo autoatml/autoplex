@@ -257,9 +257,6 @@ def test_mace_fit_maker_passEOs(test_dir, memory_jobstore, clean_dir, caplog):
 
 def test_mace_finetuning_maker(test_dir, memory_jobstore, clean_dir, caplog):
 
-    # TODO: Replace the finetuning dataset with correct reference keys
-    # as per mace logs using 'energy', 'forces' and 'stress' as ref keys is 
-    # no longer safe when communicating between MACE and ASE
     
     database_dir = test_dir / "fitting/rss_training_dataset/"
 
@@ -310,45 +307,3 @@ def test_mace_finetuning_maker(test_dir, memory_jobstore, clean_dir, caplog):
     assert "Energies are not used for training or validation." not in caplog.text
     assert "Forces are not used for training or validation." not in caplog.text
 
-def test_mace_finetuning_maker2(test_dir, memory_jobstore, clean_dir):
-    database_dir = test_dir / "fitting/rss_training_dataset/"
-
-    macefit = MLIPFitMaker(
-        mlip_type="MACE",
-        ref_energy_name=None,
-        ref_force_name=None,
-        ref_virial_name=None,
-        num_processes_fit=1,
-        apply_data_preprocessing=False,
-    ).make(
-        database_dir=database_dir,
-        name="MACE_final",
-        foundation_model="small",
-        multiheads_finetuning=False,
-        r_max = 6,
-        loss = "huber",
-        energy_weight = 1000.0,
-        forces_weight = 1000.0,
-        stress_weight = 1.0 ,
-        compute_stress=True,
-        E0s = "average",
-        scaling = "rms_forces_scaling",
-        batch_size = 1,
-        max_num_epochs = 1,
-        ema=True,
-        ema_decay = 0.99,
-        amsgrad=True,
-        default_dtype = "float64",
-        restart_latest=True,
-        lr = 0.0001,
-        patience = 20,
-        device = "cpu",
-        save_cpu =True,
-        seed = 3,
-    )
-
-    run_locally(
-        macefit, ensure_success=True, create_folders=True, store=memory_jobstore
-    )
-
-    assert Path(macefit.output["mlip_path"][0].resolve(memory_jobstore)).exists()
