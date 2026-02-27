@@ -43,7 +43,6 @@ from monty.serialization import dumpfn
 from nequip.ase import NequIPCalculator
 from numpy import ndarray
 from pydantic import Field
-from pymatgen.core import Structure
 from pymatgen.io.ase import AseAtomsAdaptor
 from pytorch_lightning.loggers import CSVLogger
 from quippy import descriptors
@@ -67,6 +66,7 @@ from autoplex.data.common.utils import (
 
 if TYPE_CHECKING:
     from autoplex.settings import AutoplexBaseModel
+    from pymatgen.core import Structure
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
