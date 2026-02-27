@@ -14,7 +14,7 @@ import xml.etree.ElementTree as ET
 from collections.abc import Iterable
 from functools import partial
 from pathlib import Path
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 import ase
 import lightning as pl
@@ -49,7 +49,6 @@ from pytorch_lightning.loggers import CSVLogger
 from quippy import descriptors
 from scipy.spatial import ConvexHull
 from threadpoolctl import threadpool_limits
-from typing import TYPE_CHECKING
 
 from autoplex import (
     GAP_HYPERS,
@@ -65,6 +64,7 @@ from autoplex.data.common.utils import (
     rms_dict,
     stratified_dataset_split,
 )
+
 if TYPE_CHECKING:
     from autoplex.settings import AutoplexBaseModel
 
@@ -1507,6 +1507,7 @@ def mace_fitting(
             "mlip_path": Path.cwd(),
         }
 
+
 def _extract_counts_from_line(line: str) -> tuple[int, int, int] | None:
     """
     Extract (energy, stress, forces) counts from a single summary line.
@@ -1516,7 +1517,6 @@ def _extract_counts_from_line(line: str) -> tuple[int, int, int] | None:
 
     Returns None if the pattern is not found on this line.
     """
-   
     m = re.search(r"energy:\s*(\d+)[^\n]*?stress:\s*(\d+)[^\n]*?forces:\s*(\d+)", line)
     if not m:
         return None
