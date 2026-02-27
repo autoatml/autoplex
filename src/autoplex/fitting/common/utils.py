@@ -49,6 +49,7 @@ from pytorch_lightning.loggers import CSVLogger
 from quippy import descriptors
 from scipy.spatial import ConvexHull
 from threadpoolctl import threadpool_limits
+from typing import TYPE_CHECKING
 
 from autoplex import (
     GAP_HYPERS,
@@ -64,7 +65,8 @@ from autoplex.data.common.utils import (
     rms_dict,
     stratified_dataset_split,
 )
-from autoplex.settings import AutoplexBaseModel
+if TYPE_CHECKING:
+    from autoplex.settings import AutoplexBaseModel
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
@@ -1505,10 +1507,13 @@ def mace_fitting(
             "mlip_path": Path.cwd(),
         }
 
-def _extract_counts_from_line(line: str) -> Optional[tuple[int, int, int]]:
+def _extract_counts_from_line(line: str) -> tuple[int, int, int] | None:
     """
-    Extract (energy, stress, forces) counts from a single summary line like:
-      "Total Training set [energy: 8, stress: 0, ..., forces: 8, ...]"
+    Extract (energy, stress, forces) counts from a single summary line.
+
+    The line should look like:
+    "Total Training set [energy: 8, stress: 0, ..., forces: 8, ...]"
+
     Returns None if the pattern is not found on this line.
     """
     m = re.search(r"energy:\s*(\d+)[^\n]*?stress:\s*(\d+)[^\n]*?forces:\s*(\d+)", line)
@@ -1519,7 +1524,7 @@ def _extract_counts_from_line(line: str) -> Optional[tuple[int, int, int]]:
 
 
 # --- helper: choose the “best” line for a split (prefer 'Total ... set') ---
-def _pick_line_for_split(lines, split_label: str) -> Optional[str]:
+def _pick_line_for_split(lines, split_label: str) -> str | None:
     """
     split_label is 'Training' or 'Validation'.
     Prefer 'Total <split> set ...' line; fall back to '<split> set ...'.
