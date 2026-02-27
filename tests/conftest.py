@@ -79,6 +79,7 @@ _DEFAULT_STATIC_ENERGY_MAKER = StaticMaker(
 )
 
 
+
 @pytest.fixture(scope="session")
 def test_dir():
     from pathlib import Path

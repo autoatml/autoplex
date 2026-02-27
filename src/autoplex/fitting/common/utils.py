@@ -1,5 +1,7 @@
 """Utility functions for fitting jobs."""
 
+from __future__ import annotations
+
 import contextlib
 import logging
 import multiprocessing as mp
@@ -12,7 +14,7 @@ import xml.etree.ElementTree as ET
 from collections.abc import Iterable
 from functools import partial
 from pathlib import Path
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 import ase
 import lightning as pl
@@ -41,7 +43,6 @@ from monty.serialization import dumpfn
 from nequip.ase import NequIPCalculator
 from numpy import ndarray
 from pydantic import Field
-from pymatgen.core import Structure
 from pymatgen.io.ase import AseAtomsAdaptor
 from pytorch_lightning.loggers import CSVLogger
 from quippy import descriptors
@@ -62,6 +63,11 @@ from autoplex.data.common.utils import (
     rms_dict,
     stratified_dataset_split,
 )
+
+if TYPE_CHECKING:
+    from pymatgen.core import Structure
+
+    from autoplex.settings import AutoplexBaseModel
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
@@ -1274,13 +1280,14 @@ def m3gnet_fitting(
 
 def mace_fitting(
     db_dir: Path,
-    hyperparameters: MACE_HYPERS = MACE_HYPERS,
+    hyperparameters: AutoplexBaseModel = MACE_HYPERS,
     device: Literal["cpu", "cuda", "mps", "xpu"] = Field(
         default="cpu", description="Device to be used for model fitting"
     ),
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",
+    ref_stress_name: str = "REF_stress",
     disable_testing: bool = False,
     fit_kwargs: dict | None = None,
 ) -> dict:
@@ -1290,6 +1297,9 @@ def mace_fitting(
     This function sets up and executes a python script to perform MACE fitting using specified parameters
     and input data located in the provided directory. It handles the input/output of atomic configurations,
     sets up the NequIP model, and calculates training and testing errors after fitting.
+
+    Please note that we currently use energies, forces and virials/stresses for fitting MACE, if provided in
+    the database. We can further refine the fitting procedure in the future.
 
     Parameters
     ----------
@@ -1304,7 +1314,9 @@ def mace_fitting(
     ref_force_name : str, optional
         Reference force name.
     ref_virial_name : str, optional
-        Reference virial name.
+        Reference virial name. If ref_virial_name or ref_stress_name is provided, MACE will be trained on stress.
+    ref_stress_name : str, optional
+        Reference stress name. If ref_virial_name or ref_stress_name is provided, MACE will be trained on stress.
     disable_testing: bool
         Whether to disable running the model on test data.
     fit_kwargs: dict.
@@ -1341,11 +1353,23 @@ def mace_fitting(
     """
     hyperparameters = hyperparameters.model_copy(deep=True)
 
-    if ref_virial_name is not None:
-        atoms = read(f"{db_dir}/train.extxyz", index=":")
-        mace_convert_virial_to_stress(
-            atoms=atoms, ref_virial_name=ref_virial_name, out_file_name="train.extxyz"
-        )
+    # at the moment, we simply use energies, forces and virials/stresses for fitting.
+    # TODO: we can further refine the fitting procedure in the future.
+    atoms = read(f"{db_dir}/train.extxyz", index=":")
+    mace_convert_virial_to_stress(
+        atoms=atoms,
+        ref_virial_name=ref_virial_name,
+        ref_stress_name=ref_stress_name,
+        out_file_name="train.extxyz",
+    )
+
+    atoms = read(f"{db_dir}/test.extxyz", index=":")
+    mace_convert_virial_to_stress(
+        atoms=atoms,
+        ref_virial_name=ref_virial_name,
+        ref_stress_name=ref_stress_name,
+        out_file_name="test.extxyz",
+    )
 
     hyperparameters.update_parameters(fit_kwargs)
 
@@ -1392,22 +1416,25 @@ def mace_fitting(
         else:
             hypers.append(f"--{hyper}={mace_hypers[hyper]}")
 
-    hypers.append(f"--train_file={db_dir}/train.extxyz")
+    # we have now saved the train and test files in the current directory
+    # with default names "train.extxyz" and "test.extxyz"
+    hypers.append("--train_file=./train.extxyz")
     if not disable_testing:
-        hypers.append(f"--valid_file={db_dir}/test.extxyz")
+        hypers.append("--valid_file=./test.extxyz")
     else:
         hypers.append("--valid_fraction=1")
 
+    # we will train on energy, forces and stresses for now.
+    # more options will follow in the future.
     if ref_energy_name is not None:
         hypers.append(f"--energy_key={ref_energy_name}")
     if ref_force_name is not None:
         hypers.append(f"--forces_key={ref_force_name}")
-    if ref_virial_name is not None:
-        hypers.append(
-            "--stress_key={'REF_stress'}"
-        )  # MACE will be trained on stress instead of virial.
-        # They are essentially equivalent, but since the MACE-torch log file directly
-        # reports the stress error, we train on stress for consistency.
+    if ref_virial_name is not None or ref_stress_name is not None:
+        hypers.append(f"--stress_key={ref_stress_name}")
+    # MACE will be trained on stress instead of virial.
+    # They are essentially equivalent, but since the MACE-torch log file directly
+    # reports the stress error, we train on stress for consistency.
     if device is not None:
         hypers.append(f"--device={device}")
 
@@ -1429,8 +1456,35 @@ def mace_fitting(
                 with open(f"./logs/{fit_kwargs['name']}_run-3.log") as file:
                     log_data = file.read()
 
+    energy_force_stress = check_energy_force_stress_reading(log_data)
+
+    if (
+        energy_force_stress["train_energy"] is False
+        or energy_force_stress["valid_energy"] is False
+    ):
+        logging.info("Energies are not used for training or validation.")
+
+    if (
+        energy_force_stress["train_forces"] is False
+        or energy_force_stress["valid_forces"] is False
+    ):
+        logging.info("Forces are not used for training or validation.")
+
+    if (
+        energy_force_stress["train_stress"] is False
+        or energy_force_stress["valid_stress"] is False
+    ):
+        logging.info("Stresses are not used for training or validation.")
+
+    # check if all keys in energy_force_stress are True, if yes, write a log info
+    if all(energy_force_stress[key] for key in energy_force_stress):
+        logging.info(
+            "Energies, forces and stresses are used for training and validation."
+        )
+
     tables = re.split(r"\+-+\+\n", log_data)
     # if tables:
+    logging.log(msg=len(tables), level=logging.INFO)
     last_table = tables[-2]
     try:
         matches = re.findall(
@@ -1453,6 +1507,116 @@ def mace_fitting(
             "test_error": float(matches[1][1]) if not disable_testing else None,
             "mlip_path": Path.cwd(),
         }
+
+
+def _extract_counts_from_line(line: str) -> tuple[int, int, int] | None:
+    """
+    Extract (energy, stress, forces) counts from a single summary line.
+
+    Parameters
+    ----------
+    line : str
+        A line from the log file, potentially containing dataset summary counts.
+        Should look like: "Total Training set [energy: 8, stress: 0, ..., forces: 8, ...]"
+
+    Returns
+    -------
+    tuple[int, int, int] or None
+        A tuple of (energy_count, stress_count, forces_count) if the pattern is found,
+        or None if the pattern is not found on this line.
+    """
+    m = re.search(r"energy:\s*(\d+)[^\n]*?stress:\s*(\d+)[^\n]*?forces:\s*(\d+)", line)
+    if not m:
+        return None
+    e, s, f = map(int, m.groups())
+    return e, s, f
+
+
+# --- helper: choose the “best” line for a split (prefer 'Total ... set') ---
+def _pick_line_for_split(lines, split_label: str) -> str | None:
+    """
+    Pick the best line for a given split (Training or Validation).
+
+    Prefers 'Total <split_label> set' line; falls back to '<split_label> set'.
+
+    Parameters
+    ----------
+    lines : list[str]
+        Lines from the log file to search.
+    split_label : str
+        The split identifier ('Training' or 'Validation').
+
+    Returns
+    -------
+    str or None
+        The best matching line, or None if no match found.
+    """
+    total = None
+    fallback = None
+    for ln in lines:
+        # Quick guards to avoid unrelated lines
+        if "energy:" not in ln:
+            continue
+        if f"Total {split_label} set" in ln:
+            total = ln
+        elif f"{split_label} set" in ln:
+            fallback = ln
+    return total or fallback
+
+
+def check_energy_force_stress_reading(log_data: str) -> dict[str, bool]:
+    """
+    Check if energies, forces, and stresses were read and parsed.
+
+    Parameters
+    ----------
+    log_data : str
+        The MACE log file content as a string.
+
+    Returns
+    -------
+    dict[str, bool]
+        A dictionary with keys indicating whether energies, forces, and stresses
+        were used (i.e., dataset summary counts > 0) for both Training and Validation:
+        - "train_energy": bool
+        - "train_forces": bool
+        - "train_stress": bool
+        - "valid_energy": bool
+        - "valid_forces": bool
+        - "valid_stress": bool
+    """
+    lines = log_data.splitlines()
+
+    train_line = _pick_line_for_split(lines, "Training")
+    valid_line = _pick_line_for_split(lines, "Validation")
+
+    # Defaults: if lines are missing or don't match, treat as not used (False)
+    out = {
+        "train_energy": False,
+        "train_forces": False,
+        "train_stress": False,
+        "valid_energy": False,
+        "valid_forces": False,
+        "valid_stress": False,
+    }
+
+    if train_line:
+        counts = _extract_counts_from_line(train_line)
+        if counts:
+            e, s, f = counts
+            out["train_energy"] = e > 0
+            out["train_forces"] = f > 0
+            out["train_stress"] = s > 0
+
+    if valid_line:
+        counts = _extract_counts_from_line(valid_line)
+        if counts:
+            e, s, f = counts
+            out["valid_energy"] = e > 0
+            out["valid_forces"] = f > 0
+            out["valid_stress"] = s > 0
+
+    return out
 
 
 def check_convergence(test_error: float) -> bool:
@@ -2256,7 +2420,7 @@ def write_after_distillation_data_split(
 
 
 def mace_convert_virial_to_stress(
-    atoms: list[Atoms], ref_virial_name: str, out_file_name: str
+    atoms: list[Atoms], ref_virial_name: str, ref_stress_name: str, out_file_name: str
 ) -> None:
     """
     Convert a virial vector into a stress tensor.
@@ -2267,14 +2431,18 @@ def mace_convert_virial_to_stress(
         input structures
     ref_virial_name: str
         virial label
+    ref_stress_name: str
+        stress label
     out_file_name: str
         name of output file
     """
     formatted_atoms = []
     for at in atoms:
         if ref_virial_name in at.info:
-            at.info["REF_stress"] = -at.info[ref_virial_name] / at.get_volume()
+            at.info[ref_stress_name] = -at.info[ref_virial_name] / at.get_volume()
             del at.info[ref_virial_name]
+            formatted_atoms.append(at)
+        else:
             formatted_atoms.append(at)
 
     write(out_file_name, formatted_atoms, format="extxyz")
