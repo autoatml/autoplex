@@ -1,0 +1,2096 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>autoplex.auto.phonons.flows &#8212; autoplex</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=1ea92b8b" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../../_static/documentation_options.js?v=e18d2f4a"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+
+
+
+
+
+const initStyles = () => {
+    const defaultStyle = document.createElement('style');
+    defaultStyle.textContent = `pre.mermaid {
+    /* Same as .mermaid-container > pre */
+    display: block;
+    width: 100%;
+}
+
+pre.mermaid > svg {
+    /* Same as .mermaid-container > pre > svg */
+    height: 500px;
+    width: 100%;
+    max-width: 100% !important;
+}`;
+    document.head.appendChild(defaultStyle);
+
+    const fullscreenStyle = document.createElement('style');
+    fullscreenStyle.textContent = `.mermaid-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.mermaid-container > pre {
+    display: block;
+    width: 100%;
+}
+
+.mermaid-container > pre > svg {
+    height: 500px;
+    width: 100%;
+    max-width: 100% !important;
+}
+
+.mermaid-fullscreen-btn {
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+    color: #333;
+}
+
+.mermaid-fullscreen-btn:hover {
+    opacity: 100% !important;
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+    transform: scale(1.1);
+}
+
+.mermaid-fullscreen-btn.dark-theme {
+    background: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #e0e0e0;
+}
+
+.mermaid-fullscreen-btn.dark-theme:hover {
+    background: rgba(60, 60, 60, 1);
+    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-modal {
+    display: none;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 95vw;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.98);
+    z-index: 9999;
+    padding: 20px;
+    overflow: auto;
+}
+
+.mermaid-fullscreen-modal.dark-theme {
+    background: rgba(0, 0, 0, 0.98);
+}
+
+.mermaid-fullscreen-modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen {
+    position: relative;
+    width: 95vw;
+    height: 90vh;
+    max-width: 95vw;
+    max-height: 90vh;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    overflow: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen.dark-theme {
+    background: #1a1a1a;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+}
+
+.mermaid-container-fullscreen pre.mermaid {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen .mermaid svg {
+    height: 100% !important;
+    width: 100% !important;
+    cursor: grab;
+}
+
+.mermaid-fullscreen-close {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s;
+    font-size: 24px;
+    line-height: 1;
+    color: #333;
+}
+
+.mermaid-fullscreen-close:hover {
+    background: white;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    transform: scale(1.1);
+}
+
+.mermaid-fullscreen-close.dark-theme {
+    background: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #e0e0e0;
+}
+
+.mermaid-fullscreen-close.dark-theme:hover {
+    background: rgba(60, 60, 60, 1);
+    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-modal .mermaid-fullscreen-btn {
+    display: none !important;
+}`;
+    document.head.appendChild(fullscreenStyle);
+}
+
+// Detect if page has dark background
+const isDarkTheme = () => {
+    // We use a set of heuristics:
+    // 1. Check for common dark mode classes or attributes
+    // 2. Check computed background color brightness
+    if (document.documentElement.classList.contains('dark') ||
+        document.documentElement.getAttribute('data-theme') === 'dark' ||
+        document.body.classList.contains('dark') ||
+        document.body.getAttribute('data-theme') === 'dark') {
+        // console.log("Dark theme detected via class/attribute");
+        return true;
+    }
+    if (document.documentElement.classList.contains('light') ||
+        document.documentElement.getAttribute('data-theme') === 'light' ||
+        document.body.classList.contains('light') ||
+        document.body.getAttribute('data-theme') === 'light') {
+        // console.log("Light theme detected via class/attribute");
+        return false;
+    }
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        // console.log("Dark theme detected via prefers-color-scheme");
+        return true;
+    }
+    const bgColor = window.getComputedStyle(document.body).backgroundColor;
+    const match = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {
+        const r = parseInt(match[1]);
+        const g = parseInt(match[2]);
+        const b = parseInt(match[3]);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        // console.log("Background color brightness:", brightness);
+        return brightness < 128;
+    }
+    // console.log("No dark or light theme detected, defaulting to light theme");
+    return false;
+};
+
+let darkTheme = isDarkTheme();
+let modal = null;
+let modalContent = null;
+let previousScrollOffset = [window.scrollX, window.scrollY];
+
+const runMermaid = async (rerun) => {
+    console.log("Running mermaid diagrams, rerun =", rerun);
+    // clear all existing mermaid charts
+    let all_mermaids = document.querySelectorAll(".mermaid");
+
+    if (rerun) {
+        all_mermaids.forEach((el) => {
+            if(!el.hasAttribute("data-original-code")) {
+                // store original code
+                // console.log(`Storing original code for first run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+            if(el.getAttribute("data-processed") === "true") {
+                // remove and restore original
+                el.removeAttribute("data-processed");
+                // console.log(`Restoring original code for re-run: `, el.getAttribute('data-original-code'));
+                el.innerHTML = el.getAttribute('data-original-code');
+            } else {
+                // store original code
+                // console.log(`Storing original code for re-run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+        });
+        await mermaid.run();
+    }
+
+    all_mermaids = document.querySelectorAll(".mermaid");
+    const mermaids_processed = document.querySelectorAll(".mermaid[data-processed='true']");
+
+    if ("False" === "True") {
+        const mermaids_to_add_zoom = -1 === -1 ? all_mermaids.length : -1;
+        if(mermaids_to_add_zoom > 0) {
+            var svgs = d3.selectAll("");
+            if(all_mermaids.length !== mermaids_processed.length) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            } else if(svgs.size() !== mermaids_to_add_zoom) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            } else {
+                svgs.each(function() {
+                    var svg = d3.select(this);
+                    svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+                    var inner = svg.select("g");
+                    var zoom = d3.zoom().on("zoom", function(event) {
+                        inner.attr("transform", event.transform);
+                    });
+                    svg.call(zoom);
+                });
+            }
+        }
+    } else if(all_mermaids.length !== mermaids_processed.length) {
+        // Wait for mermaid to process all diagrams
+        setTimeout(() => runMermaid(false), 200);
+        return;
+    }
+
+    // Stop here if not adding fullscreen capability
+    if ("True" !== "True") return;
+
+    if (modal !== null ) {
+        // Destroy existing modal
+        modal.remove();
+        modal = null;
+        modalContent = null;
+    }
+
+    modal = document.createElement('div');
+    modal.className = 'mermaid-fullscreen-modal' + (darkTheme ? ' dark-theme' : '');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Fullscreen diagram viewer');
+    modal.innerHTML = `
+        <button class="mermaid-fullscreen-close${darkTheme ? ' dark-theme' : ''}" aria-label="Close fullscreen">✕</button>
+        <div class="mermaid-container-fullscreen${darkTheme ? ' dark-theme' : ''}"></div>
+    `;
+    document.body.appendChild(modal);
+
+    modalContent = modal.querySelector('.mermaid-container-fullscreen');
+    const closeBtn = modal.querySelector('.mermaid-fullscreen-close');
+
+    const closeModal = () => {
+        modal.classList.remove('active');
+        modalContent.innerHTML = '';
+        document.body.style.overflow = ''
+        window.scrollTo({left: previousScrollOffset[0], top: previousScrollOffset[1], behavior: 'instant'});
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+            closeModal();
+        }
+    });
+
+    document.querySelectorAll('.mermaid').forEach((mermaidDiv) => {
+        if (mermaidDiv.parentNode.classList.contains('mermaid-container') ||
+            mermaidDiv.closest('.mermaid-fullscreen-modal')) {
+            // Already processed, adjust button class if needed
+            const existingBtn = mermaidDiv.parentNode.querySelector('.mermaid-fullscreen-btn');
+            if (existingBtn) {
+                existingBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+            }
+            return;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'mermaid-container';
+        mermaidDiv.parentNode.insertBefore(container, mermaidDiv);
+        container.appendChild(mermaidDiv);
+
+        const fullscreenBtn = document.createElement('button');
+        fullscreenBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+        fullscreenBtn.setAttribute('aria-label', 'View diagram in fullscreen');
+        fullscreenBtn.textContent = '⛶';
+        fullscreenBtn.style.opacity = '50%';
+
+        // Calculate dynamic position based on diagram's margin and padding
+        const diagramStyle = window.getComputedStyle(mermaidDiv);
+        const marginTop = parseFloat(diagramStyle.marginTop) || 0;
+        const marginRight = parseFloat(diagramStyle.marginRight) || 0;
+        const paddingTop = parseFloat(diagramStyle.paddingTop) || 0;
+        const paddingRight = parseFloat(diagramStyle.paddingRight) || 0;
+        fullscreenBtn.style.top = `${marginTop + paddingTop + 4}px`;
+        fullscreenBtn.style.right = `${marginRight + paddingRight + 4}px`;
+
+        fullscreenBtn.addEventListener('click', () => {
+            previousScrollOffset = [window.scroll, window.scrollY];
+            const clone = mermaidDiv.cloneNode(true);
+            modalContent.innerHTML = '';
+            modalContent.appendChild(clone);
+
+            const svg = clone.querySelector('svg');
+            if (svg) {
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.style.width = '100%';
+                svg.style.height = 'auto';
+                svg.style.maxWidth = '100%';
+                svg.style.sdisplay = 'block';
+
+                if ("False" === "True") {
+                    setTimeout(() => {
+                        const g = svg.querySelector('g');
+                        if (g) {
+                            var svgD3 = d3.select(svg);
+                            svgD3.html("<g class='wrapper'>" + svgD3.html() + "</g>");
+                            var inner = svgD3.select("g");
+                            var zoom = d3.zoom().on("zoom", function(event) {
+                                inner.attr("transform", event.transform);
+                            });
+                            svgD3.call(zoom);
+                        }
+                    }, 100);
+                }
+            }
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        container.appendChild(fullscreenBtn);
+    });
+};
+
+const load = async () => {
+    initStyles();
+
+    await runMermaid(true);
+
+    const reRunIfThemeChanges = async () => {
+        const newDarkTheme = isDarkTheme();
+        if (newDarkTheme !== darkTheme) {
+            darkTheme = newDarkTheme;
+            console.log("Theme change detected, re-running mermaid with", darkTheme ? "dark" : "default", "theme");
+            await mermaid.initialize(
+                {...JSON.parse(
+                    `{"startOnLoad": false}`
+                ),
+                ...{ darkMode: darkTheme, theme: darkTheme ? 'dark' : 'default' },
+                }
+            );
+            await runMermaid(true);
+        }
+    };
+
+    // Update theme classes when theme changes
+    const themeObserver = new MutationObserver(reRunIfThemeChanges);
+    themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+    themeObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+};
+
+
+
+
+
+console.log("Initializing mermaid with", darkTheme ? "dark" : "default", "theme");
+mermaid.initialize(
+    {...JSON.parse(
+        `{"startOnLoad": false}`
+    ),
+    ...{ darkMode: darkTheme, theme: darkTheme ? 'dark' : 'default' },
+    }
+);
+
+window.addEventListener("load", load);</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/autoplex/auto/phonons/flows';</script>
+    <link rel="icon" href="../../../../_static/autoplex_favicon.png"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.1.dev1+g6ffcd01a0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../../_static/autoplex_logo.png" class="logo__image only-light" alt="autoplex - Home"/>
+    <img src="../../../../_static/autoplex_logo.png" class="logo__image only-dark pst-js-only" alt="autoplex - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../user/index.html">Overview</a></li>
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../../../../user/setup.html">Quick-start</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../user/tutorials.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../user/installation/installation.html">Installation guide</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../user/rss/index.html">RSS workflow</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/rss/flow/introduction/intro.html">Brief overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/rss/flow/input/input.html">Input YAML configuration file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/rss/flow/quick_start/start.html">Quick start</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/rss/flow/example/example.html">Examples</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../user/phonon/index.html">Phonon workflow</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/phonon/flows/flows.html">Out-of-the-box workflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/phonon/flows/generation/data.html">Generating reference data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/phonon/flows/fitting/fitting.html">Fitting phonon-accurate potentials</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/phonon/flows/benchmark/benchmark.html">Benchmark of ML-based phonon structure</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../user/executable/index.html">Executable tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/executable/tutorial_phonon.html">Iterative DFT vs MLIP benchmark workflow for phonons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/executable/tutorial_rss.html">RSS Workflow</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../reference/index.html">API reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.auto.html">autoplex.auto</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.auto.phonons.html">autoplex.auto.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.auto.phonons.flows.html">autoplex.auto.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.auto.phonons.jobs.html">autoplex.auto.phonons.jobs</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.auto.rss.html">autoplex.auto.rss</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.auto.rss.flows.html">autoplex.auto.rss.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.auto.rss.jobs.html">autoplex.auto.rss.jobs</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.benchmark.html">autoplex.benchmark</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.benchmark.phonons.html">autoplex.benchmark.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.benchmark.phonons.flows.html">autoplex.benchmark.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.benchmark.phonons.jobs.html">autoplex.benchmark.phonons.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.benchmark.phonons.utils.html">autoplex.benchmark.phonons.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.benchmark.rss.html">autoplex.benchmark.rss</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.html">autoplex.data</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.common.html">autoplex.data.common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.common.flows.html">autoplex.data.common.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.common.jobs.html">autoplex.data.common.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.common.utils.html">autoplex.data.common.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.phonons.html">autoplex.data.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.phonons.flows.html">autoplex.data.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.phonons.jobs.html">autoplex.data.phonons.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.phonons.utils.html">autoplex.data.phonons.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.rss.html">autoplex.data.rss</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.rss.flows.html">autoplex.data.rss.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.rss.jobs.html">autoplex.data.rss.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.rss.utils.html">autoplex.data.rss.utils</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.fitting.html">autoplex.fitting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.html">autoplex.fitting.common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.flows.html">autoplex.fitting.common.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.jobs.html">autoplex.fitting.common.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.regularization.html">autoplex.fitting.common.regularization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.utils.html">autoplex.fitting.common.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.fitting.phonons.html">autoplex.fitting.phonons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.fitting.rss.html">autoplex.fitting.rss</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.misc.html">autoplex.misc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.html">autoplex.misc.castep</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.flows.html">autoplex.misc.castep.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.jobs.html">autoplex.misc.castep.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.run.html">autoplex.misc.castep.run</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.schema.html">autoplex.misc.castep.schema</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.utils.html">autoplex.misc.castep.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.misc.utils.html">autoplex.misc.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.utils.mock_castep.html">autoplex.misc.utils.mock_castep</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.settings.html">autoplex.settings</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.AutoplexBaseModel.html">AutoplexBaseModel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.AutoplexSettings.html">AutoplexSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.BcurParams.html">BcurParams</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.BuildcellOptions.html">BuildcellOptions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.CustomIncar.html">CustomIncar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.GAPGeneralSettings.html">GAPGeneralSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.GAPSettings.html">GAPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.JACESettings.html">JACESettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.LossCoeff.html">LossCoeff</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.M3GNETSettings.html">M3GNETSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.MACESettings.html">MACESettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.MLIPHypers.html">MLIPHypers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.NEPSettings.html">NEPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.NEQUIPSettings.html">NEQUIPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.Nonlinearity.html">Nonlinearity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.ResumeFromPreviousState.html">ResumeFromPreviousState</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.RssConfig.html">RssConfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.SETTINGS.html">SETTINGS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.SoapParas.html">SoapParas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.SoapSettings.html">SoapSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.ThreebSettings.html">ThreebSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.TwobSettings.html">TwobSettings</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contributing Guide</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/contributing.html">Contributing to autoplex</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/dev_install.html">Developer Installation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../about/changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../about/contributors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../about/license.html">License</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/JaGeo/autoplex" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/JaGeo/autoplex/issues/new?title=Issue%20on%20page%20%2F_modules/autoplex/auto/phonons/flows.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for autoplex.auto.phonons.flows</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Flows to perform automatic data generation, fitting, and benchmarking of ML potentials.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">atomate2.ase.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">AseMaker</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">atomate2.common.schemas.phonons</span><span class="w"> </span><span class="kn">import</span> <span class="n">PhononBSDOSDoc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">atomate2.vasp.flows.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">DoubleRelaxMaker</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">atomate2.vasp.flows.mp</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MPGGADoubleRelaxMaker</span><span class="p">,</span>
+    <span class="n">MPGGARelaxMaker</span><span class="p">,</span>
+    <span class="n">MPGGAStaticMaker</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">atomate2.vasp.jobs.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseVaspMaker</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">atomate2.vasp.jobs.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">TightRelaxMaker</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">atomate2.vasp.sets.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">TightRelaxSetGenerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jobflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flow</span><span class="p">,</span> <span class="n">Maker</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pymatgen.core.structure</span><span class="w"> </span><span class="kn">import</span> <span class="n">Structure</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pymatgen.io.vasp.sets</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MPRelaxSet</span><span class="p">,</span>
+    <span class="n">MPStaticSet</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">autoplex</span><span class="w"> </span><span class="kn">import</span> <span class="n">MLIP_HYPERS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.auto.phonons.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">complete_benchmark</span><span class="p">,</span>
+    <span class="n">dft_phonopy_gen_data</span><span class="p">,</span>
+    <span class="n">dft_random_gen_data</span><span class="p">,</span>
+    <span class="n">do_iterative_rattled_structures</span><span class="p">,</span>
+    <span class="n">generate_supercells</span><span class="p">,</span>
+    <span class="n">get_iso_atom</span><span class="p">,</span>
+    <span class="n">get_phonon_output</span><span class="p">,</span>
+    <span class="n">run_supercells</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.benchmark.phonons.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_benchmark_metrics</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.data.phonons.flows</span><span class="w"> </span><span class="kn">import</span> <span class="n">IsoAtomStaticMaker</span><span class="p">,</span> <span class="n">TightDFTStaticMaker</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.data.phonons.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">reduce_supercell_size_job</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.fitting.common.flows</span><span class="w"> </span><span class="kn">import</span> <span class="n">MLIPFitMaker</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;CompleteDFTvsMLBenchmarkWorkflow&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CompleteDFTvsMLBenchmarkWorkflowMPSettings&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;DFTSupercellSettingsMaker&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;IterativeCompleteDFTvsMLBenchmarkWorkflow&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="CompleteDFTvsMLBenchmarkWorkflow">
+<a class="viewcode-back" href="../../../../reference/autoplex.auto.phonons.flows.CompleteDFTvsMLBenchmarkWorkflow.html#autoplex.auto.phonons.flows.CompleteDFTvsMLBenchmarkWorkflow">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CompleteDFTvsMLBenchmarkWorkflow</span><span class="p">(</span><span class="n">Maker</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Maker to construct a DFT (VASP) based dataset, composed of the following two configuration types.</span>
+
+<span class="sd">    (1) single atom displaced supercells (based on the atomate2 PhononMaker subroutines)</span>
+<span class="sd">    (2) supercells with randomly displaced atoms (based on the ase rattled function).</span>
+
+<span class="sd">    Machine-learned interatomic potential(s) are then fitted on the dataset, followed by</span>
+<span class="sd">    benchmarking the resulting potential(s) to DFT (VASP) level using the provided benchmark</span>
+<span class="sd">    structure(s) and comparing the respective DFT and MLIP-based Phonon calculations.</span>
+<span class="sd">    The benchmark metrics are provided in form of a phonon band structure comparison and</span>
+<span class="sd">    q-point-wise phonons RMSE plots, as well as a summary text file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str</span>
+<span class="sd">        Name of the flow produced by this maker.</span>
+<span class="sd">    add_dft_phonon_struct: bool.</span>
+<span class="sd">        If True, will add displaced supercells via phonopy for DFT calculation.</span>
+<span class="sd">    add_dft_rattled_struct: bool.</span>
+<span class="sd">        If True, will add rattled structures for DFT calculation.</span>
+<span class="sd">    add_rss_struct: bool.</span>
+<span class="sd">        If True, will add RSS generated structures for DFT calculation.</span>
+<span class="sd">    n_structures: int.</span>
+<span class="sd">        The total number of randomly displaced structures to be generated.</span>
+<span class="sd">    displacement_maker: BaseVaspMaker|AseMaker</span>
+<span class="sd">        Maker used for a static calculation for a supercell.</span>
+<span class="sd">    phonon_bulk_relax_maker: BaseVaspMaker|AseMaker</span>
+<span class="sd">        Maker used for the bulk relax unit cell calculation.</span>
+<span class="sd">    rattled_bulk_relax_maker: BaseVaspMaker|AseMaker</span>
+<span class="sd">        Maker used for the bulk relax unit cell calculation.</span>
+<span class="sd">    phonon_static_energy_maker: BaseVaspMaker|AseMaker</span>
+<span class="sd">        Maker used for the static energy unit cell calculation.</span>
+<span class="sd">    isolated_atom_maker: IsoAtomStaticMaker|AseMaker</span>
+<span class="sd">        VASP maker for the isolated atom calculation.</span>
+<span class="sd">    n_structures : int.</span>
+<span class="sd">        Total number of distorted structures to be generated.</span>
+<span class="sd">        Must be provided if distorting volume without specifying a range, or if distorting angles.</span>
+<span class="sd">        Default=10.</span>
+<span class="sd">    displacements: list[float]</span>
+<span class="sd">        Displacement distances for phonon data generation for the fiting.</span>
+<span class="sd">        Only 0.01 is used for the benchmark at the moment.</span>
+<span class="sd">        This value can currently not be changed.</span>
+<span class="sd">    symprec: float</span>
+<span class="sd">        Symmetry precision to use in the</span>
+<span class="sd">        reduction of symmetry to find the primitive/conventional cell</span>
+<span class="sd">        (use_primitive_standard_structure, use_conventional_standard_structure)</span>
+<span class="sd">        and to handle all symmetry-related tasks in phonopy.</span>
+<span class="sd">    uc: bool.</span>
+<span class="sd">        If True, will generate randomly distorted structures (unitcells)</span>
+<span class="sd">        and add static computation jobs to the flow.</span>
+<span class="sd">    distort_type : int.</span>
+<span class="sd">        0- volume distortion, 1- angle distortion, 2- volume and angle distortion. Default=0.</span>
+<span class="sd">    volume_scale_factor_range : list[float]</span>
+<span class="sd">        [min, max] of volume scale factors.</span>
+<span class="sd">        e.g. [0.90, 1.10] will distort volume +-10%.</span>
+<span class="sd">    volume_custom_scale_factors : list[float]</span>
+<span class="sd">        Specify explicit scale factors (if range is not specified).</span>
+<span class="sd">        If None, will default to [0.90, 0.95, 0.98, 0.99, 1.01, 1.02, 1.05, 1.10].</span>
+<span class="sd">    min_distance: float</span>
+<span class="sd">        Minimum separation allowed between any two atoms.</span>
+<span class="sd">        Default= 1.5A.</span>
+<span class="sd">    angle_percentage_scale: float</span>
+<span class="sd">        Angle scaling factor.</span>
+<span class="sd">        Default= 10 will randomly distort angles by +-10% of original value.</span>
+<span class="sd">    angle_max_attempts: int.</span>
+<span class="sd">        Maximum number of attempts to distort structure before aborting.</span>
+<span class="sd">        Default=1000.</span>
+<span class="sd">    w_angle: list[float]</span>
+<span class="sd">        List of angle indices to be changed i.e. 0=alpha, 1=beta, 2=gamma.</span>
+<span class="sd">        Default= [0, 1, 2].</span>
+<span class="sd">    rattle_type: int.</span>
+<span class="sd">        0- standard rattling, 1- Monte-Carlo rattling. Default=0.</span>
+<span class="sd">    rattle_std: float.</span>
+<span class="sd">        Rattle amplitude (standard deviation in normal distribution).</span>
+<span class="sd">        Default=0.01.</span>
+<span class="sd">        Note that for MC rattling, displacements generated will roughly be</span>
+<span class="sd">        rattle_mc_n_iter**0.5 * rattle_std for small values of n_iter.</span>
+<span class="sd">    rattle_mc_n_iter: int.</span>
+<span class="sd">        Number of Monte Carlo iterations.</span>
+<span class="sd">        Larger number of iterations will generate larger displacements.</span>
+<span class="sd">        Default=10.</span>
+<span class="sd">    ml_models: list[str]</span>
+<span class="sd">        List of the ML models to be used. Default is GAP.</span>
+<span class="sd">    force_max: float</span>
+<span class="sd">        Maximum allowed force in the dataset.</span>
+<span class="sd">    force_min: float</span>
+<span class="sd">        Minimal force cutoff value for atom-wise regularization.</span>
+<span class="sd">    split_ratio: float.</span>
+<span class="sd">        Parameter to divide the training set and the test set.</span>
+<span class="sd">        A value of 0.1 means that the ratio of the training set to the test set is 9:1.</span>
+<span class="sd">    regularization: bool</span>
+<span class="sd">        For using sigma regularization.</span>
+<span class="sd">    distillation: bool</span>
+<span class="sd">        For using data distillation.</span>
+<span class="sd">    separated: bool</span>
+<span class="sd">        Repeat the fit for each data_type available in the (combined) database.</span>
+<span class="sd">    num_processes_fit: int</span>
+<span class="sd">        Number of processes for fitting.</span>
+<span class="sd">    apply_data_preprocessing: bool</span>
+<span class="sd">        Apply data preprocessing.</span>
+<span class="sd">    atomwise_regularization_parameter: float</span>
+<span class="sd">        Regularization value for the atom-wise force components.</span>
+<span class="sd">    atom_wise_regularization: bool</span>
+<span class="sd">        For including atom-wise regularization.</span>
+<span class="sd">    auto_delta: bool</span>
+<span class="sd">        Automatically determines delta for 2b, 3b and soap terms.</span>
+<span class="sd">    hyper_para_loop: bool</span>
+<span class="sd">        Making it easier to loop through several hyperparameter sets.</span>
+<span class="sd">    atomwise_regularization_list: list</span>
+<span class="sd">        List of atom-wise regularization parameters that are checked.</span>
+<span class="sd">    soap_delta_list: list</span>
+<span class="sd">        List of SOAP delta values that are checked.</span>
+<span class="sd">    n_sparse_list: list</span>
+<span class="sd">        List of GAP n_sparse values that are checked.</span>
+<span class="sd">    supercell_settings: dict</span>
+<span class="sd">        Settings for supercell generation</span>
+<span class="sd">    benchmark_kwargs: dict</span>
+<span class="sd">        Keyword arguments for the benchmark flows</span>
+<span class="sd">    summary_filename_prefix: str</span>
+<span class="sd">        Prefix of the result summary file.</span>
+<span class="sd">    glue_xml: bool</span>
+<span class="sd">        Use the glue.xml core potential instead of fitting 2b terms.</span>
+<span class="sd">    glue_file_path: str</span>
+<span class="sd">        Name of the glue.xml file path.</span>
+<span class="sd">    run_fits_on_different_cluster: bool</span>
+<span class="sd">        Allows you to run fits on a different cluster than DFT (will transfer</span>
+<span class="sd">        fit database via MongoDB, might be slow).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;add_data&quot;</span>
+    <span class="n">add_dft_phonon_struct</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">add_dft_rattled_struct</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">add_rss_struct</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">displacement_maker</span><span class="p">:</span> <span class="n">BaseVaspMaker</span> <span class="o">|</span> <span class="n">AseMaker</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">phonon_bulk_relax_maker</span><span class="p">:</span> <span class="n">BaseVaspMaker</span> <span class="o">|</span> <span class="n">AseMaker</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">DoubleRelaxMaker</span><span class="o">.</span><span class="n">from_relax_maker</span><span class="p">(</span>
+            <span class="n">TightRelaxMaker</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;dft tight relax&quot;</span><span class="p">,</span>
+                <span class="n">run_vasp_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;handlers&quot;</span><span class="p">:</span> <span class="p">{}},</span>
+                <span class="n">input_set_generator</span><span class="o">=</span><span class="n">TightRelaxSetGenerator</span><span class="p">(</span>
+                    <span class="n">user_incar_settings</span><span class="o">=</span><span class="p">{</span>
+                        <span class="c1"># TODO check if user_incar_settings has to be set like that or can be left out</span>
+                        <span class="s2">&quot;ALGO&quot;</span><span class="p">:</span> <span class="s2">&quot;Normal&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;ISPIN&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                        <span class="s2">&quot;LAECHG&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                        <span class="s2">&quot;ISMEAR&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                        <span class="s2">&quot;ENCUT&quot;</span><span class="p">:</span> <span class="mi">700</span><span class="p">,</span>
+                        <span class="s2">&quot;ISYM&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                        <span class="s2">&quot;SIGMA&quot;</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">,</span>
+                        <span class="s2">&quot;LCHARG&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># Do not write the CHGCAR file</span>
+                        <span class="s2">&quot;LWAVE&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># Do not write the WAVECAR file</span>
+                        <span class="s2">&quot;LVTOT&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># Do not write LOCPOT file</span>
+                        <span class="s2">&quot;LORBIT&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR</span>
+                        <span class="s2">&quot;LOPTICS&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># No PCDAT file</span>
+                        <span class="s2">&quot;NSW&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+                        <span class="s2">&quot;NELM&quot;</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span>
+                        <span class="c1"># to be removed</span>
+                        <span class="s2">&quot;NPAR&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+                    <span class="p">}</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">phonon_static_energy_maker</span><span class="p">:</span> <span class="n">BaseVaspMaker</span> <span class="o">|</span> <span class="n">AseMaker</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">rattled_bulk_relax_maker</span><span class="p">:</span> <span class="n">BaseVaspMaker</span> <span class="o">|</span> <span class="n">AseMaker</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">TightRelaxMaker</span><span class="p">(</span>
+            <span class="n">run_vasp_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;handlers&quot;</span><span class="p">:</span> <span class="p">{}},</span>
+            <span class="n">input_set_generator</span><span class="o">=</span><span class="n">TightRelaxSetGenerator</span><span class="p">(</span>
+                <span class="n">user_incar_settings</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;ALGO&quot;</span><span class="p">:</span> <span class="s2">&quot;Normal&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;ISPIN&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                    <span class="s2">&quot;LAECHG&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                    <span class="s2">&quot;ISYM&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># to be changed</span>
+                    <span class="s2">&quot;ISMEAR&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                    <span class="s2">&quot;SIGMA&quot;</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">,</span>  <span class="c1"># to be changed back</span>
+                    <span class="s2">&quot;LCHARG&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># Do not write the CHGCAR file</span>
+                    <span class="s2">&quot;LWAVE&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># Do not write the WAVECAR file</span>
+                    <span class="s2">&quot;LVTOT&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># Do not write LOCPOT file</span>
+                    <span class="s2">&quot;LORBIT&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># No output of projected or partial DOS in EIGENVAL, PROCAR and DOSCAR</span>
+                    <span class="s2">&quot;LOPTICS&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># No PCDAT file</span>
+                    <span class="s2">&quot;NSW&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+                    <span class="s2">&quot;NELM&quot;</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span>
+                    <span class="c1"># to be removed</span>
+                    <span class="s2">&quot;NPAR&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">isolated_atom_maker</span><span class="p">:</span> <span class="n">IsoAtomStaticMaker</span> <span class="o">|</span> <span class="n">AseMaker</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">n_structures</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">displacements</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.01</span><span class="p">])</span>
+    <span class="n">symprec</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-4</span>
+    <span class="n">uc</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">volume_custom_scale_factors</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">volume_scale_factor_range</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">rattle_std</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span>
+    <span class="n">distort_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">min_distance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.5</span>
+    <span class="n">angle_percentage_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">angle_max_attempts</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span>
+    <span class="n">rattle_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">rattle_mc_n_iter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">w_angle</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">ml_models</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;GAP&quot;</span><span class="p">])</span>
+    <span class="n">atomwise_regularization_parameter</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">atom_wise_regularization</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">force_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">40.0</span>
+    <span class="n">force_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span>  <span class="c1"># unit: eV Å-1</span>
+    <span class="n">split_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.4</span>
+    <span class="n">regularization</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">separated</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">num_processes_fit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">distillation</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">apply_data_preprocessing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">auto_delta</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">hyper_para_loop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">atomwise_regularization_list</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">soap_delta_list</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">n_sparse_list</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">supercell_settings</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;min_length&quot;</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span> <span class="s2">&quot;max_length&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">benchmark_kwargs</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">summary_filename_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;results_&quot;</span>
+    <span class="n">glue_xml</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">glue_file_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;glue.xml&quot;</span>
+    <span class="n">run_fits_on_different_cluster</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="CompleteDFTvsMLBenchmarkWorkflow.make">
+<a class="viewcode-back" href="../../../../reference/autoplex.auto.phonons.flows.CompleteDFTvsMLBenchmarkWorkflow.html#autoplex.auto.phonons.flows.CompleteDFTvsMLBenchmarkWorkflow.make">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">make</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">structure_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Structure</span><span class="p">],</span>
+        <span class="n">mp_ids</span><span class="p">,</span>
+        <span class="n">hyperparameters</span><span class="p">:</span> <span class="n">MLIP_HYPERS</span> <span class="o">=</span> <span class="n">MLIP_HYPERS</span><span class="p">,</span>
+        <span class="n">dft_references</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">PhononBSDOSDoc</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">benchmark_structures</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Structure</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">benchmark_mp_ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">pre_database_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">pre_xyz_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">rattle_seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mi">42</span><span class="p">,</span>
+        <span class="n">fit_kwargs_list</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Flow</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Make flow for constructing the dataset, fitting the potentials and performing the benchmarks.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        structure_list:</span>
+<span class="sd">            List of pymatgen structures.</span>
+<span class="sd">        mp_ids:</span>
+<span class="sd">            Materials Project IDs.</span>
+<span class="sd">        hyperparameters: MLIP_HYPERS</span>
+<span class="sd">            Hyperparameters for the MLIP models.</span>
+<span class="sd">        dft_references: list[PhononBSDOSDoc] | None</span>
+<span class="sd">            List of DFT reference files containing the PhononBSDOCDoc object.</span>
+<span class="sd">            Reference files have to refer to a finite displacement of 0.01.</span>
+<span class="sd">            For benchmarking, only 0.01 is supported</span>
+<span class="sd">        benchmark_structures: list[Structure] | None</span>
+<span class="sd">            The pymatgen structure for benchmarking.</span>
+<span class="sd">        benchmark_mp_ids: list[str] | None</span>
+<span class="sd">            Materials Project ID of the benchmarking structure.</span>
+<span class="sd">        pre_xyz_files: list[str] or None</span>
+<span class="sd">            Names of the pre-database train xyz file and test xyz file.</span>
+<span class="sd">        pre_database_dir: str or None</span>
+<span class="sd">            The pre-database directory.</span>
+<span class="sd">        rattle_seed: int | None</span>
+<span class="sd">            Random seed for structure generation.</span>
+<span class="sd">        fit_kwargs_list : list[dict].</span>
+<span class="sd">            Dict including MLIP fit keyword args.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">structure_list</span> <span class="o">=</span> <span class="n">structure_list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mp_ids</span> <span class="o">=</span> <span class="n">mp_ids</span>
+        <span class="k">if</span> <span class="n">rattle_seed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rattle_seed</span> <span class="o">=</span> <span class="mi">42</span>
+
+        <span class="n">flows</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">fit_input</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">bm_outputs</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">hyperparameters</span> <span class="o">=</span> <span class="n">hyperparameters</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">default_hyperparameters</span> <span class="o">=</span> <span class="n">hyperparameters</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">by_alias</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">soap_default_dict</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="n">key</span><span class="p">:</span> <span class="n">value</span>
+                    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">fit_kwargs</span><span class="p">[</span><span class="s2">&quot;soap&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;n_sparse&quot;</span><span class="p">,</span> <span class="s2">&quot;delta&quot;</span><span class="p">]</span>
+                <span class="p">}</span>
+                <span class="k">for</span> <span class="n">fit_kwargs</span> <span class="ow">in</span> <span class="p">(</span><span class="n">fit_kwargs_list</span> <span class="ow">or</span> <span class="p">[])</span>
+                <span class="k">if</span> <span class="s2">&quot;soap&quot;</span> <span class="ow">in</span> <span class="n">fit_kwargs</span>
+            <span class="p">),</span>
+            <span class="n">default_hyperparameters</span><span class="p">[</span><span class="s2">&quot;GAP&quot;</span><span class="p">][</span><span class="s2">&quot;soap&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="c1"># add an optional pre-optimization step here</span>
+
+        <span class="k">for</span> <span class="n">structure</span><span class="p">,</span> <span class="n">mp_id</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">structure_list</span><span class="p">,</span> <span class="n">mp_ids</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">supercell_settings</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">mp_id</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Currently, &quot;</span>
+                <span class="s2">&quot;the same supercell settings for single-atom displaced and rattled supercells are used.&quot;</span>
+            <span class="p">)</span>
+            <span class="n">supercell_matrix_job</span> <span class="o">=</span> <span class="n">reduce_supercell_size_job</span><span class="p">(</span>
+                <span class="n">structure</span><span class="o">=</span><span class="n">structure</span><span class="p">,</span>
+                <span class="n">min_length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">supercell_settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;min_length&quot;</span><span class="p">,</span> <span class="mi">15</span><span class="p">),</span>
+                <span class="n">max_length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">supercell_settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_length&quot;</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span>
+                <span class="n">fallback_min_length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">supercell_settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                    <span class="s2">&quot;fallback_min_length&quot;</span><span class="p">,</span> <span class="mi">12</span>
+                <span class="p">),</span>
+                <span class="n">max_atoms</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">supercell_settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_atoms&quot;</span><span class="p">,</span> <span class="mi">500</span><span class="p">),</span>
+                <span class="n">min_atoms</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">supercell_settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;min_atoms&quot;</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
+                <span class="n">step_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">supercell_settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;step_size&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="n">flows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">supercell_matrix_job</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">supercell_settings</span><span class="p">[</span><span class="n">mp_id</span><span class="p">][</span>
+                <span class="s2">&quot;supercell_matrix&quot;</span>
+            <span class="p">]</span> <span class="o">=</span> <span class="n">supercell_matrix_job</span><span class="o">.</span><span class="n">output</span>
+
+            <span class="c1"># TODO: add a separate optimization here if add_dft_rattld_structu or add_dft_phonon_struct is activated</span>
+            <span class="c1"># TODO: then forward the optimized structures to the next step</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_dft_rattled_struct</span><span class="p">:</span>
+                <span class="n">add_dft_ratt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_dft_rattled</span><span class="p">(</span>
+                    <span class="n">structure</span><span class="o">=</span><span class="n">structure</span><span class="p">,</span>
+                    <span class="n">mp_id</span><span class="o">=</span><span class="n">mp_id</span><span class="p">,</span>
+                    <span class="n">displacement_maker</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">displacement_maker</span><span class="p">,</span>
+                    <span class="n">rattled_bulk_relax_maker</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rattled_bulk_relax_maker</span><span class="p">,</span>
+                    <span class="n">n_structures</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_structures</span><span class="p">,</span>
+                    <span class="n">uc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uc</span><span class="p">,</span>
+                    <span class="n">volume_custom_scale_factors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">volume_custom_scale_factors</span><span class="p">,</span>
+                    <span class="n">volume_scale_factor_range</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">volume_scale_factor_range</span><span class="p">,</span>
+                    <span class="n">rattle_std</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rattle_std</span><span class="p">,</span>
+                    <span class="n">distort_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">distort_type</span><span class="p">,</span>
+                    <span class="n">min_distance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_distance</span><span class="p">,</span>
+                    <span class="n">rattle_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rattle_type</span><span class="p">,</span>
+                    <span class="n">rattle_seed</span><span class="o">=</span><span class="n">rattle_seed</span><span class="p">,</span>
+                    <span class="n">rattle_mc_n_iter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rattle_mc_n_iter</span><span class="p">,</span>
+                    <span class="n">angle_max_attempts</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">angle_max_attempts</span><span class="p">,</span>
+                    <span class="n">angle_percentage_scale</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">angle_percentage_scale</span><span class="p">,</span>
+                    <span class="n">w_angle</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">w_angle</span><span class="p">,</span>
+                    <span class="n">supercell_settings</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">supercell_settings</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">add_dft_ratt</span><span class="o">.</span><span class="n">append_name</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">mp_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">flows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">add_dft_ratt</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">volume_custom_scale_factors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">rattle_seed</span> <span class="o">=</span> <span class="n">rattle_seed</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">volume_custom_scale_factors</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_structures</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">rattle_seed</span> <span class="o">=</span> <span class="n">rattle_seed</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_structures</span>
+                <span class="n">fit_input</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">mp_id</span><span class="p">:</span> <span class="n">add_dft_ratt</span><span class="o">.</span><span class="n">output</span><span class="p">})</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_dft_phonon_struct</span><span class="p">:</span>
+                <span class="n">add_dft_phon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_dft_phonons</span><span class="p">(</span>
+                    <span class="n">structure</span><span class="o">=</span><span class="n">structure</span><span class="p">,</span>
+                    <span class="n">mp_id</span><span class="o">=</span><span class="n">mp_id</span><span class="p">,</span>
+                    <span class="n">displacements</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">displacements</span><span class="p">,</span>
+                    <span class="n">symprec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">symprec</span><span class="p">,</span>
+                    <span class="n">phonon_bulk_relax_maker</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">phonon_bulk_relax_maker</span><span class="p">,</span>
+                    <span class="n">phonon_static_energy_maker</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">phonon_static_energy_maker</span><span class="p">,</span>
+                    <span class="n">phonon_displacement_maker</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">displacement_maker</span><span class="p">,</span>
+                    <span class="n">supercell_settings</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">supercell_settings</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">flows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">add_dft_phon</span><span class="p">)</span>
+                <span class="n">add_dft_phon</span><span class="o">.</span><span class="n">append_name</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">mp_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">fit_input</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">mp_id</span><span class="p">:</span> <span class="n">add_dft_phon</span><span class="o">.</span><span class="n">output</span><span class="p">})</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_dft_rattled_struct</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_dft_phonon_struct</span><span class="p">:</span>
+                <span class="n">fit_input</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="n">mp_id</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">&quot;rattled_dir&quot;</span><span class="p">:</span> <span class="n">add_dft_ratt</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;rattled_dir&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;phonon_dir&quot;</span><span class="p">:</span> <span class="n">add_dft_phon</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;phonon_dir&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;phonon_data&quot;</span><span class="p">:</span> <span class="n">add_dft_phon</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;phonon_data&quot;</span><span class="p">],</span>
+                        <span class="p">}</span>
+                    <span class="p">}</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_rss_struct</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+        <span class="n">isoatoms</span> <span class="o">=</span> <span class="n">get_iso_atom</span><span class="p">(</span><span class="n">structure_list</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">isolated_atom_maker</span><span class="p">)</span>
+        <span class="n">flows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">isoatoms</span><span class="p">)</span>
+
+        <span class="c1"># isolated atoms energy needs to be added</span>
+        <span class="k">if</span> <span class="n">pre_xyz_files</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fit_input</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="p">{</span><span class="s2">&quot;IsolatedAtom&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;iso_atoms_dir&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">isoatoms</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;dirs&quot;</span><span class="p">]]}}</span>
+            <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">ml_model</span><span class="p">,</span> <span class="n">fit_kwargs</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ml_models</span><span class="p">,</span> <span class="n">fit_kwargs_list</span> <span class="ow">or</span> <span class="p">[{}]):</span>
+            <span class="n">add_data_fit</span> <span class="o">=</span> <span class="n">MLIPFitMaker</span><span class="p">(</span>
+                <span class="n">mlip_type</span><span class="o">=</span><span class="n">ml_model</span><span class="p">,</span>
+                <span class="n">glue_xml</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">glue_xml</span><span class="p">,</span>
+                <span class="n">glue_file_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">glue_file_path</span><span class="p">,</span>
+                <span class="n">split_ratio</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">split_ratio</span><span class="p">,</span>
+                <span class="n">force_max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">force_max</span><span class="p">,</span>
+                <span class="n">pre_xyz_files</span><span class="o">=</span><span class="n">pre_xyz_files</span><span class="p">,</span>
+                <span class="n">pre_database_dir</span><span class="o">=</span><span class="n">pre_database_dir</span><span class="p">,</span>
+                <span class="n">atomwise_regularization_parameter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atomwise_regularization_parameter</span><span class="p">,</span>
+                <span class="n">force_min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">force_min</span><span class="p">,</span>
+                <span class="n">atom_wise_regularization</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_wise_regularization</span><span class="p">,</span>
+                <span class="n">auto_delta</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">auto_delta</span><span class="p">,</span>
+                <span class="n">apply_data_preprocessing</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">apply_data_preprocessing</span><span class="p">,</span>
+                <span class="n">num_processes_fit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_processes_fit</span><span class="p">,</span>
+                <span class="n">separated</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">separated</span><span class="p">,</span>
+                <span class="n">regularization</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">regularization</span><span class="p">,</span>
+                <span class="n">distillation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">distillation</span><span class="p">,</span>
+                <span class="n">run_fits_on_different_cluster</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_fits_on_different_cluster</span><span class="p">,</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">make</span><span class="p">(</span>
+                <span class="n">species_list</span><span class="o">=</span><span class="n">isoatoms</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;species&quot;</span><span class="p">],</span>
+                <span class="n">isolated_atom_energies</span><span class="o">=</span><span class="n">isoatoms</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;energies&quot;</span><span class="p">],</span>
+                <span class="n">hyperparameters</span><span class="o">=</span><span class="n">hyperparameters</span><span class="p">,</span>
+                <span class="n">fit_input</span><span class="o">=</span><span class="n">fit_input</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">fit_kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">flows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">add_data_fit</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">benchmark_structures</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">benchmark_mp_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="n">dft_new_references</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">ibenchmark_structure</span><span class="p">,</span> <span class="n">benchmark_structure</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+                    <span class="n">benchmark_structures</span>
+                <span class="p">):</span>
+                    <span class="c1"># hard coded at the moment as other displacements</span>
+                    <span class="c1"># are not treated correctly in benchmark part</span>
+                    <span class="n">complete_bm</span> <span class="o">=</span> <span class="n">complete_benchmark</span><span class="p">(</span>
+                        <span class="n">ibenchmark_structure</span><span class="o">=</span><span class="n">ibenchmark_structure</span><span class="p">,</span>
+                        <span class="n">benchmark_structure</span><span class="o">=</span><span class="n">benchmark_structure</span><span class="p">,</span>
+                        <span class="n">ml_model</span><span class="o">=</span><span class="n">ml_model</span><span class="p">,</span>
+                        <span class="n">ml_path</span><span class="o">=</span><span class="n">add_data_fit</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;mlip_path&quot;</span><span class="p">],</span>
+                        <span class="n">mp_ids</span><span class="o">=</span><span class="n">mp_ids</span><span class="p">,</span>
+                        <span class="n">benchmark_mp_ids</span><span class="o">=</span><span class="n">benchmark_mp_ids</span><span class="p">,</span>
+                        <span class="n">add_dft_phonon_struct</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">add_dft_phonon_struct</span><span class="p">,</span>
+                        <span class="n">fit_input</span><span class="o">=</span><span class="n">fit_input</span><span class="p">,</span>
+                        <span class="n">symprec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">symprec</span><span class="p">,</span>
+                        <span class="n">phonon_bulk_relax_maker</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">phonon_bulk_relax_maker</span><span class="p">,</span>
+                        <span class="n">phonon_static_energy_maker</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">phonon_static_energy_maker</span><span class="p">,</span>
+                        <span class="n">phonon_displacement_maker</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">displacement_maker</span><span class="p">,</span>
+                        <span class="n">dft_references</span><span class="o">=</span><span class="n">dft_references</span><span class="p">,</span>
+                        <span class="n">supercell_settings</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">supercell_settings</span><span class="p">,</span>
+                        <span class="n">displacement</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+                        <span class="n">atomwise_regularization_parameter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atomwise_regularization_parameter</span><span class="p">,</span>
+                        <span class="n">soap_dict</span><span class="o">=</span><span class="n">soap_default_dict</span><span class="p">,</span>
+                        <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">benchmark_kwargs</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">complete_bm</span><span class="o">.</span><span class="n">append_name</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">benchmark_mp_ids</span><span class="p">[</span><span class="n">ibenchmark_structure</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                    <span class="n">flows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">complete_bm</span><span class="p">)</span>
+                    <span class="n">bm_outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">complete_bm</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;bm_output&quot;</span><span class="p">])</span>
+                    <span class="n">dft_new_references</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">complete_bm</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;dft_references&quot;</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hyper_para_loop</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">atomwise_regularization_list</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">atomwise_regularization_list</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.0001</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">soap_delta_list</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">soap_delta_list</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_sparse_list</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">n_sparse_list</span> <span class="o">=</span> <span class="p">[</span>
+                        <span class="mi">1000</span><span class="p">,</span>
+                        <span class="mi">2000</span><span class="p">,</span>
+                        <span class="mi">3000</span><span class="p">,</span>
+                        <span class="mi">4000</span><span class="p">,</span>
+                        <span class="mi">5000</span><span class="p">,</span>
+                        <span class="mi">6000</span><span class="p">,</span>
+                        <span class="mi">7000</span><span class="p">,</span>
+                        <span class="mi">8000</span><span class="p">,</span>
+                        <span class="mi">9000</span><span class="p">,</span>
+                    <span class="p">]</span>
+                <span class="k">for</span> <span class="n">atomwise_reg_parameter</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atomwise_regularization_list</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">n_sparse</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_sparse_list</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">delta</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">soap_delta_list</span><span class="p">:</span>
+                            <span class="n">soap_dict</span> <span class="o">=</span> <span class="p">{</span>
+                                <span class="s2">&quot;n_sparse&quot;</span><span class="p">:</span> <span class="n">n_sparse</span><span class="p">,</span>
+                                <span class="s2">&quot;delta&quot;</span><span class="p">:</span> <span class="n">delta</span><span class="p">,</span>
+                            <span class="p">}</span>
+                            <span class="n">loop_data_fit</span> <span class="o">=</span> <span class="n">MLIPFitMaker</span><span class="p">(</span>
+                                <span class="n">mlip_type</span><span class="o">=</span><span class="n">ml_model</span><span class="p">,</span>
+                                <span class="n">glue_xml</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">glue_xml</span><span class="p">,</span>
+                                <span class="n">glue_file_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">glue_file_path</span><span class="p">,</span>
+                                <span class="n">split_ratio</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">split_ratio</span><span class="p">,</span>
+                                <span class="n">force_max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">force_max</span><span class="p">,</span>
+                                <span class="n">pre_xyz_files</span><span class="o">=</span><span class="n">pre_xyz_files</span><span class="p">,</span>
+                                <span class="n">pre_database_dir</span><span class="o">=</span><span class="n">pre_database_dir</span><span class="p">,</span>
+                                <span class="n">atomwise_regularization_parameter</span><span class="o">=</span><span class="n">atomwise_reg_parameter</span><span class="p">,</span>
+                                <span class="n">force_min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">force_min</span><span class="p">,</span>
+                                <span class="n">auto_delta</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">auto_delta</span><span class="p">,</span>
+                                <span class="n">num_processes_fit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_processes_fit</span><span class="p">,</span>
+                                <span class="n">separated</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">separated</span><span class="p">,</span>
+                                <span class="n">regularization</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">regularization</span><span class="p">,</span>
+                                <span class="n">distillation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">distillation</span><span class="p">,</span>
+                            <span class="p">)</span><span class="o">.</span><span class="n">make</span><span class="p">(</span>
+                                <span class="n">species_list</span><span class="o">=</span><span class="n">isoatoms</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;species&quot;</span><span class="p">],</span>
+                                <span class="n">isolated_atom_energies</span><span class="o">=</span><span class="n">isoatoms</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;energies&quot;</span><span class="p">],</span>
+                                <span class="n">hyperparameters</span><span class="o">=</span><span class="n">hyperparameters</span><span class="p">,</span>
+                                <span class="n">fit_input</span><span class="o">=</span><span class="n">fit_input</span><span class="p">,</span>
+                                <span class="n">soap</span><span class="o">=</span><span class="n">soap_dict</span><span class="p">,</span>
+                            <span class="p">)</span>
+                            <span class="n">flows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loop_data_fit</span><span class="p">)</span>
+
+                            <span class="k">if</span> <span class="p">(</span><span class="n">benchmark_structures</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+                                <span class="n">benchmark_mp_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                            <span class="p">):</span>
+                                <span class="n">dft_new_references</span> <span class="o">=</span> <span class="p">[]</span>
+                                <span class="k">for</span> <span class="p">(</span>
+                                    <span class="n">ibenchmark_structure</span><span class="p">,</span>
+                                    <span class="n">benchmark_structure</span><span class="p">,</span>
+                                <span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">benchmark_structures</span><span class="p">):</span>
+
+                                    <span class="n">complete_bm</span> <span class="o">=</span> <span class="n">complete_benchmark</span><span class="p">(</span>
+                                        <span class="n">ibenchmark_structure</span><span class="o">=</span><span class="n">ibenchmark_structure</span><span class="p">,</span>
+                                        <span class="n">benchmark_structure</span><span class="o">=</span><span class="n">benchmark_structure</span><span class="p">,</span>
+                                        <span class="n">ml_model</span><span class="o">=</span><span class="n">ml_model</span><span class="p">,</span>
+                                        <span class="n">ml_path</span><span class="o">=</span><span class="n">loop_data_fit</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;mlip_path&quot;</span><span class="p">],</span>
+                                        <span class="n">mp_ids</span><span class="o">=</span><span class="n">mp_ids</span><span class="p">,</span>
+                                        <span class="n">benchmark_mp_ids</span><span class="o">=</span><span class="n">benchmark_mp_ids</span><span class="p">,</span>
+                                        <span class="n">add_dft_phonon_struct</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">add_dft_phonon_struct</span><span class="p">,</span>
+                                        <span class="n">fit_input</span><span class="o">=</span><span class="n">fit_input</span><span class="p">,</span>
+                                        <span class="n">symprec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">symprec</span><span class="p">,</span>
+                                        <span class="n">phonon_bulk_relax_maker</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">phonon_bulk_relax_maker</span><span class="p">,</span>
+                                        <span class="n">phonon_static_energy_maker</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">phonon_static_energy_maker</span><span class="p">,</span>
+                                        <span class="n">phonon_displacement_maker</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">displacement_maker</span><span class="p">,</span>
+                                        <span class="n">dft_references</span><span class="o">=</span><span class="n">dft_references</span><span class="p">,</span>
+                                        <span class="n">supercell_settings</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">supercell_settings</span><span class="p">,</span>
+                                        <span class="n">displacement</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+                                        <span class="n">atomwise_regularization_parameter</span><span class="o">=</span><span class="n">atomwise_reg_parameter</span><span class="p">,</span>
+                                        <span class="n">soap_dict</span><span class="o">=</span><span class="n">soap_dict</span><span class="p">,</span>
+                                        <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">benchmark_kwargs</span><span class="p">,</span>
+                                    <span class="p">)</span>
+                                    <span class="n">complete_bm</span><span class="o">.</span><span class="n">append_name</span><span class="p">(</span>
+                                        <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">benchmark_mp_ids</span><span class="p">[</span><span class="n">ibenchmark_structure</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                                    <span class="p">)</span>
+                                    <span class="n">flows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">complete_bm</span><span class="p">)</span>
+                                    <span class="n">bm_outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">complete_bm</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;bm_output&quot;</span><span class="p">])</span>
+                                    <span class="c1"># save the dft references okay</span>
+
+                                    <span class="n">dft_new_references</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                                        <span class="n">complete_bm</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;dft_references&quot;</span><span class="p">]</span>
+                                    <span class="p">)</span>
+
+        <span class="n">collect_bm</span> <span class="o">=</span> <span class="n">write_benchmark_metrics</span><span class="p">(</span>
+            <span class="n">benchmark_structures</span><span class="o">=</span><span class="n">benchmark_structures</span><span class="p">,</span>
+            <span class="n">metrics</span><span class="o">=</span><span class="n">bm_outputs</span><span class="p">,</span>
+            <span class="n">filename_prefix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">summary_filename_prefix</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># collect_bm must be extended in a way that we get access to all benchmark structures and the previous databases</span>
+
+        <span class="n">flows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">collect_bm</span><span class="p">)</span>
+
+        <span class="n">output_flow</span> <span class="o">=</span> <span class="n">get_phonon_output</span><span class="p">(</span>
+            <span class="n">metrics</span><span class="o">=</span><span class="n">collect_bm</span><span class="o">.</span><span class="n">output</span><span class="p">,</span>
+            <span class="n">benchmark_structures</span><span class="o">=</span><span class="n">benchmark_structures</span><span class="p">,</span>
+            <span class="n">benchmark_mp_ids</span><span class="o">=</span><span class="n">benchmark_mp_ids</span><span class="p">,</span>
+            <span class="n">dft_references</span><span class="o">=</span><span class="n">dft_new_references</span><span class="p">,</span>
+            <span class="n">pre_xyz_files</span><span class="o">=</span><span class="n">pre_xyz_files</span><span class="p">,</span>
+            <span class="n">pre_database_dir</span><span class="o">=</span><span class="n">add_data_fit</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;database_dir&quot;</span><span class="p">],</span>
+            <span class="n">fit_kwargs_list</span><span class="o">=</span><span class="n">fit_kwargs_list</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">flows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output_flow</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Flow</span><span class="p">(</span><span class="n">jobs</span><span class="o">=</span><span class="n">flows</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">output_flow</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CompleteDFTvsMLBenchmarkWorkflow.add_dft_phonons">
+<a class="viewcode-back" href="../../../../reference/autoplex.auto.phonons.flows.CompleteDFTvsMLBenchmarkWorkflow.html#autoplex.auto.phonons.flows.CompleteDFTvsMLBenchmarkWorkflow.add_dft_phonons">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_dft_phonons</span><span class="p">(</span>
+        <span class="n">structure</span><span class="p">:</span> <span class="n">Structure</span><span class="p">,</span>
+        <span class="n">mp_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">displacements</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+        <span class="n">symprec</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">phonon_bulk_relax_maker</span><span class="p">:</span> <span class="n">BaseVaspMaker</span><span class="p">,</span>
+        <span class="n">phonon_static_energy_maker</span><span class="p">:</span> <span class="n">BaseVaspMaker</span><span class="p">,</span>
+        <span class="n">phonon_displacement_maker</span><span class="p">:</span> <span class="n">BaseVaspMaker</span><span class="p">,</span>
+        <span class="n">supercell_settings</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add DFT phonon runs for reference structures.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        structure: Structure</span>
+<span class="sd">            The pymatgen Structure object</span>
+<span class="sd">        mp_id: str</span>
+<span class="sd">            Materials Project ID</span>
+<span class="sd">        displacements: list[float]</span>
+<span class="sd">           Displacement distance for phonons</span>
+<span class="sd">        symprec: float</span>
+<span class="sd">            Symmetry precision to use in the</span>
+<span class="sd">            reduction of symmetry to find the primitive/conventional cell</span>
+<span class="sd">            (use_primitive_standard_structure, use_conventional_standard_structure)</span>
+<span class="sd">            and to handle all symmetry-related tasks in phonopy</span>
+<span class="sd">        phonon_displacement_maker: BaseVaspMaker</span>
+<span class="sd">            Maker used to compute the forces for a supercell.</span>
+<span class="sd">        phonon_bulk_relax_maker: BaseVaspMaker</span>
+<span class="sd">            Maker used for the bulk relax unit cell calculation.</span>
+<span class="sd">        phonon_static_energy_maker: BaseVaspMaker</span>
+<span class="sd">            Maker used for the static energy unit cell calculation.</span>
+<span class="sd">        supercell_settings: dict</span>
+<span class="sd">            Supercell settings</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dft_phonons</span> <span class="o">=</span> <span class="n">dft_phonopy_gen_data</span><span class="p">(</span>
+            <span class="n">structure</span><span class="o">=</span><span class="n">structure</span><span class="p">,</span>
+            <span class="n">mp_id</span><span class="o">=</span><span class="n">mp_id</span><span class="p">,</span>
+            <span class="n">displacements</span><span class="o">=</span><span class="n">displacements</span><span class="p">,</span>
+            <span class="n">symprec</span><span class="o">=</span><span class="n">symprec</span><span class="p">,</span>
+            <span class="n">phonon_bulk_relax_maker</span><span class="o">=</span><span class="n">phonon_bulk_relax_maker</span><span class="p">,</span>
+            <span class="n">phonon_static_energy_maker</span><span class="o">=</span><span class="n">phonon_static_energy_maker</span><span class="p">,</span>
+            <span class="n">phonon_displacement_maker</span><span class="o">=</span><span class="n">phonon_displacement_maker</span><span class="p">,</span>
+            <span class="n">supercell_settings</span><span class="o">=</span><span class="n">supercell_settings</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># let&#39;s append a name</span>
+        <span class="n">dft_phonons</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;single-atom displaced supercells&quot;</span>
+        <span class="k">return</span> <span class="n">dft_phonons</span></div>
+
+
+<div class="viewcode-block" id="CompleteDFTvsMLBenchmarkWorkflow.add_dft_rattled">
+<a class="viewcode-back" href="../../../../reference/autoplex.auto.phonons.flows.CompleteDFTvsMLBenchmarkWorkflow.html#autoplex.auto.phonons.flows.CompleteDFTvsMLBenchmarkWorkflow.add_dft_rattled">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_dft_rattled</span><span class="p">(</span>
+        <span class="n">structure</span><span class="p">:</span> <span class="n">Structure</span><span class="p">,</span>
+        <span class="n">mp_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">rattled_bulk_relax_maker</span><span class="p">:</span> <span class="n">BaseVaspMaker</span><span class="p">,</span>
+        <span class="n">displacement_maker</span><span class="p">:</span> <span class="n">BaseVaspMaker</span><span class="p">,</span>
+        <span class="n">uc</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">volume_custom_scale_factors</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">volume_scale_factor_range</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">rattle_std</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span>
+        <span class="n">distort_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">n_structures</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="n">min_distance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.5</span><span class="p">,</span>
+        <span class="n">angle_percentage_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="n">angle_max_attempts</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
+        <span class="n">rattle_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">rattle_seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">42</span><span class="p">,</span>
+        <span class="n">rattle_mc_n_iter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="n">w_angle</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">supercell_settings</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add DFT static runs for randomly displaced structures.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        structure: Structure</span>
+<span class="sd">            The pymatgen Structure object</span>
+<span class="sd">        mp_id: str</span>
+<span class="sd">            Materials Project ID</span>
+<span class="sd">        displacement_maker: BaseVaspMaker</span>
+<span class="sd">            Maker used for a static calculation for a supercell.</span>
+<span class="sd">        rattled_bulk_relax_maker: BaseVaspMaker</span>
+<span class="sd">            Maker used for the bulk relax unit cell calculation.</span>
+<span class="sd">        uc: bool.</span>
+<span class="sd">            If True, will generate randomly distorted structures (unitcells)</span>
+<span class="sd">            and add static computation jobs to the flow.</span>
+<span class="sd">        distort_type : int.</span>
+<span class="sd">            0- volume distortion, 1- angle distortion, 2- volume and angle distortion. Default=0.</span>
+<span class="sd">        n_structures : int.</span>
+<span class="sd">            Total number of distorted structures to be generated.</span>
+<span class="sd">            Must be provided if distorting volume without specifying a range, or if distorting angles.</span>
+<span class="sd">            Default=10.</span>
+<span class="sd">        volume_scale_factor_range : list[float]</span>
+<span class="sd">            [min, max] of volume scale factors.</span>
+<span class="sd">            e.g. [0.90, 1.10] will distort volume +-10%.</span>
+<span class="sd">        volume_custom_scale_factors : list[float]</span>
+<span class="sd">            Specify explicit scale factors (if range is not specified).</span>
+<span class="sd">            If None, will default to [0.90, 0.95, 0.98, 0.99, 1.01, 1.02, 1.05, 1.10].</span>
+<span class="sd">        min_distance: float</span>
+<span class="sd">            Minimum separation allowed between any two atoms.</span>
+<span class="sd">            Default= 1.5A.</span>
+<span class="sd">        angle_percentage_scale: float</span>
+<span class="sd">            Angle scaling factor.</span>
+<span class="sd">            Default= 10 will randomly distort angles by +-10% of original value.</span>
+<span class="sd">        angle_max_attempts: int.</span>
+<span class="sd">            Maximum number of attempts to distort structure before aborting.</span>
+<span class="sd">            Default=1000.</span>
+<span class="sd">        w_angle: list[float]</span>
+<span class="sd">            List of angle indices to be changed i.e. 0=alpha, 1=beta, 2=gamma.</span>
+<span class="sd">            Default= [0, 1, 2].</span>
+<span class="sd">        rattle_type: int.</span>
+<span class="sd">            0- standard rattling, 1- Monte-Carlo rattling. Default=0.</span>
+<span class="sd">        rattle_std: float.</span>
+<span class="sd">            Rattle amplitude (standard deviation in normal distribution).</span>
+<span class="sd">            Default=0.01.</span>
+<span class="sd">            Note that for MC rattling, displacements generated will roughly be</span>
+<span class="sd">            rattle_mc_n_iter**0.5 * rattle_std for small values of n_iter.</span>
+<span class="sd">        rattle_seed: int.</span>
+<span class="sd">            Seed for setting up NumPy random state from which random numbers are generated.</span>
+<span class="sd">            Default=42.</span>
+<span class="sd">        rattle_mc_n_iter: int.</span>
+<span class="sd">            Number of Monte Carlo iterations.</span>
+<span class="sd">            Larger number of iterations will generate larger displacements.</span>
+<span class="sd">            Default=10.</span>
+<span class="sd">        supercell_settings: dict</span>
+<span class="sd">            Settings for supercells</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">additonal_dft_random</span> <span class="o">=</span> <span class="n">dft_random_gen_data</span><span class="p">(</span>
+            <span class="n">structure</span><span class="o">=</span><span class="n">structure</span><span class="p">,</span>
+            <span class="n">mp_id</span><span class="o">=</span><span class="n">mp_id</span><span class="p">,</span>
+            <span class="n">rattled_bulk_relax_maker</span><span class="o">=</span><span class="n">rattled_bulk_relax_maker</span><span class="p">,</span>
+            <span class="n">displacement_maker</span><span class="o">=</span><span class="n">displacement_maker</span><span class="p">,</span>
+            <span class="n">n_structures</span><span class="o">=</span><span class="n">n_structures</span><span class="p">,</span>
+            <span class="n">uc</span><span class="o">=</span><span class="n">uc</span><span class="p">,</span>
+            <span class="n">volume_custom_scale_factors</span><span class="o">=</span><span class="n">volume_custom_scale_factors</span><span class="p">,</span>
+            <span class="n">volume_scale_factor_range</span><span class="o">=</span><span class="n">volume_scale_factor_range</span><span class="p">,</span>
+            <span class="n">rattle_std</span><span class="o">=</span><span class="n">rattle_std</span><span class="p">,</span>
+            <span class="n">distort_type</span><span class="o">=</span><span class="n">distort_type</span><span class="p">,</span>
+            <span class="n">rattle_seed</span><span class="o">=</span><span class="n">rattle_seed</span><span class="p">,</span>
+            <span class="n">rattle_mc_n_iter</span><span class="o">=</span><span class="n">rattle_mc_n_iter</span><span class="p">,</span>
+            <span class="n">rattle_type</span><span class="o">=</span><span class="n">rattle_type</span><span class="p">,</span>
+            <span class="n">angle_max_attempts</span><span class="o">=</span><span class="n">angle_max_attempts</span><span class="p">,</span>
+            <span class="n">angle_percentage_scale</span><span class="o">=</span><span class="n">angle_percentage_scale</span><span class="p">,</span>
+            <span class="n">w_angle</span><span class="o">=</span><span class="n">w_angle</span><span class="p">,</span>
+            <span class="n">min_distance</span><span class="o">=</span><span class="n">min_distance</span><span class="p">,</span>
+            <span class="n">supercell_settings</span><span class="o">=</span><span class="n">supercell_settings</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">additonal_dft_random</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;rattled supercells&quot;</span>
+        <span class="k">return</span> <span class="n">additonal_dft_random</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CompleteDFTvsMLBenchmarkWorkflowMPSettings">
+<a class="viewcode-back" href="../../../../reference/autoplex.auto.phonons.flows.CompleteDFTvsMLBenchmarkWorkflowMPSettings.html#autoplex.auto.phonons.flows.CompleteDFTvsMLBenchmarkWorkflowMPSettings">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CompleteDFTvsMLBenchmarkWorkflowMPSettings</span><span class="p">(</span><span class="n">CompleteDFTvsMLBenchmarkWorkflow</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Maker to construct a DFT (VASP) based dataset, composed of the following two configuration types.</span>
+
+<span class="sd">    (1) single atom displaced supercells (based on the atomate2 PhononMaker subroutines)</span>
+<span class="sd">    (2) supercells with randomly displaced atoms (based on the ase rattled function).</span>
+
+<span class="sd">    Machine-learned interatomic potential(s) are then fitted on the dataset, followed by</span>
+<span class="sd">    benchmarking the resulting potential(s) to DFT (VASP) level using the provided benchmark</span>
+<span class="sd">    structure(s) and comparing the respective DFT and MLIP-based Phonon calculations.</span>
+<span class="sd">    The benchmark metrics are provided in form of a phonon band structure comparison and</span>
+<span class="sd">    q-point-wise phonons RMSE plots, as well as a summary text file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str</span>
+<span class="sd">        Name of the flow produced by this maker.</span>
+<span class="sd">    add_dft_phonon_struct: bool.</span>
+<span class="sd">        If True, will add displaced supercells via phonopy for DFT calculation.</span>
+<span class="sd">    add_dft_rattled_struct: bool.</span>
+<span class="sd">        If True, will add randomly distorted structures for DFT calculation.</span>
+<span class="sd">    add_rss_struct: bool.</span>
+<span class="sd">        If True, will add RSS generated structures for DFT calculation.</span>
+<span class="sd">        n_structures: int.</span>
+<span class="sd">        The total number of randomly displaced structures to be generated.</span>
+<span class="sd">    displacement_maker: BaseVaspMaker</span>
+<span class="sd">        Maker used for a static calculation for a supercell.</span>
+<span class="sd">    phonon_bulk_relax_maker: BaseVaspMaker</span>
+<span class="sd">        Maker used for the bulk relax unit cell calculation.</span>
+<span class="sd">    rattled_bulk_relax_maker: BaseVaspMaker</span>
+<span class="sd">        Maker used for the bulk relax unit cell calculation.</span>
+<span class="sd">    phonon_static_energy_maker: BaseVaspMaker</span>
+<span class="sd">        Maker used for the static energy unit cell calculation.</span>
+<span class="sd">    isolated_atom_maker: IsoAtomStaticMaker</span>
+<span class="sd">        VASP maker for the isolated atom calculation.</span>
+<span class="sd">    n_structures : int.</span>
+<span class="sd">        Total number of distorted structures to be generated.</span>
+<span class="sd">        Must be provided if distorting volume without specifying a range, or if distorting angles.</span>
+<span class="sd">        Default=10.</span>
+<span class="sd">    displacements: list[float]</span>
+<span class="sd">        Displacement distances for phonons</span>
+<span class="sd">    symprec: float</span>
+<span class="sd">        Symmetry precision to use in the</span>
+<span class="sd">        reduction of symmetry to find the primitive/conventional cell</span>
+<span class="sd">        (use_primitive_standard_structure, use_conventional_standard_structure)</span>
+<span class="sd">        and to handle all symmetry-related tasks in phonopy.</span>
+<span class="sd">    uc: bool.</span>
+<span class="sd">        If True, will generate randomly distorted structures (unitcells)</span>
+<span class="sd">        and add static computation jobs to the flow.</span>
+<span class="sd">    distort_type : int.</span>
+<span class="sd">        0- volume distortion, 1- angle distortion, 2- volume and angle distortion. Default=0.</span>
+<span class="sd">    volume_scale_factor_range : list[float]</span>
+<span class="sd">        [min, max] of volume scale factors.</span>
+<span class="sd">        e.g. [0.90, 1.10] will distort volume +-10%.</span>
+<span class="sd">    volume_custom_scale_factors : list[float]</span>
+<span class="sd">        Specify explicit scale factors (if range is not specified).</span>
+<span class="sd">        If None, will default to [0.90, 0.95, 0.98, 0.99, 1.01, 1.02, 1.05, 1.10].</span>
+<span class="sd">    min_distance: float</span>
+<span class="sd">        Minimum separation allowed between any two atoms.</span>
+<span class="sd">        Default= 1.5A.</span>
+<span class="sd">    angle_percentage_scale: float</span>
+<span class="sd">        Angle scaling factor.</span>
+<span class="sd">        Default= 10 will randomly distort angles by +-10% of original value.</span>
+<span class="sd">    angle_max_attempts: int.</span>
+<span class="sd">        Maximum number of attempts to distort structure before aborting.</span>
+<span class="sd">        Default=1000.</span>
+<span class="sd">    w_angle: list[float]</span>
+<span class="sd">        List of angle indices to be changed i.e. 0=alpha, 1=beta, 2=gamma.</span>
+<span class="sd">        Default= [0, 1, 2].</span>
+<span class="sd">    rattle_type: int.</span>
+<span class="sd">        0- standard rattling, 1- Monte-Carlo rattling. Default=0.</span>
+<span class="sd">    rattle_std: float.</span>
+<span class="sd">        Rattle amplitude (standard deviation in normal distribution).</span>
+<span class="sd">        Default=0.01.</span>
+<span class="sd">        Note that for MC rattling, displacements generated will roughly be</span>
+<span class="sd">        rattle_mc_n_iter**0.5 * rattle_std for small values of n_iter.</span>
+<span class="sd">    rattle_seed: int.</span>
+<span class="sd">        Seed for setting up NumPy random state from which random numbers are generated.</span>
+<span class="sd">        Default=42.</span>
+<span class="sd">    rattle_mc_n_iter: int.</span>
+<span class="sd">        Number of Monte Carlo iterations.</span>
+<span class="sd">        Larger number of iterations will generate larger displacements.</span>
+<span class="sd">        Default=10.</span>
+<span class="sd">    ml_models: list[str]</span>
+<span class="sd">        List of the ML models to be used. Default is GAP.</span>
+<span class="sd">    force_max: float</span>
+<span class="sd">        Maximum allowed force in the dataset.</span>
+<span class="sd">    force_min: float</span>
+<span class="sd">        Minimal force cutoff value for atom-wise regularization.</span>
+<span class="sd">    split_ratio: float.</span>
+<span class="sd">        Parameter to divide the training set and the test set.</span>
+<span class="sd">        A value of 0.1 means that the ratio of the training set to the test set is 9:1.</span>
+<span class="sd">    apply_data_preprocessing: bool</span>
+<span class="sd">        Apply data preprocessing.</span>
+<span class="sd">    atomwise_regularization_parameter: float</span>
+<span class="sd">        Regularization value for the atom-wise force components.</span>
+<span class="sd">    atom_wise_regularization: bool</span>
+<span class="sd">        For including atom-wise regularization.</span>
+<span class="sd">    auto_delta: bool</span>
+<span class="sd">        Automatically determines delta for 2b, 3b and soap terms.</span>
+<span class="sd">    hyper_para_loop: bool</span>
+<span class="sd">        If true, performs several fits using the provided hyperparameter sets.</span>
+<span class="sd">    atomwise_regularization_list: list</span>
+<span class="sd">        List of atom-wise regularization parameters that are checked.</span>
+<span class="sd">    soap_delta_list: list</span>
+<span class="sd">        List of SOAP delta values that are checked.</span>
+<span class="sd">    n_sparse_list: list</span>
+<span class="sd">        List of GAP n_sparse values that are checked.</span>
+<span class="sd">    supercell_settings: dict</span>
+<span class="sd">        Settings for supercell generation</span>
+<span class="sd">    benchmark_kwargs: dict</span>
+<span class="sd">        Keyword arguments for the benchmark flows</span>
+<span class="sd">    summary_filename_prefix: str</span>
+<span class="sd">        Prefix of the result summary file.</span>
+<span class="sd">    glue_file_path: str</span>
+<span class="sd">        Name of the glue.xml file path.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">phonon_bulk_relax_maker</span><span class="p">:</span> <span class="n">BaseVaspMaker</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">MPGGADoubleRelaxMaker</span><span class="o">.</span><span class="n">from_relax_maker</span><span class="p">(</span>
+            <span class="n">MPGGARelaxMaker</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;dft tight relax&quot;</span><span class="p">,</span>
+                <span class="n">run_vasp_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;handlers&quot;</span><span class="p">:</span> <span class="p">()},</span>
+                <span class="n">input_set_generator</span><span class="o">=</span><span class="n">MPRelaxSet</span><span class="p">(</span>
+                    <span class="n">force_gamma</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">auto_metal_kpoints</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">inherit_incar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">user_incar_settings</span><span class="o">=</span><span class="p">{</span>
+                        <span class="s2">&quot;NPAR&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+                        <span class="s2">&quot;EDIFF&quot;</span><span class="p">:</span> <span class="mf">1e-7</span><span class="p">,</span>
+                        <span class="s2">&quot;EDIFFG&quot;</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">,</span>
+                        <span class="s2">&quot;ALGO&quot;</span><span class="p">:</span> <span class="s2">&quot;NORMAL&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;ISPIN&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                        <span class="s2">&quot;LREAL&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                        <span class="s2">&quot;LCHARG&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                        <span class="s2">&quot;ISMEAR&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                        <span class="s2">&quot;KSPACING&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
+                    <span class="p">},</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">rattled_bulk_relax_maker</span><span class="p">:</span> <span class="n">BaseVaspMaker</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">MPGGADoubleRelaxMaker</span><span class="o">.</span><span class="n">from_relax_maker</span><span class="p">(</span>
+            <span class="n">MPGGARelaxMaker</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;dft tight relax&quot;</span><span class="p">,</span>
+                <span class="n">run_vasp_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;handlers&quot;</span><span class="p">:</span> <span class="p">()},</span>
+                <span class="n">input_set_generator</span><span class="o">=</span><span class="n">MPRelaxSet</span><span class="p">(</span>
+                    <span class="n">force_gamma</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">auto_metal_kpoints</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">inherit_incar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">user_incar_settings</span><span class="o">=</span><span class="p">{</span>
+                        <span class="s2">&quot;NPAR&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+                        <span class="s2">&quot;EDIFF&quot;</span><span class="p">:</span> <span class="mf">1e-7</span><span class="p">,</span>
+                        <span class="s2">&quot;EDIFFG&quot;</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">,</span>
+                        <span class="s2">&quot;ALGO&quot;</span><span class="p">:</span> <span class="s2">&quot;NORMAL&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;ISPIN&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                        <span class="s2">&quot;LREAL&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                        <span class="s2">&quot;LCHARG&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                        <span class="s2">&quot;ISMEAR&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                        <span class="s2">&quot;KSPACING&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
+                    <span class="p">},</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">displacement_maker</span><span class="p">:</span> <span class="n">BaseVaspMaker</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">MPGGAStaticMaker</span><span class="p">(</span>
+            <span class="n">run_vasp_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;handlers&quot;</span><span class="p">:</span> <span class="p">()},</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;dft phonon static&quot;</span><span class="p">,</span>
+            <span class="n">input_set_generator</span><span class="o">=</span><span class="n">MPStaticSet</span><span class="p">(</span>
+                <span class="n">force_gamma</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">auto_metal_kpoints</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">inherit_incar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">user_incar_settings</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;NPAR&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+                    <span class="s2">&quot;EDIFF&quot;</span><span class="p">:</span> <span class="mf">1e-7</span><span class="p">,</span>
+                    <span class="s2">&quot;EDIFFG&quot;</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">,</span>
+                    <span class="s2">&quot;ALGO&quot;</span><span class="p">:</span> <span class="s2">&quot;NORMAL&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;ISPIN&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                    <span class="s2">&quot;LREAL&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                    <span class="s2">&quot;LCHARG&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                    <span class="s2">&quot;ISMEAR&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                    <span class="s2">&quot;KSPACING&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">isolated_atom_maker</span><span class="p">:</span> <span class="n">BaseVaspMaker</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">MPGGAStaticMaker</span><span class="p">(</span>
+            <span class="n">run_vasp_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;handlers&quot;</span><span class="p">:</span> <span class="p">()},</span>
+            <span class="n">input_set_generator</span><span class="o">=</span><span class="n">MPStaticSet</span><span class="p">(</span>
+                <span class="n">user_kpoints_settings</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;reciprocal_density&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+                <span class="n">force_gamma</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">auto_metal_kpoints</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">inherit_incar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">user_incar_settings</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;NPAR&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+                    <span class="s2">&quot;EDIFF&quot;</span><span class="p">:</span> <span class="mf">1e-7</span><span class="p">,</span>
+                    <span class="s2">&quot;EDIFFG&quot;</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">,</span>
+                    <span class="s2">&quot;ALGO&quot;</span><span class="p">:</span> <span class="s2">&quot;NORMAL&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;ISPIN&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                    <span class="s2">&quot;LREAL&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                    <span class="s2">&quot;LCHARG&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                    <span class="s2">&quot;ISMEAR&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">phonon_static_energy_maker</span><span class="p">:</span> <span class="n">BaseVaspMaker</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="DFTSupercellSettingsMaker">
+<a class="viewcode-back" href="../../../../reference/autoplex.auto.phonons.flows.DFTSupercellSettingsMaker.html#autoplex.auto.phonons.flows.DFTSupercellSettingsMaker">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DFTSupercellSettingsMaker</span><span class="p">(</span><span class="n">Maker</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Maker to test the DFT and supercell settings.</span>
+
+<span class="sd">    This maker is used to test your queue settings for the rattled and phonon supercells.</span>
+<span class="sd">    Although the cells are not displaced, it provides an impression of the required memory</span>
+<span class="sd">    and other resources as the process runs without symmetry considerations.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name (str): The name of the maker. Default is &quot;test dft and supercell settings&quot;.</span>
+<span class="sd">    supercell_settings (dict): Settings for the supercells. Default is {&quot;min_length&quot;: 15}.</span>
+<span class="sd">    DFT_Maker (BaseVaspMaker): The DFT maker to be used. Default is TightDFTStaticMaker.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;test dft and supercell settings&quot;</span>
+    <span class="n">supercell_settings</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;min_length&quot;</span><span class="p">:</span> <span class="mi">15</span><span class="p">})</span>
+    <span class="n">DFT_Maker</span><span class="p">:</span> <span class="n">BaseVaspMaker</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">TightDFTStaticMaker</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DFTSupercellSettingsMaker.make">
+<a class="viewcode-back" href="../../../../reference/autoplex.auto.phonons.flows.DFTSupercellSettingsMaker.html#autoplex.auto.phonons.flows.DFTSupercellSettingsMaker.make">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">make</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Structure</span><span class="p">],</span> <span class="n">mp_ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Flow</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate and runs supercell jobs for the given list of structures.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            structure_list (list[Structure]): List of structures to process.</span>
+<span class="sd">            mp_ids (list[str]): List of MP IDs.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            Flow: A Flow object containing the jobs and their output.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">job_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Modify to run for more than one cell</span>
+        <span class="n">supercell_job</span> <span class="o">=</span> <span class="n">generate_supercells</span><span class="p">(</span><span class="n">structure_list</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">supercell_settings</span><span class="p">)</span>
+        <span class="n">job_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">supercell_job</span><span class="p">)</span>
+
+        <span class="n">supercell_job</span> <span class="o">=</span> <span class="n">run_supercells</span><span class="p">(</span>
+            <span class="n">structure_list</span><span class="p">,</span> <span class="n">supercell_job</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="n">mp_ids</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">DFT_Maker</span>
+        <span class="p">)</span>
+        <span class="n">job_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">supercell_job</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">Flow</span><span class="p">(</span><span class="n">jobs</span><span class="o">=</span><span class="n">job_list</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">supercell_job</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="IterativeCompleteDFTvsMLBenchmarkWorkflow">
+<a class="viewcode-back" href="../../../../reference/autoplex.auto.phonons.flows.IterativeCompleteDFTvsMLBenchmarkWorkflow.html#autoplex.auto.phonons.flows.IterativeCompleteDFTvsMLBenchmarkWorkflow">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">IterativeCompleteDFTvsMLBenchmarkWorkflow</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Iterative Version of CompleteDFTvsMLBenchmarkWorkflow.</span>
+
+<span class="sd">    Maker to run CompleteDFTvsMLBenchmarkWorkflow in an iterative</span>
+<span class="sd">    fashion to ensure convergence of the potentials.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str</span>
+<span class="sd">        Name of the flow produced by this maker.</span>
+<span class="sd">    max_iterations: int.</span>
+<span class="sd">        Maximum number of iterations to run.</span>
+<span class="sd">    rms_max: float.</span>
+<span class="sd">        Will stop once the best potential has a max rmse below this value.</span>
+<span class="sd">        The RMSE value is in THz.</span>
+<span class="sd">    complete_dft_vs_ml_benchmark_workflow_0: CompleteDFTvsMLBenchmarkWorkflow.</span>
+<span class="sd">        First Iteration will be performed with this flow.</span>
+<span class="sd">    complete_dft_vs_ml_benchmark_workflow_1: CompleteDFTvsMLBenchmarkWorkflow.</span>
+<span class="sd">        All Iterations after the first one will be performed with this flow.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;IterativeCompleteDFTvsMLBenchmarkWorkflow&quot;</span>
+    <span class="n">max_iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">rms_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="n">complete_dft_vs_ml_benchmark_workflow_0</span><span class="p">:</span> <span class="n">CompleteDFTvsMLBenchmarkWorkflow</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">CompleteDFTvsMLBenchmarkWorkflow</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">complete_dft_vs_ml_benchmark_workflow_1</span><span class="p">:</span> <span class="n">CompleteDFTvsMLBenchmarkWorkflow</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">field</span><span class="p">(</span>
+            <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">CompleteDFTvsMLBenchmarkWorkflow</span><span class="p">(</span>
+                <span class="n">add_dft_phonon_struct</span><span class="o">=</span><span class="kc">False</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="IterativeCompleteDFTvsMLBenchmarkWorkflow.make">
+<a class="viewcode-back" href="../../../../reference/autoplex.auto.phonons.flows.IterativeCompleteDFTvsMLBenchmarkWorkflow.html#autoplex.auto.phonons.flows.IterativeCompleteDFTvsMLBenchmarkWorkflow.make">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">make</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">structure_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Structure</span><span class="p">],</span>
+        <span class="n">mp_ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">dft_references</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">PhononBSDOSDoc</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">benchmark_structures</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Structure</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">benchmark_mp_ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">pre_database_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">pre_xyz_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">rattle_seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">fit_kwargs_list</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Flow</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Make flow for constructing the dataset, fitting the potentials and performing the benchmarks.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        structure_list:</span>
+<span class="sd">            List of pymatgen structures.</span>
+<span class="sd">        mp_ids:</span>
+<span class="sd">            Materials Project IDs.</span>
+<span class="sd">        dft_references: list[PhononBSDOSDoc] | None</span>
+<span class="sd">            List of DFT reference files containing the PhononBSDOCDoc object.</span>
+<span class="sd">            Reference files have to refer to a finite displacement of 0.01.</span>
+<span class="sd">            For benchmarking, only 0.01 is supported</span>
+<span class="sd">        benchmark_structures: list[Structure] | None</span>
+<span class="sd">            The pymatgen structure for benchmarking.</span>
+<span class="sd">        benchmark_mp_ids: list[str] | None</span>
+<span class="sd">            Materials Project ID of the benchmarking structure.</span>
+<span class="sd">        pre_xyz_files: list[str] or None</span>
+<span class="sd">            Names of the pre-database train xyz file and test xyz file.</span>
+<span class="sd">        pre_database_dir: str or None</span>
+<span class="sd">            The pre-database directory.</span>
+<span class="sd">        rattle_seed: int | None</span>
+<span class="sd">            Random seed.</span>
+<span class="sd">        fit_kwargs_list : list[dict].</span>
+<span class="sd">            Dict including MLIP fit keyword args.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">flow</span> <span class="o">=</span> <span class="n">do_iterative_rattled_structures</span><span class="p">(</span>
+            <span class="n">workflow_maker_gen_0</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">complete_dft_vs_ml_benchmark_workflow_0</span><span class="p">,</span>
+            <span class="n">workflow_maker_gen_1</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">complete_dft_vs_ml_benchmark_workflow_1</span><span class="p">,</span>
+            <span class="n">structure_list</span><span class="o">=</span><span class="n">structure_list</span><span class="p">,</span>
+            <span class="n">mp_ids</span><span class="o">=</span><span class="n">mp_ids</span><span class="p">,</span>
+            <span class="n">benchmark_structures</span><span class="o">=</span><span class="n">benchmark_structures</span><span class="p">,</span>
+            <span class="n">benchmark_mp_ids</span><span class="o">=</span><span class="n">benchmark_mp_ids</span><span class="p">,</span>
+            <span class="n">number_of_iteration</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">rms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">max_iteration</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_iterations</span><span class="p">,</span>
+            <span class="n">rms_max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rms_max</span><span class="p">,</span>
+            <span class="n">rattle_seed</span><span class="o">=</span><span class="n">rattle_seed</span><span class="p">,</span>
+            <span class="n">dft_references</span><span class="o">=</span><span class="n">dft_references</span><span class="p">,</span>
+            <span class="n">fit_kwargs_list</span><span class="o">=</span><span class="n">fit_kwargs_list</span><span class="p">,</span>
+            <span class="n">pre_database_dir</span><span class="o">=</span><span class="n">pre_database_dir</span><span class="p">,</span>
+            <span class="n">pre_xyz_files</span><span class="o">=</span><span class="n">pre_xyz_files</span><span class="p">,</span>
+            <span class="n">previous_output</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">Flow</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">flow</span><span class="o">.</span><span class="n">output</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test settings during the initialisation.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">complete_dft_vs_ml_benchmark_workflow_1</span><span class="o">.</span><span class="n">add_dft_phonon_struct</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Phonon Data is generated in the second iteration. This will likely&quot;</span>
+                <span class="s2">&quot;waste resources. It is recommended to switch this off.&quot;</span><span class="p">,</span>
+                <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">)</span></div>
+
+</pre></div>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Author name not set
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, autoplex development team.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

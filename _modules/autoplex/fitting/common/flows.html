@@ -1,0 +1,1490 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>autoplex.fitting.common.flows &#8212; autoplex</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=1ea92b8b" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../../_static/documentation_options.js?v=e18d2f4a"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+
+
+
+
+
+const initStyles = () => {
+    const defaultStyle = document.createElement('style');
+    defaultStyle.textContent = `pre.mermaid {
+    /* Same as .mermaid-container > pre */
+    display: block;
+    width: 100%;
+}
+
+pre.mermaid > svg {
+    /* Same as .mermaid-container > pre > svg */
+    height: 500px;
+    width: 100%;
+    max-width: 100% !important;
+}`;
+    document.head.appendChild(defaultStyle);
+
+    const fullscreenStyle = document.createElement('style');
+    fullscreenStyle.textContent = `.mermaid-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.mermaid-container > pre {
+    display: block;
+    width: 100%;
+}
+
+.mermaid-container > pre > svg {
+    height: 500px;
+    width: 100%;
+    max-width: 100% !important;
+}
+
+.mermaid-fullscreen-btn {
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+    color: #333;
+}
+
+.mermaid-fullscreen-btn:hover {
+    opacity: 100% !important;
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+    transform: scale(1.1);
+}
+
+.mermaid-fullscreen-btn.dark-theme {
+    background: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #e0e0e0;
+}
+
+.mermaid-fullscreen-btn.dark-theme:hover {
+    background: rgba(60, 60, 60, 1);
+    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-modal {
+    display: none;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 95vw;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.98);
+    z-index: 9999;
+    padding: 20px;
+    overflow: auto;
+}
+
+.mermaid-fullscreen-modal.dark-theme {
+    background: rgba(0, 0, 0, 0.98);
+}
+
+.mermaid-fullscreen-modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen {
+    position: relative;
+    width: 95vw;
+    height: 90vh;
+    max-width: 95vw;
+    max-height: 90vh;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    overflow: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen.dark-theme {
+    background: #1a1a1a;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+}
+
+.mermaid-container-fullscreen pre.mermaid {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen .mermaid svg {
+    height: 100% !important;
+    width: 100% !important;
+    cursor: grab;
+}
+
+.mermaid-fullscreen-close {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s;
+    font-size: 24px;
+    line-height: 1;
+    color: #333;
+}
+
+.mermaid-fullscreen-close:hover {
+    background: white;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    transform: scale(1.1);
+}
+
+.mermaid-fullscreen-close.dark-theme {
+    background: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #e0e0e0;
+}
+
+.mermaid-fullscreen-close.dark-theme:hover {
+    background: rgba(60, 60, 60, 1);
+    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-modal .mermaid-fullscreen-btn {
+    display: none !important;
+}`;
+    document.head.appendChild(fullscreenStyle);
+}
+
+// Detect if page has dark background
+const isDarkTheme = () => {
+    // We use a set of heuristics:
+    // 1. Check for common dark mode classes or attributes
+    // 2. Check computed background color brightness
+    if (document.documentElement.classList.contains('dark') ||
+        document.documentElement.getAttribute('data-theme') === 'dark' ||
+        document.body.classList.contains('dark') ||
+        document.body.getAttribute('data-theme') === 'dark') {
+        // console.log("Dark theme detected via class/attribute");
+        return true;
+    }
+    if (document.documentElement.classList.contains('light') ||
+        document.documentElement.getAttribute('data-theme') === 'light' ||
+        document.body.classList.contains('light') ||
+        document.body.getAttribute('data-theme') === 'light') {
+        // console.log("Light theme detected via class/attribute");
+        return false;
+    }
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        // console.log("Dark theme detected via prefers-color-scheme");
+        return true;
+    }
+    const bgColor = window.getComputedStyle(document.body).backgroundColor;
+    const match = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {
+        const r = parseInt(match[1]);
+        const g = parseInt(match[2]);
+        const b = parseInt(match[3]);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        // console.log("Background color brightness:", brightness);
+        return brightness < 128;
+    }
+    // console.log("No dark or light theme detected, defaulting to light theme");
+    return false;
+};
+
+let darkTheme = isDarkTheme();
+let modal = null;
+let modalContent = null;
+let previousScrollOffset = [window.scrollX, window.scrollY];
+
+const runMermaid = async (rerun) => {
+    console.log("Running mermaid diagrams, rerun =", rerun);
+    // clear all existing mermaid charts
+    let all_mermaids = document.querySelectorAll(".mermaid");
+
+    if (rerun) {
+        all_mermaids.forEach((el) => {
+            if(!el.hasAttribute("data-original-code")) {
+                // store original code
+                // console.log(`Storing original code for first run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+            if(el.getAttribute("data-processed") === "true") {
+                // remove and restore original
+                el.removeAttribute("data-processed");
+                // console.log(`Restoring original code for re-run: `, el.getAttribute('data-original-code'));
+                el.innerHTML = el.getAttribute('data-original-code');
+            } else {
+                // store original code
+                // console.log(`Storing original code for re-run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+        });
+        await mermaid.run();
+    }
+
+    all_mermaids = document.querySelectorAll(".mermaid");
+    const mermaids_processed = document.querySelectorAll(".mermaid[data-processed='true']");
+
+    if ("False" === "True") {
+        const mermaids_to_add_zoom = -1 === -1 ? all_mermaids.length : -1;
+        if(mermaids_to_add_zoom > 0) {
+            var svgs = d3.selectAll("");
+            if(all_mermaids.length !== mermaids_processed.length) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            } else if(svgs.size() !== mermaids_to_add_zoom) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            } else {
+                svgs.each(function() {
+                    var svg = d3.select(this);
+                    svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+                    var inner = svg.select("g");
+                    var zoom = d3.zoom().on("zoom", function(event) {
+                        inner.attr("transform", event.transform);
+                    });
+                    svg.call(zoom);
+                });
+            }
+        }
+    } else if(all_mermaids.length !== mermaids_processed.length) {
+        // Wait for mermaid to process all diagrams
+        setTimeout(() => runMermaid(false), 200);
+        return;
+    }
+
+    // Stop here if not adding fullscreen capability
+    if ("True" !== "True") return;
+
+    if (modal !== null ) {
+        // Destroy existing modal
+        modal.remove();
+        modal = null;
+        modalContent = null;
+    }
+
+    modal = document.createElement('div');
+    modal.className = 'mermaid-fullscreen-modal' + (darkTheme ? ' dark-theme' : '');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Fullscreen diagram viewer');
+    modal.innerHTML = `
+        <button class="mermaid-fullscreen-close${darkTheme ? ' dark-theme' : ''}" aria-label="Close fullscreen">✕</button>
+        <div class="mermaid-container-fullscreen${darkTheme ? ' dark-theme' : ''}"></div>
+    `;
+    document.body.appendChild(modal);
+
+    modalContent = modal.querySelector('.mermaid-container-fullscreen');
+    const closeBtn = modal.querySelector('.mermaid-fullscreen-close');
+
+    const closeModal = () => {
+        modal.classList.remove('active');
+        modalContent.innerHTML = '';
+        document.body.style.overflow = ''
+        window.scrollTo({left: previousScrollOffset[0], top: previousScrollOffset[1], behavior: 'instant'});
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+            closeModal();
+        }
+    });
+
+    document.querySelectorAll('.mermaid').forEach((mermaidDiv) => {
+        if (mermaidDiv.parentNode.classList.contains('mermaid-container') ||
+            mermaidDiv.closest('.mermaid-fullscreen-modal')) {
+            // Already processed, adjust button class if needed
+            const existingBtn = mermaidDiv.parentNode.querySelector('.mermaid-fullscreen-btn');
+            if (existingBtn) {
+                existingBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+            }
+            return;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'mermaid-container';
+        mermaidDiv.parentNode.insertBefore(container, mermaidDiv);
+        container.appendChild(mermaidDiv);
+
+        const fullscreenBtn = document.createElement('button');
+        fullscreenBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+        fullscreenBtn.setAttribute('aria-label', 'View diagram in fullscreen');
+        fullscreenBtn.textContent = '⛶';
+        fullscreenBtn.style.opacity = '50%';
+
+        // Calculate dynamic position based on diagram's margin and padding
+        const diagramStyle = window.getComputedStyle(mermaidDiv);
+        const marginTop = parseFloat(diagramStyle.marginTop) || 0;
+        const marginRight = parseFloat(diagramStyle.marginRight) || 0;
+        const paddingTop = parseFloat(diagramStyle.paddingTop) || 0;
+        const paddingRight = parseFloat(diagramStyle.paddingRight) || 0;
+        fullscreenBtn.style.top = `${marginTop + paddingTop + 4}px`;
+        fullscreenBtn.style.right = `${marginRight + paddingRight + 4}px`;
+
+        fullscreenBtn.addEventListener('click', () => {
+            previousScrollOffset = [window.scroll, window.scrollY];
+            const clone = mermaidDiv.cloneNode(true);
+            modalContent.innerHTML = '';
+            modalContent.appendChild(clone);
+
+            const svg = clone.querySelector('svg');
+            if (svg) {
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.style.width = '100%';
+                svg.style.height = 'auto';
+                svg.style.maxWidth = '100%';
+                svg.style.sdisplay = 'block';
+
+                if ("False" === "True") {
+                    setTimeout(() => {
+                        const g = svg.querySelector('g');
+                        if (g) {
+                            var svgD3 = d3.select(svg);
+                            svgD3.html("<g class='wrapper'>" + svgD3.html() + "</g>");
+                            var inner = svgD3.select("g");
+                            var zoom = d3.zoom().on("zoom", function(event) {
+                                inner.attr("transform", event.transform);
+                            });
+                            svgD3.call(zoom);
+                        }
+                    }, 100);
+                }
+            }
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        container.appendChild(fullscreenBtn);
+    });
+};
+
+const load = async () => {
+    initStyles();
+
+    await runMermaid(true);
+
+    const reRunIfThemeChanges = async () => {
+        const newDarkTheme = isDarkTheme();
+        if (newDarkTheme !== darkTheme) {
+            darkTheme = newDarkTheme;
+            console.log("Theme change detected, re-running mermaid with", darkTheme ? "dark" : "default", "theme");
+            await mermaid.initialize(
+                {...JSON.parse(
+                    `{"startOnLoad": false}`
+                ),
+                ...{ darkMode: darkTheme, theme: darkTheme ? 'dark' : 'default' },
+                }
+            );
+            await runMermaid(true);
+        }
+    };
+
+    // Update theme classes when theme changes
+    const themeObserver = new MutationObserver(reRunIfThemeChanges);
+    themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+    themeObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+};
+
+
+
+
+
+console.log("Initializing mermaid with", darkTheme ? "dark" : "default", "theme");
+mermaid.initialize(
+    {...JSON.parse(
+        `{"startOnLoad": false}`
+    ),
+    ...{ darkMode: darkTheme, theme: darkTheme ? 'dark' : 'default' },
+    }
+);
+
+window.addEventListener("load", load);</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/autoplex/fitting/common/flows';</script>
+    <link rel="icon" href="../../../../_static/autoplex_favicon.png"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.1.dev1+g6ffcd01a0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../../_static/autoplex_logo.png" class="logo__image only-light" alt="autoplex - Home"/>
+    <img src="../../../../_static/autoplex_logo.png" class="logo__image only-dark pst-js-only" alt="autoplex - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../user/index.html">Overview</a></li>
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../../../../user/setup.html">Quick-start</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../user/tutorials.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../user/installation/installation.html">Installation guide</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../user/rss/index.html">RSS workflow</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/rss/flow/introduction/intro.html">Brief overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/rss/flow/input/input.html">Input YAML configuration file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/rss/flow/quick_start/start.html">Quick start</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/rss/flow/example/example.html">Examples</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../user/phonon/index.html">Phonon workflow</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/phonon/flows/flows.html">Out-of-the-box workflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/phonon/flows/generation/data.html">Generating reference data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/phonon/flows/fitting/fitting.html">Fitting phonon-accurate potentials</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/phonon/flows/benchmark/benchmark.html">Benchmark of ML-based phonon structure</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../user/executable/index.html">Executable tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/executable/tutorial_phonon.html">Iterative DFT vs MLIP benchmark workflow for phonons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/executable/tutorial_rss.html">RSS Workflow</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../reference/index.html">API reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.auto.html">autoplex.auto</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.auto.phonons.html">autoplex.auto.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.auto.phonons.flows.html">autoplex.auto.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.auto.phonons.jobs.html">autoplex.auto.phonons.jobs</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.auto.rss.html">autoplex.auto.rss</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.auto.rss.flows.html">autoplex.auto.rss.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.auto.rss.jobs.html">autoplex.auto.rss.jobs</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.benchmark.html">autoplex.benchmark</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.benchmark.phonons.html">autoplex.benchmark.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.benchmark.phonons.flows.html">autoplex.benchmark.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.benchmark.phonons.jobs.html">autoplex.benchmark.phonons.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.benchmark.phonons.utils.html">autoplex.benchmark.phonons.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.benchmark.rss.html">autoplex.benchmark.rss</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.html">autoplex.data</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.common.html">autoplex.data.common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.common.flows.html">autoplex.data.common.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.common.jobs.html">autoplex.data.common.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.common.utils.html">autoplex.data.common.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.phonons.html">autoplex.data.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.phonons.flows.html">autoplex.data.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.phonons.jobs.html">autoplex.data.phonons.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.phonons.utils.html">autoplex.data.phonons.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.rss.html">autoplex.data.rss</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.rss.flows.html">autoplex.data.rss.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.rss.jobs.html">autoplex.data.rss.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.rss.utils.html">autoplex.data.rss.utils</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.fitting.html">autoplex.fitting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.html">autoplex.fitting.common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.flows.html">autoplex.fitting.common.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.jobs.html">autoplex.fitting.common.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.regularization.html">autoplex.fitting.common.regularization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.utils.html">autoplex.fitting.common.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.fitting.phonons.html">autoplex.fitting.phonons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.fitting.rss.html">autoplex.fitting.rss</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.misc.html">autoplex.misc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.html">autoplex.misc.castep</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.flows.html">autoplex.misc.castep.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.jobs.html">autoplex.misc.castep.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.run.html">autoplex.misc.castep.run</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.schema.html">autoplex.misc.castep.schema</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.utils.html">autoplex.misc.castep.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.misc.utils.html">autoplex.misc.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.utils.mock_castep.html">autoplex.misc.utils.mock_castep</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.settings.html">autoplex.settings</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.AutoplexBaseModel.html">AutoplexBaseModel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.AutoplexSettings.html">AutoplexSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.BcurParams.html">BcurParams</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.BuildcellOptions.html">BuildcellOptions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.CustomIncar.html">CustomIncar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.GAPGeneralSettings.html">GAPGeneralSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.GAPSettings.html">GAPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.JACESettings.html">JACESettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.LossCoeff.html">LossCoeff</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.M3GNETSettings.html">M3GNETSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.MACESettings.html">MACESettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.MLIPHypers.html">MLIPHypers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.NEPSettings.html">NEPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.NEQUIPSettings.html">NEQUIPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.Nonlinearity.html">Nonlinearity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.ResumeFromPreviousState.html">ResumeFromPreviousState</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.RssConfig.html">RssConfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.SETTINGS.html">SETTINGS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.SoapParas.html">SoapParas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.SoapSettings.html">SoapSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.ThreebSettings.html">ThreebSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.TwobSettings.html">TwobSettings</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contributing Guide</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/contributing.html">Contributing to autoplex</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/dev_install.html">Developer Installation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../about/changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../about/contributors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../about/license.html">License</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/JaGeo/autoplex" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/JaGeo/autoplex/issues/new?title=Issue%20on%20page%20%2F_modules/autoplex/fitting/common/flows.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for autoplex.fitting.common.flows</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Flows consisting of jobs to fit ML potentials.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">ase.io</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jobflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flow</span><span class="p">,</span> <span class="n">Maker</span><span class="p">,</span> <span class="n">job</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pymatgen.io.ase</span><span class="w"> </span><span class="kn">import</span> <span class="n">AseAtomsAdaptor</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">autoplex</span><span class="w"> </span><span class="kn">import</span> <span class="n">MLIP_HYPERS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.fitting.common.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">machine_learning_fit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.fitting.common.regularization</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_custom_sigma</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.fitting.common.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_list_of_vasp_calc_dirs</span><span class="p">,</span>
+    <span class="n">vaspoutput_2_extended_xyz</span><span class="p">,</span>
+    <span class="n">write_after_distillation_data_split</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+    <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2"> - </span><span class="si">%(levelname)s</span><span class="s2"> - </span><span class="si">%(message)s</span><span class="s2">&quot;</span>
+<span class="p">)</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;DataPreprocessing&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;MLIPFitMaker&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="MLIPFitMaker">
+<a class="viewcode-back" href="../../../../reference/autoplex.fitting.common.flows.MLIPFitMaker.html#autoplex.fitting.common.flows.MLIPFitMaker">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MLIPFitMaker</span><span class="p">(</span><span class="n">Maker</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Maker to fit ML potentials based on DFT labelled reference data.</span>
+
+<span class="sd">    This Maker will filter the provided dataset in a data preprocessing step and then proceed</span>
+<span class="sd">    with the MLIP fit (default is GAP).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str</span>
+<span class="sd">        Name of the flows produced by this maker.</span>
+<span class="sd">    mlip_type: Literal[&quot;GAP&quot;, &quot;J-ACE&quot;, &quot;NEP&quot;, &quot;NEQUIP&quot;, &quot;M3GNET&quot;, &quot;MACE&quot;]</span>
+<span class="sd">        Choose one specific MLIP type to be fitted.</span>
+<span class="sd">    hyperpara_opt: bool</span>
+<span class="sd">        Perform hyperparameter optimization using XPOT</span>
+<span class="sd">        (XPOT: https://pubs.aip.org/aip/jcp/article/159/2/024803/2901815)</span>
+<span class="sd">    ref_energy_name : str</span>
+<span class="sd">        Reference energy name.</span>
+<span class="sd">    ref_force_name : str</span>
+<span class="sd">        Reference force name.</span>
+<span class="sd">    ref_virial_name : str</span>
+<span class="sd">        Reference virial name.</span>
+<span class="sd">    ref_stress_name : str</span>
+<span class="sd">        Reference stress name.</span>
+<span class="sd">    glue_file_path: str</span>
+<span class="sd">        Name of the glue.xml file path.</span>
+<span class="sd">    split_ratio: float</span>
+<span class="sd">        Ratio to divide the dataset into training and test sets.</span>
+<span class="sd">        A value of 0.1 means 90% training data and 10% test data</span>
+<span class="sd">    force_max: float</span>
+<span class="sd">        Maximum allowed force in the dataset.</span>
+<span class="sd">    force_min: float</span>
+<span class="sd">        Minimal force cutoff value for atom-wise regularization.</span>
+<span class="sd">    regularization: bool</span>
+<span class="sd">        For using sigma regularization.</span>
+<span class="sd">    distillation: bool</span>
+<span class="sd">        For using data distillation.</span>
+<span class="sd">    separated: bool</span>
+<span class="sd">        Repeat the fit for each data_type available in the (combined) database.</span>
+<span class="sd">    pre_xyz_files: list[str] or None</span>
+<span class="sd">        Names of the pre-database train xyz file and test xyz file.</span>
+<span class="sd">    pre_database_dir: str or None</span>
+<span class="sd">        The pre-database directory.</span>
+<span class="sd">    atomwise_regularization_parameter: float</span>
+<span class="sd">        Regularization value for the atom-wise force components.</span>
+<span class="sd">    atom_wise_regularization: bool</span>
+<span class="sd">        For including atom-wise regularization.</span>
+<span class="sd">    auto_delta: bool</span>
+<span class="sd">        Automatically determine delta for 2b, 3b and soap terms.</span>
+<span class="sd">    glue_xml: bool</span>
+<span class="sd">        Use the glue.xml core potential instead of fitting 2b terms.</span>
+<span class="sd">    num_processes_fit: int</span>
+<span class="sd">        Number of processes for fitting.</span>
+<span class="sd">    apply_data_preprocessing: bool</span>
+<span class="sd">        Determine whether to preprocess the data.</span>
+<span class="sd">    run_fits_on_different_cluster: bool</span>
+<span class="sd">        If true, run fits on different clusters.</span>
+<span class="sd">    disable_testing: bool</span>
+<span class="sd">        Whether to disable running the model on test data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;MLpotentialFit&quot;</span>
+    <span class="n">mlip_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;GAP&quot;</span><span class="p">,</span> <span class="s2">&quot;J-ACE&quot;</span><span class="p">,</span> <span class="s2">&quot;NEP&quot;</span><span class="p">,</span> <span class="s2">&quot;NEQUIP&quot;</span><span class="p">,</span> <span class="s2">&quot;M3GNET&quot;</span><span class="p">,</span> <span class="s2">&quot;MACE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;GAP&quot;</span>
+    <span class="n">hyperpara_opt</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">ref_energy_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;REF_energy&quot;</span>
+    <span class="n">ref_force_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;REF_forces&quot;</span>
+    <span class="n">ref_virial_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;REF_virial&quot;</span>
+    <span class="n">ref_stress_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;REF_stress&quot;</span>
+    <span class="n">glue_file_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;glue.xml&quot;</span>
+    <span class="n">split_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.4</span>
+    <span class="n">force_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">40.0</span>
+    <span class="n">force_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span>  <span class="c1"># unit: eV Å-1</span>
+    <span class="n">distillation</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">separated</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">pre_xyz_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">pre_database_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">regularization</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># This is only used for GAP.</span>
+    <span class="n">atomwise_regularization_parameter</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># This is only used for GAP.</span>
+    <span class="n">atom_wise_regularization</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># This is only used for GAP.</span>
+    <span class="n">auto_delta</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># This is only used for GAP.</span>
+    <span class="n">glue_xml</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># This is only used for GAP.</span>
+    <span class="n">num_processes_fit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">apply_data_preprocessing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">run_fits_on_different_cluster</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">disable_testing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="MLIPFitMaker.make">
+<a class="viewcode-back" href="../../../../reference/autoplex.fitting.common.flows.MLIPFitMaker.html#autoplex.fitting.common.flows.MLIPFitMaker.make">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">make</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">database_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">fit_input</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># This is specific to phonon workflow</span>
+        <span class="n">hyperparameters</span><span class="p">:</span> <span class="n">MLIP_HYPERS</span> <span class="o">=</span> <span class="n">MLIP_HYPERS</span><span class="p">,</span>
+        <span class="n">species_list</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">isolated_atom_energies</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">fit_kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Make a flow for fitting MLIP models.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        database_dir: Path | str</span>
+<span class="sd">            Path to the directory containing the database.</span>
+<span class="sd">        fit_input: dict</span>
+<span class="sd">            Output from the CompletePhononDFTMLDataGenerationFlow process.</span>
+<span class="sd">        database_dir: Path | str</span>
+<span class="sd">            Path to the directory containing the database.</span>
+<span class="sd">        hyperparameters: MLIP_HYPERS</span>
+<span class="sd">            Hyperparameters for the MLIP.</span>
+<span class="sd">        species_list: list</span>
+<span class="sd">            List of element names (strings) involved in the training dataset</span>
+<span class="sd">        isolated_atom_energies: dict</span>
+<span class="sd">            Dictionary of isolated atoms energies.</span>
+<span class="sd">        device: str</span>
+<span class="sd">            Device to be used for model fitting, either &quot;cpu&quot; or &quot;cuda&quot;.</span>
+<span class="sd">        fit_kwargs: dict</span>
+<span class="sd">            Additional keyword arguments for MLIP fitting.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlip_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;GAP&quot;</span><span class="p">,</span> <span class="s2">&quot;J-ACE&quot;</span><span class="p">,</span> <span class="s2">&quot;NEP&quot;</span><span class="p">,</span> <span class="s2">&quot;NEQUIP&quot;</span><span class="p">,</span> <span class="s2">&quot;M3GNET&quot;</span><span class="p">,</span> <span class="s2">&quot;MACE&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Please correct the MLIP name!&quot;</span>
+                <span class="s2">&quot;The current version ONLY supports the following models: GAP, J-ACE, NEP, NEQUIP, M3GNET, and MACE.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_data_preprocessing</span><span class="p">:</span>
+            <span class="n">jobs</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">data_prep_job</span> <span class="o">=</span> <span class="n">DataPreprocessing</span><span class="p">(</span>
+                <span class="n">split_ratio</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">split_ratio</span><span class="p">,</span>
+                <span class="n">regularization</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">regularization</span><span class="p">,</span>
+                <span class="n">separated</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">separated</span><span class="p">,</span>
+                <span class="n">distillation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">distillation</span><span class="p">,</span>
+                <span class="n">force_max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">force_max</span><span class="p">,</span>
+                <span class="n">pre_xyz_files</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pre_xyz_files</span><span class="p">,</span>
+                <span class="n">pre_database_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pre_database_dir</span><span class="p">,</span>
+                <span class="n">force_min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">force_min</span><span class="p">,</span>
+                <span class="n">ref_virial_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_virial_name</span><span class="p">,</span>
+                <span class="n">ref_force_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_force_name</span><span class="p">,</span>
+                <span class="n">ref_energy_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_energy_name</span><span class="p">,</span>
+                <span class="n">ref_stress_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_stress_name</span><span class="p">,</span>
+                <span class="n">atomwise_regularization_parameter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atomwise_regularization_parameter</span><span class="p">,</span>
+                <span class="n">atom_wise_regularization</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_wise_regularization</span><span class="p">,</span>
+                <span class="n">run_fits_on_different_cluster</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_fits_on_different_cluster</span><span class="p">,</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">make</span><span class="p">(</span>
+                <span class="n">fit_input</span><span class="o">=</span><span class="n">fit_input</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">jobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data_prep_job</span><span class="p">)</span>
+
+            <span class="n">mlip_fit_job</span> <span class="o">=</span> <span class="n">machine_learning_fit</span><span class="p">(</span>
+                <span class="n">database_dir</span><span class="o">=</span><span class="n">data_prep_job</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;database_dir&quot;</span><span class="p">],</span>
+                <span class="n">run_fits_on_different_cluster</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_fits_on_different_cluster</span><span class="p">,</span>
+                <span class="n">isolated_atom_energies</span><span class="o">=</span><span class="n">isolated_atom_energies</span><span class="p">,</span>
+                <span class="n">num_processes_fit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_processes_fit</span><span class="p">,</span>
+                <span class="n">auto_delta</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">auto_delta</span><span class="p">,</span>
+                <span class="n">glue_xml</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">glue_xml</span><span class="p">,</span>
+                <span class="n">glue_file_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">glue_file_path</span><span class="p">,</span>
+                <span class="n">mlip_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mlip_type</span><span class="p">,</span>
+                <span class="n">hyperpara_opt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hyperpara_opt</span><span class="p">,</span>
+                <span class="n">hyperparameters</span><span class="o">=</span><span class="n">hyperparameters</span><span class="p">,</span>
+                <span class="n">ref_energy_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_energy_name</span><span class="p">,</span>
+                <span class="n">ref_force_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_force_name</span><span class="p">,</span>
+                <span class="n">ref_stress_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_stress_name</span><span class="p">,</span>
+                <span class="n">ref_virial_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_virial_name</span><span class="p">,</span>
+                <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
+                <span class="n">species_list</span><span class="o">=</span><span class="n">species_list</span><span class="p">,</span>
+                <span class="n">database_dict</span><span class="o">=</span><span class="n">data_prep_job</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;database_dict&quot;</span><span class="p">],</span>
+                <span class="n">disable_testing</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">disable_testing</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">fit_kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">jobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mlip_fit_job</span><span class="p">)</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;mlip_path&quot;</span><span class="p">:</span> <span class="n">mlip_fit_job</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;mlip_path&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;train_error&quot;</span><span class="p">:</span> <span class="n">mlip_fit_job</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;train_error&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;test_error&quot;</span><span class="p">:</span> <span class="n">mlip_fit_job</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;test_error&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;convergence&quot;</span><span class="p">:</span> <span class="n">mlip_fit_job</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;convergence&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;database_dir&quot;</span><span class="p">:</span> <span class="n">data_prep_job</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;database_dir&quot;</span><span class="p">],</span>
+            <span class="p">}</span>
+            <span class="k">return</span> <span class="n">Flow</span><span class="p">(</span><span class="n">jobs</span><span class="o">=</span><span class="n">jobs</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">output</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="c1"># this will only run if train.extxyz and test.extxyz files are present in the database_dir</span>
+        <span class="c1"># TODO: shouldn&#39;t this be the exception rather then the default run?!</span>
+        <span class="c1"># TODO: I assume we always want to use data from before?</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">database_dir</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">database_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">database_dir</span><span class="p">)</span>
+
+        <span class="n">mlip_fit_job</span> <span class="o">=</span> <span class="n">machine_learning_fit</span><span class="p">(</span>
+            <span class="n">database_dir</span><span class="o">=</span><span class="n">database_dir</span><span class="p">,</span>
+            <span class="n">isolated_atom_energies</span><span class="o">=</span><span class="n">isolated_atom_energies</span><span class="p">,</span>
+            <span class="n">num_processes_fit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_processes_fit</span><span class="p">,</span>
+            <span class="n">auto_delta</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">auto_delta</span><span class="p">,</span>
+            <span class="n">glue_xml</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">glue_xml</span><span class="p">,</span>
+            <span class="n">glue_file_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">glue_file_path</span><span class="p">,</span>
+            <span class="n">mlip_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mlip_type</span><span class="p">,</span>
+            <span class="n">hyperpara_opt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hyperpara_opt</span><span class="p">,</span>
+            <span class="n">hyperparameters</span><span class="o">=</span><span class="n">hyperparameters</span><span class="p">,</span>
+            <span class="n">ref_energy_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_energy_name</span><span class="p">,</span>
+            <span class="n">ref_force_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_force_name</span><span class="p">,</span>
+            <span class="n">ref_virial_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_virial_name</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
+            <span class="n">species_list</span><span class="o">=</span><span class="n">species_list</span><span class="p">,</span>
+            <span class="n">disable_testing</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">disable_testing</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">fit_kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">output</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;mlip_path&quot;</span><span class="p">:</span> <span class="n">mlip_fit_job</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;mlip_path&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;train_error&quot;</span><span class="p">:</span> <span class="n">mlip_fit_job</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;train_error&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;test_error&quot;</span><span class="p">:</span> <span class="n">mlip_fit_job</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;test_error&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;convergence&quot;</span><span class="p">:</span> <span class="n">mlip_fit_job</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;convergence&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;database_dir&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_database_dir</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">Flow</span><span class="p">(</span><span class="n">jobs</span><span class="o">=</span><span class="n">mlip_fit_job</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">output</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="DataPreprocessing">
+<a class="viewcode-back" href="../../../../reference/autoplex.fitting.common.flows.DataPreprocessing.html#autoplex.fitting.common.flows.DataPreprocessing">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DataPreprocessing</span><span class="p">(</span><span class="n">Maker</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Data preprocessing of the provided dataset.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str</span>
+<span class="sd">        Name of the flows produced by this maker.</span>
+<span class="sd">    split_ratio: float</span>
+<span class="sd">        Parameter to divide the training set and the test set.</span>
+<span class="sd">        A value of 0.1 means that the ratio of the training set to the test set is 9:1</span>
+<span class="sd">    regularization: bool</span>
+<span class="sd">        For using sigma regularization.</span>
+<span class="sd">    separated: bool</span>
+<span class="sd">        Repeat the fit for each data_type available in the (combined) database.</span>
+<span class="sd">    distillation: bool</span>
+<span class="sd">        For using data distillation.</span>
+<span class="sd">    ref_energy_name : str</span>
+<span class="sd">        Reference energy name in xyz file.</span>
+<span class="sd">    ref_force_name : str</span>
+<span class="sd">        Reference force name in xyz file.</span>
+<span class="sd">    ref_virial_name : str</span>
+<span class="sd">        Reference virial name in xyz file.</span>
+<span class="sd">    ref_stress_name : str</span>
+<span class="sd">        Reference stress name in xyz file.</span>
+<span class="sd">    force_max: float</span>
+<span class="sd">        Maximally allowed force in the data set.</span>
+<span class="sd">    force_min: float</span>
+<span class="sd">        Minimal force cutoff value for atom-wise regularization.</span>
+<span class="sd">    pre_database_dir: str or None</span>
+<span class="sd">        The pre-database directory.</span>
+<span class="sd">    pre_xyz_files: list[str] or None</span>
+<span class="sd">        Names of the pre-database train xyz file and test xyz file labelled by VASP.</span>
+<span class="sd">    atomwise_regularization_parameter: float</span>
+<span class="sd">        Regularization value for the atom-wise force components.</span>
+<span class="sd">    atom_wise_regularization: bool</span>
+<span class="sd">        If True, includes atom-wise regularization.</span>
+<span class="sd">    train_data_file: str</span>
+<span class="sd">        Name of the training xyz data file.</span>
+<span class="sd">    test_data_file: str</span>
+<span class="sd">        Name of the test xyz data file.</span>
+<span class="sd">    run_fits_on_different_cluster: bool</span>
+<span class="sd">        If True, will copy the fitting database to the MongoDB</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;data_preprocessing_for_fitting&quot;</span>
+    <span class="n">split_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">regularization</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">separated</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">distillation</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">ref_energy_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;REF_energy&quot;</span>
+    <span class="n">ref_force_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;REF_forces&quot;</span>
+    <span class="n">ref_virial_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;REF_virial&quot;</span>
+    <span class="n">ref_stress_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;REF_stress&quot;</span>
+    <span class="n">force_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">40.0</span>
+    <span class="n">force_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span>  <span class="c1"># unit: eV Å-1</span>
+    <span class="n">pre_database_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">pre_xyz_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">atomwise_regularization_parameter</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">atom_wise_regularization</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">train_data_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;train.extxyz&quot;</span>
+    <span class="n">test_data_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;test.extxyz&quot;</span>
+    <span class="n">run_fits_on_different_cluster</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="DataPreprocessing.make">
+<a class="viewcode-back" href="../../../../reference/autoplex.fitting.common.flows.DataPreprocessing.html#autoplex.fitting.common.flows.DataPreprocessing.make">[docs]</a>
+    <span class="nd">@job</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;database_dict&quot;</span><span class="p">])</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">make</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">fit_input</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Maker for data preprocessing.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fit_input:</span>
+<span class="sd">            Mixed list of dictionary and lists of the fit input data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_xyz_files</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pre_xyz_files</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;train.extxyz&quot;</span><span class="p">,</span> <span class="s2">&quot;test.extxyz&quot;</span><span class="p">]</span>
+
+        <span class="n">list_of_vasp_calc_dirs</span> <span class="o">=</span> <span class="n">get_list_of_vasp_calc_dirs</span><span class="p">(</span><span class="n">flow_output</span><span class="o">=</span><span class="n">fit_input</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">fit_input</span><span class="p">)</span>
+        <span class="n">config_types</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">key</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">fit_input</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">key2</span><span class="p">,</span> <span class="n">value2</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">key2</span> <span class="o">!=</span> <span class="s2">&quot;phonon_data&quot;</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">value2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">]</span>
+
+        <span class="n">data_types</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">key2</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">fit_input</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">key2</span><span class="p">,</span> <span class="n">value2</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">key2</span> <span class="o">!=</span> <span class="s2">&quot;phonon_data&quot;</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">value2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_database_dir</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pre_database_dir</span><span class="p">):</span>
+            <span class="n">current_working_directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pre_xyz_files</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">file_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_xyz_files</span><span class="p">:</span>
+                    <span class="n">source_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pre_database_dir</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+                    <span class="n">destination_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                        <span class="n">current_working_directory</span><span class="p">,</span> <span class="s2">&quot;vasp_ref.extxyz&quot;</span>
+                    <span class="p">)</span>
+                    <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">source_file_path</span><span class="p">,</span> <span class="n">destination_file_path</span><span class="p">)</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;File </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> has been copied to </span><span class="si">{</span><span class="n">destination_file_path</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pre_xyz_files</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="c1"># join to one file and then split again afterwards</span>
+                <span class="c1"># otherwise, split percentage will not be true</span>
+                <span class="n">destination_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="n">current_working_directory</span><span class="p">,</span> <span class="s2">&quot;vasp_ref.extxyz&quot;</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">file_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_xyz_files</span><span class="p">:</span>
+                    <span class="c1"># TODO: if it makes sense to remove isolated atoms from other files as well</span>
+                    <span class="n">atoms_list</span> <span class="o">=</span> <span class="n">ase</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">read</span><span class="p">(</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pre_database_dir</span><span class="p">,</span> <span class="n">file_name</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="s2">&quot;:&quot;</span>
+                    <span class="p">)</span>
+                    <span class="n">new_atoms_list</span> <span class="o">=</span> <span class="p">[</span>
+                        <span class="n">atoms</span>
+                        <span class="k">for</span> <span class="n">atoms</span> <span class="ow">in</span> <span class="n">atoms_list</span>
+                        <span class="k">if</span> <span class="n">atoms</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;config_type&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;IsolatedAtom&quot;</span>
+                    <span class="p">]</span>
+
+                    <span class="n">ase</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">destination_file_path</span><span class="p">,</span> <span class="n">new_atoms_list</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+                    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;File </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">pre_xyz_files</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> has been copied to </span><span class="si">{</span><span class="n">destination_file_path</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pre_xyz_files</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Please provide a train and a test extxyz file (two files in total) for the pre_xyz_files.&quot;</span>
+                <span class="p">)</span>
+
+        <span class="n">vaspoutput_2_extended_xyz</span><span class="p">(</span>
+            <span class="n">path_to_vasp_static_calcs</span><span class="o">=</span><span class="n">list_of_vasp_calc_dirs</span><span class="p">,</span>
+            <span class="n">config_types</span><span class="o">=</span><span class="n">config_types</span><span class="p">,</span>
+            <span class="n">data_types</span><span class="o">=</span><span class="n">data_types</span><span class="p">,</span>
+            <span class="n">f_min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">force_min</span><span class="p">,</span>
+            <span class="n">regularization</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atomwise_regularization_parameter</span><span class="p">,</span>
+            <span class="n">atom_wise_regularization</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_wise_regularization</span><span class="p">,</span>
+            <span class="n">ref_force_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_force_name</span><span class="p">,</span>
+            <span class="n">ref_energy_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_energy_name</span><span class="p">,</span>
+            <span class="n">ref_virial_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_virial_name</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">write_after_distillation_data_split</span><span class="p">(</span>
+            <span class="n">distillation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">distillation</span><span class="p">,</span>
+            <span class="n">force_max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">force_max</span><span class="p">,</span>
+            <span class="n">split_ratio</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">split_ratio</span><span class="p">,</span>
+            <span class="n">force_label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_force_name</span><span class="p">,</span>
+            <span class="n">energy_label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_energy_name</span><span class="p">,</span>
+            <span class="n">train_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">train_data_file</span><span class="p">,</span>
+            <span class="n">test_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_data_file</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Merging database</span>
+        <span class="c1"># TODO: does a merge happen here?</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">regularization</span><span class="p">:</span>
+            <span class="n">base_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+            <span class="n">folder_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_dir</span><span class="p">,</span> <span class="s2">&quot;without_regularization&quot;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">folder_name</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created/verified folder: </span><span class="si">{</span><span class="n">folder_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error creating folder </span><span class="si">{</span><span class="n">folder_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">train_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_data_file</span><span class="p">)</span>
+            <span class="n">test_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_data_file</span><span class="p">)</span>
+            <span class="n">atoms</span> <span class="o">=</span> <span class="n">ase</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_data_file</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+            <span class="n">ase</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">train_path</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;extxyz&quot;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Written train file without regularization to: </span><span class="si">{</span><span class="n">train_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_data_file</span><span class="p">,</span> <span class="n">test_path</span><span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Copied test file to: </span><span class="si">{</span><span class="n">test_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;test.extxyz not found. Skipping copy.&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error copying test.extxyz: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">atoms_with_sigma</span> <span class="o">=</span> <span class="n">set_custom_sigma</span><span class="p">(</span>
+                <span class="n">atoms</span><span class="p">,</span>
+                <span class="n">reg_minmax</span><span class="o">=</span><span class="p">[(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.0316</span><span class="p">,</span> <span class="mf">0.316</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.0632</span><span class="p">,</span> <span class="mf">0.632</span><span class="p">)],</span>
+            <span class="p">)</span>
+            <span class="n">ase</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_data_file</span><span class="p">,</span> <span class="n">atoms_with_sigma</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;extxyz&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">separated</span><span class="p">:</span>
+            <span class="n">base_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+            <span class="n">atoms_train</span> <span class="o">=</span> <span class="n">ase</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_data_file</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+            <span class="n">atoms_test</span> <span class="o">=</span> <span class="n">ase</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_data_file</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">data_types</span><span class="p">):</span>
+                <span class="n">data_type</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">removesuffix</span><span class="p">(</span><span class="s2">&quot;_dir&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">data_type</span> <span class="o">!=</span> <span class="s2">&quot;iso_atoms&quot;</span><span class="p">:</span>
+                    <span class="n">folder_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_dir</span><span class="p">,</span> <span class="n">data_type</span><span class="p">)</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">folder_name</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created/verified folder: </span><span class="si">{</span><span class="n">folder_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Error creating folder </span><span class="si">{</span><span class="n">folder_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">. &quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Proceeding without separated dataset&quot;</span>
+                        <span class="p">)</span>
+                        <span class="k">continue</span>
+                    <span class="n">vasp_ref_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder_name</span><span class="p">,</span> <span class="s2">&quot;vasp_ref.extxyz&quot;</span><span class="p">)</span>
+                    <span class="n">train_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_data_file</span><span class="p">)</span>
+                    <span class="n">test_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_data_file</span><span class="p">)</span>
+
+                    <span class="k">for</span> <span class="n">atoms</span> <span class="ow">in</span> <span class="n">atoms_train</span> <span class="o">+</span> <span class="n">atoms_test</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">atoms</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;data_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;iso_atoms&quot;</span><span class="p">:</span>
+                            <span class="n">ase</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                                <span class="n">vasp_ref_path</span><span class="p">,</span>
+                                <span class="n">atoms</span><span class="p">,</span>
+                                <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;extxyz&quot;</span><span class="p">,</span>
+                                <span class="n">append</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                            <span class="p">)</span>
+                        <span class="k">if</span> <span class="n">atoms</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;data_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">data_type</span><span class="p">:</span>
+                            <span class="n">ase</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                                <span class="n">vasp_ref_path</span><span class="p">,</span>
+                                <span class="n">atoms</span><span class="p">,</span>
+                                <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;extxyz&quot;</span><span class="p">,</span>
+                                <span class="n">append</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                            <span class="p">)</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">write_after_distillation_data_split</span><span class="p">(</span>
+                            <span class="n">distillation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">distillation</span><span class="p">,</span>
+                            <span class="n">force_max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">force_max</span><span class="p">,</span>
+                            <span class="n">split_ratio</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">split_ratio</span><span class="p">,</span>
+                            <span class="n">vasp_ref_name</span><span class="o">=</span><span class="n">vasp_ref_path</span><span class="p">,</span>
+                            <span class="n">train_name</span><span class="o">=</span><span class="n">train_path</span><span class="p">,</span>
+                            <span class="n">test_name</span><span class="o">=</span><span class="n">test_path</span><span class="p">,</span>
+                            <span class="n">force_label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_force_name</span><span class="p">,</span>
+                        <span class="p">)</span>
+                        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Data split written: </span><span class="si">{</span><span class="n">train_path</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">test_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Error in write_after_distillation_data_split: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">)</span>
+
+        <span class="c1"># TODO: add a database to MongoDB besides just the path</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_fits_on_different_cluster</span><span class="p">:</span>
+
+            <span class="n">adapter</span> <span class="o">=</span> <span class="n">AseAtomsAdaptor</span><span class="p">()</span>
+
+            <span class="c1"># must always exist</span>
+            <span class="n">required_paths</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;train.extxyz&quot;</span><span class="p">,</span> <span class="s2">&quot;test.extxyz&quot;</span><span class="p">]</span>
+
+            <span class="n">optional_paths</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s2">&quot;phonon/train.extxyz&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;phonon/test.extxyz&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;rattled/train.extxyz&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;rattled/test.extxyz&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;without_regularization/train.extxyz&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;without_regularization/test.extxyz&quot;</span><span class="p">,</span>
+            <span class="p">]</span>
+
+            <span class="n">database_dict</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">path</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="n">adapter</span><span class="o">.</span><span class="n">get_structure</span><span class="p">(</span><span class="n">atoms</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">atoms</span> <span class="ow">in</span> <span class="n">ase</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span> <span class="o">/</span> <span class="n">path</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">)</span>
+                <span class="p">]</span>
+                <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">required_paths</span>
+            <span class="p">}</span>
+
+            <span class="n">database_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="n">path</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="n">adapter</span><span class="o">.</span><span class="n">get_structure</span><span class="p">(</span><span class="n">atoms</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">atoms</span> <span class="ow">in</span> <span class="n">ase</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span> <span class="o">/</span> <span class="n">path</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">)</span>
+                        <span class="p">]</span>
+                        <span class="k">if</span> <span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span> <span class="o">/</span> <span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+                        <span class="k">else</span> <span class="kc">None</span>
+                    <span class="p">)</span>
+                    <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">optional_paths</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;database_dir&quot;</span><span class="p">:</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">(),</span> <span class="s2">&quot;database_dict&quot;</span><span class="p">:</span> <span class="n">database_dict</span><span class="p">}</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;database_dir&quot;</span><span class="p">:</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">(),</span> <span class="s2">&quot;database_dict&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span></div>
+</div>
+
+</pre></div>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Author name not set
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, autoplex development team.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

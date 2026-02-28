@@ -1,0 +1,1626 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>autoplex.fitting.common.regularization &#8212; autoplex</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=1ea92b8b" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../../_static/documentation_options.js?v=e18d2f4a"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+
+
+
+
+
+const initStyles = () => {
+    const defaultStyle = document.createElement('style');
+    defaultStyle.textContent = `pre.mermaid {
+    /* Same as .mermaid-container > pre */
+    display: block;
+    width: 100%;
+}
+
+pre.mermaid > svg {
+    /* Same as .mermaid-container > pre > svg */
+    height: 500px;
+    width: 100%;
+    max-width: 100% !important;
+}`;
+    document.head.appendChild(defaultStyle);
+
+    const fullscreenStyle = document.createElement('style');
+    fullscreenStyle.textContent = `.mermaid-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.mermaid-container > pre {
+    display: block;
+    width: 100%;
+}
+
+.mermaid-container > pre > svg {
+    height: 500px;
+    width: 100%;
+    max-width: 100% !important;
+}
+
+.mermaid-fullscreen-btn {
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+    color: #333;
+}
+
+.mermaid-fullscreen-btn:hover {
+    opacity: 100% !important;
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+    transform: scale(1.1);
+}
+
+.mermaid-fullscreen-btn.dark-theme {
+    background: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #e0e0e0;
+}
+
+.mermaid-fullscreen-btn.dark-theme:hover {
+    background: rgba(60, 60, 60, 1);
+    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-modal {
+    display: none;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 95vw;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.98);
+    z-index: 9999;
+    padding: 20px;
+    overflow: auto;
+}
+
+.mermaid-fullscreen-modal.dark-theme {
+    background: rgba(0, 0, 0, 0.98);
+}
+
+.mermaid-fullscreen-modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen {
+    position: relative;
+    width: 95vw;
+    height: 90vh;
+    max-width: 95vw;
+    max-height: 90vh;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    overflow: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen.dark-theme {
+    background: #1a1a1a;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+}
+
+.mermaid-container-fullscreen pre.mermaid {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen .mermaid svg {
+    height: 100% !important;
+    width: 100% !important;
+    cursor: grab;
+}
+
+.mermaid-fullscreen-close {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s;
+    font-size: 24px;
+    line-height: 1;
+    color: #333;
+}
+
+.mermaid-fullscreen-close:hover {
+    background: white;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    transform: scale(1.1);
+}
+
+.mermaid-fullscreen-close.dark-theme {
+    background: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #e0e0e0;
+}
+
+.mermaid-fullscreen-close.dark-theme:hover {
+    background: rgba(60, 60, 60, 1);
+    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-modal .mermaid-fullscreen-btn {
+    display: none !important;
+}`;
+    document.head.appendChild(fullscreenStyle);
+}
+
+// Detect if page has dark background
+const isDarkTheme = () => {
+    // We use a set of heuristics:
+    // 1. Check for common dark mode classes or attributes
+    // 2. Check computed background color brightness
+    if (document.documentElement.classList.contains('dark') ||
+        document.documentElement.getAttribute('data-theme') === 'dark' ||
+        document.body.classList.contains('dark') ||
+        document.body.getAttribute('data-theme') === 'dark') {
+        // console.log("Dark theme detected via class/attribute");
+        return true;
+    }
+    if (document.documentElement.classList.contains('light') ||
+        document.documentElement.getAttribute('data-theme') === 'light' ||
+        document.body.classList.contains('light') ||
+        document.body.getAttribute('data-theme') === 'light') {
+        // console.log("Light theme detected via class/attribute");
+        return false;
+    }
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        // console.log("Dark theme detected via prefers-color-scheme");
+        return true;
+    }
+    const bgColor = window.getComputedStyle(document.body).backgroundColor;
+    const match = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {
+        const r = parseInt(match[1]);
+        const g = parseInt(match[2]);
+        const b = parseInt(match[3]);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        // console.log("Background color brightness:", brightness);
+        return brightness < 128;
+    }
+    // console.log("No dark or light theme detected, defaulting to light theme");
+    return false;
+};
+
+let darkTheme = isDarkTheme();
+let modal = null;
+let modalContent = null;
+let previousScrollOffset = [window.scrollX, window.scrollY];
+
+const runMermaid = async (rerun) => {
+    console.log("Running mermaid diagrams, rerun =", rerun);
+    // clear all existing mermaid charts
+    let all_mermaids = document.querySelectorAll(".mermaid");
+
+    if (rerun) {
+        all_mermaids.forEach((el) => {
+            if(!el.hasAttribute("data-original-code")) {
+                // store original code
+                // console.log(`Storing original code for first run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+            if(el.getAttribute("data-processed") === "true") {
+                // remove and restore original
+                el.removeAttribute("data-processed");
+                // console.log(`Restoring original code for re-run: `, el.getAttribute('data-original-code'));
+                el.innerHTML = el.getAttribute('data-original-code');
+            } else {
+                // store original code
+                // console.log(`Storing original code for re-run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+        });
+        await mermaid.run();
+    }
+
+    all_mermaids = document.querySelectorAll(".mermaid");
+    const mermaids_processed = document.querySelectorAll(".mermaid[data-processed='true']");
+
+    if ("False" === "True") {
+        const mermaids_to_add_zoom = -1 === -1 ? all_mermaids.length : -1;
+        if(mermaids_to_add_zoom > 0) {
+            var svgs = d3.selectAll("");
+            if(all_mermaids.length !== mermaids_processed.length) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            } else if(svgs.size() !== mermaids_to_add_zoom) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            } else {
+                svgs.each(function() {
+                    var svg = d3.select(this);
+                    svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+                    var inner = svg.select("g");
+                    var zoom = d3.zoom().on("zoom", function(event) {
+                        inner.attr("transform", event.transform);
+                    });
+                    svg.call(zoom);
+                });
+            }
+        }
+    } else if(all_mermaids.length !== mermaids_processed.length) {
+        // Wait for mermaid to process all diagrams
+        setTimeout(() => runMermaid(false), 200);
+        return;
+    }
+
+    // Stop here if not adding fullscreen capability
+    if ("True" !== "True") return;
+
+    if (modal !== null ) {
+        // Destroy existing modal
+        modal.remove();
+        modal = null;
+        modalContent = null;
+    }
+
+    modal = document.createElement('div');
+    modal.className = 'mermaid-fullscreen-modal' + (darkTheme ? ' dark-theme' : '');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Fullscreen diagram viewer');
+    modal.innerHTML = `
+        <button class="mermaid-fullscreen-close${darkTheme ? ' dark-theme' : ''}" aria-label="Close fullscreen">✕</button>
+        <div class="mermaid-container-fullscreen${darkTheme ? ' dark-theme' : ''}"></div>
+    `;
+    document.body.appendChild(modal);
+
+    modalContent = modal.querySelector('.mermaid-container-fullscreen');
+    const closeBtn = modal.querySelector('.mermaid-fullscreen-close');
+
+    const closeModal = () => {
+        modal.classList.remove('active');
+        modalContent.innerHTML = '';
+        document.body.style.overflow = ''
+        window.scrollTo({left: previousScrollOffset[0], top: previousScrollOffset[1], behavior: 'instant'});
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+            closeModal();
+        }
+    });
+
+    document.querySelectorAll('.mermaid').forEach((mermaidDiv) => {
+        if (mermaidDiv.parentNode.classList.contains('mermaid-container') ||
+            mermaidDiv.closest('.mermaid-fullscreen-modal')) {
+            // Already processed, adjust button class if needed
+            const existingBtn = mermaidDiv.parentNode.querySelector('.mermaid-fullscreen-btn');
+            if (existingBtn) {
+                existingBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+            }
+            return;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'mermaid-container';
+        mermaidDiv.parentNode.insertBefore(container, mermaidDiv);
+        container.appendChild(mermaidDiv);
+
+        const fullscreenBtn = document.createElement('button');
+        fullscreenBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+        fullscreenBtn.setAttribute('aria-label', 'View diagram in fullscreen');
+        fullscreenBtn.textContent = '⛶';
+        fullscreenBtn.style.opacity = '50%';
+
+        // Calculate dynamic position based on diagram's margin and padding
+        const diagramStyle = window.getComputedStyle(mermaidDiv);
+        const marginTop = parseFloat(diagramStyle.marginTop) || 0;
+        const marginRight = parseFloat(diagramStyle.marginRight) || 0;
+        const paddingTop = parseFloat(diagramStyle.paddingTop) || 0;
+        const paddingRight = parseFloat(diagramStyle.paddingRight) || 0;
+        fullscreenBtn.style.top = `${marginTop + paddingTop + 4}px`;
+        fullscreenBtn.style.right = `${marginRight + paddingRight + 4}px`;
+
+        fullscreenBtn.addEventListener('click', () => {
+            previousScrollOffset = [window.scroll, window.scrollY];
+            const clone = mermaidDiv.cloneNode(true);
+            modalContent.innerHTML = '';
+            modalContent.appendChild(clone);
+
+            const svg = clone.querySelector('svg');
+            if (svg) {
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.style.width = '100%';
+                svg.style.height = 'auto';
+                svg.style.maxWidth = '100%';
+                svg.style.sdisplay = 'block';
+
+                if ("False" === "True") {
+                    setTimeout(() => {
+                        const g = svg.querySelector('g');
+                        if (g) {
+                            var svgD3 = d3.select(svg);
+                            svgD3.html("<g class='wrapper'>" + svgD3.html() + "</g>");
+                            var inner = svgD3.select("g");
+                            var zoom = d3.zoom().on("zoom", function(event) {
+                                inner.attr("transform", event.transform);
+                            });
+                            svgD3.call(zoom);
+                        }
+                    }, 100);
+                }
+            }
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        container.appendChild(fullscreenBtn);
+    });
+};
+
+const load = async () => {
+    initStyles();
+
+    await runMermaid(true);
+
+    const reRunIfThemeChanges = async () => {
+        const newDarkTheme = isDarkTheme();
+        if (newDarkTheme !== darkTheme) {
+            darkTheme = newDarkTheme;
+            console.log("Theme change detected, re-running mermaid with", darkTheme ? "dark" : "default", "theme");
+            await mermaid.initialize(
+                {...JSON.parse(
+                    `{"startOnLoad": false}`
+                ),
+                ...{ darkMode: darkTheme, theme: darkTheme ? 'dark' : 'default' },
+                }
+            );
+            await runMermaid(true);
+        }
+    };
+
+    // Update theme classes when theme changes
+    const themeObserver = new MutationObserver(reRunIfThemeChanges);
+    themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+    themeObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+};
+
+
+
+
+
+console.log("Initializing mermaid with", darkTheme ? "dark" : "default", "theme");
+mermaid.initialize(
+    {...JSON.parse(
+        `{"startOnLoad": false}`
+    ),
+    ...{ darkMode: darkTheme, theme: darkTheme ? 'dark' : 'default' },
+    }
+);
+
+window.addEventListener("load", load);</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/autoplex/fitting/common/regularization';</script>
+    <link rel="icon" href="../../../../_static/autoplex_favicon.png"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.1.dev1+g6ffcd01a0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../../_static/autoplex_logo.png" class="logo__image only-light" alt="autoplex - Home"/>
+    <img src="../../../../_static/autoplex_logo.png" class="logo__image only-dark pst-js-only" alt="autoplex - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../user/index.html">Overview</a></li>
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../../../../user/setup.html">Quick-start</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../user/tutorials.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../user/installation/installation.html">Installation guide</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../user/rss/index.html">RSS workflow</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/rss/flow/introduction/intro.html">Brief overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/rss/flow/input/input.html">Input YAML configuration file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/rss/flow/quick_start/start.html">Quick start</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/rss/flow/example/example.html">Examples</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../user/phonon/index.html">Phonon workflow</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/phonon/flows/flows.html">Out-of-the-box workflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/phonon/flows/generation/data.html">Generating reference data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/phonon/flows/fitting/fitting.html">Fitting phonon-accurate potentials</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/phonon/flows/benchmark/benchmark.html">Benchmark of ML-based phonon structure</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../user/executable/index.html">Executable tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/executable/tutorial_phonon.html">Iterative DFT vs MLIP benchmark workflow for phonons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/executable/tutorial_rss.html">RSS Workflow</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../reference/index.html">API reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.auto.html">autoplex.auto</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.auto.phonons.html">autoplex.auto.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.auto.phonons.flows.html">autoplex.auto.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.auto.phonons.jobs.html">autoplex.auto.phonons.jobs</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.auto.rss.html">autoplex.auto.rss</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.auto.rss.flows.html">autoplex.auto.rss.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.auto.rss.jobs.html">autoplex.auto.rss.jobs</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.benchmark.html">autoplex.benchmark</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.benchmark.phonons.html">autoplex.benchmark.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.benchmark.phonons.flows.html">autoplex.benchmark.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.benchmark.phonons.jobs.html">autoplex.benchmark.phonons.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.benchmark.phonons.utils.html">autoplex.benchmark.phonons.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.benchmark.rss.html">autoplex.benchmark.rss</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.html">autoplex.data</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.common.html">autoplex.data.common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.common.flows.html">autoplex.data.common.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.common.jobs.html">autoplex.data.common.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.common.utils.html">autoplex.data.common.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.phonons.html">autoplex.data.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.phonons.flows.html">autoplex.data.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.phonons.jobs.html">autoplex.data.phonons.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.phonons.utils.html">autoplex.data.phonons.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.rss.html">autoplex.data.rss</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.rss.flows.html">autoplex.data.rss.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.rss.jobs.html">autoplex.data.rss.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.rss.utils.html">autoplex.data.rss.utils</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.fitting.html">autoplex.fitting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.html">autoplex.fitting.common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.flows.html">autoplex.fitting.common.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.jobs.html">autoplex.fitting.common.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.regularization.html">autoplex.fitting.common.regularization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.utils.html">autoplex.fitting.common.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.fitting.phonons.html">autoplex.fitting.phonons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.fitting.rss.html">autoplex.fitting.rss</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.misc.html">autoplex.misc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.html">autoplex.misc.castep</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.flows.html">autoplex.misc.castep.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.jobs.html">autoplex.misc.castep.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.run.html">autoplex.misc.castep.run</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.schema.html">autoplex.misc.castep.schema</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.utils.html">autoplex.misc.castep.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.misc.utils.html">autoplex.misc.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.utils.mock_castep.html">autoplex.misc.utils.mock_castep</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.settings.html">autoplex.settings</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.AutoplexBaseModel.html">AutoplexBaseModel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.AutoplexSettings.html">AutoplexSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.BcurParams.html">BcurParams</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.BuildcellOptions.html">BuildcellOptions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.CustomIncar.html">CustomIncar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.GAPGeneralSettings.html">GAPGeneralSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.GAPSettings.html">GAPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.JACESettings.html">JACESettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.LossCoeff.html">LossCoeff</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.M3GNETSettings.html">M3GNETSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.MACESettings.html">MACESettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.MLIPHypers.html">MLIPHypers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.NEPSettings.html">NEPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.NEQUIPSettings.html">NEQUIPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.Nonlinearity.html">Nonlinearity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.ResumeFromPreviousState.html">ResumeFromPreviousState</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.RssConfig.html">RssConfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.SETTINGS.html">SETTINGS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.SoapParas.html">SoapParas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.SoapSettings.html">SoapSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.ThreebSettings.html">ThreebSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.TwobSettings.html">TwobSettings</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contributing Guide</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/contributing.html">Contributing to autoplex</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/dev_install.html">Developer Installation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../about/changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../about/contributors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../about/license.html">License</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/JaGeo/autoplex" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/JaGeo/autoplex/issues/new?title=Issue%20on%20page%20%2F_modules/autoplex/fitting/common/regularization.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for autoplex.fitting.common.regularization</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Functions for automatic regularization and weighting of training data.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">ast</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">traceback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">suppress</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ase</span><span class="w"> </span><span class="kn">import</span> <span class="n">Atoms</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.spatial</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConvexHull</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+    <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2"> - </span><span class="si">%(levelname)s</span><span class="s2"> - </span><span class="si">%(message)s</span><span class="s2">&quot;</span>
+<span class="p">)</span>
+
+
+<span class="c1"># adapted from MorrowChem&#39;s RSS routines.</span>
+<div class="viewcode-block" id="set_custom_sigma">
+<a class="viewcode-back" href="../../../../reference/autoplex.fitting.common.regularization.set_custom_sigma.html#autoplex.fitting.common.regularization.set_custom_sigma">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_custom_sigma</span><span class="p">(</span>
+    <span class="n">atoms</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Atoms</span><span class="p">],</span>
+    <span class="n">reg_minmax</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">],</span>
+    <span class="n">isolated_atom_energies</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">scheme</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;linear-hull&quot;</span><span class="p">,</span>
+    <span class="n">energy_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;REF_energy&quot;</span><span class="p">,</span>
+    <span class="n">force_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;REF_forces&quot;</span><span class="p">,</span>
+    <span class="n">virial_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;REF_virial&quot;</span><span class="p">,</span>
+    <span class="n">element_order</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_energy</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">20.0</span><span class="p">,</span>
+    <span class="n">config_type_override</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">retain_existing_sigma</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Atoms</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handle automatic regularisation based on distance to convex hull, amongst other things.</span>
+
+<span class="sd">    TODO: Need to make sure this works for full multi-stoichiometry systems.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    atoms: (list of ase.Atoms)</span>
+<span class="sd">        List of atoms objects to set reg. for. Usually fitting database</span>
+<span class="sd">    reg_minmax: (list of tuples)</span>
+<span class="sd">        List of tuples of (min, max) values for energy, force, virial sigmas</span>
+<span class="sd">    scheme: (str)</span>
+<span class="sd">        Method to use for regularization. Options are: linear_hull, volume-stoichiometry</span>
+<span class="sd">        linear_hull: for single-composition system, use 2D convex hull (E, V)</span>
+<span class="sd">        volume-stoichiometry: for multi-composition system, use 3D convex hull of (E, V, mole-fraction)</span>
+<span class="sd">    energy_name: (str)</span>
+<span class="sd">        Name of energy key in atoms.info</span>
+<span class="sd">    force_name: (str)</span>
+<span class="sd">        Name of force key in atoms.arrays</span>
+<span class="sd">    virial_name: (str)</span>
+<span class="sd">        Name of virial key in atoms.info</span>
+<span class="sd">    isolated_atom_energies: (dict)</span>
+<span class="sd">        Dictionary of isolated energies for each atomic number.</span>
+<span class="sd">        Only needed for volume-x scheme e.g. {14: &#39;-163.0&#39;, 8:&#39;-75.0&#39;}</span>
+<span class="sd">        for SiO2</span>
+<span class="sd">    element_order: (list)</span>
+<span class="sd">        List of atomic numbers in order of choice (e.g. [42, 16] for MoS2)</span>
+<span class="sd">    max_energy: (float)</span>
+<span class="sd">        Ignore any structures with energy above hull greater than this value (eV)</span>
+<span class="sd">    config_type_override: (dict)</span>
+<span class="sd">        Give custom regularization for specific configuration types</span>
+<span class="sd">    retain_existing_sigma: bool</span>
+<span class="sd">        Whether to keep the current sigma values for specific configuration types.</span>
+<span class="sd">        If set to True, existing sigma values for specific configurations will remain unchanged.</span>
+
+<span class="sd">    e.g. reg_minmax = [(0.1, 1), (0.001, 0.1), (0.0316, 0.316), (0.0632, 0.632)]</span>
+<span class="sd">    [(emin, emax), (semin, semax), (sfmin, sfmax), (ssvmin, svmax)]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sigs</span> <span class="o">=</span> <span class="p">[[],</span> <span class="p">[],</span> <span class="p">[]]</span>  <span class="c1"># type: ignore</span>
+    <span class="n">atoms_modi</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="n">config_type_override</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">config_type_override</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;IsolatedAtom&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">1e-4</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+            <span class="s2">&quot;dimer&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+        <span class="p">}</span>
+
+    <span class="k">for</span> <span class="n">at</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">config_type</span><span class="p">,</span> <span class="n">sigs_override</span> <span class="ow">in</span> <span class="n">config_type_override</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">at</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;config_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">config_type</span><span class="p">:</span>
+                <span class="n">at</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;energy_sigma&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sigs_override</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">at</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;force_sigma&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sigs_override</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">at</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;virial_sigma&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sigs_override</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                <span class="n">atoms_modi</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">at</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">at</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;config_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;IsolatedAtom&quot;</span><span class="p">:</span>
+            <span class="n">at</span><span class="o">.</span><span class="n">calc</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># TODO side-effect alert</span>
+            <span class="k">del</span> <span class="n">at</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;force_sigma&quot;</span><span class="p">]</span>
+            <span class="k">del</span> <span class="n">at</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;virial_sigma&quot;</span><span class="p">]</span>
+            <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="n">at</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;config_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;dimer&quot;</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">suppress</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+                <span class="k">del</span> <span class="n">at</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="n">virial_name</span><span class="p">]</span>
+
+            <span class="k">continue</span>
+
+    <span class="n">isolated_atom_energies</span> <span class="o">=</span> <span class="n">isolated_atom_energies</span> <span class="ow">or</span> <span class="p">{}</span>
+
+    <span class="k">if</span> <span class="n">scheme</span> <span class="o">==</span> <span class="s2">&quot;linear-hull&quot;</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Regularising with linear hull&quot;</span><span class="p">)</span>
+        <span class="n">hull</span><span class="p">,</span> <span class="n">points</span> <span class="o">=</span> <span class="n">get_convex_hull</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">energy_name</span><span class="o">=</span><span class="n">energy_name</span><span class="p">)</span>
+        <span class="n">get_e_distance_func</span> <span class="o">=</span> <span class="n">get_e_distance_to_hull</span>
+
+    <span class="k">elif</span> <span class="n">scheme</span> <span class="o">==</span> <span class="s2">&quot;volume-stoichiometry&quot;</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Regularising with 3D volume-mole fraction hull&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">isolated_atom_energies</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Need to supply dictionary of isolated energies.&quot;</span><span class="p">)</span>
+
+        <span class="n">isolated_atom_energies</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">k</span><span class="p">:</span> <span class="n">v</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">isolated_atom_energies</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="n">label_stoichiometry_volume</span><span class="p">(</span>
+            <span class="n">atoms</span><span class="p">,</span> <span class="n">isolated_atom_energies</span><span class="p">,</span> <span class="n">energy_name</span><span class="p">,</span> <span class="n">element_order</span><span class="o">=</span><span class="n">element_order</span>
+        <span class="p">)</span>  <span class="c1"># label atoms with volume and mole fraction</span>
+        <span class="n">hull</span> <span class="o">=</span> <span class="n">calculate_hull_nd</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+        <span class="n">get_e_distance_func</span> <span class="o">=</span> <span class="n">get_e_distance_to_hull_nd</span>  <span class="c1"># type: ignore</span>
+
+    <span class="n">points</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span>
+        <span class="p">{</span>  <span class="c1"># check if set comprehension is running as supposed to</span>
+            <span class="n">at</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rss_group&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">at</span> <span class="ow">in</span> <span class="n">atoms</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">at</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rss_nonperiodic&quot;</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">):</span>
+        <span class="n">points</span><span class="p">[</span><span class="n">group</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">at</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># skip non-periodic configs, volume is meaningless</span>
+            <span class="k">if</span> <span class="n">at</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rss_nonperiodic&quot;</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">points</span><span class="p">[</span><span class="n">at</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rss_group&quot;</span><span class="p">)]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">at</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+    <span class="k">for</span> <span class="n">group</span><span class="p">,</span> <span class="n">atoms_group</span> <span class="ow">in</span> <span class="n">points</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;group: </span><span class="si">{</span><span class="n">group</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">atoms_group</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="n">retain_existing_sigma</span> <span class="ow">and</span> <span class="s2">&quot;energy_sigma&quot;</span> <span class="ow">in</span> <span class="n">val</span><span class="o">.</span><span class="n">info</span><span class="p">:</span>
+                <span class="n">atoms_modi</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="n">de</span> <span class="o">=</span> <span class="n">get_e_distance_func</span><span class="p">(</span>
+                <span class="n">hull</span><span class="p">,</span>
+                <span class="n">val</span><span class="p">,</span>
+                <span class="n">energy_name</span><span class="o">=</span><span class="n">energy_name</span><span class="p">,</span>
+                <span class="n">isolated_atom_energies</span><span class="o">=</span><span class="n">isolated_atom_energies</span><span class="p">,</span>
+                <span class="n">element_order</span><span class="o">=</span><span class="n">element_order</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">de</span> <span class="o">&gt;</span> <span class="n">max_energy</span><span class="p">:</span>
+                <span class="c1"># don&#39;t even fit if too high</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">val</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;config_type&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config_type_override</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">group</span> <span class="o">==</span> <span class="s2">&quot;initial&quot;</span><span class="p">:</span>
+                    <span class="n">sigs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reg_minmax</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">sigs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reg_minmax</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">sigs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reg_minmax</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">val</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;energy_sigma&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">reg_minmax</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">val</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;force_sigma&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">reg_minmax</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">val</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;virial_sigma&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">reg_minmax</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">atoms_modi</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                    <span class="k">continue</span>
+
+                <span class="k">if</span> <span class="n">de</span> <span class="o">&lt;=</span> <span class="n">reg_minmax</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span>
+                    <span class="n">sigs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reg_minmax</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">sigs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reg_minmax</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">sigs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reg_minmax</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">val</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;energy_sigma&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">reg_minmax</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">val</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;force_sigma&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">reg_minmax</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">val</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;virial_sigma&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">reg_minmax</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">atoms_modi</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
+                <span class="k">elif</span> <span class="n">de</span> <span class="o">&gt;=</span> <span class="n">reg_minmax</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">sigs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reg_minmax</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">sigs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reg_minmax</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">sigs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reg_minmax</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">val</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;energy_sigma&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">reg_minmax</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">val</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;force_sigma&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">reg_minmax</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">val</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;virial_sigma&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">reg_minmax</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">atoms_modi</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="p">[</span><span class="n">e</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="n">piecewise_linear</span><span class="p">(</span>
+                        <span class="n">de</span><span class="p">,</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span>
+                                <span class="mf">0.1</span><span class="p">,</span>
+                                <span class="p">[</span><span class="n">reg_minmax</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">reg_minmax</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">reg_minmax</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">0</span><span class="p">]],</span>
+                            <span class="p">),</span>
+                            <span class="p">(</span>
+                                <span class="mf">1.0</span><span class="p">,</span>
+                                <span class="p">[</span><span class="n">reg_minmax</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">reg_minmax</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">reg_minmax</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">1</span><span class="p">]],</span>
+                            <span class="p">),</span>
+                        <span class="p">],</span>
+                    <span class="p">)</span>
+                    <span class="n">sigs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                    <span class="n">sigs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                    <span class="n">sigs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                    <span class="n">val</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;energy_sigma&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e</span>
+                    <span class="n">val</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;force_sigma&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span>
+                    <span class="n">val</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;virial_sigma&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+                    <span class="n">atoms_modi</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
+    <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;E&quot;</span><span class="p">,</span> <span class="s2">&quot;F&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">]</span>
+    <span class="n">data_type</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sig</span><span class="p">)</span> <span class="k">for</span> <span class="n">sig</span> <span class="ow">in</span> <span class="n">sigs</span><span class="p">]</span>  <span class="c1"># [e, f, v]</span>
+
+    <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">data_type</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="s2">&quot;No automatic regularisation performed (no structures requested)&quot;</span>
+            <span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">label</span> <span class="o">==</span> <span class="s2">&quot;E&quot;</span><span class="p">:</span>
+            <span class="c1"># Report of the regularisation statistics</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Automatic regularisation statistics for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2"> structures:</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="s2">&quot;</span><span class="si">{:&gt;20s}{:&gt;20s}{:&gt;20s}{:&gt;20s}{:&gt;20s}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;Mean&quot;</span><span class="p">,</span> <span class="s2">&quot;Std&quot;</span><span class="p">,</span> <span class="s2">&quot;Nmin&quot;</span><span class="p">,</span> <span class="s2">&quot;Nmax&quot;</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">label</span><span class="si">:</span><span class="s2">&gt;20s</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">&gt;20.4f</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">std</span><span class="p">()</span><span class="si">:</span><span class="s2">&gt;20.4f</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="p">(</span><span class="n">data</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">data</span><span class="o">.</span><span class="n">min</span><span class="p">())</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">:</span><span class="s2">&gt;20d</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="p">(</span><span class="n">data</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">data</span><span class="o">.</span><span class="n">max</span><span class="p">())</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">:</span><span class="s2">&gt;20d</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">atoms_modi</span></div>
+
+
+
+<div class="viewcode-block" id="get_convex_hull">
+<a class="viewcode-back" href="../../../../reference/autoplex.fitting.common.regularization.get_convex_hull.html#autoplex.fitting.common.regularization.get_convex_hull">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_convex_hull</span><span class="p">(</span>
+    <span class="n">atoms</span><span class="p">,</span> <span class="n">energy_name</span><span class="o">=</span><span class="s2">&quot;energy&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the simple linear (E,V) convex hull.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    atoms: list</span>
+<span class="sd">        List of atoms objects.</span>
+<span class="sd">    energy_name: str</span>
+<span class="sd">        Name of the energy key in atoms.info (typically a DFT energy).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple</span>
+<span class="sd">        A tuple containing two elements:</span>
+<span class="sd">        - lower_half_hull_points: list of points (volume, energy) in the convex hull (lower half only).</span>
+<span class="sd">        - p: list of all points for testing purposes.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">points_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">failed_count</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;config_type&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;IsolatedAtom&quot;</span><span class="p">,</span> <span class="s2">&quot;dimer&quot;</span><span class="p">]:</span>
+            <span class="k">continue</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">volume_per_atom</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">get_volume</span><span class="p">()</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+            <span class="n">energy_per_atom</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">atom</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="n">energy_name</span><span class="p">]</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">energy_name</span> <span class="o">!=</span> <span class="s2">&quot;energy&quot;</span>
+                <span class="k">else</span> <span class="n">atom</span><span class="o">.</span><span class="n">get_potential_energy</span><span class="p">()</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">points_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">volume_per_atom</span><span class="p">,</span> <span class="n">energy_per_atom</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">failed_count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">failed_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Convex hull failed to include </span><span class="si">{</span><span class="n">failed_count</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">atoms</span><span class="p">)</span><span class="si">}</span><span class="s2"> structures&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">points_list</span><span class="p">)</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="n">points</span><span class="o">.</span><span class="n">T</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">points</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span><span class="o">.</span><span class="n">T</span>  <span class="c1"># sort by volume axis</span>
+
+    <span class="n">hull</span> <span class="o">=</span> <span class="n">ConvexHull</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>  <span class="c1"># generate full convex hull</span>
+    <span class="n">hull_points</span> <span class="o">=</span> <span class="n">points</span><span class="p">[</span><span class="n">hull</span><span class="o">.</span><span class="n">vertices</span><span class="p">]</span>
+
+    <span class="n">min_x_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">hull_points</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">max_x_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">hull_points</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">lower_half_hull</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">min_x_index</span>
+
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">lower_half_hull</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hull</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">hull</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">max_x_index</span><span class="p">:</span>
+            <span class="n">lower_half_hull</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hull</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">break</span>
+
+    <span class="n">lower_half_hull_points</span> <span class="o">=</span> <span class="n">points</span><span class="p">[</span><span class="n">lower_half_hull</span><span class="p">]</span>
+
+    <span class="n">lower_half_hull_points</span> <span class="o">=</span> <span class="n">lower_half_hull_points</span><span class="p">[</span>
+        <span class="n">lower_half_hull_points</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">lower_half_hull_points</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">lower_half_hull_points</span><span class="p">,</span> <span class="n">points</span></div>
+
+
+
+<div class="viewcode-block" id="get_e_distance_to_hull">
+<a class="viewcode-back" href="../../../../reference/autoplex.fitting.common.regularization.get_e_distance_to_hull.html#autoplex.fitting.common.regularization.get_e_distance_to_hull">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_e_distance_to_hull</span><span class="p">(</span>
+    <span class="n">hull</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">energy_name</span><span class="o">=</span><span class="s2">&quot;energy&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the distance of a structure to the linear convex hull in energy.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    hull: (np.array)</span>
+<span class="sd">        Points in the convex hull</span>
+<span class="sd">    atoms: (Atoms)</span>
+<span class="sd">        Structure to calculate distance to hull</span>
+<span class="sd">    energy_name: (str)</span>
+<span class="sd">        Name of the energy key in atoms.info (typically a DFT energy)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">volume</span> <span class="o">=</span> <span class="n">atoms</span><span class="o">.</span><span class="n">get_volume</span><span class="p">()</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">atoms</span><span class="p">)</span>
+    <span class="n">energy</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">atoms</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="n">energy_name</span><span class="p">]</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">atoms</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">energy_name</span> <span class="o">!=</span> <span class="s2">&quot;energy&quot;</span>
+        <span class="k">else</span> <span class="n">atoms</span><span class="o">.</span><span class="n">get_potential_energy</span><span class="p">()</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">atoms</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">tp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">volume</span><span class="p">,</span> <span class="n">energy</span><span class="p">])</span>
+    <span class="n">hull_ps</span> <span class="o">=</span> <span class="n">hull</span><span class="o">.</span><span class="n">points</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">hull</span><span class="p">,</span> <span class="n">ConvexHull</span><span class="p">)</span> <span class="k">else</span> <span class="n">hull</span>
+
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">hull_ps</span><span class="p">[:],</span> <span class="n">tp</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="p">):</span>  <span class="c1"># if the point is on the hull, return 0.0</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+
+    <span class="n">nearest</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">hull_ps</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">tp</span><span class="p">,</span> <span class="n">side</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)[</span>
+        <span class="mi">0</span>
+    <span class="p">]</span>  <span class="c1"># find the nearest convex hull point</span>
+
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">energy</span>
+        <span class="o">-</span> <span class="n">get_intersect</span><span class="p">(</span>
+            <span class="n">tp</span><span class="p">,</span>  <span class="c1"># get intersection of the vertical line (energy axis)</span>
+            <span class="n">tp</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>  <span class="c1"># and the line between the nearest hull points</span>
+            <span class="n">hull_ps</span><span class="p">[(</span><span class="n">nearest</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">hull_ps</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">0</span><span class="p">])],</span>
+            <span class="n">hull_ps</span><span class="p">[</span><span class="n">nearest</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">hull_ps</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">0</span><span class="p">])],</span>
+        <span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_intersect">
+<a class="viewcode-back" href="../../../../reference/autoplex.fitting.common.regularization.get_intersect.html#autoplex.fitting.common.regularization.get_intersect">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_intersect</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return the point of intersection of the lines passing through a2,a1 and b2,b1.</span>
+
+<span class="sd">    a1: [x, y]</span>
+<span class="sd">        A point on the first line</span>
+<span class="sd">    a2: [x, y]</span>
+<span class="sd">        Another point on the first line</span>
+<span class="sd">    b1: [x, y]</span>
+<span class="sd">        A point on the second line</span>
+<span class="sd">    b2: [x, y]</span>
+<span class="sd">        Another point on the second line</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">])</span>  <span class="c1"># s for stacked</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">s</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">))))</span>  <span class="c1"># h for homogeneous</span>
+    <span class="n">l1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">h</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">h</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># get first line</span>
+    <span class="n">l2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">h</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">h</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>  <span class="c1"># get second line</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">l1</span><span class="p">,</span> <span class="n">l2</span><span class="p">)</span>  <span class="c1"># point of intersection</span>
+    <span class="k">if</span> <span class="n">z</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># lines are parallel</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">/</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span> <span class="o">/</span> <span class="n">z</span></div>
+
+
+
+<div class="viewcode-block" id="get_mole_frac">
+<a class="viewcode-back" href="../../../../reference/autoplex.fitting.common.regularization.get_mole_frac.html#autoplex.fitting.common.regularization.get_mole_frac">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_mole_frac</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">element_order</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the mole-fraction of a structure.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    atoms: (Atoms)</span>
+<span class="sd">        Structure to calculate mole-fraction of</span>
+<span class="sd">    element_order: (list)</span>
+<span class="sd">        List of atomic numbers in order of choice (e.g. [42, 16] for MoS2)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    (x2, x3...): (array of float)</span>
+<span class="sd">        Reduced mole-fraction of structure - first element n = 1-sum(others)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">element</span><span class="p">,</span> <span class="n">cts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">atoms</span><span class="o">.</span><span class="n">get_atomic_numbers</span><span class="p">(),</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">element_order</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">element</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>  <span class="c1"># compatibility with old version</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">cts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="n">cts</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">element</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">else</span> <span class="mi">1</span>
+
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># new version, requires element_order, recommended for all new calculations</span>
+        <span class="k">if</span> <span class="n">element_order</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">element_order</span> <span class="o">=</span> <span class="n">element</span>  <span class="c1"># use default order</span>
+        <span class="n">not_in</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">element_order</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">element</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">not_in</span><span class="p">:</span>
+            <span class="n">element</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+            <span class="n">cts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">cts</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">cts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">cts</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">element</span> <span class="o">==</span> <span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">element_order</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">element</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">element</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">element</span> <span class="o">==</span> <span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">element_order</span><span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="n">cts</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="n">cts</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">x</span></div>
+
+
+
+<div class="viewcode-block" id="label_stoichiometry_volume">
+<a class="viewcode-back" href="../../../../reference/autoplex.fitting.common.regularization.label_stoichiometry_volume.html#autoplex.fitting.common.regularization.label_stoichiometry_volume">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">label_stoichiometry_volume</span><span class="p">(</span>
+    <span class="n">atoms_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Atoms</span><span class="p">],</span>
+    <span class="n">isolated_atom_energies</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="n">energy_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">element_order</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the stoichiometry, energy, and volume coordinates for forming the convex hull.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    atoms_list: (list[Atoms])</span>
+<span class="sd">        List of atoms objects</span>
+<span class="sd">    isolated_atom_energies: (dict)</span>
+<span class="sd">        Dictionary of isolated atom energies {atomic_number: energy}</span>
+<span class="sd">    energy_name: (str)</span>
+<span class="sd">        Name of energy key in atoms.info (typically a DFT energy)</span>
+<span class="sd">    element_order: (list | None)</span>
+<span class="sd">        List of atomic numbers in order of choice (e.g. [42, 16] for MoS2)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">isolated_atom_energies</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">k</span><span class="p">:</span> <span class="n">v</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">isolated_atom_energies</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="p">}</span>
+    <span class="n">points_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms_list</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">volume</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">get_volume</span><span class="p">()</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+            <span class="c1"># make energy relative to isolated atoms</span>
+            <span class="n">energy</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">atom</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="n">energy_name</span><span class="p">]</span>
+                <span class="o">-</span> <span class="nb">sum</span><span class="p">([</span><span class="n">isolated_atom_energies</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">atom</span><span class="o">.</span><span class="n">get_atomic_numbers</span><span class="p">()])</span>
+                <span class="k">if</span> <span class="n">energy_name</span> <span class="o">!=</span> <span class="s2">&quot;energy&quot;</span>
+                <span class="k">else</span> <span class="n">atom</span><span class="o">.</span><span class="n">get_potential_energy</span><span class="p">()</span>
+                <span class="o">-</span> <span class="nb">sum</span><span class="p">([</span><span class="n">isolated_atom_energies</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">atom</span><span class="o">.</span><span class="n">get_atomic_numbers</span><span class="p">()])</span>
+            <span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+            <span class="n">mole_frac</span> <span class="o">=</span> <span class="n">get_mole_frac</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">element_order</span><span class="o">=</span><span class="n">element_order</span><span class="p">)</span>
+            <span class="n">points_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">mole_frac</span><span class="p">,</span> <span class="n">volume</span><span class="p">,</span> <span class="n">energy</span><span class="p">)))</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">points_list</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">points</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">lexsort</span><span class="p">(</span><span class="n">points</span><span class="o">.</span><span class="n">T</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])]</span></div>
+
+
+
+<div class="viewcode-block" id="point_in_triangle_2D">
+<a class="viewcode-back" href="../../../../reference/autoplex.fitting.common.regularization.point_in_triangle_2D.html#autoplex.fitting.common.regularization.point_in_triangle_2D">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">point_in_triangle_2D</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">pn</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if a point is inside a triangle in 2D.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    p1: (tuple)</span>
+<span class="sd">        Coordinates of first point</span>
+<span class="sd">    p2: (tuple)</span>
+<span class="sd">        Coordinates of second point</span>
+<span class="sd">    p3: (tuple)</span>
+<span class="sd">        Coordinates of third point</span>
+<span class="sd">    pn: (tuple)</span>
+<span class="sd">        Coordinates of point to check</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ep</span> <span class="o">=</span> <span class="mf">1e-4</span>
+    <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span> <span class="o">=</span> <span class="n">p1</span>
+    <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span> <span class="o">=</span> <span class="n">p2</span>
+    <span class="n">x3</span><span class="p">,</span> <span class="n">y3</span> <span class="o">=</span> <span class="n">p3</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">pn</span>
+
+    <span class="n">denominator</span> <span class="o">=</span> <span class="p">(</span><span class="n">y2</span> <span class="o">-</span> <span class="n">y3</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x1</span> <span class="o">-</span> <span class="n">x3</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">x3</span> <span class="o">-</span> <span class="n">x2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">y1</span> <span class="o">-</span> <span class="n">y3</span><span class="p">)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="p">((</span><span class="n">y2</span> <span class="o">-</span> <span class="n">y3</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">x3</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">x3</span> <span class="o">-</span> <span class="n">x2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y3</span><span class="p">))</span> <span class="o">/</span> <span class="n">denominator</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="p">((</span><span class="n">y3</span> <span class="o">-</span> <span class="n">y1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">x3</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">x1</span> <span class="o">-</span> <span class="n">x3</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y3</span><span class="p">))</span> <span class="o">/</span> <span class="n">denominator</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">a</span> <span class="o">-</span> <span class="n">b</span>
+
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="mi">0</span> <span class="o">-</span> <span class="n">ep</span> <span class="o">&lt;=</span> <span class="n">a</span>
+        <span class="ow">and</span> <span class="n">a</span> <span class="o">&lt;=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">ep</span>
+        <span class="ow">and</span> <span class="mi">0</span> <span class="o">-</span> <span class="n">ep</span> <span class="o">&lt;=</span> <span class="n">b</span>
+        <span class="ow">and</span> <span class="n">b</span> <span class="o">&lt;=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">ep</span>
+        <span class="ow">and</span> <span class="mi">0</span> <span class="o">-</span> <span class="n">ep</span> <span class="o">&lt;=</span> <span class="n">c</span>
+        <span class="ow">and</span> <span class="n">c</span> <span class="o">&lt;=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">ep</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="point_in_simplex_nd">
+<a class="viewcode-back" href="../../../../reference/autoplex.fitting.common.regularization.point_in_simplex_nd.html#autoplex.fitting.common.regularization.point_in_simplex_nd">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">point_in_simplex_nd</span><span class="p">(</span><span class="n">pn</span><span class="p">,</span> <span class="o">*</span><span class="n">preg</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if a point is inside a region of hyperplanes in N dimensions.</span>
+
+<span class="sd">    Make a little convex hull in N-1 D and check this.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    pn:</span>
+<span class="sd">        Point to check (in ND)</span>
+<span class="sd">    *preg:</span>
+<span class="sd">        A list of points defining an (N-1)D simplex.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">preg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">preg</span><span class="p">)</span>
+    <span class="n">pn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pn</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">preg</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">pn</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Point and points must have the same dimensionality. Got </span><span class="si">{</span><span class="n">pn</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">preg</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+    <span class="n">hull</span> <span class="o">=</span> <span class="n">ConvexHull</span><span class="p">(</span><span class="n">preg</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">hull</span><span class="o">.</span><span class="n">equations</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">pn</span><span class="p">)</span> <span class="o">+</span> <span class="n">hull</span><span class="o">.</span><span class="n">equations</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mf">1e-10</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="calculate_hull_nd">
+<a class="viewcode-back" href="../../../../reference/autoplex.fitting.common.regularization.calculate_hull_nd.html#autoplex.fitting.common.regularization.calculate_hull_nd">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_hull_nd</span><span class="p">(</span><span class="n">points_nd</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConvexHull</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the convex hull in ND (N&gt;=3).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    points_nd:</span>
+<span class="sd">        Point in ND.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Convex hull in ND.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">p0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="p">(</span><span class="n">points_nd</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">points_nd</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">())</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">points_nd</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">points_nd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="o">+</span> <span class="p">[</span><span class="o">-</span><span class="mf">1e6</span><span class="p">]</span>
+    <span class="p">)</span>  <span class="c1"># test point to get the visible facets from below</span>
+    <span class="n">pn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">p0</span><span class="p">,</span> <span class="n">points_nd</span><span class="p">))</span>
+    <span class="n">remove_dim</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">points_nd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">points_nd</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">points_nd</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]):</span>
+            <span class="n">pn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">pn</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Convex hull lower dimensional - removing dimension </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">remove_dim</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+    <span class="n">hull</span> <span class="o">=</span> <span class="n">ConvexHull</span><span class="p">(</span><span class="n">pn</span><span class="p">,</span> <span class="n">qhull_options</span><span class="o">=</span><span class="s2">&quot;QG0&quot;</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;done calculating hull&quot;</span><span class="p">)</span>
+    <span class="n">hull</span><span class="o">.</span><span class="n">remove_dim</span> <span class="o">=</span> <span class="n">remove_dim</span>
+
+    <span class="k">return</span> <span class="n">hull</span></div>
+
+
+
+<div class="viewcode-block" id="get_e_distance_to_hull_nd">
+<a class="viewcode-back" href="../../../../reference/autoplex.fitting.common.regularization.get_e_distance_to_hull_nd.html#autoplex.fitting.common.regularization.get_e_distance_to_hull_nd">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_e_distance_to_hull_nd</span><span class="p">(</span>
+    <span class="n">hull</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">isolated_atom_energies</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">energy_name</span><span class="o">=</span><span class="s2">&quot;energy&quot;</span><span class="p">,</span> <span class="n">element_order</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the energy distance to the N-dimensional convex hull.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    hull:</span>
+<span class="sd">        Convex hull.</span>
+<span class="sd">    atoms: (ase.Atoms)</span>
+<span class="sd">        Structure to calculate mole-fraction of</span>
+<span class="sd">    isolated_atom_energies: (dict)</span>
+<span class="sd">        Dictionary of isolated atom energies</span>
+<span class="sd">    energy_name: (str)</span>
+<span class="sd">        Name of energy key in atoms.info (typically a DFT energy)</span>
+<span class="sd">    element_order: (list)</span>
+<span class="sd">        List of atomic numbers in order of choice (e.g. [42, 16] for MoS2)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">isolated_atom_energies</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">k</span><span class="p">:</span> <span class="n">v</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">isolated_atom_energies</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="p">}</span>
+    <span class="n">mole_frac</span> <span class="o">=</span> <span class="n">get_mole_frac</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">element_order</span><span class="o">=</span><span class="n">element_order</span><span class="p">)</span>
+    <span class="n">energy</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">atoms</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="n">energy_name</span><span class="p">]</span>
+        <span class="o">-</span> <span class="nb">sum</span><span class="p">([</span><span class="n">isolated_atom_energies</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">atoms</span><span class="o">.</span><span class="n">get_atomic_numbers</span><span class="p">()])</span>
+        <span class="k">if</span> <span class="n">energy_name</span> <span class="o">!=</span> <span class="s2">&quot;energy&quot;</span>
+        <span class="k">else</span> <span class="n">atoms</span><span class="o">.</span><span class="n">get_potential_energy</span><span class="p">()</span>
+        <span class="o">-</span> <span class="nb">sum</span><span class="p">([</span><span class="n">isolated_atom_energies</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">atoms</span><span class="o">.</span><span class="n">get_atomic_numbers</span><span class="p">()])</span>
+    <span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">atoms</span><span class="p">)</span>
+    <span class="n">volume</span> <span class="o">=</span> <span class="n">atoms</span><span class="o">.</span><span class="n">get_volume</span><span class="p">()</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">atoms</span><span class="p">)</span>
+    <span class="n">sp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">mole_frac</span><span class="p">,</span> <span class="n">volume</span><span class="p">,</span> <span class="n">energy</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">hull</span><span class="o">.</span><span class="n">remove_dim</span><span class="p">:</span>
+        <span class="n">sp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">sp</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sp</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;doing convexhull analysis in 1D&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">get_e_distance_to_hull</span><span class="p">(</span><span class="n">hull</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">energy_name</span><span class="o">=</span><span class="n">energy_name</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">visible_facet</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">hull</span><span class="o">.</span><span class="n">simplices</span><span class="p">[</span><span class="n">hull</span><span class="o">.</span><span class="n">good</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="n">point_in_simplex_nd</span><span class="p">(</span><span class="n">sp</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="o">*</span><span class="n">hull</span><span class="o">.</span><span class="n">points</span><span class="p">[</span><span class="n">visible_facet</span><span class="p">][:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="n">n_d</span> <span class="o">=</span> <span class="n">hull</span><span class="o">.</span><span class="n">points</span><span class="p">[</span><span class="n">visible_facet</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">n_d</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">n_d</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">n_d</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">n_d</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">n_d</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">plane_norm</span> <span class="o">=</span> <span class="n">norm</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">norm</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">relative_vectors</span> <span class="o">=</span> <span class="n">n_d</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">n_d</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">plane_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span>
+                    <span class="n">relative_vectors</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">relative_vectors</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">rcond</span><span class="o">=</span><span class="kc">None</span>
+                <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">plane_constant</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">plane_norm</span><span class="p">,</span> <span class="n">n_d</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="n">energy</span>
+                <span class="o">-</span> <span class="p">(</span><span class="n">plane_constant</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">plane_norm</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">sp</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span> <span class="o">/</span> <span class="n">plane_norm</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="p">)</span>
+
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Failed to find distance to hull in ND&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="mf">1e6</span></div>
+
+
+
+<div class="viewcode-block" id="piecewise_linear">
+<a class="viewcode-back" href="../../../../reference/autoplex.fitting.common.regularization.piecewise_linear.html#autoplex.fitting.common.regularization.piecewise_linear">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">piecewise_linear</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">vals</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Piecewise linear.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x:</span>
+<span class="sd">        The x value.</span>
+<span class="sd">    vals:</span>
+<span class="sd">        The values</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">([</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vals</span><span class="p">],</span> <span class="n">x</span><span class="p">)</span>
+    <span class="n">f0</span> <span class="o">=</span> <span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">vals</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">f0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">f0</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span></div>
+
+</pre></div>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Author name not set
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, autoplex development team.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

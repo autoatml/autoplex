@@ -1,0 +1,2712 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Index &#8212; autoplex</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=1ea92b8b" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=e18d2f4a"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+
+
+
+
+
+const initStyles = () => {
+    const defaultStyle = document.createElement('style');
+    defaultStyle.textContent = `pre.mermaid {
+    /* Same as .mermaid-container > pre */
+    display: block;
+    width: 100%;
+}
+
+pre.mermaid > svg {
+    /* Same as .mermaid-container > pre > svg */
+    height: 500px;
+    width: 100%;
+    max-width: 100% !important;
+}`;
+    document.head.appendChild(defaultStyle);
+
+    const fullscreenStyle = document.createElement('style');
+    fullscreenStyle.textContent = `.mermaid-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.mermaid-container > pre {
+    display: block;
+    width: 100%;
+}
+
+.mermaid-container > pre > svg {
+    height: 500px;
+    width: 100%;
+    max-width: 100% !important;
+}
+
+.mermaid-fullscreen-btn {
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+    color: #333;
+}
+
+.mermaid-fullscreen-btn:hover {
+    opacity: 100% !important;
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+    transform: scale(1.1);
+}
+
+.mermaid-fullscreen-btn.dark-theme {
+    background: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #e0e0e0;
+}
+
+.mermaid-fullscreen-btn.dark-theme:hover {
+    background: rgba(60, 60, 60, 1);
+    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-modal {
+    display: none;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 95vw;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.98);
+    z-index: 9999;
+    padding: 20px;
+    overflow: auto;
+}
+
+.mermaid-fullscreen-modal.dark-theme {
+    background: rgba(0, 0, 0, 0.98);
+}
+
+.mermaid-fullscreen-modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen {
+    position: relative;
+    width: 95vw;
+    height: 90vh;
+    max-width: 95vw;
+    max-height: 90vh;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    overflow: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen.dark-theme {
+    background: #1a1a1a;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+}
+
+.mermaid-container-fullscreen pre.mermaid {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen .mermaid svg {
+    height: 100% !important;
+    width: 100% !important;
+    cursor: grab;
+}
+
+.mermaid-fullscreen-close {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s;
+    font-size: 24px;
+    line-height: 1;
+    color: #333;
+}
+
+.mermaid-fullscreen-close:hover {
+    background: white;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    transform: scale(1.1);
+}
+
+.mermaid-fullscreen-close.dark-theme {
+    background: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #e0e0e0;
+}
+
+.mermaid-fullscreen-close.dark-theme:hover {
+    background: rgba(60, 60, 60, 1);
+    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-modal .mermaid-fullscreen-btn {
+    display: none !important;
+}`;
+    document.head.appendChild(fullscreenStyle);
+}
+
+// Detect if page has dark background
+const isDarkTheme = () => {
+    // We use a set of heuristics:
+    // 1. Check for common dark mode classes or attributes
+    // 2. Check computed background color brightness
+    if (document.documentElement.classList.contains('dark') ||
+        document.documentElement.getAttribute('data-theme') === 'dark' ||
+        document.body.classList.contains('dark') ||
+        document.body.getAttribute('data-theme') === 'dark') {
+        // console.log("Dark theme detected via class/attribute");
+        return true;
+    }
+    if (document.documentElement.classList.contains('light') ||
+        document.documentElement.getAttribute('data-theme') === 'light' ||
+        document.body.classList.contains('light') ||
+        document.body.getAttribute('data-theme') === 'light') {
+        // console.log("Light theme detected via class/attribute");
+        return false;
+    }
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        // console.log("Dark theme detected via prefers-color-scheme");
+        return true;
+    }
+    const bgColor = window.getComputedStyle(document.body).backgroundColor;
+    const match = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {
+        const r = parseInt(match[1]);
+        const g = parseInt(match[2]);
+        const b = parseInt(match[3]);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        // console.log("Background color brightness:", brightness);
+        return brightness < 128;
+    }
+    // console.log("No dark or light theme detected, defaulting to light theme");
+    return false;
+};
+
+let darkTheme = isDarkTheme();
+let modal = null;
+let modalContent = null;
+let previousScrollOffset = [window.scrollX, window.scrollY];
+
+const runMermaid = async (rerun) => {
+    console.log("Running mermaid diagrams, rerun =", rerun);
+    // clear all existing mermaid charts
+    let all_mermaids = document.querySelectorAll(".mermaid");
+
+    if (rerun) {
+        all_mermaids.forEach((el) => {
+            if(!el.hasAttribute("data-original-code")) {
+                // store original code
+                // console.log(`Storing original code for first run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+            if(el.getAttribute("data-processed") === "true") {
+                // remove and restore original
+                el.removeAttribute("data-processed");
+                // console.log(`Restoring original code for re-run: `, el.getAttribute('data-original-code'));
+                el.innerHTML = el.getAttribute('data-original-code');
+            } else {
+                // store original code
+                // console.log(`Storing original code for re-run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+        });
+        await mermaid.run();
+    }
+
+    all_mermaids = document.querySelectorAll(".mermaid");
+    const mermaids_processed = document.querySelectorAll(".mermaid[data-processed='true']");
+
+    if ("False" === "True") {
+        const mermaids_to_add_zoom = -1 === -1 ? all_mermaids.length : -1;
+        if(mermaids_to_add_zoom > 0) {
+            var svgs = d3.selectAll("");
+            if(all_mermaids.length !== mermaids_processed.length) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            } else if(svgs.size() !== mermaids_to_add_zoom) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            } else {
+                svgs.each(function() {
+                    var svg = d3.select(this);
+                    svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+                    var inner = svg.select("g");
+                    var zoom = d3.zoom().on("zoom", function(event) {
+                        inner.attr("transform", event.transform);
+                    });
+                    svg.call(zoom);
+                });
+            }
+        }
+    } else if(all_mermaids.length !== mermaids_processed.length) {
+        // Wait for mermaid to process all diagrams
+        setTimeout(() => runMermaid(false), 200);
+        return;
+    }
+
+    // Stop here if not adding fullscreen capability
+    if ("True" !== "True") return;
+
+    if (modal !== null ) {
+        // Destroy existing modal
+        modal.remove();
+        modal = null;
+        modalContent = null;
+    }
+
+    modal = document.createElement('div');
+    modal.className = 'mermaid-fullscreen-modal' + (darkTheme ? ' dark-theme' : '');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Fullscreen diagram viewer');
+    modal.innerHTML = `
+        <button class="mermaid-fullscreen-close${darkTheme ? ' dark-theme' : ''}" aria-label="Close fullscreen">✕</button>
+        <div class="mermaid-container-fullscreen${darkTheme ? ' dark-theme' : ''}"></div>
+    `;
+    document.body.appendChild(modal);
+
+    modalContent = modal.querySelector('.mermaid-container-fullscreen');
+    const closeBtn = modal.querySelector('.mermaid-fullscreen-close');
+
+    const closeModal = () => {
+        modal.classList.remove('active');
+        modalContent.innerHTML = '';
+        document.body.style.overflow = ''
+        window.scrollTo({left: previousScrollOffset[0], top: previousScrollOffset[1], behavior: 'instant'});
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+            closeModal();
+        }
+    });
+
+    document.querySelectorAll('.mermaid').forEach((mermaidDiv) => {
+        if (mermaidDiv.parentNode.classList.contains('mermaid-container') ||
+            mermaidDiv.closest('.mermaid-fullscreen-modal')) {
+            // Already processed, adjust button class if needed
+            const existingBtn = mermaidDiv.parentNode.querySelector('.mermaid-fullscreen-btn');
+            if (existingBtn) {
+                existingBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+            }
+            return;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'mermaid-container';
+        mermaidDiv.parentNode.insertBefore(container, mermaidDiv);
+        container.appendChild(mermaidDiv);
+
+        const fullscreenBtn = document.createElement('button');
+        fullscreenBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+        fullscreenBtn.setAttribute('aria-label', 'View diagram in fullscreen');
+        fullscreenBtn.textContent = '⛶';
+        fullscreenBtn.style.opacity = '50%';
+
+        // Calculate dynamic position based on diagram's margin and padding
+        const diagramStyle = window.getComputedStyle(mermaidDiv);
+        const marginTop = parseFloat(diagramStyle.marginTop) || 0;
+        const marginRight = parseFloat(diagramStyle.marginRight) || 0;
+        const paddingTop = parseFloat(diagramStyle.paddingTop) || 0;
+        const paddingRight = parseFloat(diagramStyle.paddingRight) || 0;
+        fullscreenBtn.style.top = `${marginTop + paddingTop + 4}px`;
+        fullscreenBtn.style.right = `${marginRight + paddingRight + 4}px`;
+
+        fullscreenBtn.addEventListener('click', () => {
+            previousScrollOffset = [window.scroll, window.scrollY];
+            const clone = mermaidDiv.cloneNode(true);
+            modalContent.innerHTML = '';
+            modalContent.appendChild(clone);
+
+            const svg = clone.querySelector('svg');
+            if (svg) {
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.style.width = '100%';
+                svg.style.height = 'auto';
+                svg.style.maxWidth = '100%';
+                svg.style.sdisplay = 'block';
+
+                if ("False" === "True") {
+                    setTimeout(() => {
+                        const g = svg.querySelector('g');
+                        if (g) {
+                            var svgD3 = d3.select(svg);
+                            svgD3.html("<g class='wrapper'>" + svgD3.html() + "</g>");
+                            var inner = svgD3.select("g");
+                            var zoom = d3.zoom().on("zoom", function(event) {
+                                inner.attr("transform", event.transform);
+                            });
+                            svgD3.call(zoom);
+                        }
+                    }, 100);
+                }
+            }
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        container.appendChild(fullscreenBtn);
+    });
+};
+
+const load = async () => {
+    initStyles();
+
+    await runMermaid(true);
+
+    const reRunIfThemeChanges = async () => {
+        const newDarkTheme = isDarkTheme();
+        if (newDarkTheme !== darkTheme) {
+            darkTheme = newDarkTheme;
+            console.log("Theme change detected, re-running mermaid with", darkTheme ? "dark" : "default", "theme");
+            await mermaid.initialize(
+                {...JSON.parse(
+                    `{"startOnLoad": false}`
+                ),
+                ...{ darkMode: darkTheme, theme: darkTheme ? 'dark' : 'default' },
+                }
+            );
+            await runMermaid(true);
+        }
+    };
+
+    // Update theme classes when theme changes
+    const themeObserver = new MutationObserver(reRunIfThemeChanges);
+    themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+    themeObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+};
+
+
+
+
+
+console.log("Initializing mermaid with", darkTheme ? "dark" : "default", "theme");
+mermaid.initialize(
+    {...JSON.parse(
+        `{"startOnLoad": false}`
+    ),
+    ...{ darkMode: darkTheme, theme: darkTheme ? 'dark' : 'default' },
+    }
+);
+
+window.addEventListener("load", load);</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'genindex';</script>
+    <link rel="icon" href="_static/autoplex_favicon.png"/>
+    <link rel="index" title="Index" href="#" />
+    <link rel="search" title="Search" href="search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.1.dev1+g6ffcd01a0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/autoplex_logo.png" class="logo__image only-light" alt="autoplex - Home"/>
+    <img src="_static/autoplex_logo.png" class="logo__image only-dark pst-js-only" alt="autoplex - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="user/index.html">Overview</a></li>
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="user/setup.html">Quick-start</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="user/tutorials.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="user/installation/installation.html">Installation guide</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="user/rss/index.html">RSS workflow</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="user/rss/flow/introduction/intro.html">Brief overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user/rss/flow/input/input.html">Input YAML configuration file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user/rss/flow/quick_start/start.html">Quick start</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user/rss/flow/example/example.html">Examples</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="user/phonon/index.html">Phonon workflow</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="user/phonon/flows/flows.html">Out-of-the-box workflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user/phonon/flows/generation/data.html">Generating reference data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user/phonon/flows/fitting/fitting.html">Fitting phonon-accurate potentials</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user/phonon/flows/benchmark/benchmark.html">Benchmark of ML-based phonon structure</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="user/executable/index.html">Executable tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="user/executable/tutorial_phonon.html">Iterative DFT vs MLIP benchmark workflow for phonons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user/executable/tutorial_rss.html">RSS Workflow</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="reference/index.html">API reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="reference/autoplex.auto.html">autoplex.auto</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="reference/autoplex.auto.phonons.html">autoplex.auto.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="reference/autoplex.auto.phonons.flows.html">autoplex.auto.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reference/autoplex.auto.phonons.jobs.html">autoplex.auto.phonons.jobs</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="reference/autoplex.auto.rss.html">autoplex.auto.rss</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="reference/autoplex.auto.rss.flows.html">autoplex.auto.rss.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reference/autoplex.auto.rss.jobs.html">autoplex.auto.rss.jobs</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="reference/autoplex.benchmark.html">autoplex.benchmark</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="reference/autoplex.benchmark.phonons.html">autoplex.benchmark.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="reference/autoplex.benchmark.phonons.flows.html">autoplex.benchmark.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reference/autoplex.benchmark.phonons.jobs.html">autoplex.benchmark.phonons.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reference/autoplex.benchmark.phonons.utils.html">autoplex.benchmark.phonons.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/autoplex.benchmark.rss.html">autoplex.benchmark.rss</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="reference/autoplex.data.html">autoplex.data</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="reference/autoplex.data.common.html">autoplex.data.common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="reference/autoplex.data.common.flows.html">autoplex.data.common.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reference/autoplex.data.common.jobs.html">autoplex.data.common.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reference/autoplex.data.common.utils.html">autoplex.data.common.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="reference/autoplex.data.phonons.html">autoplex.data.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="reference/autoplex.data.phonons.flows.html">autoplex.data.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reference/autoplex.data.phonons.jobs.html">autoplex.data.phonons.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reference/autoplex.data.phonons.utils.html">autoplex.data.phonons.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="reference/autoplex.data.rss.html">autoplex.data.rss</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="reference/autoplex.data.rss.flows.html">autoplex.data.rss.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reference/autoplex.data.rss.jobs.html">autoplex.data.rss.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reference/autoplex.data.rss.utils.html">autoplex.data.rss.utils</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="reference/autoplex.fitting.html">autoplex.fitting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="reference/autoplex.fitting.common.html">autoplex.fitting.common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="reference/autoplex.fitting.common.flows.html">autoplex.fitting.common.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reference/autoplex.fitting.common.jobs.html">autoplex.fitting.common.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reference/autoplex.fitting.common.regularization.html">autoplex.fitting.common.regularization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reference/autoplex.fitting.common.utils.html">autoplex.fitting.common.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/autoplex.fitting.phonons.html">autoplex.fitting.phonons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/autoplex.fitting.rss.html">autoplex.fitting.rss</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="reference/autoplex.misc.html">autoplex.misc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="reference/autoplex.misc.castep.html">autoplex.misc.castep</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="reference/autoplex.misc.castep.flows.html">autoplex.misc.castep.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reference/autoplex.misc.castep.jobs.html">autoplex.misc.castep.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reference/autoplex.misc.castep.run.html">autoplex.misc.castep.run</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reference/autoplex.misc.castep.schema.html">autoplex.misc.castep.schema</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reference/autoplex.misc.castep.utils.html">autoplex.misc.castep.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="reference/autoplex.misc.utils.html">autoplex.misc.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="reference/autoplex.misc.utils.mock_castep.html">autoplex.misc.utils.mock_castep</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="reference/autoplex.settings.html">autoplex.settings</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/autoplex.settings.AutoplexBaseModel.html">AutoplexBaseModel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/autoplex.settings.AutoplexSettings.html">AutoplexSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/autoplex.settings.BcurParams.html">BcurParams</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/autoplex.settings.BuildcellOptions.html">BuildcellOptions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/autoplex.settings.CustomIncar.html">CustomIncar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/autoplex.settings.GAPGeneralSettings.html">GAPGeneralSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/autoplex.settings.GAPSettings.html">GAPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/autoplex.settings.JACESettings.html">JACESettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/autoplex.settings.LossCoeff.html">LossCoeff</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/autoplex.settings.M3GNETSettings.html">M3GNETSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/autoplex.settings.MACESettings.html">MACESettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/autoplex.settings.MLIPHypers.html">MLIPHypers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/autoplex.settings.NEPSettings.html">NEPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/autoplex.settings.NEQUIPSettings.html">NEQUIPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/autoplex.settings.Nonlinearity.html">Nonlinearity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/autoplex.settings.ResumeFromPreviousState.html">ResumeFromPreviousState</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/autoplex.settings.RssConfig.html">RssConfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/autoplex.settings.SETTINGS.html">SETTINGS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/autoplex.settings.SoapParas.html">SoapParas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/autoplex.settings.SoapSettings.html">SoapSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/autoplex.settings.ThreebSettings.html">ThreebSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/autoplex.settings.TwobSettings.html">TwobSettings</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contributing Guide</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="dev/contributing.html">Contributing to autoplex</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dev/dev_install.html">Developer Installation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="about/changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="about/contributors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="about/license.html">License</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/JaGeo/autoplex" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/JaGeo/autoplex/issues/new?title=Issue%20on%20page%20%2Fgenindex.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+
+<h1 id="index">Index</h1>
+
+<div class="genindex-jumpbox">
+ <a href="#A"><strong>A</strong></a>
+ | <a href="#B"><strong>B</strong></a>
+ | <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
+ | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
+ | <a href="#I"><strong>I</strong></a>
+ | <a href="#J"><strong>J</strong></a>
+ | <a href="#K"><strong>K</strong></a>
+ | <a href="#L"><strong>L</strong></a>
+ | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
+ | <a href="#P"><strong>P</strong></a>
+ | <a href="#R"><strong>R</strong></a>
+ | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
+ | <a href="#U"><strong>U</strong></a>
+ | <a href="#V"><strong>V</strong></a>
+ | <a href="#W"><strong>W</strong></a>
+ | <a href="#Z"><strong>Z</strong></a>
+ 
+</div>
+<h2 id="A">A</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.settings.BuildcellOptions.html#autoplex.settings.BuildcellOptions.ABFIX">ABFIX (autoplex.settings.BuildcellOptions attribute)</a>
+</li>
+      <li><a href="reference/autoplex.auto.phonons.flows.CompleteDFTvsMLBenchmarkWorkflow.html#autoplex.auto.phonons.flows.CompleteDFTvsMLBenchmarkWorkflow.add_dft_phonons">add_dft_phonons() (autoplex.auto.phonons.flows.CompleteDFTvsMLBenchmarkWorkflow static method)</a>
+</li>
+      <li><a href="reference/autoplex.auto.phonons.flows.CompleteDFTvsMLBenchmarkWorkflow.html#autoplex.auto.phonons.flows.CompleteDFTvsMLBenchmarkWorkflow.add_dft_rattled">add_dft_rattled() (autoplex.auto.phonons.flows.CompleteDFTvsMLBenchmarkWorkflow static method)</a>
+</li>
+      <li><a href="reference/autoplex.settings.SoapSettings.html#autoplex.settings.SoapSettings.add_species">add_species (autoplex.settings.SoapSettings attribute)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.settings.ThreebSettings.html#autoplex.settings.ThreebSettings.add_species">(autoplex.settings.ThreebSettings attribute)</a>
+</li>
+        <li><a href="reference/autoplex.settings.TwobSettings.html#autoplex.settings.TwobSettings.add_species">(autoplex.settings.TwobSettings attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.settings.CustomIncar.html#autoplex.settings.CustomIncar.ADDGRID">ADDGRID (autoplex.settings.CustomIncar attribute)</a>
+</li>
+      <li><a href="reference/autoplex.data.rss.utils.HookeanRepulsion.html#autoplex.data.rss.utils.HookeanRepulsion.adjust_forces">adjust_forces() (autoplex.data.rss.utils.HookeanRepulsion method)</a>
+</li>
+      <li><a href="reference/autoplex.data.rss.utils.HookeanRepulsion.html#autoplex.data.rss.utils.HookeanRepulsion.adjust_momenta">adjust_momenta() (autoplex.data.rss.utils.HookeanRepulsion method)</a>
+</li>
+      <li><a href="reference/autoplex.data.rss.utils.HookeanRepulsion.html#autoplex.data.rss.utils.HookeanRepulsion.adjust_positions">adjust_positions() (autoplex.data.rss.utils.HookeanRepulsion method)</a>
+</li>
+      <li><a href="reference/autoplex.data.rss.utils.HookeanRepulsion.html#autoplex.data.rss.utils.HookeanRepulsion.adjust_potential_energy">adjust_potential_energy() (autoplex.data.rss.utils.HookeanRepulsion method)</a>
+</li>
+      <li><a href="reference/autoplex.settings.CustomIncar.html#autoplex.settings.CustomIncar.ALGO">ALGO (autoplex.settings.CustomIncar attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.allow_missing_labels">allow_missing_labels (autoplex.settings.M3GNETSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.allow_tf32">allow_tf32 (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.CustomIncar.html#autoplex.settings.CustomIncar.AMIX">AMIX (autoplex.settings.CustomIncar attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.amsgrad">amsgrad (autoplex.settings.MACESettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.append">append (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.AutoplexBaseModel.html#autoplex.settings.AutoplexBaseModel.as_dict">as_dict() (autoplex.settings.AutoplexBaseModel method)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.ase_args">ase_args (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.GAPGeneralSettings.html#autoplex.settings.GAPGeneralSettings.at_file">at_file (autoplex.settings.GAPGeneralSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.SoapParas.html#autoplex.settings.SoapParas.atom_sigma">atom_sigma (autoplex.settings.SoapParas attribute)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.settings.SoapSettings.html#autoplex.settings.SoapSettings.atom_sigma">(autoplex.settings.SoapSettings attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.data.rss.jobs.atomic_numbers.html#autoplex.data.rss.jobs.atomic_numbers">atomic_numbers (in module autoplex.data.rss.jobs)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.data.rss.utils.atomic_numbers.html#autoplex.data.rss.utils.atomic_numbers">(in module autoplex.data.rss.utils)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.auto_delta">auto_delta (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li>
+    autoplex.auto
+
+      <ul>
+        <li><a href="reference/autoplex.auto.html#module-autoplex.auto">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.auto.phonons
+
+      <ul>
+        <li><a href="reference/autoplex.auto.phonons.html#module-autoplex.auto.phonons">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.auto.phonons.flows
+
+      <ul>
+        <li><a href="reference/autoplex.auto.phonons.flows.html#module-autoplex.auto.phonons.flows">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.auto.phonons.jobs
+
+      <ul>
+        <li><a href="reference/autoplex.auto.phonons.jobs.html#module-autoplex.auto.phonons.jobs">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.auto.rss
+
+      <ul>
+        <li><a href="reference/autoplex.auto.rss.html#module-autoplex.auto.rss">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.auto.rss.flows
+
+      <ul>
+        <li><a href="reference/autoplex.auto.rss.flows.html#module-autoplex.auto.rss.flows">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.auto.rss.jobs
+
+      <ul>
+        <li><a href="reference/autoplex.auto.rss.jobs.html#module-autoplex.auto.rss.jobs">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.benchmark
+
+      <ul>
+        <li><a href="reference/autoplex.benchmark.html#module-autoplex.benchmark">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.benchmark.phonons
+
+      <ul>
+        <li><a href="reference/autoplex.benchmark.phonons.html#module-autoplex.benchmark.phonons">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.benchmark.phonons.flows
+
+      <ul>
+        <li><a href="reference/autoplex.benchmark.phonons.flows.html#module-autoplex.benchmark.phonons.flows">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.benchmark.phonons.jobs
+
+      <ul>
+        <li><a href="reference/autoplex.benchmark.phonons.jobs.html#module-autoplex.benchmark.phonons.jobs">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.benchmark.phonons.utils
+
+      <ul>
+        <li><a href="reference/autoplex.benchmark.phonons.utils.html#module-autoplex.benchmark.phonons.utils">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.benchmark.rss
+
+      <ul>
+        <li><a href="reference/autoplex.benchmark.rss.html#module-autoplex.benchmark.rss">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.data
+
+      <ul>
+        <li><a href="reference/autoplex.data.html#module-autoplex.data">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.data.common
+
+      <ul>
+        <li><a href="reference/autoplex.data.common.html#module-autoplex.data.common">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.data.common.flows
+
+      <ul>
+        <li><a href="reference/autoplex.data.common.flows.html#module-autoplex.data.common.flows">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    autoplex.data.common.jobs
+
+      <ul>
+        <li><a href="reference/autoplex.data.common.jobs.html#module-autoplex.data.common.jobs">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.data.common.utils
+
+      <ul>
+        <li><a href="reference/autoplex.data.common.utils.html#module-autoplex.data.common.utils">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.data.phonons
+
+      <ul>
+        <li><a href="reference/autoplex.data.phonons.html#module-autoplex.data.phonons">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.data.phonons.flows
+
+      <ul>
+        <li><a href="reference/autoplex.data.phonons.flows.html#module-autoplex.data.phonons.flows">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.data.phonons.jobs
+
+      <ul>
+        <li><a href="reference/autoplex.data.phonons.jobs.html#module-autoplex.data.phonons.jobs">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.data.phonons.utils
+
+      <ul>
+        <li><a href="reference/autoplex.data.phonons.utils.html#module-autoplex.data.phonons.utils">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.data.rss
+
+      <ul>
+        <li><a href="reference/autoplex.data.rss.html#module-autoplex.data.rss">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.data.rss.flows
+
+      <ul>
+        <li><a href="reference/autoplex.data.rss.flows.html#module-autoplex.data.rss.flows">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.data.rss.jobs
+
+      <ul>
+        <li><a href="reference/autoplex.data.rss.jobs.html#module-autoplex.data.rss.jobs">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.data.rss.utils
+
+      <ul>
+        <li><a href="reference/autoplex.data.rss.utils.html#module-autoplex.data.rss.utils">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.fitting
+
+      <ul>
+        <li><a href="reference/autoplex.fitting.html#module-autoplex.fitting">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.fitting.common
+
+      <ul>
+        <li><a href="reference/autoplex.fitting.common.html#module-autoplex.fitting.common">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.fitting.common.flows
+
+      <ul>
+        <li><a href="reference/autoplex.fitting.common.flows.html#module-autoplex.fitting.common.flows">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.fitting.common.jobs
+
+      <ul>
+        <li><a href="reference/autoplex.fitting.common.jobs.html#module-autoplex.fitting.common.jobs">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.fitting.common.regularization
+
+      <ul>
+        <li><a href="reference/autoplex.fitting.common.regularization.html#module-autoplex.fitting.common.regularization">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.fitting.common.utils
+
+      <ul>
+        <li><a href="reference/autoplex.fitting.common.utils.html#module-autoplex.fitting.common.utils">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.fitting.phonons
+
+      <ul>
+        <li><a href="reference/autoplex.fitting.phonons.html#module-autoplex.fitting.phonons">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.fitting.rss
+
+      <ul>
+        <li><a href="reference/autoplex.fitting.rss.html#module-autoplex.fitting.rss">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.misc
+
+      <ul>
+        <li><a href="reference/autoplex.misc.html#module-autoplex.misc">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.misc.castep
+
+      <ul>
+        <li><a href="reference/autoplex.misc.castep.html#module-autoplex.misc.castep">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.misc.castep.flows
+
+      <ul>
+        <li><a href="reference/autoplex.misc.castep.flows.html#module-autoplex.misc.castep.flows">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.misc.castep.jobs
+
+      <ul>
+        <li><a href="reference/autoplex.misc.castep.jobs.html#module-autoplex.misc.castep.jobs">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.misc.castep.run
+
+      <ul>
+        <li><a href="reference/autoplex.misc.castep.run.html#module-autoplex.misc.castep.run">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.misc.castep.schema
+
+      <ul>
+        <li><a href="reference/autoplex.misc.castep.schema.html#module-autoplex.misc.castep.schema">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.misc.castep.utils
+
+      <ul>
+        <li><a href="reference/autoplex.misc.castep.utils.html#module-autoplex.misc.castep.utils">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.misc.utils
+
+      <ul>
+        <li><a href="reference/autoplex.misc.utils.html#module-autoplex.misc.utils">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.misc.utils.mock_castep
+
+      <ul>
+        <li><a href="reference/autoplex.misc.utils.mock_castep.html#module-autoplex.misc.utils.mock_castep">module</a>
+</li>
+      </ul></li>
+      <li>
+    autoplex.settings
+
+      <ul>
+        <li><a href="reference/autoplex.settings.html#module-autoplex.settings">module</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.settings.SoapParas.html#autoplex.settings.SoapParas.average">average (autoplex.settings.SoapParas attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.avg_num_neighbors">avg_num_neighbors (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.misc.castep.jobs.BaseCastepMaker.html#autoplex.misc.castep.jobs.BaseCastepMaker">BaseCastepMaker (class in autoplex.misc.castep.jobs)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEPSettings.html#autoplex.settings.NEPSettings.basis_size">basis_size (autoplex.settings.NEPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEPSettings.html#autoplex.settings.NEPSettings.batch">batch (autoplex.settings.NEPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.batch_size">batch_size (autoplex.settings.M3GNETSettings attribute)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.batch_size">(autoplex.settings.MACESettings attribute)</a>
+</li>
+        <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.batch_size">(autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.bcur_params">bcur_params (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.besselbasis_trainable">besselbasis_trainable (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.BcurParams.html#autoplex.settings.BcurParams.bolt_max_num">bolt_max_num (autoplex.settings.BcurParams attribute)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.utils.boltzhist_cur_dual_iter.html#autoplex.data.common.utils.boltzhist_cur_dual_iter">boltzhist_cur_dual_iter() (in module autoplex.data.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.utils.boltzhist_cur_one_shot.html#autoplex.data.common.utils.boltzhist_cur_one_shot">boltzhist_cur_one_shot() (in module autoplex.data.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.buildcell_options">buildcell_options (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.data.rss.flows.BuildMultiRandomizedStructure.html#autoplex.data.rss.flows.BuildMultiRandomizedStructure">BuildMultiRandomizedStructure (class in autoplex.data.rss.flows)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="C">C</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.fitting.common.utils.CustomPotential.html#autoplex.fitting.common.utils.CustomPotential.calculate">calculate() (autoplex.fitting.common.utils.CustomPotential method)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.utils.calculate_delta_2b.html#autoplex.fitting.common.utils.calculate_delta_2b">calculate_delta_2b() (in module autoplex.fitting.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.regularization.calculate_hull_nd.html#autoplex.fitting.common.regularization.calculate_hull_nd">calculate_hull_nd() (in module autoplex.fitting.common.regularization)</a>
+</li>
+      <li><a href="reference/autoplex.settings.AutoplexSettings.html#autoplex.settings.AutoplexSettings.CASTEP_CMD">CASTEP_CMD (autoplex.settings.AutoplexSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.misc.castep.jobs.CASTEP_INPUT_FILES.html#autoplex.misc.castep.jobs.CASTEP_INPUT_FILES">CASTEP_INPUT_FILES (in module autoplex.misc.castep.jobs)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.misc.castep.utils.CASTEP_INPUT_FILES.html#autoplex.misc.castep.utils.CASTEP_INPUT_FILES">(in module autoplex.misc.castep.utils)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.misc.castep.jobs.castep_job.html#autoplex.misc.castep.jobs.castep_job">castep_job() (in module autoplex.misc.castep.jobs)</a>
+</li>
+      <li><a href="reference/autoplex.settings.AutoplexSettings.html#autoplex.settings.AutoplexSettings.CASTEP_KEYWORDS">CASTEP_KEYWORDS (autoplex.settings.AutoplexSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.misc.castep.jobs.CASTEP_OUTPUT_FILES.html#autoplex.misc.castep.jobs.CASTEP_OUTPUT_FILES">CASTEP_OUTPUT_FILES (in module autoplex.misc.castep.jobs)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.misc.castep.utils.CASTEP_OUTPUT_FILES.html#autoplex.misc.castep.utils.CASTEP_OUTPUT_FILES">(in module autoplex.misc.castep.utils)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.misc.castep.utils.CastepInputGenerator.html#autoplex.misc.castep.utils.CastepInputGenerator">CastepInputGenerator (class in autoplex.misc.castep.utils)</a>
+</li>
+      <li><a href="reference/autoplex.misc.castep.jobs.CastepStaticMaker.html#autoplex.misc.castep.jobs.CastepStaticMaker">CastepStaticMaker (class in autoplex.misc.castep.jobs)</a>
+</li>
+      <li><a href="reference/autoplex.misc.castep.utils.CastepStaticSetGenerator.html#autoplex.misc.castep.utils.CastepStaticSetGenerator">CastepStaticSetGenerator (class in autoplex.misc.castep.utils)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.cell_seed_paths">cell_seed_paths (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.misc.castep.utils.CastepInputGenerator.html#autoplex.misc.castep.utils.CastepInputGenerator.cell_updates">cell_updates (autoplex.misc.castep.utils.CastepInputGenerator property)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.misc.castep.utils.CastepStaticSetGenerator.html#autoplex.misc.castep.utils.CastepStaticSetGenerator.cell_updates">(autoplex.misc.castep.utils.CastepStaticSetGenerator property)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.settings.SoapSettings.html#autoplex.settings.SoapSettings.central_weight">central_weight (autoplex.settings.SoapSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.utils.check_convergence.html#autoplex.fitting.common.utils.check_convergence">check_convergence() (in module autoplex.fitting.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.jobs.check_convergence_aims.html#autoplex.data.common.jobs.check_convergence_aims">check_convergence_aims() (in module autoplex.data.common.jobs)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.jobs.check_convergence_castep.html#autoplex.data.common.jobs.check_convergence_castep">check_convergence_castep() (in module autoplex.data.common.jobs)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.jobs.check_convergence_vasp.html#autoplex.data.common.jobs.check_convergence_vasp">check_convergence_vasp() (in module autoplex.data.common.jobs)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.utils.check_distances.html#autoplex.data.common.utils.check_distances">check_distances() (in module autoplex.data.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.utils.check_energy_force_stress_reading.html#autoplex.fitting.common.utils.check_energy_force_stress_reading">check_energy_force_stress_reading() (in module autoplex.fitting.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.data.phonons.utils.check_supercells.html#autoplex.data.phonons.utils.check_supercells">check_supercells() (in module autoplex.data.phonons.utils)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.chemical_symbols">chemical_symbols (autoplex.settings.NEQUIPSettings attribute)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.data.rss.utils.chemical_symbols.html#autoplex.data.rss.utils.chemical_symbols">(in module autoplex.data.rss.utils)</a>
+</li>
+        <li><a href="reference/autoplex.fitting.common.utils.chemical_symbols.html#autoplex.fitting.common.utils.chemical_symbols">(in module autoplex.fitting.common.utils)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.misc.utils.mock_castep.clear_castep_inputs.html#autoplex.misc.utils.mock_castep.clear_castep_inputs">clear_castep_inputs() (in module autoplex.misc.utils.mock_castep)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.jobs.collect_dft_data.html#autoplex.data.common.jobs.collect_dft_data">collect_dft_data() (in module autoplex.data.common.jobs)</a>
+</li>
+      <li><a href="reference/autoplex.settings.ThreebSettings.html#autoplex.settings.ThreebSettings.compact_clusters">compact_clusters (autoplex.settings.ThreebSettings attribute)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.settings.TwobSettings.html#autoplex.settings.TwobSettings.compact_clusters">(autoplex.settings.TwobSettings attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.benchmark.phonons.utils.compare_plot.html#autoplex.benchmark.phonons.utils.compare_plot">compare_plot() (in module autoplex.benchmark.phonons.utils)</a>
+</li>
+      <li><a href="reference/autoplex.auto.phonons.jobs.complete_benchmark.html#autoplex.auto.phonons.jobs.complete_benchmark">complete_benchmark() (in module autoplex.auto.phonons.jobs)</a>
+</li>
+      <li><a href="reference/autoplex.auto.phonons.flows.CompleteDFTvsMLBenchmarkWorkflow.html#autoplex.auto.phonons.flows.CompleteDFTvsMLBenchmarkWorkflow">CompleteDFTvsMLBenchmarkWorkflow (class in autoplex.auto.phonons.flows)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.auto.phonons.flows.CompleteDFTvsMLBenchmarkWorkflowMPSettings.html#autoplex.auto.phonons.flows.CompleteDFTvsMLBenchmarkWorkflowMPSettings">CompleteDFTvsMLBenchmarkWorkflowMPSettings (class in autoplex.auto.phonons.flows)</a>
+</li>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.compute_avg_num_neighbors">compute_avg_num_neighbors (autoplex.settings.MACESettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.benchmark.phonons.utils.compute_bandstructure_benchmark_metrics.html#autoplex.benchmark.phonons.utils.compute_bandstructure_benchmark_metrics">compute_bandstructure_benchmark_metrics() (in module autoplex.benchmark.phonons.utils)</a>
+</li>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.compute_forces">compute_forces (autoplex.settings.MACESettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.utils.compute_num_of_descriptor.html#autoplex.fitting.common.utils.compute_num_of_descriptor">compute_num_of_descriptor() (in module autoplex.fitting.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.compute_statistics">compute_statistics (autoplex.settings.MACESettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.compute_stress">compute_stress (autoplex.settings.MACESettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.AutoplexSettings.html#autoplex.settings.AutoplexSettings.CONFIG_FILE">CONFIG_FILE (autoplex.settings.AutoplexSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.config_type_weights">config_type_weights (autoplex.settings.MACESettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.config_types">config_types (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.jobs.convert_to_extxyz.html#autoplex.data.common.jobs.convert_to_extxyz">convert_to_extxyz() (in module autoplex.data.common.jobs)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.utils.convert_xyz_to_structure.html#autoplex.fitting.common.utils.convert_xyz_to_structure">convert_xyz_to_structure() (in module autoplex.fitting.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.utils.convexhull_cur.html#autoplex.data.common.utils.convexhull_cur">convexhull_cur() (in module autoplex.data.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.misc.utils.mock_castep.copy_castep_outputs.html#autoplex.misc.utils.mock_castep.copy_castep_outputs">copy_castep_outputs() (in module autoplex.misc.utils.mock_castep)</a>
+</li>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.correlation">correlation (autoplex.settings.MACESettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.data.rss.jobs.covalent_radii.html#autoplex.data.rss.jobs.covalent_radii">covalent_radii (in module autoplex.data.rss.jobs)</a>
+</li>
+      <li><a href="reference/autoplex.settings.SoapSettings.html#autoplex.settings.SoapSettings.covariance_type">covariance_type (autoplex.settings.SoapSettings attribute)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.settings.ThreebSettings.html#autoplex.settings.ThreebSettings.covariance_type">(autoplex.settings.ThreebSettings attribute)</a>
+</li>
+        <li><a href="reference/autoplex.settings.TwobSettings.html#autoplex.settings.TwobSettings.covariance_type">(autoplex.settings.TwobSettings attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.data.common.utils.create_soap_descriptor.html#autoplex.data.common.utils.create_soap_descriptor">create_soap_descriptor() (in module autoplex.data.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.utils.cur_select.html#autoplex.data.common.utils.cur_select">cur_select() (in module autoplex.data.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.current_iter_index">current_iter_index (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.custom_incar">custom_incar (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.custom_potcar">custom_potcar (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.utils.CustomPotential.html#autoplex.fitting.common.utils.CustomPotential">CustomPotential (class in autoplex.fitting.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.settings.JACESettings.html#autoplex.settings.JACESettings.cutoff">cutoff (autoplex.settings.JACESettings attribute)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.cutoff">(autoplex.settings.M3GNETSettings attribute)</a>
+</li>
+        <li><a href="reference/autoplex.settings.NEPSettings.html#autoplex.settings.NEPSettings.cutoff">(autoplex.settings.NEPSettings attribute)</a>
+</li>
+        <li><a href="reference/autoplex.settings.SoapParas.html#autoplex.settings.SoapParas.cutoff">(autoplex.settings.SoapParas attribute)</a>
+</li>
+        <li><a href="reference/autoplex.settings.SoapSettings.html#autoplex.settings.SoapSettings.cutoff">(autoplex.settings.SoapSettings attribute)</a>
+</li>
+        <li><a href="reference/autoplex.settings.ThreebSettings.html#autoplex.settings.ThreebSettings.cutoff">(autoplex.settings.ThreebSettings attribute)</a>
+</li>
+        <li><a href="reference/autoplex.settings.TwobSettings.html#autoplex.settings.TwobSettings.cutoff">(autoplex.settings.TwobSettings attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.settings.SoapParas.html#autoplex.settings.SoapParas.cutoff_transition_width">cutoff_transition_width (autoplex.settings.SoapParas attribute)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.settings.SoapSettings.html#autoplex.settings.SoapSettings.cutoff_transition_width">(autoplex.settings.SoapSettings attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.data.common.utils.data_distillation.html#autoplex.data.common.utils.data_distillation">data_distillation() (in module autoplex.data.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.data_mean">data_mean (autoplex.settings.M3GNETSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.data_std">data_std (autoplex.settings.M3GNETSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.flows.DataPreprocessing.html#autoplex.fitting.common.flows.DataPreprocessing">DataPreprocessing (class in autoplex.fitting.common.flows)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.dataset">dataset (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.dataset_file_name">dataset_file_name (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.dataset_key_mapping">dataset_key_mapping (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.dataset_seed">dataset_seed (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.decay_alpha">decay_alpha (autoplex.settings.M3GNETSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.decay_steps">decay_steps (autoplex.settings.M3GNETSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.default_dtype">default_dtype (autoplex.settings.MACESettings attribute)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.default_dtype">(autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.settings.GAPGeneralSettings.html#autoplex.settings.GAPGeneralSettings.default_sigma">default_sigma (autoplex.settings.GAPGeneralSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.SoapSettings.html#autoplex.settings.SoapSettings.delta">delta (autoplex.settings.SoapSettings attribute)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.settings.ThreebSettings.html#autoplex.settings.ThreebSettings.delta">(autoplex.settings.ThreebSettings attribute)</a>
+</li>
+        <li><a href="reference/autoplex.settings.TwobSettings.html#autoplex.settings.TwobSettings.delta">(autoplex.settings.TwobSettings attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.device_for_fitting">device_for_fitting (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.device_for_rss">device_for_rss (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.auto.phonons.jobs.dft_phonopy_gen_data.html#autoplex.auto.phonons.jobs.dft_phonopy_gen_data">dft_phonopy_gen_data() (in module autoplex.auto.phonons.jobs)</a>
+</li>
+      <li><a href="reference/autoplex.auto.phonons.jobs.dft_random_gen_data.html#autoplex.auto.phonons.jobs.dft_random_gen_data">dft_random_gen_data() (in module autoplex.auto.phonons.jobs)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.dft_ref_file">dft_ref_file (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.data.phonons.flows.DFTPhononMaker.html#autoplex.data.phonons.flows.DFTPhononMaker">DFTPhononMaker (class in autoplex.data.phonons.flows)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.flows.DFTStaticLabelling.html#autoplex.data.common.flows.DFTStaticLabelling">DFTStaticLabelling (class in autoplex.data.common.flows)</a>
+</li>
+      <li><a href="reference/autoplex.auto.phonons.flows.DFTSupercellSettingsMaker.html#autoplex.auto.phonons.flows.DFTSupercellSettingsMaker">DFTSupercellSettingsMaker (class in autoplex.auto.phonons.flows)</a>
+</li>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.dim_edge_embedding">dim_edge_embedding (autoplex.settings.M3GNETSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.dim_node_embedding">dim_node_embedding (autoplex.settings.M3GNETSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.dim_state_embedding">dim_state_embedding (autoplex.settings.M3GNETSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.dimer_box">dimer_box (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.dimer_num">dimer_num (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.dimer_range">dimer_range (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.misc.castep.schema.TaskDoc.html#autoplex.misc.castep.schema.TaskDoc.dir_name">dir_name (autoplex.misc.castep.schema.TaskDoc attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.disable_testing">disable_testing (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.ThreebSettings.html#autoplex.settings.ThreebSettings.distance_Nb_order">distance_Nb_order (autoplex.settings.ThreebSettings attribute)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.settings.TwobSettings.html#autoplex.settings.TwobSettings.distance_Nb_order">(autoplex.settings.TwobSettings attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.distillation">distillation (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.distributed">distributed (autoplex.settings.MACESettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.GAPGeneralSettings.html#autoplex.settings.GAPGeneralSettings.do_copy_at_file">do_copy_at_file (autoplex.settings.GAPGeneralSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.auto.phonons.jobs.do_iterative_rattled_structures.html#autoplex.auto.phonons.jobs.do_iterative_rattled_structures">do_iterative_rattled_structures() (in module autoplex.auto.phonons.jobs)</a>
+</li>
+      <li><a href="reference/autoplex.auto.rss.jobs.do_rss_iterations.html#autoplex.auto.rss.jobs.do_rss_iterations">do_rss_iterations() (in module autoplex.auto.rss.jobs)</a>
+</li>
+      <li><a href="reference/autoplex.data.rss.jobs.do_rss_multi_node.html#autoplex.data.rss.jobs.do_rss_multi_node">do_rss_multi_node() (in module autoplex.data.rss.jobs)</a>
+</li>
+      <li><a href="reference/autoplex.data.rss.jobs.do_rss_single_node.html#autoplex.data.rss.jobs.do_rss_single_node">do_rss_single_node() (in module autoplex.data.rss.jobs)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.settings.Nonlinearity.html#autoplex.settings.Nonlinearity.e">e (autoplex.settings.Nonlinearity attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.GAPGeneralSettings.html#autoplex.settings.GAPGeneralSettings.e0_offset">e0_offset (autoplex.settings.GAPGeneralSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.e0_spin">e0_spin (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.E0s">E0s (autoplex.settings.MACESettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.early_stopping_lower_bounds">early_stopping_lower_bounds (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.early_stopping_patiences">early_stopping_patiences (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.CustomIncar.html#autoplex.settings.CustomIncar.EDIFF">EDIFF (autoplex.settings.CustomIncar attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.element_refs">element_refs (autoplex.settings.M3GNETSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.utils.ElementCollection.html#autoplex.data.common.utils.ElementCollection">ElementCollection (class in autoplex.data.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.ema">ema (autoplex.settings.MACESettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.ema_decay">ema_decay (autoplex.settings.MACESettings attribute)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.ema_decay">(autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.ema_use_num_updates">ema_use_num_updates (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.CustomIncar.html#autoplex.settings.CustomIncar.ENCUT">ENCUT (autoplex.settings.CustomIncar attribute)</a>
+</li>
+      <li><a href="reference/autoplex.misc.castep.schema.OutputDoc.html#autoplex.misc.castep.schema.OutputDoc.energy">energy (autoplex.misc.castep.schema.OutputDoc attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.GAPGeneralSettings.html#autoplex.settings.GAPGeneralSettings.energy_parameter_name">energy_parameter_name (autoplex.settings.GAPGeneralSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.misc.castep.schema.OutputDoc.html#autoplex.misc.castep.schema.OutputDoc.energy_per_atom">energy_per_atom (autoplex.misc.castep.schema.OutputDoc attribute)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.utils.energy_plot.html#autoplex.data.common.utils.energy_plot">energy_plot() (in module autoplex.data.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.utils.energy_remain.html#autoplex.fitting.common.utils.energy_remain">energy_remain() (in module autoplex.fitting.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.energy_weight">energy_weight (autoplex.settings.M3GNETSettings attribute)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.energy_weight">(autoplex.settings.MACESettings attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.exp_name">exp_name (autoplex.settings.M3GNETSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.utils.extract_gap_label.html#autoplex.fitting.common.utils.extract_gap_label">extract_gap_label() (in module autoplex.fitting.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.data.rss.utils.extract_pairstyle.html#autoplex.data.rss.utils.extract_pairstyle">extract_pairstyle() (in module autoplex.data.rss.utils)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="F">F</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.settings.SoapSettings.html#autoplex.settings.SoapSettings.f0">f0 (autoplex.settings.SoapSettings attribute)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.settings.ThreebSettings.html#autoplex.settings.ThreebSettings.f0">(autoplex.settings.ThreebSettings attribute)</a>
+</li>
+        <li><a href="reference/autoplex.settings.TwobSettings.html#autoplex.settings.TwobSettings.f0">(autoplex.settings.TwobSettings attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.misc.utils.mock_castep.fake_run_castep.html#autoplex.misc.utils.mock_castep.fake_run_castep">fake_run_castep() (in module autoplex.misc.utils.mock_castep)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.utils.filter_outlier_energy.html#autoplex.data.common.utils.filter_outlier_energy">filter_outlier_energy() (in module autoplex.data.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.utils.filter_outlier_forces.html#autoplex.data.common.utils.filter_outlier_forces">filter_outlier_forces() (in module autoplex.data.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.utils.ElementCollection.html#autoplex.data.common.utils.ElementCollection.find_element_pairs">find_element_pairs() (autoplex.data.common.utils.ElementCollection method)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.utils.flatten.html#autoplex.data.common.utils.flatten">flatten() (in module autoplex.data.common.utils)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.fitting.common.utils.flatten.html#autoplex.fitting.common.utils.flatten">(in module autoplex.fitting.common.utils)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.data.common.utils.flatten_list.html#autoplex.data.common.utils.flatten_list">flatten_list() (in module autoplex.data.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEPSettings.html#autoplex.settings.NEPSettings.force_delta">force_delta (autoplex.settings.NEPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.force_label">force_label (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.force_max">force_max (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.GAPGeneralSettings.html#autoplex.settings.GAPGeneralSettings.force_parameter_name">force_parameter_name (autoplex.settings.GAPGeneralSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.utils.force_plot.html#autoplex.data.common.utils.force_plot">force_plot() (in module autoplex.data.common.utils)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.force_tol">force_tol (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.force_weight">force_weight (autoplex.settings.M3GNETSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.misc.castep.schema.OutputDoc.html#autoplex.misc.castep.schema.OutputDoc.forces">forces (autoplex.misc.castep.schema.OutputDoc attribute)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.settings.LossCoeff.html#autoplex.settings.LossCoeff.forces">(autoplex.settings.LossCoeff attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.forces_weight">forces_weight (autoplex.settings.MACESettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.foundation_filter_elements">foundation_filter_elements (autoplex.settings.MACESettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.foundation_model">foundation_model (autoplex.settings.M3GNETSettings attribute)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.foundation_model">(autoplex.settings.MACESettings attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.foundation_model_readout">foundation_model_readout (autoplex.settings.MACESettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.BcurParams.html#autoplex.settings.BcurParams.frac_of_bcur">frac_of_bcur (autoplex.settings.BcurParams attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.fragment_file">fragment_file (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.fragment_numbers">fragment_numbers (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.AutoplexBaseModel.html#autoplex.settings.AutoplexBaseModel.from_dict">from_dict() (autoplex.settings.AutoplexBaseModel class method)</a>
+</li>
+      <li><a href="reference/autoplex.settings.AutoplexBaseModel.html#autoplex.settings.AutoplexBaseModel.from_file">from_file() (autoplex.settings.AutoplexBaseModel class method)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.from_file">(autoplex.settings.RssConfig class method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.settings.MLIPHypers.html#autoplex.settings.MLIPHypers.GAP">GAP (autoplex.settings.MLIPHypers attribute)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.utils.gap_fitting.html#autoplex.fitting.common.utils.gap_fitting">gap_fitting() (in module autoplex.fitting.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.utils.gap_hyperparameter_constructor.html#autoplex.fitting.common.utils.gap_hyperparameter_constructor">gap_hyperparameter_constructor() (in module autoplex.fitting.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.utils.gcm3_to_Vm.html#autoplex.fitting.common.utils.gcm3_to_Vm">gcm3_to_Vm() (in module autoplex.fitting.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.settings.GAPSettings.html#autoplex.settings.GAPSettings.general">general (autoplex.settings.GAPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.jobs.generate_randomized_structures.html#autoplex.data.common.jobs.generate_randomized_structures">generate_randomized_structures() (in module autoplex.data.common.jobs)</a>
+</li>
+      <li><a href="reference/autoplex.auto.phonons.jobs.generate_supercells.html#autoplex.auto.phonons.jobs.generate_supercells">generate_supercells() (in module autoplex.auto.phonons.jobs)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.generated_struct_numbers">generated_struct_numbers (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.flows.GenerateTrainingDataForTesting.html#autoplex.data.common.flows.GenerateTrainingDataForTesting">GenerateTrainingDataForTesting (class in autoplex.data.common.flows)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEPSettings.html#autoplex.settings.NEPSettings.generation">generation (autoplex.settings.NEPSettings attribute)</a>
+</li>
+      <li><a href="glossary.html#term-generic-type"><strong>generic type</strong></a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.utils.get_atomic_numbers.html#autoplex.fitting.common.utils.get_atomic_numbers">get_atomic_numbers() (in module autoplex.fitting.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.regularization.get_convex_hull.html#autoplex.fitting.common.regularization.get_convex_hull">get_convex_hull() (in module autoplex.fitting.common.regularization)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.regularization.get_e_distance_to_hull.html#autoplex.fitting.common.regularization.get_e_distance_to_hull">get_e_distance_to_hull() (in module autoplex.fitting.common.regularization)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.regularization.get_e_distance_to_hull_nd.html#autoplex.fitting.common.regularization.get_e_distance_to_hull_nd">get_e_distance_to_hull_nd() (in module autoplex.fitting.common.regularization)</a>
+</li>
+      <li><a href="reference/autoplex.data.rss.utils.HookeanRepulsion.html#autoplex.data.rss.utils.HookeanRepulsion.get_indices">get_indices() (autoplex.data.rss.utils.HookeanRepulsion method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.misc.castep.utils.CastepInputGenerator.html#autoplex.misc.castep.utils.CastepInputGenerator.get_input_set">get_input_set() (autoplex.misc.castep.utils.CastepInputGenerator method)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.regularization.get_intersect.html#autoplex.fitting.common.regularization.get_intersect">get_intersect() (in module autoplex.fitting.common.regularization)</a>
+</li>
+      <li><a href="reference/autoplex.auto.phonons.jobs.get_iso_atom.html#autoplex.auto.phonons.jobs.get_iso_atom">get_iso_atom() (in module autoplex.auto.phonons.jobs)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.utils.get_list_of_vasp_calc_dirs.html#autoplex.fitting.common.utils.get_list_of_vasp_calc_dirs">get_list_of_vasp_calc_dirs() (in module autoplex.fitting.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.regularization.get_mole_frac.html#autoplex.fitting.common.regularization.get_mole_frac">get_mole_frac() (in module autoplex.fitting.common.regularization)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.utils.ElementCollection.html#autoplex.data.common.utils.ElementCollection.get_number_of_species">get_number_of_species() (autoplex.data.common.utils.ElementCollection method)</a>
+</li>
+      <li><a href="reference/autoplex.auto.phonons.jobs.get_phonon_output.html#autoplex.auto.phonons.jobs.get_phonon_output">get_phonon_output() (in module autoplex.auto.phonons.jobs)</a>
+</li>
+      <li><a href="reference/autoplex.data.rss.utils.HookeanRepulsion.html#autoplex.data.rss.utils.HookeanRepulsion.get_removed_dof">get_removed_dof() (autoplex.data.rss.utils.HookeanRepulsion method)</a>
+</li>
+      <li><a href="reference/autoplex.benchmark.phonons.utils.get_rmse.html#autoplex.benchmark.phonons.utils.get_rmse">get_rmse() (in module autoplex.benchmark.phonons.utils)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.utils.ElementCollection.html#autoplex.data.common.utils.ElementCollection.get_species">get_species() (autoplex.data.common.utils.ElementCollection method)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.utils.ElementCollection.html#autoplex.data.common.utils.ElementCollection.get_species_Z">get_species_Z() (autoplex.data.common.utils.ElementCollection method)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.jobs.get_supercell_job.html#autoplex.data.common.jobs.get_supercell_job">get_supercell_job() (in module autoplex.data.common.jobs)</a>
+</li>
+      <li><a href="reference/autoplex.settings.CustomIncar.html#autoplex.settings.CustomIncar.GGA">GGA (autoplex.settings.CustomIncar attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.GAPGeneralSettings.html#autoplex.settings.GAPGeneralSettings.gp_file">gp_file (autoplex.settings.GAPGeneralSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.utils.GPa.html#autoplex.data.common.utils.GPa">GPa (in module autoplex.data.common.utils)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.data.rss.utils.GPa.html#autoplex.data.rss.utils.GPa">(in module autoplex.data.rss.utils)</a>
+</li>
+        <li><a href="reference/autoplex.misc.castep.jobs.GPa.html#autoplex.misc.castep.jobs.GPa">(in module autoplex.misc.castep.jobs)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.data.common.utils.handle_rss_trajectory.html#autoplex.data.common.utils.handle_rss_trajectory">handle_rss_trajectory() (in module autoplex.data.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.hidden_irreps">hidden_irreps (autoplex.settings.MACESettings attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.hookean_paras">hookean_paras (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.hookean_repul">hookean_repul (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.data.rss.utils.HookeanRepulsion.html#autoplex.data.rss.utils.HookeanRepulsion">HookeanRepulsion (class in autoplex.data.rss.utils)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.include_dimer">include_dimer (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.include_isolated_atom">include_isolated_atom (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.include_line_graph">include_line_graph (autoplex.settings.M3GNETSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.include_stresses">include_stresses (autoplex.settings.M3GNETSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.data.rss.utils.HookeanRepulsion.html#autoplex.data.rss.utils.HookeanRepulsion.index_shuffle">index_shuffle() (autoplex.data.rss.utils.HookeanRepulsion method)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.initial_kt">initial_kt (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.auto.rss.jobs.initial_rss.html#autoplex.auto.rss.jobs.initial_rss">initial_rss() (in module autoplex.auto.rss.jobs)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.initial_selection_enabled">initial_selection_enabled (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.misc.castep.schema.TaskDoc.html#autoplex.misc.castep.schema.TaskDoc.input">input (autoplex.misc.castep.schema.TaskDoc attribute)</a>
+</li>
+      <li><a href="reference/autoplex.misc.castep.schema.InputDoc.html#autoplex.misc.castep.schema.InputDoc.input_set">input_set (autoplex.misc.castep.schema.InputDoc attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.invariant_layers">invariant_layers (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.invariant_neurons">invariant_neurons (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.is_intensive">is_intensive (autoplex.settings.M3GNETSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.CustomIncar.html#autoplex.settings.CustomIncar.ISMEAR">ISMEAR (autoplex.settings.CustomIncar attribute)</a>
+</li>
+      <li><a href="reference/autoplex.data.phonons.flows.IsoAtomMaker.html#autoplex.data.phonons.flows.IsoAtomMaker">IsoAtomMaker (class in autoplex.data.phonons.flows)</a>
+</li>
+      <li><a href="reference/autoplex.data.phonons.flows.IsoAtomStaticMaker.html#autoplex.data.phonons.flows.IsoAtomStaticMaker">IsoAtomStaticMaker (class in autoplex.data.phonons.flows)</a>
+</li>
+      <li><a href="reference/autoplex.settings.ResumeFromPreviousState.html#autoplex.settings.ResumeFromPreviousState.isolated_atom_energies">isolated_atom_energies (autoplex.settings.ResumeFromPreviousState attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.isolatedatom_box">isolatedatom_box (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.CustomIncar.html#autoplex.settings.CustomIncar.ISYM">ISYM (autoplex.settings.CustomIncar attribute)</a>
+</li>
+      <li><a href="reference/autoplex.auto.phonons.flows.IterativeCompleteDFTvsMLBenchmarkWorkflow.html#autoplex.auto.phonons.flows.IterativeCompleteDFTvsMLBenchmarkWorkflow">IterativeCompleteDFTvsMLBenchmarkWorkflow (class in autoplex.auto.phonons.flows)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="J">J</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.settings.MLIPHypers.html#autoplex.settings.MLIPHypers.J_ACE">J_ACE (autoplex.settings.MLIPHypers attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.fitting.common.utils.jace_fitting.html#autoplex.fitting.common.utils.jace_fitting">jace_fitting() (in module autoplex.fitting.common.utils)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="K">K</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.keep_checkpoint">keep_checkpoint (autoplex.settings.MACESettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.keep_isolated_atoms">keep_isolated_atoms (autoplex.settings.MACESettings attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.keep_symmetry">keep_symmetry (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.CustomIncar.html#autoplex.settings.CustomIncar.KPAR">KPAR (autoplex.settings.CustomIncar attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.CustomIncar.html#autoplex.settings.CustomIncar.KSPACING">KSPACING (autoplex.settings.CustomIncar attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.settings.NEPSettings.html#autoplex.settings.NEPSettings.l_max">l_max (autoplex.settings.NEPSettings attribute)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.l_max">(autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+        <li><a href="reference/autoplex.settings.SoapParas.html#autoplex.settings.SoapParas.l_max">(autoplex.settings.SoapParas attribute)</a>
+</li>
+        <li><a href="reference/autoplex.settings.SoapSettings.html#autoplex.settings.SoapSettings.l_max">(autoplex.settings.SoapSettings attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.fitting.common.regularization.label_stoichiometry_volume.html#autoplex.fitting.common.regularization.label_stoichiometry_volume">label_stoichiometry_volume() (in module autoplex.fitting.common.regularization)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEPSettings.html#autoplex.settings.NEPSettings.lambda_1">lambda_1 (autoplex.settings.NEPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEPSettings.html#autoplex.settings.NEPSettings.lambda_e">lambda_e (autoplex.settings.NEPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEPSettings.html#autoplex.settings.NEPSettings.lambda_f">lambda_f (autoplex.settings.NEPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEPSettings.html#autoplex.settings.NEPSettings.lambda_v">lambda_v (autoplex.settings.NEPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.CustomIncar.html#autoplex.settings.CustomIncar.LCHARG">LCHARG (autoplex.settings.CustomIncar attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.learning_rate">learning_rate (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.log_batch_freq">log_batch_freq (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.log_epoch_freq">log_epoch_freq (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.loss">loss (autoplex.settings.M3GNETSettings attribute)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.loss">(autoplex.settings.MACESettings attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.loss_coeffs">loss_coeffs (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.loss_params">loss_params (autoplex.settings.M3GNETSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.CustomIncar.html#autoplex.settings.CustomIncar.LPLANE">LPLANE (autoplex.settings.CustomIncar attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.lr">lr (autoplex.settings.M3GNETSettings attribute)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.lr">(autoplex.settings.MACESettings attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.lr_scheduler_factor">lr_scheduler_factor (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.lr_scheduler_name">lr_scheduler_name (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.lr_scheduler_patience">lr_scheduler_patience (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.CustomIncar.html#autoplex.settings.CustomIncar.LREAL">LREAL (autoplex.settings.CustomIncar attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.CustomIncar.html#autoplex.settings.CustomIncar.LSCALAPACK">LSCALAPACK (autoplex.settings.CustomIncar attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.CustomIncar.html#autoplex.settings.CustomIncar.LWAVE">LWAVE (autoplex.settings.CustomIncar attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.settings.MLIPHypers.html#autoplex.settings.MLIPHypers.M3GNET">M3GNET (autoplex.settings.MLIPHypers attribute)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.utils.m3gnet_fitting.html#autoplex.fitting.common.utils.m3gnet_fitting">m3gnet_fitting() (in module autoplex.fitting.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.settings.MLIPHypers.html#autoplex.settings.MLIPHypers.MACE">MACE (autoplex.settings.MLIPHypers attribute)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.utils.mace_convert_virial_to_stress.html#autoplex.fitting.common.utils.mace_convert_virial_to_stress">mace_convert_virial_to_stress() (in module autoplex.fitting.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.utils.mace_fitting.html#autoplex.fitting.common.utils.mace_fitting">mace_fitting() (in module autoplex.fitting.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.jobs.machine_learning_fit.html#autoplex.fitting.common.jobs.machine_learning_fit">machine_learning_fit() (in module autoplex.fitting.common.jobs)</a>
+</li>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.magmom_target">magmom_target (autoplex.settings.M3GNETSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.magmom_weight">magmom_weight (autoplex.settings.M3GNETSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.auto.phonons.flows.CompleteDFTvsMLBenchmarkWorkflow.html#autoplex.auto.phonons.flows.CompleteDFTvsMLBenchmarkWorkflow.make">make() (autoplex.auto.phonons.flows.CompleteDFTvsMLBenchmarkWorkflow method)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.auto.phonons.flows.DFTSupercellSettingsMaker.html#autoplex.auto.phonons.flows.DFTSupercellSettingsMaker.make">(autoplex.auto.phonons.flows.DFTSupercellSettingsMaker method)</a>
+</li>
+        <li><a href="reference/autoplex.auto.phonons.flows.IterativeCompleteDFTvsMLBenchmarkWorkflow.html#autoplex.auto.phonons.flows.IterativeCompleteDFTvsMLBenchmarkWorkflow.make">(autoplex.auto.phonons.flows.IterativeCompleteDFTvsMLBenchmarkWorkflow method)</a>
+</li>
+        <li><a href="reference/autoplex.auto.rss.flows.RssMaker.html#autoplex.auto.rss.flows.RssMaker.make">(autoplex.auto.rss.flows.RssMaker method)</a>
+</li>
+        <li><a href="reference/autoplex.benchmark.phonons.flows.PhononBenchmarkMaker.html#autoplex.benchmark.phonons.flows.PhononBenchmarkMaker.make">(autoplex.benchmark.phonons.flows.PhononBenchmarkMaker method)</a>
+</li>
+        <li><a href="reference/autoplex.data.common.flows.DFTStaticLabelling.html#autoplex.data.common.flows.DFTStaticLabelling.make">(autoplex.data.common.flows.DFTStaticLabelling method)</a>
+</li>
+        <li><a href="reference/autoplex.data.common.flows.GenerateTrainingDataForTesting.html#autoplex.data.common.flows.GenerateTrainingDataForTesting.make">(autoplex.data.common.flows.GenerateTrainingDataForTesting method)</a>
+</li>
+        <li><a href="reference/autoplex.data.phonons.flows.IsoAtomMaker.html#autoplex.data.phonons.flows.IsoAtomMaker.make">(autoplex.data.phonons.flows.IsoAtomMaker method)</a>
+</li>
+        <li><a href="reference/autoplex.data.phonons.flows.RandomStructuresDataGenerator.html#autoplex.data.phonons.flows.RandomStructuresDataGenerator.make">(autoplex.data.phonons.flows.RandomStructuresDataGenerator method)</a>
+</li>
+        <li><a href="reference/autoplex.data.rss.flows.BuildMultiRandomizedStructure.html#autoplex.data.rss.flows.BuildMultiRandomizedStructure.make">(autoplex.data.rss.flows.BuildMultiRandomizedStructure method)</a>
+</li>
+        <li><a href="reference/autoplex.data.rss.jobs.RandomizedStructure.html#autoplex.data.rss.jobs.RandomizedStructure.make">(autoplex.data.rss.jobs.RandomizedStructure method)</a>
+</li>
+        <li><a href="reference/autoplex.fitting.common.flows.DataPreprocessing.html#autoplex.fitting.common.flows.DataPreprocessing.make">(autoplex.fitting.common.flows.DataPreprocessing method)</a>
+</li>
+        <li><a href="reference/autoplex.fitting.common.flows.MLIPFitMaker.html#autoplex.fitting.common.flows.MLIPFitMaker.make">(autoplex.fitting.common.flows.MLIPFitMaker method)</a>
+</li>
+        <li><a href="reference/autoplex.misc.castep.jobs.BaseCastepMaker.html#autoplex.misc.castep.jobs.BaseCastepMaker.make">(autoplex.misc.castep.jobs.BaseCastepMaker method)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.data.phonons.flows.MLPhononMaker.html#autoplex.data.phonons.flows.MLPhononMaker.make_from_ml_model">make_from_ml_model() (autoplex.data.phonons.flows.MLPhononMaker method)</a>
+</li>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.max_epochs">max_epochs (autoplex.settings.M3GNETSettings attribute)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.max_epochs">(autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.max_iteration_number">max_iteration_number (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.max_l">max_l (autoplex.settings.M3GNETSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.max_n">max_n (autoplex.settings.M3GNETSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.max_num_epochs">max_num_epochs (autoplex.settings.MACESettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.max_steps">max_steps (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.utils.mc_rattle.html#autoplex.data.common.utils.mc_rattle">mc_rattle() (in module autoplex.data.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.metrics_components">metrics_components (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.metrics_key">metrics_key (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.data.rss.utils.minimize_structures.html#autoplex.data.rss.utils.minimize_structures">minimize_structures() (in module autoplex.data.rss.utils)</a>
+</li>
+      <li><a href="reference/autoplex.settings.BuildcellOptions.html#autoplex.settings.BuildcellOptions.MINSEP">MINSEP (autoplex.settings.BuildcellOptions attribute)</a>
+</li>
+      <li><a href="reference/autoplex.data.phonons.utils.ml_phonon_maker_preparation.html#autoplex.data.phonons.utils.ml_phonon_maker_preparation">ml_phonon_maker_preparation() (in module autoplex.data.phonons.utils)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.mlip_hypers">mlip_hypers (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.ResumeFromPreviousState.html#autoplex.settings.ResumeFromPreviousState.mlip_path">mlip_path (autoplex.settings.ResumeFromPreviousState attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.mlip_type">mlip_type (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.flows.MLIPFitMaker.html#autoplex.fitting.common.flows.MLIPFitMaker">MLIPFitMaker (class in autoplex.fitting.common.flows)</a>
+</li>
+      <li><a href="reference/autoplex.data.phonons.flows.MLPhononMaker.html#autoplex.data.phonons.flows.MLPhononMaker">MLPhononMaker (class in autoplex.data.phonons.flows)</a>
+</li>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.model">model (autoplex.settings.MACESettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.model_dtype">model_dtype (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEPSettings.html#autoplex.settings.NEPSettings.model_type">model_type (autoplex.settings.NEPSettings attribute)</a>
+</li>
+      <li>
+    module
+
+      <ul>
+        <li><a href="reference/autoplex.auto.html#module-autoplex.auto">autoplex.auto</a>
+</li>
+        <li><a href="reference/autoplex.auto.phonons.html#module-autoplex.auto.phonons">autoplex.auto.phonons</a>
+</li>
+        <li><a href="reference/autoplex.auto.phonons.flows.html#module-autoplex.auto.phonons.flows">autoplex.auto.phonons.flows</a>
+</li>
+        <li><a href="reference/autoplex.auto.phonons.jobs.html#module-autoplex.auto.phonons.jobs">autoplex.auto.phonons.jobs</a>
+</li>
+        <li><a href="reference/autoplex.auto.rss.html#module-autoplex.auto.rss">autoplex.auto.rss</a>
+</li>
+        <li><a href="reference/autoplex.auto.rss.flows.html#module-autoplex.auto.rss.flows">autoplex.auto.rss.flows</a>
+</li>
+        <li><a href="reference/autoplex.auto.rss.jobs.html#module-autoplex.auto.rss.jobs">autoplex.auto.rss.jobs</a>
+</li>
+        <li><a href="reference/autoplex.benchmark.html#module-autoplex.benchmark">autoplex.benchmark</a>
+</li>
+        <li><a href="reference/autoplex.benchmark.phonons.html#module-autoplex.benchmark.phonons">autoplex.benchmark.phonons</a>
+</li>
+        <li><a href="reference/autoplex.benchmark.phonons.flows.html#module-autoplex.benchmark.phonons.flows">autoplex.benchmark.phonons.flows</a>
+</li>
+        <li><a href="reference/autoplex.benchmark.phonons.jobs.html#module-autoplex.benchmark.phonons.jobs">autoplex.benchmark.phonons.jobs</a>
+</li>
+        <li><a href="reference/autoplex.benchmark.phonons.utils.html#module-autoplex.benchmark.phonons.utils">autoplex.benchmark.phonons.utils</a>
+</li>
+        <li><a href="reference/autoplex.benchmark.rss.html#module-autoplex.benchmark.rss">autoplex.benchmark.rss</a>
+</li>
+        <li><a href="reference/autoplex.data.html#module-autoplex.data">autoplex.data</a>
+</li>
+        <li><a href="reference/autoplex.data.common.html#module-autoplex.data.common">autoplex.data.common</a>
+</li>
+        <li><a href="reference/autoplex.data.common.flows.html#module-autoplex.data.common.flows">autoplex.data.common.flows</a>
+</li>
+        <li><a href="reference/autoplex.data.common.jobs.html#module-autoplex.data.common.jobs">autoplex.data.common.jobs</a>
+</li>
+        <li><a href="reference/autoplex.data.common.utils.html#module-autoplex.data.common.utils">autoplex.data.common.utils</a>
+</li>
+        <li><a href="reference/autoplex.data.phonons.html#module-autoplex.data.phonons">autoplex.data.phonons</a>
+</li>
+        <li><a href="reference/autoplex.data.phonons.flows.html#module-autoplex.data.phonons.flows">autoplex.data.phonons.flows</a>
+</li>
+        <li><a href="reference/autoplex.data.phonons.jobs.html#module-autoplex.data.phonons.jobs">autoplex.data.phonons.jobs</a>
+</li>
+        <li><a href="reference/autoplex.data.phonons.utils.html#module-autoplex.data.phonons.utils">autoplex.data.phonons.utils</a>
+</li>
+        <li><a href="reference/autoplex.data.rss.html#module-autoplex.data.rss">autoplex.data.rss</a>
+</li>
+        <li><a href="reference/autoplex.data.rss.flows.html#module-autoplex.data.rss.flows">autoplex.data.rss.flows</a>
+</li>
+        <li><a href="reference/autoplex.data.rss.jobs.html#module-autoplex.data.rss.jobs">autoplex.data.rss.jobs</a>
+</li>
+        <li><a href="reference/autoplex.data.rss.utils.html#module-autoplex.data.rss.utils">autoplex.data.rss.utils</a>
+</li>
+        <li><a href="reference/autoplex.fitting.html#module-autoplex.fitting">autoplex.fitting</a>
+</li>
+        <li><a href="reference/autoplex.fitting.common.html#module-autoplex.fitting.common">autoplex.fitting.common</a>
+</li>
+        <li><a href="reference/autoplex.fitting.common.flows.html#module-autoplex.fitting.common.flows">autoplex.fitting.common.flows</a>
+</li>
+        <li><a href="reference/autoplex.fitting.common.jobs.html#module-autoplex.fitting.common.jobs">autoplex.fitting.common.jobs</a>
+</li>
+        <li><a href="reference/autoplex.fitting.common.regularization.html#module-autoplex.fitting.common.regularization">autoplex.fitting.common.regularization</a>
+</li>
+        <li><a href="reference/autoplex.fitting.common.utils.html#module-autoplex.fitting.common.utils">autoplex.fitting.common.utils</a>
+</li>
+        <li><a href="reference/autoplex.fitting.phonons.html#module-autoplex.fitting.phonons">autoplex.fitting.phonons</a>
+</li>
+        <li><a href="reference/autoplex.fitting.rss.html#module-autoplex.fitting.rss">autoplex.fitting.rss</a>
+</li>
+        <li><a href="reference/autoplex.misc.html#module-autoplex.misc">autoplex.misc</a>
+</li>
+        <li><a href="reference/autoplex.misc.castep.html#module-autoplex.misc.castep">autoplex.misc.castep</a>
+</li>
+        <li><a href="reference/autoplex.misc.castep.flows.html#module-autoplex.misc.castep.flows">autoplex.misc.castep.flows</a>
+</li>
+        <li><a href="reference/autoplex.misc.castep.jobs.html#module-autoplex.misc.castep.jobs">autoplex.misc.castep.jobs</a>
+</li>
+        <li><a href="reference/autoplex.misc.castep.run.html#module-autoplex.misc.castep.run">autoplex.misc.castep.run</a>
+</li>
+        <li><a href="reference/autoplex.misc.castep.schema.html#module-autoplex.misc.castep.schema">autoplex.misc.castep.schema</a>
+</li>
+        <li><a href="reference/autoplex.misc.castep.utils.html#module-autoplex.misc.castep.utils">autoplex.misc.castep.utils</a>
+</li>
+        <li><a href="reference/autoplex.misc.utils.html#module-autoplex.misc.utils">autoplex.misc.utils</a>
+</li>
+        <li><a href="reference/autoplex.misc.utils.mock_castep.html#module-autoplex.misc.utils.mock_castep">autoplex.misc.utils.mock_castep</a>
+</li>
+        <li><a href="reference/autoplex.settings.html#module-autoplex.settings">autoplex.settings</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.misc.utils.mock_castep.monkeypatch_castep.html#autoplex.misc.utils.mock_castep.monkeypatch_castep">monkeypatch_castep() (in module autoplex.misc.utils.mock_castep)</a>
+</li>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.multiheads_finetuning">multiheads_finetuning (autoplex.settings.MACESettings attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.settings.NEPSettings.html#autoplex.settings.NEPSettings.n_max">n_max (autoplex.settings.NEPSettings attribute)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.settings.SoapParas.html#autoplex.settings.SoapParas.n_max">(autoplex.settings.SoapParas attribute)</a>
+</li>
+        <li><a href="reference/autoplex.settings.SoapSettings.html#autoplex.settings.SoapSettings.n_max">(autoplex.settings.SoapSettings attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.settings.SoapSettings.html#autoplex.settings.SoapSettings.n_sparse">n_sparse (autoplex.settings.SoapSettings attribute)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.settings.ThreebSettings.html#autoplex.settings.ThreebSettings.n_sparse">(autoplex.settings.ThreebSettings attribute)</a>
+</li>
+        <li><a href="reference/autoplex.settings.TwobSettings.html#autoplex.settings.TwobSettings.n_sparse">(autoplex.settings.TwobSettings attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.n_train">n_train (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.n_val">n_val (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.name">name (autoplex.settings.MACESettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.nblocks">nblocks (autoplex.settings.M3GNETSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.CustomIncar.html#autoplex.settings.CustomIncar.NCORE">NCORE (autoplex.settings.CustomIncar attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.CustomIncar.html#autoplex.settings.CustomIncar.NELM">NELM (autoplex.settings.CustomIncar attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.MLIPHypers.html#autoplex.settings.MLIPHypers.NEP">NEP (autoplex.settings.MLIPHypers attribute)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.utils.nep_fitting.html#autoplex.fitting.common.utils.nep_fitting">nep_fitting() (in module autoplex.fitting.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.settings.MLIPHypers.html#autoplex.settings.MLIPHypers.NEQUIP">NEQUIP (autoplex.settings.MLIPHypers attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.fitting.common.utils.nequip_fitting.html#autoplex.fitting.common.utils.nequip_fitting">nequip_fitting() (in module autoplex.fitting.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEPSettings.html#autoplex.settings.NEPSettings.neuron">neuron (autoplex.settings.NEPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.BuildcellOptions.html#autoplex.settings.BuildcellOptions.NFORM">NFORM (autoplex.settings.BuildcellOptions attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.nonlinearity_gates">nonlinearity_gates (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.nonlinearity_scalars">nonlinearity_scalars (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.nonlinearity_type">nonlinearity_type (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.num_basis">num_basis (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.num_features">num_features (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.num_groups">num_groups (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.num_layers">num_layers (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.num_of_initial_selected_structs">num_of_initial_selected_structs (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.num_of_rss_selected_structs">num_of_rss_selected_structs (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.num_processes_buildcell">num_processes_buildcell (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.num_processes_fit">num_processes_fit (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.num_processes_rss">num_processes_rss (autoplex.settings.RssConfig attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.settings.Nonlinearity.html#autoplex.settings.Nonlinearity.o">o (autoplex.settings.Nonlinearity attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.BuildcellOptions.html#autoplex.settings.BuildcellOptions.OCTET">OCTET (autoplex.settings.BuildcellOptions attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.GAPGeneralSettings.html#autoplex.settings.GAPGeneralSettings.openmp_chunk_size">openmp_chunk_size (autoplex.settings.GAPGeneralSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.optimizer">optimizer (autoplex.settings.M3GNETSettings attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.optimizer_amsgrad">optimizer_amsgrad (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.optimizer_name">optimizer_name (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.JACESettings.html#autoplex.settings.JACESettings.order">order (autoplex.settings.JACESettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.misc.castep.schema.TaskDoc.html#autoplex.misc.castep.schema.TaskDoc.output">output (autoplex.misc.castep.schema.TaskDoc attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.BuildcellOptions.html#autoplex.settings.BuildcellOptions.OVERLAP">OVERLAP (autoplex.settings.BuildcellOptions attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.pair_repulsion">pair_repulsion (autoplex.settings.MACESettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.utils.parallel_calc_descriptor_vec.html#autoplex.data.common.utils.parallel_calc_descriptor_vec">parallel_calc_descriptor_vec() (in module autoplex.data.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.misc.castep.utils.CastepInputGenerator.html#autoplex.misc.castep.utils.CastepInputGenerator.param_updates">param_updates (autoplex.misc.castep.utils.CastepInputGenerator property)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.misc.castep.utils.CastepStaticSetGenerator.html#autoplex.misc.castep.utils.CastepStaticSetGenerator.param_updates">(autoplex.misc.castep.utils.CastepStaticSetGenerator property)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.parity">parity (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.patience">patience (autoplex.settings.MACESettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.per_species_rescale_scales">per_species_rescale_scales (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.per_species_rescale_scales_trainable">per_species_rescale_scales_trainable (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.per_species_rescale_shifts">per_species_rescale_shifts (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.per_species_rescale_shifts_trainable">per_species_rescale_shifts_trainable (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.benchmark.phonons.flows.PhononBenchmarkMaker.html#autoplex.benchmark.phonons.flows.PhononBenchmarkMaker">PhononBenchmarkMaker (class in autoplex.benchmark.phonons.flows)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.regularization.piecewise_linear.html#autoplex.fitting.common.regularization.piecewise_linear">piecewise_linear() (in module autoplex.fitting.common.regularization)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.utils.plot_convex_hull.html#autoplex.fitting.common.utils.plot_convex_hull">plot_convex_hull() (in module autoplex.fitting.common.utils)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.data.common.utils.plot_energy_forces.html#autoplex.data.common.utils.plot_energy_forces">plot_energy_forces() (in module autoplex.data.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.jobs.plot_force_distribution.html#autoplex.data.common.jobs.plot_force_distribution">plot_force_distribution() (in module autoplex.data.common.jobs)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.regularization.point_in_simplex_nd.html#autoplex.fitting.common.regularization.point_in_simplex_nd">point_in_simplex_nd() (in module autoplex.fitting.common.regularization)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.regularization.point_in_triangle_2D.html#autoplex.fitting.common.regularization.point_in_triangle_2D">point_in_triangle_2D() (in module autoplex.fitting.common.regularization)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.polynomialcutoff_p">polynomialcutoff_p (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEPSettings.html#autoplex.settings.NEPSettings.population">population (autoplex.settings.NEPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.ResumeFromPreviousState.html#autoplex.settings.ResumeFromPreviousState.pre_database_dir">pre_database_dir (autoplex.settings.ResumeFromPreviousState attribute)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.pre_database_dir">(autoplex.settings.RssConfig attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.settings.CustomIncar.html#autoplex.settings.CustomIncar.PREC">PREC (autoplex.settings.CustomIncar attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEPSettings.html#autoplex.settings.NEPSettings.prediction">prediction (autoplex.settings.NEPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.utils.prepare_fit_environment.html#autoplex.fitting.common.utils.prepare_fit_environment">prepare_fit_environment() (in module autoplex.fitting.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.jobs.preprocess_data.html#autoplex.data.common.jobs.preprocess_data">preprocess_data() (in module autoplex.data.common.jobs)</a>
+</li>
+      <li><a href="reference/autoplex.data.rss.utils.process_rss.html#autoplex.data.rss.utils.process_rss">process_rss() (in module autoplex.data.rss.utils)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.r_max">r_max (autoplex.settings.MACESettings attribute)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.r_max">(autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.random_seed">random_seed (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.utils.random_vary_angle.html#autoplex.data.common.utils.random_vary_angle">random_vary_angle() (in module autoplex.data.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.data.rss.jobs.RandomizedStructure.html#autoplex.data.rss.jobs.RandomizedStructure">RandomizedStructure (class in autoplex.data.rss.jobs)</a>
+</li>
+      <li><a href="reference/autoplex.data.phonons.flows.RandomStructuresDataGenerator.html#autoplex.data.phonons.flows.RandomStructuresDataGenerator">RandomStructuresDataGenerator (class in autoplex.data.phonons.flows)</a>
+</li>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.rbf_type">rbf_type (autoplex.settings.M3GNETSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.data.phonons.utils.reduce_supercell_size.html#autoplex.data.phonons.utils.reduce_supercell_size">reduce_supercell_size() (in module autoplex.data.phonons.utils)</a>
+</li>
+      <li><a href="reference/autoplex.data.phonons.jobs.reduce_supercell_size_job.html#autoplex.data.phonons.jobs.reduce_supercell_size_job">reduce_supercell_size_job() (in module autoplex.data.phonons.jobs)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.ref_energy_name">ref_energy_name (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.ref_force_name">ref_force_name (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.ref_virial_name">ref_virial_name (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.reg_minmax">reg_minmax (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.regularization">regularization (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.remove_traj_files">remove_traj_files (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.report_init_validation">report_init_validation (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.restart_latest">restart_latest (autoplex.settings.MACESettings attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.results_dir">results_dir (autoplex.settings.M3GNETSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.resume_from_previous_state">resume_from_previous_state (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.retain_existing_sigma">retain_existing_sigma (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.utils.rms_dict.html#autoplex.data.common.utils.rms_dict">rms_dict() (in module autoplex.data.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.benchmark.phonons.utils.rmse_qdep_plot.html#autoplex.benchmark.phonons.utils.rmse_qdep_plot">rmse_qdep_plot() (in module autoplex.benchmark.phonons.utils)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.root">root (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.rss_group">rss_group (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.rss_selection_method">rss_selection_method (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.auto.rss.flows.RssMaker.html#autoplex.auto.rss.flows.RssMaker">RssMaker (class in autoplex.auto.rss.flows)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.utils.run_ace.html#autoplex.fitting.common.utils.run_ace">run_ace() (in module autoplex.fitting.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.utils.run_ase_gap.html#autoplex.fitting.common.utils.run_ase_gap">run_ase_gap() (in module autoplex.fitting.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.misc.castep.run.run_castep.html#autoplex.misc.castep.run.run_castep">run_castep() (in module autoplex.misc.castep.run)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.utils.run_gap.html#autoplex.fitting.common.utils.run_gap">run_gap() (in module autoplex.fitting.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.utils.run_mace.html#autoplex.fitting.common.utils.run_mace">run_mace() (in module autoplex.fitting.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.run_name">run_name (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.utils.run_nep.html#autoplex.fitting.common.utils.run_nep">run_nep() (in module autoplex.fitting.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.fitting.common.utils.run_nequip.html#autoplex.fitting.common.utils.run_nequip">run_nequip() (in module autoplex.fitting.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.auto.phonons.jobs.run_supercells.html#autoplex.auto.phonons.jobs.run_supercells">run_supercells() (in module autoplex.auto.phonons.jobs)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.data.common.jobs.safe_strip_hostname.html#autoplex.data.common.jobs.safe_strip_hostname">safe_strip_hostname() (in module autoplex.data.common.jobs)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.jobs.sample_data.html#autoplex.data.common.jobs.sample_data">sample_data() (in module autoplex.data.common.jobs)</a>
+</li>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.save_all_checkpoints">save_all_checkpoints (autoplex.settings.MACESettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.save_checkpoint_freq">save_checkpoint_freq (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.save_cpu">save_cpu (autoplex.settings.MACESettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.save_ema_checkpoint_freq">save_ema_checkpoint_freq (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.scalar_exp_pressure">scalar_exp_pressure (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.scalar_pressure_exponential_width">scalar_pressure_exponential_width (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.scalar_pressure_high">scalar_pressure_high (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.scalar_pressure_low">scalar_pressure_low (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.scalar_pressure_method">scalar_pressure_method (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.utils.scale_cell.html#autoplex.data.common.utils.scale_cell">scale_cell() (in module autoplex.data.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.scaling">scaling (autoplex.settings.MACESettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.scheduler">scheduler (autoplex.settings.M3GNETSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.scheme">scheme (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.seed">seed (autoplex.settings.MACESettings attribute)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.seed">(autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.fitting.common.regularization.set_custom_sigma.html#autoplex.fitting.common.regularization.set_custom_sigma">set_custom_sigma() (in module autoplex.fitting.common.regularization)</a>
+</li>
+      <li><a href="reference/autoplex.settings.SETTINGS.html#autoplex.settings.SETTINGS">SETTINGS (in module autoplex.settings)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.shuffle">shuffle (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.CustomIncar.html#autoplex.settings.CustomIncar.SIGMA">SIGMA (autoplex.settings.CustomIncar attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.BuildcellOptions.html#autoplex.settings.BuildcellOptions.SLACK">SLACK (autoplex.settings.BuildcellOptions attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.GAPGeneralSettings.html#autoplex.settings.GAPGeneralSettings.soap">soap (autoplex.settings.GAPGeneralSettings attribute)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.settings.GAPSettings.html#autoplex.settings.GAPSettings.soap">(autoplex.settings.GAPSettings attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.settings.BcurParams.html#autoplex.settings.BcurParams.soap_paras">soap_paras (autoplex.settings.BcurParams attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.JACESettings.html#autoplex.settings.JACESettings.solver">solver (autoplex.settings.JACESettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.GAPGeneralSettings.html#autoplex.settings.GAPGeneralSettings.sparse_jitter">sparse_jitter (autoplex.settings.GAPGeneralSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.SoapSettings.html#autoplex.settings.SoapSettings.sparse_method">sparse_method (autoplex.settings.SoapSettings attribute)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.settings.ThreebSettings.html#autoplex.settings.ThreebSettings.sparse_method">(autoplex.settings.ThreebSettings attribute)</a>
+</li>
+        <li><a href="reference/autoplex.settings.TwobSettings.html#autoplex.settings.TwobSettings.sparse_method">(autoplex.settings.TwobSettings attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.settings.SoapParas.html#autoplex.settings.SoapParas.species">species (autoplex.settings.SoapParas attribute)</a>
+</li>
+      <li><a href="reference/autoplex.data.rss.utils.split_structure_into_groups.html#autoplex.data.rss.utils.split_structure_into_groups">split_structure_into_groups() (in module autoplex.data.rss.utils)</a>
+</li>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.start_swa">start_swa (autoplex.settings.MACESettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.flows.GenerateTrainingDataForTesting.html#autoplex.data.common.flows.GenerateTrainingDataForTesting.static_run_and_convert">static_run_and_convert() (autoplex.data.common.flows.GenerateTrainingDataForTesting method)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.utils.std_rattle.html#autoplex.data.common.utils.std_rattle">std_rattle() (in module autoplex.data.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.stop_criterion">stop_criterion (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.utils.stratified_dataset_split.html#autoplex.data.common.utils.stratified_dataset_split">stratified_dataset_split() (in module autoplex.data.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.misc.castep.schema.OutputDoc.html#autoplex.misc.castep.schema.OutputDoc.stress">stress (autoplex.misc.castep.schema.OutputDoc attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.stress_tol">stress_tol (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.stress_weight">stress_weight (autoplex.settings.M3GNETSettings attribute)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.stress_weight">(autoplex.settings.MACESettings attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.misc.castep.schema.OutputDoc.html#autoplex.misc.castep.schema.OutputDoc.structure">structure (autoplex.misc.castep.schema.OutputDoc attribute)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.misc.castep.schema.TaskDoc.html#autoplex.misc.castep.schema.TaskDoc.structure">(autoplex.misc.castep.schema.TaskDoc attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.swa">swa (autoplex.settings.MACESettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.BuildcellOptions.html#autoplex.settings.BuildcellOptions.SYMMOPS">SYMMOPS (autoplex.settings.BuildcellOptions attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.sync_dist">sync_dist (autoplex.settings.M3GNETSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.BuildcellOptions.html#autoplex.settings.BuildcellOptions.SYSTEM">SYSTEM (autoplex.settings.BuildcellOptions attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.tag">tag (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.misc.castep.schema.TaskDoc.html#autoplex.misc.castep.schema.TaskDoc.task_label">task_label (autoplex.misc.castep.schema.TaskDoc attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.ResumeFromPreviousState.html#autoplex.settings.ResumeFromPreviousState.test_error">test_error (autoplex.settings.ResumeFromPreviousState attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.test_ratio">test_ratio (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.ThreebSettings.html#autoplex.settings.ThreebSettings.theta_uniform">theta_uniform (autoplex.settings.ThreebSettings attribute)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.settings.TwobSettings.html#autoplex.settings.TwobSettings.theta_uniform">(autoplex.settings.TwobSettings attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.settings.GAPGeneralSettings.html#autoplex.settings.GAPGeneralSettings.three_body">three_body (autoplex.settings.GAPGeneralSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.GAPSettings.html#autoplex.settings.GAPSettings.threeb">threeb (autoplex.settings.GAPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.threebody_cutoff">threebody_cutoff (autoplex.settings.M3GNETSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.data.phonons.flows.TightDFTStaticMaker.html#autoplex.data.phonons.flows.TightDFTStaticMaker">TightDFTStaticMaker (class in autoplex.data.phonons.flows)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.utils.to_ase_trajectory.html#autoplex.data.common.utils.to_ase_trajectory">to_ase_trajectory() (in module autoplex.data.common.utils)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.data.rss.utils.HookeanRepulsion.html#autoplex.data.rss.utils.HookeanRepulsion.todict">todict() (autoplex.data.rss.utils.HookeanRepulsion method)</a>
+</li>
+      <li><a href="reference/autoplex.settings.LossCoeff.html#autoplex.settings.LossCoeff.total_energy">total_energy (autoplex.settings.LossCoeff attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.JACESettings.html#autoplex.settings.JACESettings.totaldegree">totaldegree (autoplex.settings.JACESettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.RssConfig.html#autoplex.settings.RssConfig.train_from_scratch">train_from_scratch (autoplex.settings.RssConfig attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.GAPGeneralSettings.html#autoplex.settings.GAPGeneralSettings.two_body">two_body (autoplex.settings.GAPGeneralSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.GAPSettings.html#autoplex.settings.GAPSettings.twob">twob (autoplex.settings.GAPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEPSettings.html#autoplex.settings.NEPSettings.type">type (autoplex.settings.NEPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.data.common.jobs.TYPE_CHECKING.html#autoplex.data.common.jobs.TYPE_CHECKING">TYPE_CHECKING (in module autoplex.data.common.jobs)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.fitting.common.utils.TYPE_CHECKING.html#autoplex.fitting.common.utils.TYPE_CHECKING">(in module autoplex.fitting.common.utils)</a>
+</li>
+        <li><a href="reference/autoplex.misc.castep.jobs.TYPE_CHECKING.html#autoplex.misc.castep.jobs.TYPE_CHECKING">(in module autoplex.misc.castep.jobs)</a>
+</li>
+        <li><a href="reference/autoplex.misc.utils.mock_castep.TYPE_CHECKING.html#autoplex.misc.utils.mock_castep.TYPE_CHECKING">(in module autoplex.misc.utils.mock_castep)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/autoplex.settings.NEPSettings.html#autoplex.settings.NEPSettings.type_weight">type_weight (autoplex.settings.NEPSettings attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.units">units (autoplex.settings.M3GNETSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.AutoplexBaseModel.html#autoplex.settings.AutoplexBaseModel.update_parameters">update_parameters() (autoplex.settings.AutoplexBaseModel method)</a>
+</li>
+      <li><a href="reference/autoplex.data.phonons.utils.update_phonon_displacement_maker.html#autoplex.data.phonons.utils.update_phonon_displacement_maker">update_phonon_displacement_maker() (in module autoplex.data.phonons.utils)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.use_ema">use_ema (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.M3GNETSettings.html#autoplex.settings.M3GNETSettings.use_foundation_model_element_refs">use_foundation_model_element_refs (autoplex.settings.M3GNETSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.use_sc">use_sc (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="V">V</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.valid_batch_size">valid_batch_size (autoplex.settings.MACESettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.validation_batch_size">validation_batch_size (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.validation_dataset">validation_dataset (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.validation_dataset_file_name">validation_dataset_file_name (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.validation_dataset_key_mapping">validation_dataset_key_mapping (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.fitting.common.utils.vaspoutput_2_extended_xyz.html#autoplex.fitting.common.utils.vaspoutput_2_extended_xyz">vaspoutput_2_extended_xyz() (in module autoplex.fitting.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.verbose">verbose (autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.NEPSettings.html#autoplex.settings.NEPSettings.version">version (autoplex.settings.NEPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.GAPGeneralSettings.html#autoplex.settings.GAPGeneralSettings.virial_parameter_name">virial_parameter_name (autoplex.settings.GAPGeneralSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.virials_weight">virials_weight (autoplex.settings.MACESettings attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="W">W</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.settings.MACESettings.html#autoplex.settings.MACESettings.wandb">wandb (autoplex.settings.MACESettings attribute)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.settings.NEQUIPSettings.html#autoplex.settings.NEQUIPSettings.wandb">(autoplex.settings.NEQUIPSettings attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.fitting.common.utils.write_after_distillation_data_split.html#autoplex.fitting.common.utils.write_after_distillation_data_split">write_after_distillation_data_split() (in module autoplex.fitting.common.utils)</a>
+</li>
+      <li><a href="reference/autoplex.benchmark.phonons.jobs.write_benchmark_metrics.html#autoplex.benchmark.phonons.jobs.write_benchmark_metrics">write_benchmark_metrics() (in module autoplex.benchmark.phonons.jobs)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Z">Z</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.settings.NEPSettings.html#autoplex.settings.NEPSettings.zbl">zbl (autoplex.settings.NEPSettings attribute)</a>
+</li>
+      <li><a href="reference/autoplex.settings.SoapParas.html#autoplex.settings.SoapParas.zeta">zeta (autoplex.settings.SoapParas attribute)</a>
+
+      <ul>
+        <li><a href="reference/autoplex.settings.SoapSettings.html#autoplex.settings.SoapSettings.zeta">(autoplex.settings.SoapSettings attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/autoplex.misc.utils.mock_castep.zpath.html#autoplex.misc.utils.mock_castep.zpath">zpath() (in module autoplex.misc.utils.mock_castep)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Author name not set
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, autoplex development team.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

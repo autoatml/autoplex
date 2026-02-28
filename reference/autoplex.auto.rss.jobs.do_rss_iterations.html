@@ -1,0 +1,739 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>do_rss_iterations &#8212; autoplex</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1ea92b8b" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=e18d2f4a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'reference/autoplex.auto.rss.jobs.do_rss_iterations';</script>
+    <link rel="icon" href="../_static/autoplex_favicon.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="initial_rss" href="autoplex.auto.rss.jobs.initial_rss.html" />
+    <link rel="prev" title="autoplex.auto.rss.jobs" href="autoplex.auto.rss.jobs.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.1.dev1+g6ffcd01a0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/autoplex_logo.png" class="logo__image only-light" alt="autoplex - Home"/>
+    <img src="../_static/autoplex_logo.png" class="logo__image only-dark pst-js-only" alt="autoplex - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">Overview</a></li>
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../user/setup.html">Quick-start</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../user/tutorials.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../user/installation/installation.html">Installation guide</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../user/rss/index.html">RSS workflow</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../user/rss/flow/introduction/intro.html">Brief overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../user/rss/flow/input/input.html">Input YAML configuration file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../user/rss/flow/quick_start/start.html">Quick start</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../user/rss/flow/example/example.html">Examples</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../user/phonon/index.html">Phonon workflow</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../user/phonon/flows/flows.html">Out-of-the-box workflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../user/phonon/flows/generation/data.html">Generating reference data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../user/phonon/flows/fitting/fitting.html">Fitting phonon-accurate potentials</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../user/phonon/flows/benchmark/benchmark.html">Benchmark of ML-based phonon structure</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../user/executable/index.html">Executable tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../user/executable/tutorial_phonon.html">Iterative DFT vs MLIP benchmark workflow for phonons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../user/executable/tutorial_rss.html">RSS Workflow</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">API reference</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="autoplex.auto.html">autoplex.auto</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3 has-children"><a class="reference internal" href="autoplex.auto.phonons.html">autoplex.auto.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoplex.auto.phonons.flows.html">autoplex.auto.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoplex.auto.phonons.jobs.html">autoplex.auto.phonons.jobs</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 current active has-children"><a class="reference internal" href="autoplex.auto.rss.html">autoplex.auto.rss</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="autoplex.auto.rss.flows.html">autoplex.auto.rss.flows</a></li>
+<li class="toctree-l4 current active"><a class="reference internal" href="autoplex.auto.rss.jobs.html">autoplex.auto.rss.jobs</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="autoplex.benchmark.html">autoplex.benchmark</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="autoplex.benchmark.phonons.html">autoplex.benchmark.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoplex.benchmark.phonons.flows.html">autoplex.benchmark.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoplex.benchmark.phonons.jobs.html">autoplex.benchmark.phonons.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoplex.benchmark.phonons.utils.html">autoplex.benchmark.phonons.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="autoplex.benchmark.rss.html">autoplex.benchmark.rss</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="autoplex.data.html">autoplex.data</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="autoplex.data.common.html">autoplex.data.common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoplex.data.common.flows.html">autoplex.data.common.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoplex.data.common.jobs.html">autoplex.data.common.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoplex.data.common.utils.html">autoplex.data.common.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="autoplex.data.phonons.html">autoplex.data.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoplex.data.phonons.flows.html">autoplex.data.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoplex.data.phonons.jobs.html">autoplex.data.phonons.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoplex.data.phonons.utils.html">autoplex.data.phonons.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="autoplex.data.rss.html">autoplex.data.rss</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoplex.data.rss.flows.html">autoplex.data.rss.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoplex.data.rss.jobs.html">autoplex.data.rss.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoplex.data.rss.utils.html">autoplex.data.rss.utils</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="autoplex.fitting.html">autoplex.fitting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="autoplex.fitting.common.html">autoplex.fitting.common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoplex.fitting.common.flows.html">autoplex.fitting.common.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoplex.fitting.common.jobs.html">autoplex.fitting.common.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoplex.fitting.common.regularization.html">autoplex.fitting.common.regularization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoplex.fitting.common.utils.html">autoplex.fitting.common.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="autoplex.fitting.phonons.html">autoplex.fitting.phonons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autoplex.fitting.rss.html">autoplex.fitting.rss</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="autoplex.misc.html">autoplex.misc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="autoplex.misc.castep.html">autoplex.misc.castep</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoplex.misc.castep.flows.html">autoplex.misc.castep.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoplex.misc.castep.jobs.html">autoplex.misc.castep.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoplex.misc.castep.run.html">autoplex.misc.castep.run</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoplex.misc.castep.schema.html">autoplex.misc.castep.schema</a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoplex.misc.castep.utils.html">autoplex.misc.castep.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="autoplex.misc.utils.html">autoplex.misc.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoplex.misc.utils.mock_castep.html">autoplex.misc.utils.mock_castep</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="autoplex.settings.html">autoplex.settings</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="autoplex.settings.AutoplexBaseModel.html">AutoplexBaseModel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autoplex.settings.AutoplexSettings.html">AutoplexSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autoplex.settings.BcurParams.html">BcurParams</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autoplex.settings.BuildcellOptions.html">BuildcellOptions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autoplex.settings.CustomIncar.html">CustomIncar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autoplex.settings.GAPGeneralSettings.html">GAPGeneralSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autoplex.settings.GAPSettings.html">GAPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autoplex.settings.JACESettings.html">JACESettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autoplex.settings.LossCoeff.html">LossCoeff</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autoplex.settings.M3GNETSettings.html">M3GNETSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autoplex.settings.MACESettings.html">MACESettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autoplex.settings.MLIPHypers.html">MLIPHypers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autoplex.settings.NEPSettings.html">NEPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autoplex.settings.NEQUIPSettings.html">NEQUIPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autoplex.settings.Nonlinearity.html">Nonlinearity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autoplex.settings.ResumeFromPreviousState.html">ResumeFromPreviousState</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autoplex.settings.RssConfig.html">RssConfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autoplex.settings.SETTINGS.html">SETTINGS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autoplex.settings.SoapParas.html">SoapParas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autoplex.settings.SoapSettings.html">SoapSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autoplex.settings.ThreebSettings.html">ThreebSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autoplex.settings.TwobSettings.html">TwobSettings</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contributing Guide</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../dev/contributing.html">Contributing to autoplex</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/dev_install.html">Developer Installation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../about/changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about/contributors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about/license.html">License</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/JaGeo/autoplex" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/JaGeo/autoplex/issues/new?title=Issue%20on%20page%20%2Freference/autoplex.auto.rss.jobs.do_rss_iterations.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/reference/autoplex.auto.rss.jobs.do_rss_iterations.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>do_rss_iterations</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#autoplex.auto.rss.jobs.do_rss_iterations"><code class="docutils literal notranslate"><span class="pre">do_rss_iterations()</span></code></a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="do-rss-iterations">
+<h1>do_rss_iterations<a class="headerlink" href="#do-rss-iterations" title="Link to this heading">#</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="autoplex.auto.rss.jobs.do_rss_iterations">
+<span class="sig-prename descclassname"><span class="pre">autoplex.auto.rss.jobs.</span></span><span class="sig-name descname"><span class="pre">do_rss_iterations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generated_struct_numbers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_of_initial_selected_structs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_seed_paths</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buildcell_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fragment_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fragment_numbers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_processes_buildcell</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_selection_enabled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rss_selection_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_of_rss_selected_structs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bcur_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_isolated_atom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isolatedatom_box</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e0_spin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_dimer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimer_box</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimer_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimer_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">21</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_incar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_potcar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dft_ref_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dft_ref.extxyz'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rss_group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rss'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disable_testing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regularization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retain_existing_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scheme</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">element_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_minmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distillation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'REF_forces'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mlip_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'GAP'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_energy_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'REF_energy'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_force_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'REF_forces'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_virial_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'REF_virial'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_delta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_processes_fit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device_for_fitting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cpu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scalar_pressure_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'exp'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scalar_exp_pressure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scalar_pressure_exponential_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scalar_pressure_low</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scalar_pressure_high</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stress_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hookean_repul</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hookean_paras</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_symmetry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_traj_files</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_processes_rss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device_for_rss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cpu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_criterion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration_number</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_kt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_iter_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static_energy_maker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">_DEFAULT_STATIC_ENERGY_MAKER</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static_energy_maker_isolated_atoms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">fit_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/autoplex/auto/rss/jobs.html#do_rss_iterations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autoplex.auto.rss.jobs.do_rss_iterations" title="Link to this definition">#</a></dt>
+<dd><p>Perform iterative RSS to improve the accuracy of a MLIP.</p>
+<p>Each iteration involves generating new structures, sampling, running
+DFT calculations, collecting data, preprocessing data, and fitting a new MLIP.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input</strong> (<em>dict</em>) – <p>A dictionary parameter used to pass specific input data required during the RSS iterations.
+The keys in this dictionary should be one of the following valid keys:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>test_error: float</dt><dd><p>The test error of the fitted MLIP.</p>
+</dd>
+<dt>pre_database_dir: str</dt><dd><p>The directory of the preprocessed database.</p>
+</dd>
+<dt>mlip_path: str | path</dt><dd><p>Path to the fitted MLIP.</p>
+</dd>
+<dt>isolated_atom_energies: dict</dt><dd><p>The isolated energy values.</p>
+</dd>
+<dt>current_iter: int</dt><dd><p>The current iteration index.</p>
+</dd>
+<dt>kt: float</dt><dd><p>The value of kt.</p>
+</dd>
+</dl>
+</div></blockquote>
+</p></li>
+<li><p><strong>tag</strong> (<em>str</em>) – Tag of systems. It can also be used for setting up elements and stoichiometry.
+For example, the tag of ‘SiO2’ will be recognized as a 1:2 ratio of Si to O and
+passed into the parameters of buildcell. However, note that this will be overwritten
+if the stoichiometric ratio of elements is defined in the ‘cell_seed_paths’ or ‘buildcell_options’.</p></li>
+<li><p><strong>generated_struct_numbers</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) – Expected number of generated randomized unit cells.</p></li>
+<li><p><strong>num_of_initial_selected_structs</strong> (<em>list</em><em>[</em><em>int</em><em>] </em><em>| </em><em>None</em>) – Number of structures to be sampled. Default is None.</p></li>
+<li><p><strong>cell_seed_paths</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – A list of paths to the custom buildcell control files, which ends with ‘.cell’. If these files exist,
+the buildcell_options argument will no longer take effect.</p></li>
+<li><p><strong>buildcell_options</strong> (<em>list</em><em>[</em><em>dict</em><em>] </em><em>| </em><em>None</em>) – Customized parameters for buildcell. Default is None.</p></li>
+<li><p><strong>fragment_file</strong> (<em>Atoms</em><em> | </em><em>list</em><em>[</em><em>Atoms</em><em>] </em><em>| </em><em>None</em>) – Fragment(s) for random structures, e.g. molecules, to be placed indivudally intact.
+atoms.arrays should have a ‘fragment_id’ key with unique identifiers for each fragment if in same Atoms.
+atoms.cell must be defined (e.g. Atoms.cell = np.eye(3)*20).</p></li>
+<li><p><strong>fragment_numbers</strong> (<em>list</em><em>[</em><em>str</em><em>] </em><em>| </em><em>None</em>) – Numbers of each fragment to be included in the random structures. Defaults to 1 for all specified.</p></li>
+<li><p><strong>num_processes_buildcell</strong> (<em>int</em>) – Number of processes to use for parallel computation during buildcell generation. Default is 1.</p></li>
+<li><p><strong>initial_selection_enabled</strong> (<em>bool</em>) – If true, sample structures using CUR. Default is False.</p></li>
+<li><p><strong>rss_selection_method</strong> (<em>str</em>) – Method for selecting samples from the generated structures. Default is None.</p></li>
+<li><p><strong>num_of_rss_selected_structs</strong> (<em>int</em>) – Number of structures to be selected.</p></li>
+<li><p><strong>bcur_params</strong> (<em>dict</em><em> | </em><em>None</em>) – Parameters for Boltzmann CUR selection. Default is None.</p></li>
+<li><p><strong>random_seed</strong> (<em>int</em><em> | </em><em>None</em>) – A seed to ensure reproducibility of CUR selection. Default is None.</p></li>
+<li><p><strong>include_isolated_atom</strong> (<em>bool</em>) – If true, perform single-point calculations for isolated atoms. Default is False.</p></li>
+<li><p><strong>isolatedatom_box</strong> (<em>list</em><em>[</em><em>float</em><em>] </em><em>| </em><em>None</em>) – List of the lattice constants for an isolated atom configuration. Default is None.</p></li>
+<li><p><strong>e0_spin</strong> (<em>bool</em>) – If true, include spin polarization in isolated atom and dimer calculations. Default is False.</p></li>
+<li><p><strong>include_dimer</strong> (<em>bool</em>) – If true, perform single-point calculations for dimers only once. Default is False.</p></li>
+<li><p><strong>dimer_box</strong> (<em>list</em><em>[</em><em>float</em><em>] </em><em>| </em><em>None</em>) – The lattice constants of a dimer box. Default is None.</p></li>
+<li><p><strong>dimer_range</strong> (<em>list</em><em>[</em><em>float</em><em>] </em><em>| </em><em>None</em>) – Range of distances for dimer calculations. Default is None.</p></li>
+<li><p><strong>dimer_num</strong> (<em>int</em>) – Number of different distances to consider for dimer calculations. Default is 21.</p></li>
+<li><p><strong>custom_incar</strong> (<em>dict</em><em> | </em><em>None</em>) – Dictionary of custom VASP input parameters. If provided, will update the
+default parameters. Default is None.</p></li>
+<li><p><strong>custom_potcar</strong> (<em>dict</em><em> | </em><em>None</em>) – Dictionary of POTCAR settings to update. Keys are element symbols, values are the desired POTCAR labels.
+Default is None.</p></li>
+<li><p><strong>config_types</strong> (<em>list</em><em>[</em><em>str</em><em>] </em><em>| </em><em>None</em>) – Configuration types for the DFT calculations. Default is None.</p></li>
+<li><p><strong>dft_ref_file</strong> (<em>str</em>) – Reference file for DFT-labelled data. Default is ‘dft_ref.extxyz’.</p></li>
+<li><p><strong>rss_group</strong> (<em>str</em>) – Group name for GAP RSS. Default is ‘rss’.</p></li>
+<li><p><strong>test_ratio</strong> (<em>float</em>) – The proportion of the test set after splitting the data. Default is 0.1.</p></li>
+<li><p><strong>disable_testing</strong> (<em>bool</em>) – Whether to disable running the model on test data. Default is False.</p></li>
+<li><p><strong>regularization</strong> (<em>bool</em>) – If true, apply regularization. This only works for GAP. Default is False.</p></li>
+<li><p><strong>retain_existing_sigma</strong> (<em>bool</em>) – Whether to keep the current sigma values for specific configuration types.
+If set to True, existing sigma values for specific configurations will remain unchanged.</p></li>
+<li><p><strong>scheme</strong> (<em>str</em><em> | </em><em>None</em>) – Scheme to use for regularization. Default is None.</p></li>
+<li><p><strong>element_order</strong> (<em>list</em><em> | </em><em>None</em>) – List of atomic numbers in order of choice (e.g. [42, 16] for MoS2).
+This value is useful when constructing high-dimensional convex hulls based on the
+“volume-stoichiometry” scheme. Specially, if the dataset contains compounds with
+different numbers of constituent elements (e.g., both binary and ternary structures),
+this value must be explicitly set to ensure the convex hull is constructed consistently.</p></li>
+<li><p><strong>reg_minmax</strong> (<em>list</em><em>[</em><em>tuple</em><em>] </em><em>| </em><em>None</em>) – A list of tuples representing the minimum and maximum values for regularization.</p></li>
+<li><p><strong>distillation</strong> (<em>bool</em>) – If true, apply data distillation. Default is True.</p></li>
+<li><p><strong>force_max</strong> (<em>float</em>) – Maximum force value to exclude structures. Default is 200.</p></li>
+<li><p><strong>force_label</strong> (<em>str</em>) – The label of force values to use for distillation. Default is ‘REF_forces’.</p></li>
+<li><p><strong>mlip_type</strong> (<em>Literal</em><em>[</em><em>&quot;GAP&quot;</em><em>, </em><em>&quot;J-ACE&quot;</em><em>, </em><em>&quot;NEP&quot;</em><em>, </em><em>&quot;NEQUIP&quot;</em><em>, </em><em>&quot;M3GNET&quot;</em><em>, </em><em>&quot;MACE&quot;</em><em>]</em>) – Choose one specific MLIP type to be fitted. Default is ‘GAP’.</p></li>
+<li><p><strong>ref_energy_name</strong> (<em>str</em>) – Reference energy name. Default is ‘REF_energy’.</p></li>
+<li><p><strong>ref_force_name</strong> (<em>str</em>) – Reference force name. Default is ‘REF_forces’.</p></li>
+<li><p><strong>ref_virial_name</strong> (<em>str</em>) – Reference virial name. Default is ‘REF_virial’.</p></li>
+<li><p><strong>auto_delta</strong> (<em>bool</em>) – If true, apply automatic determination of delta for GAP terms. Default is False.</p></li>
+<li><p><strong>num_processes_fit</strong> (<em>int</em>) – Number of processes used for fitting. Default is 1.</p></li>
+<li><p><strong>device_for_fitting</strong> (<em>str</em>) – Device to be used for model fitting, either “cpu” or “cuda”.</p></li>
+<li><p><strong>scalar_pressure_method</strong> (<em>str</em>) – Method for adding external pressures. Default is ‘exp’.</p></li>
+<li><p><strong>scalar_exp_pressure</strong> (<em>float</em>) – Scalar exponential pressure. Default is 100.</p></li>
+<li><p><strong>scalar_pressure_exponential_width</strong> (<em>float</em>) – Width for scalar pressure exponential. Default is 0.2.</p></li>
+<li><p><strong>scalar_pressure_low</strong> (<em>float</em>) – Low limit for scalar pressure. Default is 0.</p></li>
+<li><p><strong>scalar_pressure_high</strong> (<em>float</em>) – High limit for scalar pressure. Default is 50.</p></li>
+<li><p><strong>max_steps</strong> (<em>int</em>) – Maximum number of steps for relaxation. Default is 200.</p></li>
+<li><p><strong>force_tol</strong> (<em>float</em>) – Force residual tolerance for relaxation. Default is 0.05.</p></li>
+<li><p><strong>stress_tol</strong> (<em>float</em>) – Stress residual tolerance for relaxation. Default is 0.05.</p></li>
+<li><p><strong>hookean_repul</strong> (<em>bool</em>) – If true, apply Hookean repulsion. Default is False.</p></li>
+<li><p><strong>hookean_paras</strong> (<em>dict</em><em>[</em><em>tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em><em>, </em><em>tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em><em>] </em><em>| </em><em>None</em>) – Parameters for Hookean repulsion as a dictionary of tuples. Default is None.</p></li>
+<li><p><strong>keep_symmetry</strong> (<em>bool</em>) – If true, preserve symmetry during relaxation. Default is False.</p></li>
+<li><p><strong>remove_traj_files</strong> (<em>bool</em>) – If true, remove all trajectory files raised by RSS to save memory. Default is False.</p></li>
+<li><p><strong>num_processes_rss</strong> (<em>int</em>) – Number of processes used for running RSS. Default is 1.</p></li>
+<li><p><strong>device_for_rss</strong> (<em>str</em>) – Specify device to use “cuda” or “cpu” for running RSS. Default is “cpu”.</p></li>
+<li><p><strong>stop_criterion</strong> (<em>float</em>) – Convergence criterion for stopping RSS iterations. Default is 0.01.</p></li>
+<li><p><strong>max_iteration_number</strong> (<em>int</em>) – Maximum number of RSS iterations to perform. Default is 5.</p></li>
+<li><p><strong>num_groups</strong> (<em>int</em>) – Number of structure groups, used for assigning tasks across multiple nodes. Default is 1.</p></li>
+<li><p><strong>initial_kt</strong> (<em>float</em>) – Initial temperature (in eV) for Boltzmann sampling. Default is 0.3.</p></li>
+<li><p><strong>current_iter_index</strong> (<em>int</em>) – Index for the current RSS iteration. Default is 1.</p></li>
+<li><p><strong>static_energy_maker</strong> (<em>BaseVaspMaker</em><em> | </em><a class="reference internal" href="autoplex.misc.castep.jobs.CastepStaticMaker.html#autoplex.misc.castep.jobs.CastepStaticMaker" title="autoplex.misc.castep.jobs.CastepStaticMaker"><em>CastepStaticMaker</em></a><em> | </em><em>ForceFieldStaticMaker</em>) – Maker for static energy jobs: either BaseVaspMaker (VASP-based) or CastepStaticMaker
+(CASTEP-based) or ForceFieldStaticMaker (force field-based). Defaults to StaticMaker (VASP-based).</p></li>
+<li><p><strong>static_energy_maker_isolated_atoms</strong> (<em>BaseVaspMaker</em><em> | </em><a class="reference internal" href="autoplex.misc.castep.jobs.CastepStaticMaker.html#autoplex.misc.castep.jobs.CastepStaticMaker" title="autoplex.misc.castep.jobs.CastepStaticMaker"><em>CastepStaticMaker</em></a><em> | </em><em>ForceFieldStaticMaker</em>) – Maker for static energy jobs of isolated atoms: either BaseVaspMaker (VASP-based) or CastepStaticMaker
+(CASTEP-based) or ForceFieldStaticMaker (force field-based) or None. If set to <cite>None</cite>, the parameters
+from <cite>static_energy_maker</cite> will be used as the default for isolated atoms. In this case,
+if <cite>static_energy_maker</cite> is a <cite>StaticMaker</cite>, all major settings will be inherited,
+except that <cite>kspacing</cite> will be automatically set to 100 to enforce a Gamma-point-only calculation.
+This is typically suitable for single-atom systems. Default is None. If a non-<cite>StaticMaker</cite> maker
+is used here, its output must include a <cite>dir_name</cite> field to ensure compatibility with downstream workflows.</p></li>
+<li><p><strong>fit_kwargs</strong> – Additional keyword arguments for the MLIP fitting process.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>A dictionary with following information</p>
+<ul class="simple">
+<li><p>’test_error’: float, The test error of the fitted MLIP.</p></li>
+<li><p>’pre_database_dir’: str, The directory of the preprocessed database.</p></li>
+<li><p>’mlip_path’: Path to the fitted MLIP.</p></li>
+<li><p>’isolated_atom_energies’: dict, The isolated energy values.</p></li>
+<li><p>’current_iter’: int, The current iteration index.</p></li>
+<li><p>’kt’: float, The temperature (in eV) for Boltzmann sampling.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>dict</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="autoplex.auto.rss.jobs.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">autoplex.auto.rss.jobs</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="autoplex.auto.rss.jobs.initial_rss.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">initial_rss</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#autoplex.auto.rss.jobs.do_rss_iterations"><code class="docutils literal notranslate"><span class="pre">do_rss_iterations()</span></code></a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Author name not set
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, autoplex development team.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

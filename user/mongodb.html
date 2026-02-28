@@ -1,0 +1,870 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>MongoDB setup tutorial &#8212; autoplex</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1ea92b8b" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=e18d2f4a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'user/mongodb';</script>
+    <link rel="icon" href="../_static/autoplex_favicon.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.1.dev1+g6ffcd01a0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/autoplex_logo.png" class="logo__image only-light" alt="autoplex - Home"/>
+    <img src="../_static/autoplex_logo.png" class="logo__image only-dark pst-js-only" alt="autoplex - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Overview</a></li>
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="setup.html">Quick-start</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="tutorials.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation/installation.html">Installation guide</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="rss/index.html">RSS workflow</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="rss/flow/introduction/intro.html">Brief overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rss/flow/input/input.html">Input YAML configuration file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rss/flow/quick_start/start.html">Quick start</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rss/flow/example/example.html">Examples</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="phonon/index.html">Phonon workflow</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="phonon/flows/flows.html">Out-of-the-box workflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="phonon/flows/generation/data.html">Generating reference data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="phonon/flows/fitting/fitting.html">Fitting phonon-accurate potentials</a></li>
+<li class="toctree-l3"><a class="reference internal" href="phonon/flows/benchmark/benchmark.html">Benchmark of ML-based phonon structure</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="executable/index.html">Executable tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="executable/tutorial_phonon.html">Iterative DFT vs MLIP benchmark workflow for phonons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="executable/tutorial_rss.html">RSS Workflow</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../reference/index.html">API reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../reference/autoplex.auto.html">autoplex.auto</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../reference/autoplex.auto.phonons.html">autoplex.auto.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.auto.phonons.flows.html">autoplex.auto.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.auto.phonons.jobs.html">autoplex.auto.phonons.jobs</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../reference/autoplex.auto.rss.html">autoplex.auto.rss</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.auto.rss.flows.html">autoplex.auto.rss.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.auto.rss.jobs.html">autoplex.auto.rss.jobs</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../reference/autoplex.benchmark.html">autoplex.benchmark</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../reference/autoplex.benchmark.phonons.html">autoplex.benchmark.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.benchmark.phonons.flows.html">autoplex.benchmark.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.benchmark.phonons.jobs.html">autoplex.benchmark.phonons.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.benchmark.phonons.utils.html">autoplex.benchmark.phonons.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.benchmark.rss.html">autoplex.benchmark.rss</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../reference/autoplex.data.html">autoplex.data</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../reference/autoplex.data.common.html">autoplex.data.common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.data.common.flows.html">autoplex.data.common.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.data.common.jobs.html">autoplex.data.common.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.data.common.utils.html">autoplex.data.common.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../reference/autoplex.data.phonons.html">autoplex.data.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.data.phonons.flows.html">autoplex.data.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.data.phonons.jobs.html">autoplex.data.phonons.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.data.phonons.utils.html">autoplex.data.phonons.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../reference/autoplex.data.rss.html">autoplex.data.rss</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.data.rss.flows.html">autoplex.data.rss.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.data.rss.jobs.html">autoplex.data.rss.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.data.rss.utils.html">autoplex.data.rss.utils</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../reference/autoplex.fitting.html">autoplex.fitting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../reference/autoplex.fitting.common.html">autoplex.fitting.common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.fitting.common.flows.html">autoplex.fitting.common.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.fitting.common.jobs.html">autoplex.fitting.common.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.fitting.common.regularization.html">autoplex.fitting.common.regularization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.fitting.common.utils.html">autoplex.fitting.common.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.fitting.phonons.html">autoplex.fitting.phonons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.fitting.rss.html">autoplex.fitting.rss</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../reference/autoplex.misc.html">autoplex.misc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../reference/autoplex.misc.castep.html">autoplex.misc.castep</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.misc.castep.flows.html">autoplex.misc.castep.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.misc.castep.jobs.html">autoplex.misc.castep.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.misc.castep.run.html">autoplex.misc.castep.run</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.misc.castep.schema.html">autoplex.misc.castep.schema</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.misc.castep.utils.html">autoplex.misc.castep.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../reference/autoplex.misc.utils.html">autoplex.misc.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.misc.utils.mock_castep.html">autoplex.misc.utils.mock_castep</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../reference/autoplex.settings.html">autoplex.settings</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.AutoplexBaseModel.html">AutoplexBaseModel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.AutoplexSettings.html">AutoplexSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.BcurParams.html">BcurParams</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.BuildcellOptions.html">BuildcellOptions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.CustomIncar.html">CustomIncar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.GAPGeneralSettings.html">GAPGeneralSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.GAPSettings.html">GAPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.JACESettings.html">JACESettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.LossCoeff.html">LossCoeff</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.M3GNETSettings.html">M3GNETSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.MACESettings.html">MACESettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.MLIPHypers.html">MLIPHypers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.NEPSettings.html">NEPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.NEQUIPSettings.html">NEQUIPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.Nonlinearity.html">Nonlinearity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.ResumeFromPreviousState.html">ResumeFromPreviousState</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.RssConfig.html">RssConfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.SETTINGS.html">SETTINGS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.SoapParas.html">SoapParas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.SoapSettings.html">SoapSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.ThreebSettings.html">ThreebSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.TwobSettings.html">TwobSettings</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contributing Guide</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../dev/contributing.html">Contributing to autoplex</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/dev_install.html">Developer Installation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../about/changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about/contributors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about/license.html">License</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/JaGeo/autoplex" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/JaGeo/autoplex/issues/new?title=Issue%20on%20page%20%2Fuser/mongodb.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/user/mongodb.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>MongoDB setup tutorial</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mongodb-setup">MongoDB setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#alternative-mongodb-installation-through-homebrew">Alternative MongoDB installation through Homebrew</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#atomate2-configuration">atomate2 configuration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fireworks-configuration">FireWorks configuration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualize-mongodb-database">Visualize MongoDB-Database</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="mongodb-setup-tutorial">
+<h1>MongoDB setup tutorial<a class="headerlink" href="#mongodb-setup-tutorial" title="Link to this heading">#</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">autoplex</span></code> and <code class="docutils literal notranslate"><span class="pre">atomate2</span></code> use the MongoDB database framework to store the data output from the calculations.
+The data is stored in a JSON-like format which makes it easier to access through Python for further post-processing.</p>
+<section id="mongodb-setup">
+<h2>MongoDB setup<a class="headerlink" href="#mongodb-setup" title="Link to this heading">#</a></h2>
+<p>MongoDB is best run on the back-end. For this, please ask your IT department to install <a class="reference external" href="https://www.mongodb.com/">MongoDB</a> for you!
+There might be cases, where this is not feasible and then you need to run a mongodb on the FRONT-end yourself.
+This guide will walk you through the steps that you to do for running a mongodb in front-end.</p>
+<ul>
+<li><p>Get mongodb from here: https://www.mongodb.com/try/download/community</p></li>
+<li><p>You can e.g. download “Platform: SUSE 15” and “Package: tgz” and put it on your remote cluster. Check the platform-dependency of your cluster!!!</p></li>
+<li><p>Extract the files from the downloaded archive and add the executables within to your PATH environment variable i.e open the  <code class="docutils literal notranslate"><span class="pre">~/.bashrc</span></code> file and add following line to it.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;/path/to/the/mongodb-directory/bin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Now, you can start the mongodb database with the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mongod<span class="w"> </span>--bind_ip_all<span class="w">  </span>--dbpath<span class="w"> </span>/this_is_the_path_to_your_db<span class="w"> </span>--quiet<span class="w"> </span>--port<span class="w"> </span><span class="m">27017</span>
+</pre></div>
+</div>
+</li>
+<li><p>In case you run into errors to start the mongodb on login node, it is mainly due to <code class="docutils literal notranslate"><span class="pre">mongodb-27017.sock</span></code> file permissions. This file is created by mongodb inside /tmp directory. Use the following additional tag in such scenarios (–unixSocketPrefix allows you the change the directory of this file created)</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mongod<span class="w"> </span>--bind_ip_all<span class="w">  </span>--dbpath<span class="w"> </span>/this_is_the_path_to_your_db<span class="w"> </span>--quiet<span class="w"> </span>--port<span class="w"> </span><span class="m">27017</span><span class="w"> </span>--unixSocketPrefix<span class="w"> </span>/new/directory/for/temp/file
+</pre></div>
+</div>
+</li>
+<li><p>You can shut it down with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mongod<span class="w">  </span>--shutdown<span class="w"> </span>--bind_ip_all<span class="w">  </span>--dbpath<span class="w"> </span>/this_is_the_path_to_your_db
+</pre></div>
+</div>
+</li>
+<li><p>Alternatively, you can define a <code class="docutils literal notranslate"><span class="pre">mongod.conf</span></code> file and use that file to start your mongodb database instance. This file looks somewhat like this.  You can read more about the parameters within this file here : https://docs.mongodb.com/manual/administration/configuration/#std-label-base-config</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">processManagement</span><span class="p">:</span>
+<span class="w">   </span><span class="nt">fork</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">   </span><span class="nt">pidFilePath</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/dss/dsshome1/00/username/path/to/store/your/pidfile/mongod.pid</span>
+<span class="nt">net</span><span class="p">:</span>
+<span class="w">   </span><span class="nt">bindIp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0.0.0</span>
+<span class="w">   </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">27017</span>
+<span class="nt">storage</span><span class="p">:</span>
+<span class="w">   </span><span class="nt">dbPath</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/dss/dsshome1/00/username/path/to/store/your/db/mongo</span>
+<span class="nt">systemLog</span><span class="p">:</span>
+<span class="w">   </span><span class="nt">destination</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">file</span>
+<span class="w">   </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/dss/dsshome1/00/username/path/to/mongod.log</span>
+<span class="w">   </span><span class="nt">logAppend</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nt">storage</span><span class="p">:</span>
+<span class="w">   </span><span class="nt">journal</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</pre></div>
+</div>
+</li>
+<li><p>You can start the mongodb instance using the <code class="docutils literal notranslate"><span class="pre">mongod.conf</span></code> as follows:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mongod<span class="w"> </span>-f<span class="w"> </span>path/to/mongod.conf<span class="w"> </span>--quiet<span class="w"> </span>--unixSocketPrefix<span class="w"> </span>path/to/store/.sock/file
+</pre></div>
+</div>
+</li>
+<li><p><em>Note</em> down the remote cluster login node where you started your mongodb instance.</p></li>
+<li><p>Open another terminal, login to your remote cluster again and ssh to same login node on which your mongodb instance is running.</p></li>
+</ul>
+<p>Note that the next steps of creating databases also have to be done by your IT admin for running MongoDB in backend:</p>
+<ul>
+<li><p>For this, open the mongo shell there</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mongosh
+</pre></div>
+</div>
+</li>
+</ul>
+<blockquote>
+<div><p>ℹ️ Note that the <a class="reference external" href="https://www.mongodb.com/docs/manual/reference/mongo/"><code class="docutils literal notranslate"><span class="pre">mongo</span></code> shell</a> has been deprecated in MongoDB v5.0. The replacement is <code class="docutils literal notranslate"><span class="pre">mongosh</span></code>!</p>
+</div></blockquote>
+<ul>
+<li><p>You need to add a db called “database_name” (you can choose any name) and also add an admin and a readonly user to this database</p></li>
+<li><p>switch to <code class="docutils literal notranslate"><span class="pre">admin</span></code> database and create a user</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>use<span class="w"> </span>admin
+db.createUser<span class="o">(</span>
+<span class="w">  </span><span class="o">{</span>
+<span class="w">    </span>user:<span class="w"> </span><span class="s2">&quot;myUserAdmin&quot;</span>,
+<span class="w">    </span>pwd:<span class="w"> </span><span class="s2">&quot;password&quot;</span>,<span class="w"> </span>
+<span class="w">    </span>roles:<span class="w"> </span><span class="o">[</span>
+<span class="w">     </span><span class="o">{</span><span class="w"> </span>role:<span class="w"> </span><span class="s2">&quot;userAdminAnyDatabase&quot;</span>,<span class="w"> </span>db:<span class="w"> </span><span class="s2">&quot;admin&quot;</span><span class="w"> </span><span class="o">}</span>,
+<span class="w">      </span><span class="o">{</span><span class="w"> </span>role:<span class="w"> </span><span class="s2">&quot;readWriteAnyDatabase&quot;</span>,<span class="w"> </span>db:<span class="w"> </span><span class="s2">&quot;admin&quot;</span><span class="w"> </span><span class="o">}</span>
+<span class="w">    </span><span class="o">]</span>
+<span class="w">  </span><span class="o">}</span>
+<span class="o">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>Add a database for our automation</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>use<span class="w"> </span>database_name
+</pre></div>
+</div>
+</li>
+<li><p>Test if you are really in this database:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>db
+</pre></div>
+</div>
+</li>
+<li><p>Create a read user for this database:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>db.createUser<span class="o">(</span>
+<span class="w">  </span><span class="o">{</span>
+<span class="w">    </span>user:<span class="w"> </span><span class="s2">&quot;read&quot;</span>,
+<span class="w">    </span>pwd:<span class="w">  </span><span class="s2">&quot;password&quot;</span>,<span class="w">   </span>//<span class="w"> </span>or<span class="w"> </span>cleartext<span class="w"> </span>password
+<span class="w">    </span>roles:<span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="o">{</span><span class="w"> </span>role:<span class="w"> </span><span class="s2">&quot;read&quot;</span>,<span class="w"> </span>db:<span class="w"> </span><span class="s2">&quot;database_name&quot;</span><span class="w"> </span><span class="o">}</span><span class="w"> </span><span class="o">]</span>
+<span class="w">  </span><span class="o">}</span>
+<span class="o">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>Add again the admin user to this database as well, use the following command</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>db.createUser<span class="o">(</span>
+<span class="w">  </span><span class="o">{</span>
+<span class="w">    </span>user:<span class="w"> </span><span class="s2">&quot;myUserAdmin&quot;</span>,
+<span class="w">    </span>pwd:<span class="w"> </span><span class="s2">&quot;password&quot;</span>,<span class="w"> </span>
+<span class="w">    </span>roles:<span class="w"> </span><span class="o">[</span>
+<span class="w">     </span><span class="o">{</span><span class="w"> </span>role:<span class="w"> </span><span class="s2">&quot;userAdminAnyDatabase&quot;</span>,<span class="w"> </span>db:<span class="w"> </span><span class="s2">&quot;admin&quot;</span><span class="w"> </span><span class="o">}</span>,
+<span class="w">      </span><span class="o">{</span><span class="w"> </span>role:<span class="w"> </span><span class="s2">&quot;readWriteAnyDatabase&quot;</span>,<span class="w"> </span>db:<span class="w"> </span><span class="s2">&quot;admin&quot;</span><span class="w"> </span><span class="o">}</span>
+<span class="w">    </span><span class="o">]</span>
+<span class="w">  </span><span class="o">}</span>
+<span class="o">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>Close the mongo shell</p></li>
+</ul>
+</section>
+<section id="alternative-mongodb-installation-through-homebrew">
+<h2>Alternative MongoDB installation through Homebrew<a class="headerlink" href="#alternative-mongodb-installation-through-homebrew" title="Link to this heading">#</a></h2>
+<p>To install MongoDB through Homebrew, run the following commands in the terminal:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>brew<span class="w"> </span>tap<span class="w"> </span>mongodb/brew
+brew<span class="w"> </span>update
+brew<span class="w"> </span>install<span class="w"> </span>mongodb-community
+</pre></div>
+</div>
+<p>Then you can start the server with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>brew<span class="w"> </span>services<span class="w"> </span>start<span class="w"> </span>mongodb-community
+</pre></div>
+</div>
+<p>Check if the server is running with <code class="docutils literal notranslate"><span class="pre">brew</span> <span class="pre">services</span> <span class="pre">list</span></code> and it should display something like
+<code class="docutils literal notranslate"><span class="pre">mongodb-community</span> <span class="pre">started</span> <span class="pre">uthpala</span> <span class="pre">~/Library/LaunchAgents/homebrew.mxcl.mongodb-community</span></code>.</p>
+</section>
+<section id="atomate2-configuration">
+<h2>atomate2 configuration<a class="headerlink" href="#atomate2-configuration" title="Link to this heading">#</a></h2>
+<ul>
+<li><p>Create a directory scaffold for atomate2 use <code class="docutils literal notranslate"><span class="pre">mkdir</span> <span class="pre">-p</span> <span class="pre">atomate2/{config,logs}</span></code></p></li>
+<li><p>Create a new conda environment called atomate2 with Python 3.11 using <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">create</span> <span class="pre">-n</span> <span class="pre">atomate2</span> <span class="pre">python==3.11</span></code></p></li>
+<li><p>Activate your environment : <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">activate</span> <span class="pre">atomate2</span></code></p></li>
+<li><p>Install atomate2 using : <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">atomate2</span></code></p></li>
+<li><p>Create <code class="docutils literal notranslate"><span class="pre">atomate2.yaml</span></code> file with following content, use <code class="docutils literal notranslate"><span class="pre">vi</span> <span class="pre">~/atomate2/config/atomate2.yaml</span></code></p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">VASP_CMD</span><span class="p">:</span><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">mpirun -np ${SLURM_NTASKS}  /path/to/vasp_std &gt; vasp.out</span>
+<span class="nt">VASP_GAMMA_CMD</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpirun -np ${SLURM_NTASKS}  /path/to/vasp_gam &gt; vasp.out</span>
+<span class="nt">LOBSTER_CMD</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/your/lobster/binary</span>
+</pre></div>
+</div>
+</li>
+<li><p>Create <code class="docutils literal notranslate"><span class="pre">jobflow.yaml</span></code> file with following content, use <code class="docutils literal notranslate"><span class="pre">vi</span> <span class="pre">~/atomate2/config/jobflow.yaml</span></code></p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">JOB_STORE</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">docs_store</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MongoStore</span>
+<span class="w">    </span><span class="nt">database</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">autoplex</span>
+<span class="w">    </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local host name</span>
+<span class="w">    </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">27017</span>
+<span class="w">    </span><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">xxx_admin</span>
+<span class="w">    </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">xxx</span>
+<span class="w">    </span><span class="nt">collection_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">outputs</span>
+<span class="w">  </span><span class="nt">additional_stores</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">data</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GridFSStore</span>
+<span class="w">      </span><span class="nt">database</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">autoplex</span>
+<span class="w">      </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local host name</span>
+<span class="w">      </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">27017</span>
+<span class="w">      </span><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">xxx_admin</span>
+<span class="w">      </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">xxxx</span>
+<span class="w">      </span><span class="nt">collection_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">outputs_blobs</span>
+</pre></div>
+</div>
+</li>
+<li><p>You have to export the location of your files in your ~/.bashrc or ~/.bash_profile</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">ATOMATE2_CONFIG_FILE</span><span class="o">=</span><span class="s2">&quot;/home/username/atomate2/config/atomate2.yaml&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">JOBFLOW_CONFIG_FILE</span><span class="o">=</span><span class="s2">&quot;/home/username/atomate2/config/jobflow.yaml&quot;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="fireworks-configuration">
+<h2>FireWorks configuration<a class="headerlink" href="#fireworks-configuration" title="Link to this heading">#</a></h2>
+<p>We will give you a short introduction how to setup <a class="reference external" href="https://github.com/materialsproject/fireworks">FireWorks</a> to be used with the MongoDB. For <a class="reference external" href="https://github.com/Matgenix/jobflow-remote">jobflow-remote</a>, please have a look <a class="reference internal" href="jobflowremote.html"><span class="std std-doc">here</span></a>.</p>
+<p>FireWorks can be installed via <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">fireworks</span></code>.</p>
+<p>Then follow the next steps:</p>
+<ul>
+<li><p>You need to add “my_launchpad.yaml” to your current folder to add information for testing. You need to find out on which login-server you are. <code class="docutils literal notranslate"><span class="pre">echo</span> <span class="pre">$(hostname)</span></code> and then adapt the following script.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">login_node_name</span>
+<span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">27017</span>
+<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">database_name</span>
+<span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin</span>
+<span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">adminpassword</span>
+<span class="nt">ssl_ca_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="nt">logdir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="nt">strm_lvl</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">INFO</span>
+<span class="nt">user_indices</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[]</span>
+<span class="nt">wf_user_indices</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[]</span><span class="w">                  </span>
+</pre></div>
+</div>
+</li>
+<li><p>Once this is done, you can try to use “lpad reset”</p></li>
+<li><p>Then, you also need a <code class="docutils literal notranslate"><span class="pre">my_fworker.yaml</span></code> simlar to this:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">worker</span>
+<span class="nt">category</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;&#39;</span>
+<span class="nt">query</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{}&#39;</span>
+<span class="nt">env</span><span class="p">:</span>
+<span class="w">   </span><span class="nt">db_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/config/db.json</span>
+<span class="w">   </span><span class="nt">vasp_cmd</span><span class="p">:</span><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">srun -N 3 --ntasks=144 /path/to/vasp_std</span>
+<span class="w">   </span><span class="nt">lobster_cmd</span><span class="p">:</span><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">/path/to/lobster-5.1.0</span>
+<span class="w">   </span><span class="nt">scratch_dir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="w">   </span><span class="nt">auto_npar</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+</pre></div>
+</div>
+</li>
+<li><p>And, a <code class="docutils literal notranslate"><span class="pre">db.json</span></code> file similar to this:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="nt">&quot;host&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;login_node_name&quot;</span><span class="p">,</span>
+<span class="nt">&quot;port&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">27017</span><span class="p">,</span>
+<span class="nt">&quot;database&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;database_name&quot;</span><span class="p">,</span>
+<span class="nt">&quot;collection&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;vasp&quot;</span><span class="p">,</span>
+<span class="nt">&quot;admin_user&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;adminname&quot;</span><span class="p">,</span>
+<span class="nt">&quot;admin_password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;adminpassword&quot;</span><span class="p">,</span>
+<span class="nt">&quot;readonly_user&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;read&quot;</span><span class="p">,</span>
+<span class="nt">&quot;readonly_password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;readpassword&quot;</span><span class="p">,</span>
+<span class="nt">&quot;aliases&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Then, you can use the following job script or something similar to run VASP jobs:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash </span>
+<span class="c1">#SBATCH -J vaspjob</span>
+<span class="c1">#Output and error</span>
+<span class="c1">#SBATCH -o ./%x.%j.out </span>
+<span class="c1">#SBATCH -e ./%x.%j.err </span>
+<span class="c1">#Initial working directory </span>
+<span class="c1">#SBATCH -D ./</span>
+<span class="c1">#Notification and type</span>
+<span class="c1">#SBATCH --mail-type=END</span>
+<span class="c1">#SBATCH --mail-user=your.email@email</span>
+<span class="c1"># Wall clock limit: </span>
+<span class="c1">#SBATCH --time=00:30:00</span>
+<span class="c1">#SBATCH --no-requeue</span>
+<span class="c1">#Setup of execution environment</span>
+<span class="c1">#SBATCH --export=NONE </span>
+<span class="c1">#SBATCH --get-user-env</span>
+<span class="c1">#SBATCH --nodes=3</span>
+<span class="c1">#SBATCH --ntasks=144</span>
+<span class="c1">#SBATCH --account=account_name</span>
+<span class="c1">#SBATCH --partition=partition_name</span>
+<span class="c1">#SBATCH --ear=off </span>
+
+<span class="nb">source</span><span class="w"> </span>/where_is_your_python_environment/bin/activate
+
+module<span class="w"> </span>load<span class="w"> </span>slurm_setup
+module<span class="w"> </span>load<span class="w"> </span>vasp/6.1.2
+
+<span class="nb">cd</span><span class="w"> </span>/where_do_you_want_to_start_your_calcs/
+
+
+rlaunch<span class="w">   </span>-c<span class="w"> </span>/where_do_all_yamls_lie_folder<span class="w"> </span>multi<span class="w"> </span><span class="m">1</span>
+</pre></div>
+</div>
+<p>Please adjust all the scripts according to your needs, setup and cluster requirement!</p>
+</li>
+</ul>
+</section>
+<section id="visualize-mongodb-database">
+<h2>Visualize MongoDB-Database<a class="headerlink" href="#visualize-mongodb-database" title="Link to this heading">#</a></h2>
+<p>To visualize your database, you can use portforwarding, e.g., ssh remote_cluster -L 8888:localhost:5000. Then open a browser on your local machine to view “http://127.0.0.1:8888/”.</p>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mongodb-setup">MongoDB setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#alternative-mongodb-installation-through-homebrew">Alternative MongoDB installation through Homebrew</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#atomate2-configuration">atomate2 configuration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fireworks-configuration">FireWorks configuration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualize-mongodb-database">Visualize MongoDB-Database</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Author name not set
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, autoplex development team.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

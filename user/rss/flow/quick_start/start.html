@@ -1,0 +1,789 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Quick start &#8212; autoplex</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=1ea92b8b" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../../_static/documentation_options.js?v=e18d2f4a"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'user/rss/flow/quick_start/start';</script>
+    <link rel="icon" href="../../../../_static/autoplex_favicon.png"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="Examples" href="../example/example.html" />
+    <link rel="prev" title="Input YAML configuration file" href="../input/input.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.1.dev1+g6ffcd01a0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../../_static/autoplex_logo.png" class="logo__image only-light" alt="autoplex - Home"/>
+    <img src="../../../../_static/autoplex_logo.png" class="logo__image only-dark pst-js-only" alt="autoplex - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Overview</a></li>
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../../../setup.html">Quick-start</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../../tutorials.html">Tutorials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../installation/installation.html">Installation guide</a></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../../index.html">RSS workflow</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../introduction/intro.html">Brief overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../input/input.html">Input YAML configuration file</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">Quick start</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../example/example.html">Examples</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../phonon/index.html">Phonon workflow</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../phonon/flows/flows.html">Out-of-the-box workflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../phonon/flows/generation/data.html">Generating reference data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../phonon/flows/fitting/fitting.html">Fitting phonon-accurate potentials</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../phonon/flows/benchmark/benchmark.html">Benchmark of ML-based phonon structure</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../executable/index.html">Executable tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../executable/tutorial_phonon.html">Iterative DFT vs MLIP benchmark workflow for phonons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../executable/tutorial_rss.html">RSS Workflow</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../reference/index.html">API reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.auto.html">autoplex.auto</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.auto.phonons.html">autoplex.auto.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.auto.phonons.flows.html">autoplex.auto.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.auto.phonons.jobs.html">autoplex.auto.phonons.jobs</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.auto.rss.html">autoplex.auto.rss</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.auto.rss.flows.html">autoplex.auto.rss.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.auto.rss.jobs.html">autoplex.auto.rss.jobs</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.benchmark.html">autoplex.benchmark</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.benchmark.phonons.html">autoplex.benchmark.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.benchmark.phonons.flows.html">autoplex.benchmark.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.benchmark.phonons.jobs.html">autoplex.benchmark.phonons.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.benchmark.phonons.utils.html">autoplex.benchmark.phonons.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.benchmark.rss.html">autoplex.benchmark.rss</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.html">autoplex.data</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.common.html">autoplex.data.common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.common.flows.html">autoplex.data.common.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.common.jobs.html">autoplex.data.common.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.common.utils.html">autoplex.data.common.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.phonons.html">autoplex.data.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.phonons.flows.html">autoplex.data.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.phonons.jobs.html">autoplex.data.phonons.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.phonons.utils.html">autoplex.data.phonons.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.rss.html">autoplex.data.rss</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.rss.flows.html">autoplex.data.rss.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.rss.jobs.html">autoplex.data.rss.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.rss.utils.html">autoplex.data.rss.utils</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.fitting.html">autoplex.fitting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.html">autoplex.fitting.common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.flows.html">autoplex.fitting.common.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.jobs.html">autoplex.fitting.common.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.regularization.html">autoplex.fitting.common.regularization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.utils.html">autoplex.fitting.common.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.fitting.phonons.html">autoplex.fitting.phonons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.fitting.rss.html">autoplex.fitting.rss</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.misc.html">autoplex.misc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.html">autoplex.misc.castep</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.flows.html">autoplex.misc.castep.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.jobs.html">autoplex.misc.castep.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.run.html">autoplex.misc.castep.run</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.schema.html">autoplex.misc.castep.schema</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.utils.html">autoplex.misc.castep.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.misc.utils.html">autoplex.misc.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.utils.mock_castep.html">autoplex.misc.utils.mock_castep</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.settings.html">autoplex.settings</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.AutoplexBaseModel.html">AutoplexBaseModel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.AutoplexSettings.html">AutoplexSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.BcurParams.html">BcurParams</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.BuildcellOptions.html">BuildcellOptions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.CustomIncar.html">CustomIncar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.GAPGeneralSettings.html">GAPGeneralSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.GAPSettings.html">GAPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.JACESettings.html">JACESettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.LossCoeff.html">LossCoeff</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.M3GNETSettings.html">M3GNETSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.MACESettings.html">MACESettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.MLIPHypers.html">MLIPHypers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.NEPSettings.html">NEPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.NEQUIPSettings.html">NEQUIPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.Nonlinearity.html">Nonlinearity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.ResumeFromPreviousState.html">ResumeFromPreviousState</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.RssConfig.html">RssConfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.SETTINGS.html">SETTINGS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.SoapParas.html">SoapParas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.SoapSettings.html">SoapSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.ThreebSettings.html">ThreebSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.TwobSettings.html">TwobSettings</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contributing Guide</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/contributing.html">Contributing to autoplex</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/dev_install.html">Developer Installation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../about/changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../about/contributors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../about/license.html">License</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/JaGeo/autoplex" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/JaGeo/autoplex/issues/new?title=Issue%20on%20page%20%2Fuser/rss/flow/quick_start/start.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../../../_sources/user/rss/flow/quick_start/start.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Quick start</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-the-workflow-with-a-rssconfig-object">Running the workflow with a RSSConfig object</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-the-workflow-with-direct-parameter-specification">Running the workflow with direct parameter specification</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-rss-models-with-various-ml-potentials">Building RSS models with various ML potentials</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#resuming-workflow-from-point-of-interruption">Resuming workflow from point of interruption</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#expanding-pre-existing-dataset-and-refining-mlips">Expanding pre-existing dataset and refining MLIPs</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#use-case-1-combining-an-existing-dataset-with-rss-to-train-a-new-mlip">Use case 1: combining an existing dataset with RSS to train a new MLIP</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#use-case-2-kicking-off-rss-using-an-existing-mlip-and-merging-data-for-refinement">Use case 2: kicking off RSS using an existing MLIP and merging data for refinement</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#use-case-3-generating-the-whole-rss-data-from-scratch-and-merging-later">Use case 3: generating the whole RSS data from scratch and merging later</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="quick-start">
+<span id="rss-quickstart"></span><h1>Quick start<a class="headerlink" href="#quick-start" title="Link to this heading">#</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">RssMaker</span></code> class in <code class="docutils literal notranslate"><span class="pre">autoplex</span></code> is the core interface for creating ML-RSS potential models from scratch. It accepts customizable parameters that control key aspects of the RSS process, including:</p>
+<ul class="simple">
+<li><p><strong>Randomized structure generation</strong><br />
+Generate diverse initial structures for broader configurational space exploration.</p></li>
+<li><p><strong>Sampling strategies</strong><br />
+Customize methods for selecting configurations based on energy and structure diversity.</p></li>
+<li><p><strong>DFT labeling</strong><br />
+Perform single-point DFT calculations to provide accurate energy and force labels for training.</p></li>
+<li><p><strong>Data preprocessing</strong><br />
+Include steps like data regularization and filtering to improve model performance.</p></li>
+<li><p><strong>Potential fitting</strong><br />
+Perform machine learning potential fitting with flexible hyperparameter tuning.</p></li>
+<li><p><strong>Iterative loop</strong><br />
+Continuously refine the potential model through iterative RSS cycles.</p></li>
+</ul>
+<p>Parameters can be specified either through a YAML configuration file or as direct arguments in the <code class="docutils literal notranslate"><span class="pre">make</span></code> method.</p>
+<section id="running-the-workflow-with-a-rssconfig-object">
+<h2>Running the workflow with a RSSConfig object<a class="headerlink" href="#running-the-workflow-with-a-rssconfig-object" title="Link to this heading">#</a></h2>
+<blockquote>
+<div><p><strong>Recommendation</strong>: This is currently our recommended approach for setting up and managing RSS workflows.</p>
+</div></blockquote>
+<p>The RSSConfig object can be instantiated using a custom YAML configuration file, as illustrated in previous section.
+A comprehensive list of parameters, including default settings and modifiable options, is available in <code class="docutils literal notranslate"><span class="pre">autoplex.settings.RssConfig</span></code> pydantic model.
+To start a new workflow, create an <code class="docutils literal notranslate"><span class="pre">RssConfig</span></code> object using the YAML file and pass it to the <code class="docutils literal notranslate"><span class="pre">RSSMaker</span></code> class.
+When initializing the RssConfig object with a YAML file, any specified keys will override the corresponding default values.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">RssConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.auto.rss.flows</span><span class="w"> </span><span class="kn">import</span> <span class="n">RssMaker</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fireworks</span><span class="w"> </span><span class="kn">import</span> <span class="n">LaunchPad</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jobflow.managers.fireworks</span><span class="w"> </span><span class="kn">import</span> <span class="n">flow_to_workflow</span>
+
+<span class="n">rss_config</span> <span class="o">=</span> <span class="n">RssConfig</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="s1">&#39;path/to/your/config.yaml&#39;</span><span class="p">)</span>
+
+<span class="n">rss_job</span> <span class="o">=</span> <span class="n">RssMaker</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;your workflow name&quot;</span><span class="p">,</span> <span class="n">rss_config</span><span class="o">=</span><span class="n">rss_config</span><span class="p">)</span><span class="o">.</span><span class="n">make</span><span class="p">()</span>
+<span class="n">wf</span> <span class="o">=</span> <span class="n">flow_to_workflow</span><span class="p">(</span><span class="n">rss_job</span><span class="p">)</span> 
+<span class="n">lpad</span> <span class="o">=</span> <span class="n">LaunchPad</span><span class="o">.</span><span class="n">auto_load</span><span class="p">()</span>
+<span class="n">lpad</span><span class="o">.</span><span class="n">add_wf</span><span class="p">(</span><span class="n">wf</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The above code is based on <a class="reference external" href="https://materialsproject.github.io/fireworks/"><code class="docutils literal notranslate"><span class="pre">FireWorks</span></code></a> for job submission and management. You could also use <a class="reference external" href="https://matgenix.github.io/jobflow-remote/"><code class="docutils literal notranslate"><span class="pre">jobflow-remote</span></code></a>, in which case the code snippet would change as follows.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">RssConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.auto.rss.flows</span><span class="w"> </span><span class="kn">import</span> <span class="n">RssMaker</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jobflow_remote</span><span class="w"> </span><span class="kn">import</span> <span class="n">submit_flow</span>
+
+<span class="n">rss_config</span> <span class="o">=</span> <span class="n">RssConfig</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="s1">&#39;path/to/your/config.yaml&#39;</span><span class="p">)</span>
+<span class="n">rss_job</span> <span class="o">=</span> <span class="n">RssMaker</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;your workflow name&quot;</span><span class="p">,</span> <span class="n">rss_config</span><span class="o">=</span><span class="n">rss_config</span><span class="p">)</span><span class="o">.</span><span class="n">make</span><span class="p">()</span>
+<span class="n">resources</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;nodes&quot;</span><span class="p">:</span> <span class="n">N</span><span class="p">,</span> <span class="s2">&quot;partition&quot;</span><span class="p">:</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;qos&quot;</span><span class="p">:</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="s2">&quot;8:00:00&quot;</span><span class="p">,</span> <span class="s2">&quot;mail_user&quot;</span><span class="p">:</span> <span class="s2">&quot;your_email&quot;</span><span class="p">,</span> <span class="s2">&quot;mail_type&quot;</span><span class="p">:</span> <span class="s2">&quot;ALL&quot;</span><span class="p">,</span> <span class="s2">&quot;account&quot;</span><span class="p">:</span> <span class="s2">&quot;your account&quot;</span><span class="p">}</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">submit_flow</span><span class="p">(</span><span class="n">rss_job</span><span class="p">,</span> <span class="n">worker</span><span class="o">=</span><span class="s2">&quot;your worker&quot;</span><span class="p">,</span> <span class="n">resources</span><span class="o">=</span><span class="n">resources</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="s2">&quot;your project name&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>For details on setting up <code class="docutils literal notranslate"><span class="pre">FireWorks</span></code>, see <a class="reference internal" href="../../../mongodb.html#fireworks-configuration"><span class="std std-ref">FireWorks setup</span></a> and for <code class="docutils literal notranslate"><span class="pre">jobflow-remote</span></code>, see <a class="reference internal" href="../../../jobflowremote.html"><span class="std std-doc">jobflow-remote setup</span></a>.</p>
+</section>
+<section id="running-the-workflow-with-direct-parameter-specification">
+<h2>Running the workflow with direct parameter specification<a class="headerlink" href="#running-the-workflow-with-direct-parameter-specification" title="Link to this heading">#</a></h2>
+<p>As an alternative to using a RssConfig object, the RSS workflow can be initiated by directly specifying parameters in the <code class="docutils literal notranslate"><span class="pre">make</span></code> method. This approach is ideal for cases where only a few parameters need to be customized.
+You can override the default settings by passing them as keyword arguments, offering a more flexible and lightweight way to set up the workflow.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">RssConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.auto.rss.flows</span><span class="w"> </span><span class="kn">import</span> <span class="n">RssMaker</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jobflow_remote</span><span class="w"> </span><span class="kn">import</span> <span class="n">submit_flow</span>
+
+<span class="n">rss_job</span> <span class="o">=</span> <span class="n">RssMaker</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;your workflow name&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="s1">&#39;Si&#39;</span><span class="p">)</span>
+<span class="n">resources</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;nodes&quot;</span><span class="p">:</span> <span class="n">N</span><span class="p">,</span> <span class="s2">&quot;partition&quot;</span><span class="p">:</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;qos&quot;</span><span class="p">:</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="s2">&quot;8:00:00&quot;</span><span class="p">,</span> <span class="s2">&quot;mail_user&quot;</span><span class="p">:</span> <span class="s2">&quot;your_email&quot;</span><span class="p">,</span> <span class="s2">&quot;mail_type&quot;</span><span class="p">:</span> <span class="s2">&quot;ALL&quot;</span><span class="p">,</span> <span class="s2">&quot;account&quot;</span><span class="p">:</span> <span class="s2">&quot;your account&quot;</span><span class="p">}</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">submit_flow</span><span class="p">(</span><span class="n">rss_job</span><span class="p">,</span> <span class="n">worker</span><span class="o">=</span><span class="s2">&quot;your worker&quot;</span><span class="p">,</span> <span class="n">resources</span><span class="o">=</span><span class="n">resources</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="s2">&quot;your project name&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>If you choose to use the direct parameter specification method, at a minimum, you must provide the following argument:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">tag</span></code>: defines the system’s elements and stoichiometry, e.g., <code class="docutils literal notranslate"><span class="pre">tag='SiO2'</span></code> (only for compounds).</p></li>
+</ul>
+<blockquote>
+<div><p><strong>Recommendation</strong>: Although <code class="docutils literal notranslate"><span class="pre">tag</span></code> is the minimal input, we strongly recommend enabling <code class="docutils literal notranslate"><span class="pre">hookean_repul</span></code> as well, as it applies a strong repulsive force when the distance between two atoms falls below a certain threshold. This ensures that the generated structures are physically reasonable.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Note</strong>: If both a custom RssConfig object and direct parameter specifications are provided, any overlapping parameters will be overridden by the directly specified values.</p>
+</div></blockquote>
+</section>
+<section id="building-rss-models-with-various-ml-potentials">
+<h2>Building RSS models with various ML potentials<a class="headerlink" href="#building-rss-models-with-various-ml-potentials" title="Link to this heading">#</a></h2>
+<p>Currently, <code class="docutils literal notranslate"><span class="pre">RssMaker</span></code> supports GAP (Gaussian Approximation Potential), ACE (Atomic Cluster Expansion), and three graph-based network models including NequIP, M3GNet, and MACE.
+You can specify the desired model using the <code class="docutils literal notranslate"><span class="pre">mlip_type</span></code> argument and adjust relevant hyperparameters within the <code class="docutils literal notranslate"><span class="pre">make</span></code> method.
+Overview of default and adjustable hyperparameters for each model can be accessed using <code class="docutils literal notranslate"><span class="pre">MLIP_HYPERS</span></code> pydantic model of autoplex.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autoplex</span><span class="w"> </span><span class="kn">import</span> <span class="n">MLIP_HYPERS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.auto.rss.flows</span><span class="w"> </span><span class="kn">import</span> <span class="n">RssMaker</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">MLIP_HYPERS</span><span class="o">.</span><span class="n">MACE</span><span class="p">)</span> <span class="c1"># Eg:- access MACE hyperparameters</span>
+
+<span class="c1"># Intialize the workflow with the desired MLIP model</span>
+<span class="n">rss_job</span> <span class="o">=</span> <span class="n">RssMaker</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;your workflow name&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="s1">&#39;SiO2&#39;</span><span class="p">,</span>
+                                                   <span class="o">...</span> <span class="c1"># Other parameters here</span>
+                                                   <span class="n">mlip_type</span><span class="o">=</span><span class="s1">&#39;MACE&#39;</span><span class="p">,</span>
+                                                   <span class="p">{</span><span class="s2">&quot;MACE&quot;</span><span class="p">:</span> <span class="s2">&quot;hidden_irreps&quot;</span><span class="p">:</span><span class="s2">&quot;128x0e + 128x1o&quot;</span><span class="p">,</span><span class="s2">&quot;r_max&quot;</span><span class="p">:</span><span class="mf">5.0</span><span class="p">},</span>
+                                                   <span class="p">)</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p><strong>Note</strong>: We primarily recommend the GAP-RSS model for now, as GAP has demonstrated great stability with small datasets. Other models have not been thoroughly explored yet. However, we encourage users to experiment with and test other individual models or combinations for potentially interesting results.</p>
+</div></blockquote>
+</section>
+<section id="resuming-workflow-from-point-of-interruption">
+<h2>Resuming workflow from point of interruption<a class="headerlink" href="#resuming-workflow-from-point-of-interruption" title="Link to this heading">#</a></h2>
+<p>To resume an interrupted RSS workflow, use the <code class="docutils literal notranslate"><span class="pre">resume_from_previous_state</span></code> argument, which accepts a dictionary containing the necessary state information. Additionally, ensure that <code class="docutils literal notranslate"><span class="pre">train_from_scratch</span></code> is set to <code class="docutils literal notranslate"><span class="pre">False</span></code> to enable resuming from the previous state. This way, you are allowed to continue the workflow from any previously saved state.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rss_job</span> <span class="o">=</span> <span class="n">RssMaker</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;your workflow name&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="s1">&#39;SiO2&#39;</span><span class="p">,</span>
+                                                   <span class="o">...</span> <span class="c1"># Other parameters here</span>
+                                                   <span class="n">train_from_scratch</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                                   <span class="n">resume_from_previous_state</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;test_error&#39;</span><span class="p">:</span> <span class="mf">0.24</span><span class="p">,</span>
+                                                   <span class="s1">&#39;pre_database_dir&#39;</span><span class="p">:</span> <span class="s1">&#39;path/to/pre-existing/database&#39;</span><span class="p">,</span>
+                                                   <span class="s1">&#39;mlip_path&#39;</span><span class="p">:</span> <span class="s1">&#39;path/to/previous/MLIP-model&#39;</span><span class="p">,</span>
+                                                   <span class="s1">&#39;isolated_atom_energies&#39;</span><span class="p">:</span> <span class="p">{</span><span class="mi">8</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.16613333</span><span class="p">,</span> <span class="mi">14</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.16438578</span><span class="p">},</span>
+                                                   <span class="p">})</span>
+</pre></div>
+</div>
+</section>
+<section id="expanding-pre-existing-dataset-and-refining-mlips">
+<h2>Expanding pre-existing dataset and refining MLIPs<a class="headerlink" href="#expanding-pre-existing-dataset-and-refining-mlips" title="Link to this heading">#</a></h2>
+<p>If one already possesses an MLIP trained on some initial dataset, it is straightforward to use our RSS framework to generate supplemental data and refine the existing MLIP. Below, we describe three common use cases.</p>
+<section id="use-case-1-combining-an-existing-dataset-with-rss-to-train-a-new-mlip">
+<h3>Use case 1: combining an existing dataset with RSS to train a new MLIP<a class="headerlink" href="#use-case-1-combining-an-existing-dataset-with-rss-to-train-a-new-mlip" title="Link to this heading">#</a></h3>
+<p>If you simply want to combine your previous dataset with RSS-generated structures, and use the merged dataset to train an MLIP that will then drive RSS iterations, the framework supports this directly. In this case, the program first generates initial RSS structures, then merges them with the existing dataset you provide, and uses the combined data to train a new MLIP. This trained potential is then used to initiate RSS-driven iterative exploration.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rss_config</span> <span class="o">=</span> <span class="n">RssConfig</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="s1">&#39;path/to/your/config.yaml&#39;</span><span class="p">)</span>
+<span class="n">rss_job</span> <span class="o">=</span> <span class="n">RssMaker</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;your workflow name&quot;</span><span class="p">,</span> 
+                   <span class="n">rss_config</span><span class="o">=</span><span class="n">rss_config</span><span class="p">)</span><span class="o">.</span><span class="n">make</span><span class="p">(</span>
+                   <span class="n">pre_database_dir</span><span class="o">=</span><span class="s1">&#39;path/to/pre-existing/database&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This is also ideal when you don’t yet have a trained MLIP, but do have data you’d like to include in the training loop.</p>
+</section>
+<section id="use-case-2-kicking-off-rss-using-an-existing-mlip-and-merging-data-for-refinement">
+<h3>Use case 2: kicking off RSS using an existing MLIP and merging data for refinement<a class="headerlink" href="#use-case-2-kicking-off-rss-using-an-existing-mlip-and-merging-data-for-refinement" title="Link to this heading">#</a></h3>
+<p>If you already have a trained MLIP, you can use it to kick off the first round of RSS directly. Then, you can merge the RSS-generated data with your original dataset to train a new, refined potential. In this case, the usage pattern is the same as described in <a class="reference internal" href="#resuming-workflow-from-point-of-interruption"><strong>Resuming workflow from point of interruption</strong></a>.</p>
+</section>
+<section id="use-case-3-generating-the-whole-rss-data-from-scratch-and-merging-later">
+<h3>Use case 3: generating the whole RSS data from scratch and merging later<a class="headerlink" href="#use-case-3-generating-the-whole-rss-data-from-scratch-and-merging-later" title="Link to this heading">#</a></h3>
+<p>In the case, you can start by generating an RSS training set from scratch. Once the workflow completes, you can merge the generated dataset with any existing data and then invoke the training module to build a new MLIP. This approach can decouple data generation from model training.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">RssConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.auto.rss.flows</span><span class="w"> </span><span class="kn">import</span> <span class="n">RssMaker</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.fitting.common.flows</span><span class="w"> </span><span class="kn">import</span> <span class="n">MLIPFitMaker</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.data.common.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">preprocess_data</span>
+
+<span class="n">rss_config</span> <span class="o">=</span> <span class="n">RssConfig</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="s1">&#39;path/to/your/config.yaml&#39;</span><span class="p">)</span>
+<span class="n">rss_job</span> <span class="o">=</span> <span class="n">RssMaker</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;your workflow name&quot;</span><span class="p">,</span> 
+                   <span class="n">rss_config</span><span class="o">=</span><span class="n">rss_config</span><span class="p">)</span><span class="o">.</span><span class="n">make</span><span class="p">()</span>
+
+<span class="n">data_preprocessing_job</span> <span class="o">=</span> <span class="n">preprocess_data</span><span class="p">(</span>
+        <span class="n">dft_ref_dir</span><span class="o">=</span><span class="n">rss_job</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;mlip_path&quot;</span><span class="p">],</span>  <span class="c1"># The path to store the RSS dataset can be read from the previous job.</span>
+        <span class="n">pre_database_dir</span><span class="o">=</span><span class="s1">&#39;path/to/pre-existing/database&#39;</span><span class="p">,</span>  <span class="c1"># The path to store the pre-existing dataset that you&#39;d like to merge.</span>
+    <span class="p">)</span>
+
+<span class="n">fitting_job</span> <span class="o">=</span> <span class="n">MLIPFitMaker</span><span class="p">(</span>
+    <span class="n">mlip_type</span><span class="o">=</span><span class="s2">&quot;MACE&quot;</span><span class="p">,</span>              <span class="c1"># Select the potential model you want to use for training.</span>
+    <span class="n">ref_energy_name</span><span class="o">=</span><span class="s2">&quot;REF_energy&quot;</span><span class="p">,</span>  <span class="c1"># Define the name of the labels you are using.</span>
+    <span class="n">ref_force_name</span><span class="o">=</span><span class="s2">&quot;REF_forces&quot;</span><span class="p">,</span>
+    <span class="n">ref_virial_name</span><span class="o">=</span><span class="s2">&quot;REF_virial&quot;</span><span class="p">,</span>
+    <span class="n">apply_data_preprocessing</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">make</span><span class="p">(</span>
+    <span class="n">isolated_atom_energies</span><span class="o">=</span><span class="n">rss_job</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;isolated_atom_energies&quot;</span><span class="p">],</span>
+    <span class="n">database_dir</span><span class="o">=</span><span class="n">data_preprocessing_job</span><span class="o">.</span><span class="n">output</span><span class="p">,</span>
+    <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda&#39;</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">fit_kwargs</span><span class="p">,</span>   <span class="c1"># define the hyperparameters for potential training here.</span>
+    <span class="p">)</span>
+
+<span class="n">jobs</span> <span class="o">=</span> <span class="p">[</span><span class="n">rss_job</span><span class="p">,</span> <span class="n">data_preprocessing_job</span><span class="p">,</span> <span class="n">fitting_job</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../input/input.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Input YAML configuration file</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../example/example.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Examples</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-the-workflow-with-a-rssconfig-object">Running the workflow with a RSSConfig object</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-the-workflow-with-direct-parameter-specification">Running the workflow with direct parameter specification</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-rss-models-with-various-ml-potentials">Building RSS models with various ML potentials</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#resuming-workflow-from-point-of-interruption">Resuming workflow from point of interruption</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#expanding-pre-existing-dataset-and-refining-mlips">Expanding pre-existing dataset and refining MLIPs</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#use-case-1-combining-an-existing-dataset-with-rss-to-train-a-new-mlip">Use case 1: combining an existing dataset with RSS to train a new MLIP</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#use-case-2-kicking-off-rss-using-an-existing-mlip-and-merging-data-for-refinement">Use case 2: kicking off RSS using an existing MLIP and merging data for refinement</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#use-case-3-generating-the-whole-rss-data-from-scratch-and-merging-later">Use case 3: generating the whole RSS data from scratch and merging later</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Author name not set
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, autoplex development team.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

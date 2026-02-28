@@ -1,0 +1,917 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Input YAML configuration file &#8212; autoplex</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=1ea92b8b" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../../_static/documentation_options.js?v=e18d2f4a"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'user/rss/flow/input/input';</script>
+    <link rel="icon" href="../../../../_static/autoplex_favicon.png"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="Quick start" href="../quick_start/start.html" />
+    <link rel="prev" title="Brief overview" href="../introduction/intro.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.1.dev1+g6ffcd01a0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../../_static/autoplex_logo.png" class="logo__image only-light" alt="autoplex - Home"/>
+    <img src="../../../../_static/autoplex_logo.png" class="logo__image only-dark pst-js-only" alt="autoplex - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Overview</a></li>
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../../../setup.html">Quick-start</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../../tutorials.html">Tutorials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../installation/installation.html">Installation guide</a></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../../index.html">RSS workflow</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../introduction/intro.html">Brief overview</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">Input YAML configuration file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../quick_start/start.html">Quick start</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../example/example.html">Examples</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../phonon/index.html">Phonon workflow</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../phonon/flows/flows.html">Out-of-the-box workflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../phonon/flows/generation/data.html">Generating reference data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../phonon/flows/fitting/fitting.html">Fitting phonon-accurate potentials</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../phonon/flows/benchmark/benchmark.html">Benchmark of ML-based phonon structure</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../executable/index.html">Executable tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../executable/tutorial_phonon.html">Iterative DFT vs MLIP benchmark workflow for phonons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../executable/tutorial_rss.html">RSS Workflow</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../reference/index.html">API reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.auto.html">autoplex.auto</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.auto.phonons.html">autoplex.auto.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.auto.phonons.flows.html">autoplex.auto.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.auto.phonons.jobs.html">autoplex.auto.phonons.jobs</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.auto.rss.html">autoplex.auto.rss</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.auto.rss.flows.html">autoplex.auto.rss.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.auto.rss.jobs.html">autoplex.auto.rss.jobs</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.benchmark.html">autoplex.benchmark</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.benchmark.phonons.html">autoplex.benchmark.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.benchmark.phonons.flows.html">autoplex.benchmark.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.benchmark.phonons.jobs.html">autoplex.benchmark.phonons.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.benchmark.phonons.utils.html">autoplex.benchmark.phonons.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.benchmark.rss.html">autoplex.benchmark.rss</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.html">autoplex.data</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.common.html">autoplex.data.common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.common.flows.html">autoplex.data.common.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.common.jobs.html">autoplex.data.common.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.common.utils.html">autoplex.data.common.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.phonons.html">autoplex.data.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.phonons.flows.html">autoplex.data.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.phonons.jobs.html">autoplex.data.phonons.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.phonons.utils.html">autoplex.data.phonons.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.rss.html">autoplex.data.rss</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.rss.flows.html">autoplex.data.rss.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.rss.jobs.html">autoplex.data.rss.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.rss.utils.html">autoplex.data.rss.utils</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.fitting.html">autoplex.fitting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.html">autoplex.fitting.common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.flows.html">autoplex.fitting.common.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.jobs.html">autoplex.fitting.common.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.regularization.html">autoplex.fitting.common.regularization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.utils.html">autoplex.fitting.common.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.fitting.phonons.html">autoplex.fitting.phonons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.fitting.rss.html">autoplex.fitting.rss</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.misc.html">autoplex.misc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.html">autoplex.misc.castep</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.flows.html">autoplex.misc.castep.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.jobs.html">autoplex.misc.castep.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.run.html">autoplex.misc.castep.run</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.schema.html">autoplex.misc.castep.schema</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.utils.html">autoplex.misc.castep.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.misc.utils.html">autoplex.misc.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.utils.mock_castep.html">autoplex.misc.utils.mock_castep</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.settings.html">autoplex.settings</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.AutoplexBaseModel.html">AutoplexBaseModel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.AutoplexSettings.html">AutoplexSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.BcurParams.html">BcurParams</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.BuildcellOptions.html">BuildcellOptions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.CustomIncar.html">CustomIncar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.GAPGeneralSettings.html">GAPGeneralSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.GAPSettings.html">GAPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.JACESettings.html">JACESettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.LossCoeff.html">LossCoeff</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.M3GNETSettings.html">M3GNETSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.MACESettings.html">MACESettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.MLIPHypers.html">MLIPHypers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.NEPSettings.html">NEPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.NEQUIPSettings.html">NEQUIPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.Nonlinearity.html">Nonlinearity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.ResumeFromPreviousState.html">ResumeFromPreviousState</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.RssConfig.html">RssConfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.SETTINGS.html">SETTINGS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.SoapParas.html">SoapParas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.SoapSettings.html">SoapSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.ThreebSettings.html">ThreebSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.TwobSettings.html">TwobSettings</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contributing Guide</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/contributing.html">Contributing to autoplex</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/dev_install.html">Developer Installation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../about/changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../about/contributors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../about/license.html">License</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/JaGeo/autoplex" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/JaGeo/autoplex/issues/new?title=Issue%20on%20page%20%2Fuser/rss/flow/input/input.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../../../_sources/user/rss/flow/input/input.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Input YAML configuration file</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#general-parameters">General parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#buildcell-parameters">Buildcell parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sampling-parameters">Sampling parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#labelling-parameters">Labelling parameters</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#disclaimer">Disclaimer</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-preprocessing-parameters">Data preprocessing parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mlip-parameters">MLIP parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rss-exploration-parameters">RSS Exploration Parameters</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="input-yaml-configuration-file">
+<span id="input"></span><h1>Input YAML configuration file<a class="headerlink" href="#input-yaml-configuration-file" title="Link to this heading">#</a></h1>
+<p>The YAML configuration file contains all the inputs you need to define and customize your RSS workflow. This section provides a detailed explanation of how to set up the file, using silicon (<code class="docutils literal notranslate"><span class="pre">Si</span></code>) as an example. To make it easier to understand, we will break down the YAML file into several sections based on the key components of the RSS workflow and explain each part in detail.</p>
+<section id="general-parameters">
+<h2>General parameters<a class="headerlink" href="#general-parameters" title="Link to this heading">#</a></h2>
+<p>The section defines the general settings for the RSS workflow, including the system’s formula, whether to start fresh, or resume from a previous state.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># General Parameters</span>
+<span class="nt">tag</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;Si&#39;</span>
+<span class="nt">train_from_scratch</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="nt">resume_from_previous_state</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">test_error</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">pre_database_dir</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">mlip_path</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">isolated_atom_energies</span><span class="p">:</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">tag</span></code> identifies the elements in the system, such as <code class="docutils literal notranslate"><span class="pre">Si</span></code> in this example, and can also be passed to the parameters for random structure generation. Setting <code class="docutils literal notranslate"><span class="pre">train_from_scratch=True</span></code> indicates that the RSS workflow will start from scratch. To resume a workflow, refer to the <a class="reference internal" href="../quick_start/start.html"><span class="std std-doc">Resuming workflow from point of interruption</span></a> section.</p>
+</section>
+<section id="buildcell-parameters">
+<h2>Buildcell parameters<a class="headerlink" href="#buildcell-parameters" title="Link to this heading">#</a></h2>
+<p>The section defines the settings for generating initial random structures. These parameters control the diversity, symmetry, size, and number of the generated structures. We utilize the <code class="docutils literal notranslate"><span class="pre">buildcell</span></code> software from <a class="reference external" href="https://airss-docs.github.io/technical-reference/buildcell-manual">AIRSS</a> for random structure generation, ensuring flexibility and efficiency in exploring configurational space.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Buildcell Parameters</span>
+<span class="nt">generated_struct_numbers</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8000</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2000</span>
+<span class="nt">cell_seed_paths</span><span class="p">:</span>
+<span class="nt">buildcell_options</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">NFORM</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">    </span><span class="nt">SYMMOPS</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1-4&#39;</span>
+<span class="w">    </span><span class="nt">SLACK</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.25</span>
+<span class="w">    </span><span class="nt">OVERLAP</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
+<span class="w">    </span><span class="nt">NATOM</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{6,8,10,12,14,16,18,20,22,24}&#39;</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">NFORM</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
+<span class="w">    </span><span class="nt">SYMMOPS</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1-4&#39;</span>
+<span class="w">    </span><span class="nt">SLACK</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.25</span>
+<span class="w">    </span><span class="nt">OVERLAP</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
+<span class="w">    </span><span class="nt">NATOM</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{7,9,11,13,15,17,19,21,23}&#39;</span>
+<span class="nt">fragment_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="nt">fragment_numbers</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="nt">num_processes_buildcell</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">128</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">buildcell_options</span></code> parameter is one of the most critical settings,
+as it determines the scope of the RSS search and directly influences the diversity of the generated structures.
+We provide multiple sets of <code class="docutils literal notranslate"><span class="pre">buildcell</span></code> input parameters.
+Using the configuration file above, a total of 8000 structures will be generated, each containing an even number of atoms.
+Additionally, 2000 structures will be created with an odd number of atoms. The symmetry operations will vary from 1 to 4.
+You can supply a single set or multiple sets as needed.
+This flexibility ensures that the initial structures have sufficient diversity.
+In principle, any parameter supported by <a class="reference external" href="https://airss-docs.github.io/technical-reference/buildcell-manual">buildcell</a> can be used in the <code class="docutils literal notranslate"><span class="pre">buildcell_options</span></code> section. In addition to <code class="docutils literal notranslate"><span class="pre">buildcell_options</span></code>, one can also load buildcell parameters from standard <code class="docutils literal notranslate"><span class="pre">.cell</span></code> files (as described in the <a class="reference external" href="https://airss-docs.github.io/technical-reference/buildcell-manual">buildcell</a> through <code class="docutils literal notranslate"><span class="pre">cell_seed_paths</span></code>. This allows for greater flexibility, especially for defining interface structures and solution systems, as users can rely on well-established input formats.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">fragment_file</span></code> and <code class="docutils literal notranslate"><span class="pre">fragment_numbers</span></code> parameters are used during random structure generation to define specific fragments as the smallest building blocks. For example, you can define an H<sub>2</sub>O molecule as a fragment and use it as the basic unit for generating random structures. This allows for more customized and realistic initial configurations when working with molecular or other complex systems. The <code class="docutils literal notranslate"><span class="pre">num_processes_buildcell</span></code> parameter specifies the number of CPU cores to be used in parallel during random structure generation. Note that this parameter is limited to a single node.</p>
+<blockquote>
+<div><p><strong>Note</strong>: The <code class="docutils literal notranslate"><span class="pre">generated_struct_numbers</span></code> and <code class="docutils literal notranslate"><span class="pre">buildcell_options</span></code> parameters must have the same length. Each entry in <code class="docutils literal notranslate"><span class="pre">buildcell_options</span></code> corresponds to the number of structures specified at the same position in <code class="docutils literal notranslate"><span class="pre">generated_struct_numbers</span></code>. If both <code class="docutils literal notranslate"><span class="pre">cell_seed_paths</span></code> and <code class="docutils literal notranslate"><span class="pre">buildcell_options</span></code> are set, only <code class="docutils literal notranslate"><span class="pre">cell_seed_paths</span></code> will take effect.</p>
+</div></blockquote>
+</section>
+<section id="sampling-parameters">
+<h2>Sampling parameters<a class="headerlink" href="#sampling-parameters" title="Link to this heading">#</a></h2>
+<p>The section controls the selection methods of structures during the RSS workflow. These parameters determine how initial and iteratively generated structures are selected.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Sampling Parameters</span>
+<span class="nt">num_of_initial_selected_structs</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">80</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20</span>
+<span class="nt">num_of_rss_selected_structs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100</span>
+<span class="nt">initial_selection_enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nt">rss_selection_method</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;bcur2i&#39;</span>
+<span class="nt">bcur_params</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">soap_paras</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">l_max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">12</span>
+<span class="w">    </span><span class="nt">n_max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">12</span>
+<span class="w">    </span><span class="nt">atom_sigma</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0875</span>
+<span class="w">    </span><span class="nt">cutoff</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10.5</span>
+<span class="w">    </span><span class="nt">cutoff_transition_width</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span>
+<span class="w">    </span><span class="nt">zeta</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4.0</span>
+<span class="w">    </span><span class="nt">average</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">species</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">  </span><span class="nt">frac_of_bcur</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.8</span>
+<span class="w">  </span><span class="nt">bolt_max_num</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3000</span>
+<span class="nt">random_seed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+</pre></div>
+</div>
+<p>If the RSS workflow starts exploration from scratch, it consists of two stages. In the first stage, there is no pre-existing potential, so structures are directly selected from the initial random structures for fitting. The <code class="docutils literal notranslate"><span class="pre">num_of_initial_selected_structs</span></code> parameter defines how many structures are selected from the initial random structures. In the example provided, the workflow selects 80 structures from 8000 even-numbered cells and 20 structures from 2000 odd-numbered cells for fitting the initial potential. In the second stage, after obtaining the initial potential, the workflow transitions to ML-driven RSS iterations. During this stage, the <code class="docutils literal notranslate"><span class="pre">num_of_rss_selected_structs</span></code> parameter specifies the number of structures sampled in each RSS iteration.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">initial_selection_enabled</span></code> parameter enables initial structure selection when set to <code class="docutils literal notranslate"><span class="pre">true</span></code>. In this case, the sampling method will be CUR. The <code class="docutils literal notranslate"><span class="pre">rss_selection_method</span></code> defines the strategy for selecting structures during the RSS iteration. In this example, the method <code class="docutils literal notranslate"><span class="pre">bcur2i</span></code> is used, which combines Boltzmann-weighted energy histograms and CUR sampling to select low-energy and diverse structures. The <code class="docutils literal notranslate"><span class="pre">bcur_params</span></code> section provides detailed settings for the <code class="docutils literal notranslate"><span class="pre">bcur2i</span></code> method. The <code class="docutils literal notranslate"><span class="pre">soap_paras</span></code> define the SOAP descriptors used for structure representation.</p>
+</section>
+<section id="labelling-parameters">
+<h2>Labelling parameters<a class="headerlink" href="#labelling-parameters" title="Link to this heading">#</a></h2>
+<p>This section allows you to set up static calculations based on DFT or force fields for accurately labelling training structures, including bulk, isolated atoms, and dimers. This can be specified in the RSS config file as:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># DFT Labelling Parameters</span>
+<span class="nt">include_isolated_atom</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nt">isolatedatom_box</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20.0</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20.0</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20.0</span>
+<span class="nt">e0_spin</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="nt">include_dimer</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nt">dimer_box</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20.0</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20.0</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20.0</span>
+<span class="nt">dimer_range</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5.0</span>
+<span class="nt">dimer_num</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">21</span>
+</pre></div>
+</div>
+<p>If <code class="docutils literal notranslate"><span class="pre">include_isolated_atom</span></code> and <code class="docutils literal notranslate"><span class="pre">include_dimer</span></code> are set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, the program will automatically identify all elements present in the structures generated by <code class="docutils literal notranslate"><span class="pre">buildcell</span></code> and set up cells for isolated atoms and dimers accordingly based on the recognized elements.</p>
+<p>DFT calculations can be carried out with either VASP or CASTEP. We provide below example inputs for (i) VASP and (ii) CASTEP DFT codes. Both can be specified through the python input script.</p>
+<p>Since VASP is the default DFT code, its parameters only need to be specified with the <code class="docutils literal notranslate"><span class="pre">BaseVaspMaker</span></code> if you want to override the default settings. If you want to use CASTEP, you must specify a <code class="docutils literal notranslate"><span class="pre">CastepStaticMaker</span></code> in the input script.</p>
+<p>(i) Example input script using VASP.</p>
+<p>Please note that the commands to run VASP are set via SETTINGS of atomate2.
+Typically, one uses a <code class="docutils literal notranslate"><span class="pre">.atomate2.yaml</span></code> file to define a <code class="docutils literal notranslate"><span class="pre">VASP_CMD</span></code>.
+Within the <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code>, one then include a <code class="docutils literal notranslate"><span class="pre">ATOMATE2_CONFIG_FILE=/yourpath/.autoplex.yaml</span></code>
+statement. However, one can also directly export the variable <code class="docutils literal notranslate"><span class="pre">ATOMATE2_VASP_CMD=vasp_binary_name</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">RssConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.auto.rss.flows</span><span class="w"> </span><span class="kn">import</span> <span class="n">RssMaker</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">atomate2.vasp.jobs.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">StaticMaker</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">atomate2.vasp.sets.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">StaticSetGenerator</span>
+
+<span class="n">vasp_maker</span> <span class="o">=</span> <span class="n">StaticMaker</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;static_vasp&quot;</span><span class="p">,</span>
+    <span class="n">input_set_generator</span><span class="o">=</span><span class="n">StaticSetGenerator</span><span class="p">(</span>
+        <span class="n">user_incar_settings</span><span class="o">=</span><span class="p">{</span>
+          <span class="s2">&quot;ENCUT&quot;</span><span class="p">:</span> <span class="mi">600</span><span class="p">,</span> 
+          <span class="s2">&quot;EDIFF&quot;</span><span class="p">:</span> <span class="mf">1e-05</span><span class="p">,</span>
+          <span class="s2">&quot;PREC&quot;</span><span class="p">:</span> <span class="s2">&quot;Normal&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>(ii) Example input script using CASTEP.</p>
+<p>Please note that the commands to run CASTEP are set via SETTINGS of autoplex as CASTEP is currently not integrated into atomate2. Typically, one uses a <code class="docutils literal notranslate"><span class="pre">.autoplex.yaml</span></code> file to define a <code class="docutils literal notranslate"><span class="pre">CASTEP_CMD</span></code>. Within the <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code>, one then includes a <code class="docutils literal notranslate"><span class="pre">AUTOPLEX_CONFIG_FILE=/yourpath/.autoplex.yaml</span></code> statement. It is also possible to export the <code class="docutils literal notranslate"><span class="pre">AUTOPLEX_CASTEP_CMD=castep_binary_name</span></code> directly, for example: <code class="docutils literal notranslate"><span class="pre">export</span> <span class="pre">AUTOPLEX_CASTEP_CMD='mpirun</span> <span class="pre">-np</span> <span class="pre">64</span> <span class="pre">/yourpath/castep.mpi'</span></code>.</p>
+<p>All allowed CASTEP keywords and definitions for setting up <code class="docutils literal notranslate"><span class="pre">.param</span></code> and <code class="docutils literal notranslate"><span class="pre">.cell</span></code> files can be found in the <code class="docutils literal notranslate"><span class="pre">autoplex</span></code> package at: <code class="docutils literal notranslate"><span class="pre">/yourpath/autoplex/misc/castep/castep_keywords.json</span></code>. Alternatively, ASE will generate the <code class="docutils literal notranslate"><span class="pre">castep_keywords.json</span></code> file automatically the first time you run an <code class="docutils literal notranslate"><span class="pre">ase.calculators.castep</span></code> calculation, although this process may be relatively slow.</p>
+<section id="disclaimer">
+<h3>Disclaimer<a class="headerlink" href="#disclaimer" title="Link to this heading">#</a></h3>
+<p>Please note that the CASTEP interface in <code class="docutils literal notranslate"><span class="pre">autoplex</span></code> is still undergoing testing and refinement. Hence, the <strong>CASTEP parameter settings must be carefully adjusted by the user</strong> according to the specific system under study. Using the default parameters provided by <code class="docutils literal notranslate"><span class="pre">autoplex</span></code> may <strong>not guarantee convergence or reliable results</strong>, as the optimal settings — such as <strong>mixing scheme</strong>, <strong>cutoff energy</strong>, <strong>k-point mesh</strong>, and <strong>smearing method</strong> — can vary significantly depending on the material and calculation type. Users are strongly advised to validate, test, and tune these parameters for their specific system before performing large-scale or production-level calculations.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">RssConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.auto.rss.flows</span><span class="w"> </span><span class="kn">import</span> <span class="n">RssMaker</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.misc.castep.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">CastepStaticMaker</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.misc.castep.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">CastepStaticSetGenerator</span>
+
+<span class="n">castep_maker</span> <span class="o">=</span> <span class="n">CastepStaticMaker</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;static_castep&quot;</span><span class="p">,</span>
+    <span class="n">input_set_generator</span><span class="o">=</span><span class="n">CastepStaticSetGenerator</span><span class="p">(</span>
+        <span class="n">user_param_settings</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;cut_off_energy&quot;</span><span class="p">:</span> <span class="mf">600.0</span><span class="p">,</span>
+            <span class="s2">&quot;xc_functional&quot;</span><span class="p">:</span> <span class="s2">&quot;PBE&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;max_scf_cycles&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>
+            <span class="s2">&quot;elec_energy_tol&quot;</span><span class="p">:</span> <span class="mf">1e-5</span><span class="p">,</span>
+            <span class="s2">&quot;smearing_scheme&quot;</span><span class="p">:</span> <span class="s2">&quot;Gaussian&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;smearing_width&quot;</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">,</span>   
+            <span class="s2">&quot;spin_polarized&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">&quot;finite_basis_corr&quot;</span><span class="p">:</span> <span class="s2">&quot;automatic&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;perc_extra_bands&quot;</span><span class="p">:</span> <span class="mi">100</span>  
+        <span class="p">},</span>
+        <span class="n">user_cell_settings</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;kpoint_mp_spacing&quot;</span><span class="p">:</span> <span class="mf">0.03</span><span class="p">,</span> 
+            <span class="s2">&quot;symmetry_generate&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Then, to set up the RSS job:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rss_config</span> <span class="o">=</span> <span class="n">RssConfig</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="s1">&#39;/path/to/rss/config/file&#39;</span><span class="p">)</span> 
+
+<span class="n">rss_job</span> <span class="o">=</span> <span class="n">RssMaker</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Si_rss&quot;</span><span class="p">,</span> 
+                   <span class="n">rss_config</span><span class="o">=</span><span class="n">rss_config</span><span class="p">,</span>
+                   <span class="n">static_energy_maker</span><span class="o">=</span><span class="c1"># castep_maker or vasp_maker</span>
+                   <span class="n">static_energy_maker_isolated_atoms</span><span class="o">=</span><span class="c1"># castep_maker or vasp_maker,</span>
+                   <span class="p">)</span><span class="o">.</span><span class="n">make</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="data-preprocessing-parameters">
+<h2>Data preprocessing parameters<a class="headerlink" href="#data-preprocessing-parameters" title="Link to this heading">#</a></h2>
+<p>The section defines how the training data is prepared before fitting potentials. This includes filtering, regularization, combining external datasets, and splitting the data into training and testing sets.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Data Preprocessing Parameters</span>
+<span class="nt">config_types</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;initial&#39;</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;traj_early&#39;</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;traj&#39;</span>
+<span class="nt">rss_group</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;traj&#39;</span>
+<span class="nt">test_ratio</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
+<span class="nt">regularization</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nt">scheme</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;linear-hull&#39;</span>
+<span class="nt">retain_existing_sigma</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nt">reg_minmax</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">0.1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">1</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">0.001</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">0.1</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">0.0316</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">0.316</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">0.0632</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">0.632</span><span class="p p-Indicator">]</span>
+<span class="nt">distillation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="nt">force_max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="nt">force_label</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="nt">pre_database_dir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+</pre></div>
+</div>
+<p>Regularization is currently only applicable to GAP potentials and is adjusted using the <code class="docutils literal notranslate"><span class="pre">scheme</span></code> parameter. Common schemes include <code class="docutils literal notranslate"><span class="pre">'linear-hull'</span></code> and <code class="docutils literal notranslate"><span class="pre">'volume-stoichiometry'</span></code>. For systems with fixed stoichiometry, <code class="docutils literal notranslate"><span class="pre">'linear-hull'</span></code> is recommended. For systems with varying stoichiometries, <code class="docutils literal notranslate"><span class="pre">'volume-stoichiometry'</span></code> is more appropriate.</p>
+</section>
+<section id="mlip-parameters">
+<h2>MLIP parameters<a class="headerlink" href="#mlip-parameters" title="Link to this heading">#</a></h2>
+<p>The section defines the settings for training machine learning potentials. Currently supported architectures include GAP, ACE(Julia), NequIP, M3GNet, and MACE.
+You can specify the desired model using the <code class="docutils literal notranslate"><span class="pre">mlip_type</span></code> argument and tune hyperparameters flexibly by adding key-value pairs.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># MLIP Parameters</span>
+<span class="nt">mlip_type</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;GAP&#39;</span>
+<span class="nt">auto_delta</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="nt">mlip_hypers</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">GAP</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">general</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">at_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">train.extxyz</span>
+<span class="w">      </span><span class="nt">default_sigma</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{0.0001</span><span class="nv"> </span><span class="s">0.05</span><span class="nv"> </span><span class="s">0.05</span><span class="nv"> </span><span class="s">0}&#39;</span>
+<span class="w">      </span><span class="nt">energy_parameter_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">REF_energy</span>
+<span class="w">      </span><span class="nt">force_parameter_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">REF_forces</span>
+<span class="w">      </span><span class="nt">virial_parameter_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">REF_virial</span>
+<span class="w">      </span><span class="nt">sparse_jitter</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1e-08</span>
+<span class="w">      </span><span class="nt">do_copy_at_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">F</span>
+<span class="w">      </span><span class="nt">openmp_chunk_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10000</span>
+<span class="w">      </span><span class="nt">gp_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gap_file.xml</span>
+<span class="w">      </span><span class="nt">e0_offset</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<span class="w">      </span><span class="nt">two_body</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">      </span><span class="nt">three_body</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">      </span><span class="nt">soap</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">twob</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">distance_Nb_order</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">      </span><span class="nt">f0</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<span class="w">      </span><span class="nt">add_species</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">T</span>
+<span class="w">      </span><span class="nt">cutoff</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5.0</span>
+<span class="w">      </span><span class="nt">n_sparse</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">15</span>
+<span class="w">      </span><span class="nt">covariance_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ard_se</span>
+<span class="w">      </span><span class="nt">delta</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.0</span>
+<span class="w">      </span><span class="nt">theta_uniform</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.5</span>
+<span class="w">      </span><span class="nt">sparse_method</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">uniform</span>
+<span class="w">      </span><span class="nt">compact_clusters</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">T</span>
+<span class="w">    </span><span class="nt">threeb</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">distance_Nb_order</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">      </span><span class="nt">f0</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<span class="w">      </span><span class="nt">add_species</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">T</span>
+<span class="w">      </span><span class="nt">cutoff</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3.25</span>
+<span class="w">      </span><span class="nt">n_sparse</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100</span>
+<span class="w">      </span><span class="nt">covariance_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ard_se</span>
+<span class="w">      </span><span class="nt">delta</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.0</span>
+<span class="w">      </span><span class="nt">theta_uniform</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span>
+<span class="w">      </span><span class="nt">sparse_method</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">uniform</span>
+<span class="w">      </span><span class="nt">compact_clusters</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">T</span>
+<span class="w">    </span><span class="nt">soap</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">add_species</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">T</span>
+<span class="w">      </span><span class="nt">l_max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10</span>
+<span class="w">      </span><span class="nt">n_max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">12</span>
+<span class="w">      </span><span class="nt">atom_sigma</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.5</span>
+<span class="w">      </span><span class="nt">zeta</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<span class="w">      </span><span class="nt">cutoff</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5.0</span>
+<span class="w">      </span><span class="nt">cutoff_transition_width</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span>
+<span class="w">      </span><span class="nt">central_weight</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span>
+<span class="w">      </span><span class="nt">n_sparse</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">6000</span>
+<span class="w">      </span><span class="nt">delta</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span>
+<span class="w">      </span><span class="nt">f0</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<span class="w">      </span><span class="nt">covariance_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dot_product</span>
+<span class="w">      </span><span class="nt">sparse_method</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cur_points</span>
+</pre></div>
+</div>
+</section>
+<section id="rss-exploration-parameters">
+<h2>RSS Exploration Parameters<a class="headerlink" href="#rss-exploration-parameters" title="Link to this heading">#</a></h2>
+<p>The section sets up the RSS iterative process, including parameters for structure optimization and convergence criteria.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># RSS Exploration Parameters</span>
+<span class="nt">scalar_pressure_method</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;exp&#39;</span>
+<span class="nt">scalar_exp_pressure</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="nt">scalar_pressure_exponential_width</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span>
+<span class="nt">scalar_pressure_low</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="nt">scalar_pressure_high</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">25</span>
+<span class="nt">max_steps</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">200</span>
+<span class="nt">force_tol</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.01</span>
+<span class="nt">stress_tol</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.01</span>
+<span class="nt">stop_criterion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.001</span>
+<span class="nt">max_iteration_number</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">25</span>
+<span class="nt">num_groups</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">6</span>
+<span class="nt">initial_kt</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.3</span>
+<span class="nt">current_iter_index</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="nt">hookean_repul</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nt">hookean_paras</span><span class="p">:</span>
+<span class="w">  </span><span class="s">&#39;(14,</span><span class="nv"> </span><span class="s">14)&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1000</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">1.0</span><span class="p p-Indicator">]</span>
+<span class="nt">keep_symmetry</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nt">remove_traj_files</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nt">num_processes_rss</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">128</span>
+<span class="nt">device_for_rss</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;cpu&#39;</span>
+</pre></div>
+</div>
+<p>The RSS workflow supports searching for structures under high pressure, controlled by the <code class="docutils literal notranslate"><span class="pre">scalar_pressure_method</span></code> parameter. Two methods are available: <code class="docutils literal notranslate"><span class="pre">exp</span></code>, where pressure is sampled based on an exponential distribution with control parameters <code class="docutils literal notranslate"><span class="pre">scalar_exp_pressure</span></code> and <code class="docutils literal notranslate"><span class="pre">scalar_pressure_exponential_width</span></code>, and <code class="docutils literal notranslate"><span class="pre">uniform</span></code>, where pressure is sampled uniformly within a range defined by <code class="docutils literal notranslate"><span class="pre">scalar_pressure_low</span></code> and <code class="docutils literal notranslate"><span class="pre">scalar_pressure_high</span></code>. One can use <code class="docutils literal notranslate"><span class="pre">remove_traj_files</span></code> to delete all RSS trajectories in order to save storage space.</p>
+<p>To terminate the iterative process, two stopping criteria are provided: <code class="docutils literal notranslate"><span class="pre">stop_criterion</span></code> and <code class="docutils literal notranslate"><span class="pre">max_iteration_number</span></code>. The iterations stop when the prediction error falls below the value of <code class="docutils literal notranslate"><span class="pre">stop_criterion</span></code>. Or the iterations stop when the number of iterations exceeds the limit defined by <code class="docutils literal notranslate"><span class="pre">max_iteration_number</span></code>. The workflow will stop when either of the above criteria is satisfied.</p>
+<p>We strongly recommend enabling <code class="docutils literal notranslate"><span class="pre">hookean_repul</span></code>, as it applies a strong repulsive force when the distance between two atoms falls below a certain threshold. This ensures that the generated structures are physically reasonable.</p>
+<p>The GAP-RSS model of Si was iterated 25 times on a server cluster with 7 nodes, each equipped with 128 cores, taking approximately 1 day to complete. The resulting potential was found to accurately describe different crystalline polymorphs as well as disordered phases.</p>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../introduction/intro.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Brief overview</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../quick_start/start.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Quick start</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#general-parameters">General parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#buildcell-parameters">Buildcell parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sampling-parameters">Sampling parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#labelling-parameters">Labelling parameters</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#disclaimer">Disclaimer</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-preprocessing-parameters">Data preprocessing parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mlip-parameters">MLIP parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rss-exploration-parameters">RSS Exploration Parameters</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Author name not set
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, autoplex development team.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,782 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Overview &#8212; autoplex</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1ea92b8b" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=e18d2f4a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'user/index';</script>
+    <link rel="icon" href="../_static/autoplex_favicon.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Quick-start" href="setup.html" />
+    <link rel="prev" title="autoplex documentation" href="../index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.1.dev1+g6ffcd01a0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/autoplex_logo.png" class="logo__image only-light" alt="autoplex - Home"/>
+    <img src="../_static/autoplex_logo.png" class="logo__image only-dark pst-js-only" alt="autoplex - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Overview</a></li>
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="setup.html">Quick-start</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="tutorials.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation/installation.html">Installation guide</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="rss/index.html">RSS workflow</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="rss/flow/introduction/intro.html">Brief overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rss/flow/input/input.html">Input YAML configuration file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rss/flow/quick_start/start.html">Quick start</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rss/flow/example/example.html">Examples</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="phonon/index.html">Phonon workflow</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="phonon/flows/flows.html">Out-of-the-box workflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="phonon/flows/generation/data.html">Generating reference data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="phonon/flows/fitting/fitting.html">Fitting phonon-accurate potentials</a></li>
+<li class="toctree-l3"><a class="reference internal" href="phonon/flows/benchmark/benchmark.html">Benchmark of ML-based phonon structure</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="executable/index.html">Executable tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="executable/tutorial_phonon.html">Iterative DFT vs MLIP benchmark workflow for phonons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="executable/tutorial_rss.html">RSS Workflow</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../reference/index.html">API reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../reference/autoplex.auto.html">autoplex.auto</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../reference/autoplex.auto.phonons.html">autoplex.auto.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.auto.phonons.flows.html">autoplex.auto.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.auto.phonons.jobs.html">autoplex.auto.phonons.jobs</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../reference/autoplex.auto.rss.html">autoplex.auto.rss</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.auto.rss.flows.html">autoplex.auto.rss.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.auto.rss.jobs.html">autoplex.auto.rss.jobs</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../reference/autoplex.benchmark.html">autoplex.benchmark</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../reference/autoplex.benchmark.phonons.html">autoplex.benchmark.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.benchmark.phonons.flows.html">autoplex.benchmark.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.benchmark.phonons.jobs.html">autoplex.benchmark.phonons.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.benchmark.phonons.utils.html">autoplex.benchmark.phonons.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.benchmark.rss.html">autoplex.benchmark.rss</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../reference/autoplex.data.html">autoplex.data</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../reference/autoplex.data.common.html">autoplex.data.common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.data.common.flows.html">autoplex.data.common.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.data.common.jobs.html">autoplex.data.common.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.data.common.utils.html">autoplex.data.common.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../reference/autoplex.data.phonons.html">autoplex.data.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.data.phonons.flows.html">autoplex.data.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.data.phonons.jobs.html">autoplex.data.phonons.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.data.phonons.utils.html">autoplex.data.phonons.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../reference/autoplex.data.rss.html">autoplex.data.rss</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.data.rss.flows.html">autoplex.data.rss.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.data.rss.jobs.html">autoplex.data.rss.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.data.rss.utils.html">autoplex.data.rss.utils</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../reference/autoplex.fitting.html">autoplex.fitting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../reference/autoplex.fitting.common.html">autoplex.fitting.common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.fitting.common.flows.html">autoplex.fitting.common.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.fitting.common.jobs.html">autoplex.fitting.common.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.fitting.common.regularization.html">autoplex.fitting.common.regularization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.fitting.common.utils.html">autoplex.fitting.common.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.fitting.phonons.html">autoplex.fitting.phonons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.fitting.rss.html">autoplex.fitting.rss</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../reference/autoplex.misc.html">autoplex.misc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../reference/autoplex.misc.castep.html">autoplex.misc.castep</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.misc.castep.flows.html">autoplex.misc.castep.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.misc.castep.jobs.html">autoplex.misc.castep.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.misc.castep.run.html">autoplex.misc.castep.run</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.misc.castep.schema.html">autoplex.misc.castep.schema</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.misc.castep.utils.html">autoplex.misc.castep.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../reference/autoplex.misc.utils.html">autoplex.misc.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../reference/autoplex.misc.utils.mock_castep.html">autoplex.misc.utils.mock_castep</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../reference/autoplex.settings.html">autoplex.settings</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.AutoplexBaseModel.html">AutoplexBaseModel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.AutoplexSettings.html">AutoplexSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.BcurParams.html">BcurParams</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.BuildcellOptions.html">BuildcellOptions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.CustomIncar.html">CustomIncar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.GAPGeneralSettings.html">GAPGeneralSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.GAPSettings.html">GAPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.JACESettings.html">JACESettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.LossCoeff.html">LossCoeff</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.M3GNETSettings.html">M3GNETSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.MACESettings.html">MACESettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.MLIPHypers.html">MLIPHypers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.NEPSettings.html">NEPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.NEQUIPSettings.html">NEQUIPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.Nonlinearity.html">Nonlinearity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.ResumeFromPreviousState.html">ResumeFromPreviousState</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.RssConfig.html">RssConfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.SETTINGS.html">SETTINGS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.SoapParas.html">SoapParas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.SoapSettings.html">SoapSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.ThreebSettings.html">ThreebSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/autoplex.settings.TwobSettings.html">TwobSettings</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contributing Guide</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../dev/contributing.html">Contributing to autoplex</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/dev_install.html">Developer Installation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../about/changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about/contributors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about/license.html">License</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/JaGeo/autoplex" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/JaGeo/autoplex/issues/new?title=Issue%20on%20page%20%2Fuser/index.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/user/index.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Overview</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Overview</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#workflow-overview">Workflow overview</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation">Documentation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-to-cite">What to cite?</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#before-you-start-using-autoplex">Before you start using <code class="docutils literal notranslate"><span class="pre">autoplex</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-version">Python version</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#standard-installation">Standard installation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#enabling-rss-workflows">Enabling RSS workflows</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lammps-installation">LAMMPS installation</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#contributing-guidelines-developer-s-installation">Contributing guidelines / Developer’s installation</a></li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="overview">
+<h1>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h1>
+<div style="border: 1px solid #2e3191; padding: 5px; position: relative;">
+    <div style="background-color: #2e3191; color: #ffffff; padding: 0px; position: absolute; top: 0; left: 0; right: 0; text-align: center;">
+        <strong>Disclaimer</strong>
+    </div>
+<br>
+<p><code class="docutils literal notranslate"><span class="pre">autoplex</span></code> is still under very active development and larger modifications to the source code should be expected.</p>
+</div>
+<br>
+<p><code class="docutils literal notranslate"><span class="pre">autoplex</span></code> is a software for generating and benchmarking machine learning (ML)-based interatomic potentials. The aim of <code class="docutils literal notranslate"><span class="pre">autoplex</span></code> is to provide a fully automated solution for creating high-quality ML potentials. The software is interfaced to multiple different ML potential fitting frameworks and to the atomate2 and ase environments for efficient high-throughput computations. The vision of this project is to allow a wide community of researchers to create accurate and reliable ML potentials for materials simulations.</p>
+<p><code class="docutils literal notranslate"><span class="pre">autoplex</span></code> is developed jointly by two research groups at BAM Berlin and the University of Oxford.</p>
+<p><code class="docutils literal notranslate"><span class="pre">autoplex</span></code> is an evolving project and <strong>contributions are very welcome</strong>! To ensure that the code remains of high quality, please raise a pull request for any contributions, which will be reviewed before integration into the main branch of the code. Initially, <a class="reference external" href="https://github.com/JaGeo">&#64;JaGeo</a> will handle the reviews.</p>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="workflow-overview">
+<h1>Workflow overview<a class="headerlink" href="#workflow-overview" title="Link to this heading">#</a></h1>
+<p>We currently have two different types of automation workflows available:</p>
+<ul class="simple">
+<li><p>Workflow to use random-structure searches for the systematic construction of interatomic potentials: <a class="reference external" href="https://arxiv.org/abs/2412.16736">arXiv: 10.48550/arXiv.2412.16736</a>.
+The implementation automates ideas from the following articles: <a class="reference external" href="https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.120.156001"><em>Phys. Rev. Lett.</em> <strong>120</strong>, 156001 (2018)</a> and <a class="reference external" href="https://www.nature.com/articles/s41524-019-0236-6"><em>npj Comput. Mater.</em> <strong>5</strong>, 99 (2019)</a>.</p></li>
+<li><p>Workflow to train accurate interatomic potentials for harmonic phonon properties. The implementation automates the ideas from the following article: <a class="reference external" href="https://pubs.aip.org/aip/jcp/article/153/4/044104/1056348/Combining-phonon-accuracy-with-high"><em>J. Chem. Phys.</em> <strong>153</strong>, 044104 (2020)</a>.</p></li>
+</ul>
+<section id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Link to this heading">#</a></h2>
+<p>You can find the <code class="docutils literal notranslate"><span class="pre">autoplex</span></code> documentation <a class="reference external" href="https://autoatml.github.io/autoplex/index.html">here</a>!
+The documentation also contains tutorials that teach you how to use <code class="docutils literal notranslate"><span class="pre">autoplex</span></code> for different use cases for the RSS and phonon workflows and individual modules therein.</p>
+</section>
+<section id="what-to-cite">
+<h2>What to cite?<a class="headerlink" href="#what-to-cite" title="Link to this heading">#</a></h2>
+<p>Please cite our publication introducing <code class="docutils literal notranslate"><span class="pre">autoplex</span></code>:</p>
+<p><a class="reference external" href="https://doi.org/10.1038/s41467-025-62510-6">Y. Liu, J. D. Morrow, C. Ertural, N. L. Fragapane, J. L. A. Gardner, A. A. Naik, Y. Zhou, J. George, V. L. Deringer, Nat Commun 16, 7666 (2025). https://doi.org/10.1038/s41467-025-62510-6</a>.</p>
+<p>Please additionally cite all relevant software we rely on within <code class="docutils literal notranslate"><span class="pre">autoplex</span></code> and specific workflows. Please take a look below and check out the corresponding links.</p>
+</section>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="before-you-start-using-autoplex">
+<h1>Before you start using <code class="docutils literal notranslate"><span class="pre">autoplex</span></code><a class="headerlink" href="#before-you-start-using-autoplex" title="Link to this heading">#</a></h1>
+<p>We expect the general user of <code class="docutils literal notranslate"><span class="pre">autoplex</span></code> to be familiar with the <a class="reference external" href="https://github.com/materialsproject">Materials Project</a> framework software tools and related
+packages for (high-throughput) workflow submission and management.
+This involves the following software packages:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/materialsproject/pymatgen">pymatgen</a> for input and output handling of computational materials science software,</p></li>
+<li><p><a class="reference external" href="https://github.com/materialsproject/atomate2">atomate2</a> for providing a library of pre-defined computational materials science workflows,</p></li>
+<li><p><a class="reference external" href="https://github.com/materialsproject/jobflow">jobflow</a> for processes, job and workflow handling,</p></li>
+<li><p><a class="reference external" href="https://github.com/Matgenix/jobflow-remote">jobflow-remote</a> or <a class="reference external" href="https://github.com/materialsproject/fireworks">FireWorks</a> for workflow and database (MongoDB) management,</p></li>
+<li><p><a class="reference external" href="https://www.mongodb.com/">MongoDB</a> as the database (we recommend installing the MongoDB community edition). More help regarding the MongoDB installation can be found <a class="reference external" href="https://materialsproject.github.io/fireworks/installation.html#install-mongodb">here</a>.</p></li>
+</ul>
+<p>All of these software tools provide documentation and tutorials. Please take your time and check everything out! Please also cite the software packages if you are using them!</p>
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>To set up the mandatory prerequisites for using <code class="docutils literal notranslate"><span class="pre">autoplex,</span></code> please follow the <a class="reference external" href="https://materialsproject.github.io/atomate2/user/install.html">installation guide of atomate2</a>.</p>
+<p>After setting up <code class="docutils literal notranslate"><span class="pre">atomate2</span></code>, make sure to add <code class="docutils literal notranslate"><span class="pre">VASP_INCAR_UPDATES:</span> <span class="pre">{&quot;NPAR&quot;:</span> <span class="pre">number}</span></code> in your <code class="docutils literal notranslate"><span class="pre">~/atomate2/config/atomate2.yaml</span></code> file.
+Set a number that is a divisor of the number of tasks you use for the VASP calculations.</p>
+</section>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h1>
+<section id="python-version">
+<h2>Python version<a class="headerlink" href="#python-version" title="Link to this heading">#</a></h2>
+<p>Before the installation, please make sure that you are using one of the supported Python versions (see <a class="reference external" href="https://github.com/autoatml/autoplex/blob/main/pyproject.toml">pyproject.toml</a>)</p>
+</section>
+<section id="standard-installation">
+<h2>Standard installation<a class="headerlink" href="#standard-installation" title="Link to this heading">#</a></h2>
+<p>Please install <code class="docutils literal notranslate"><span class="pre">autoplex</span></code> using</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">autoplex</span><span class="p">[</span><span class="n">strict</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>This will install all the Python packages and dependencies needed for MLIP fits.</p>
+<blockquote>
+<div><p>ℹ️ To fit and validate <code class="docutils literal notranslate"><span class="pre">ACEpotentials</span></code>, one also needs to install Julia, as <code class="docutils literal notranslate"><span class="pre">autoplex</span></code> relies on <a class="reference external" href="https://acesuit.github.io/ACEpotentials.jl/dev/gettingstarted/installation/">ACEpotentials</a>, which supports fitting of linear ACE. Currently, no Python package exists for the same.
+Please run the following commands to enable the <code class="docutils literal notranslate"><span class="pre">ACEpotentials</span></code> fitting options and further functionality.</p>
+</div></blockquote>
+<p>Install Julia v1.9.2</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://install.julialang.org<span class="w"> </span><span class="p">|</span><span class="w"> </span>sh<span class="w"> </span>-s<span class="w"> </span>--<span class="w"> </span>default-channel<span class="w"> </span><span class="m">1</span>.9.2
+</pre></div>
+</div>
+<p>Once installed in the terminal, run the following commands to get Julia ACEpotentials dependencies.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>julia<span class="w"> </span>-e<span class="w"> </span><span class="s1">&#39;using Pkg; Pkg.Registry.add(&quot;General&quot;); Pkg.Registry.add(Pkg.Registry.RegistrySpec(url=&quot;https://github.com/ACEsuit/ACEregistry&quot;)); Pkg.add(Pkg.PackageSpec(;name=&quot;ACEpotentials&quot;, version=&quot;0.6.7&quot;)); Pkg.add(&quot;DataFrames&quot;); Pkg.add(&quot;CSV&quot;)&#39;</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>ℹ️ To fit and validate NEP potentials, one requires an Nvidia GPU card with compute capability no less than 3.5 and CUDA toolkit 9.0 or newer. This potential can only be trained on GPU only and currently interface to NEP potential training is provided via <a class="reference external" href="https://calorine.materialsmodeling.org/">calorine</a> package that uses <code class="docutils literal notranslate"><span class="pre">nep</span></code> executable from the <a class="reference external" href="https://gpumd.org/index.html">GPUMD</a> package. To get this executable please follow the compilation instructions <a class="reference external" href="https://gpumd.org/installation.html">here</a> and add this executable to the system path.</p>
+</div></blockquote>
+</section>
+<section id="enabling-rss-workflows">
+<h2>Enabling RSS workflows<a class="headerlink" href="#enabling-rss-workflows" title="Link to this heading">#</a></h2>
+<p>Additionally, <code class="docutils literal notranslate"><span class="pre">buildcell</span></code> as a part of <code class="docutils literal notranslate"><span class="pre">AIRSS</span></code> needs to be installed if one wants to use the RSS functionality:</p>
+<blockquote>
+<div><p>ℹ️ To be able to build the AIRSS utilities one needs <code class="docutils literal notranslate"><span class="pre">gcc</span></code> and <code class="docutils literal notranslate"><span class="pre">gfortran</span></code> version 5 and above. Other compiler families (such as ifort) are not supported.
+These compilers are usually available on HPCs and one can simply load them if needed. On Ubuntu/Debian systems, one can install the necessary compilers with the following command:</p>
+</div></blockquote>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>build-essential<span class="w"> </span>gfortran
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-O<span class="w"> </span>https://www.mtg.msm.cam.ac.uk/files/airss-0.9.3.tgz<span class="p">;</span><span class="w"> </span>tar<span class="w"> </span>-xf<span class="w"> </span>airss-0.9.3.tgz<span class="p">;</span><span class="w"> </span>rm<span class="w"> </span>airss-0.9.3.tgz<span class="p">;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>airss<span class="p">;</span><span class="w"> </span>make<span class="w"> </span><span class="p">;</span><span class="w"> </span>make<span class="w"> </span>install<span class="w"> </span><span class="p">;</span><span class="w"> </span>make<span class="w"> </span>neat<span class="p">;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>..
+</pre></div>
+</div>
+<p>Please find out about licenses and citation requirements here: <a class="reference external" href="https://airss-docs.github.io/">https://airss-docs.github.io/</a></p>
+</section>
+<section id="lammps-installation">
+<h2>LAMMPS installation<a class="headerlink" href="#lammps-installation" title="Link to this heading">#</a></h2>
+<p>You only need to install LAMMPS, if you want to use J-ACE as your MLIP.
+Recipe for compiling lammps-ace including the download of the <code class="docutils literal notranslate"><span class="pre">libpace.tar.gz</span></code> file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>git clone -b stable_29Aug2024_update1 https://github.com/lammps/lammps.git
+cd lammps
+mkdir build
+cd build
+wget -O libpace.tar.gz https://github.com/wcwitt/lammps-user-pace/archive/main.tar.gz
+
+cmake  -C ../cmake/presets/clang.cmake -D BUILD_SHARED_LIBS=on -D BUILD_MPI=yes \
+-DMLIAP_ENABLE_PYTHON=yes -D PKG_PYTHON=on -D PKG_KOKKOS=yes -D Kokkos_ARCH_ZEN3=yes \
+-D PKG_PHONON=yes -D PKG_MOLECULE=yes -D PKG_MANYBODY=yes \
+-D Kokkos_ENABLE_OPENMP=yes -D BUILD_OMP=yes -D LAMMPS_EXCEPTIONS=yes \
+-D PKG_ML-PACE=yes -D PACELIB_MD5=$(md5sum libpace.tar.gz | awk &#39;{print $1}&#39;) \
+-D CMAKE_INSTALL_PREFIX=$LAMMPS_INSTALL -D CMAKE_EXE_LINKER_FLAGS:STRING=&quot;-lgfortran&quot; \
+../cmake
+
+make -j 16
+make install-python
+</pre></div>
+</div>
+<p>$LAMMPS_INSTALL is the conda environment for installing the lammps-python interface.
+Use <code class="docutils literal notranslate"><span class="pre">BUILD_MPI=yes</span></code> to enable MPI for parallelization.</p>
+<p>After the installation, enter the following commands in the Python environment.
+If you get the same output, it means the installation was successful.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">lammps</span><span class="w"> </span><span class="kn">import</span> <span class="n">lammps</span><span class="p">;</span> <span class="n">lmp</span> <span class="o">=</span> <span class="n">lammps</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>LAMMPS<span class="w"> </span><span class="o">(</span><span class="m">29</span><span class="w"> </span>Aug<span class="w"> </span><span class="m">2024</span><span class="w"> </span>-<span class="w"> </span>Update<span class="w"> </span><span class="m">1</span><span class="o">)</span>
+OMP_NUM_THREADS<span class="w"> </span>environment<span class="w"> </span>is<span class="w"> </span>not<span class="w"> </span>set.<span class="w"> </span>Defaulting<span class="w"> </span>to<span class="w"> </span><span class="m">1</span><span class="w"> </span>thread.<span class="w"> </span><span class="o">(</span>src/comm.cpp:98<span class="o">)</span>
+<span class="w">  </span>using<span class="w"> </span><span class="m">1</span><span class="w"> </span>OpenMP<span class="w"> </span>thread<span class="o">(</span>s<span class="o">)</span><span class="w"> </span>per<span class="w"> </span>MPI<span class="w"> </span>task
+&gt;&gt;&gt;
+</pre></div>
+</div>
+<p>It is very important to have it compiled with Python (<code class="docutils literal notranslate"><span class="pre">-D</span> <span class="pre">PKG_PYTHON=on</span></code>) and
+LIB PACE flags (<code class="docutils literal notranslate"><span class="pre">-D</span> <span class="pre">PACELIB_MD5=$(md5sum</span> <span class="pre">libpace.tar.gz</span> <span class="pre">|</span> <span class="pre">awk</span> <span class="pre">'{print</span> <span class="pre">$1}')</span></code>).</p>
+<p>Please find out about licenses and citation requirements here: <a class="reference external" href="https://www.lammps.org/">https://www.lammps.org/</a></p>
+</section>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="contributing-guidelines-developer-s-installation">
+<h1>Contributing guidelines / Developer’s installation<a class="headerlink" href="#contributing-guidelines-developer-s-installation" title="Link to this heading">#</a></h1>
+<p>A short guide to contributing to autoplex can be found <a class="reference external" href="https://autoatml.github.io/autoplex/dev/contributing.html">here</a>. Additional information for developers can be found <a class="reference external" href="https://autoatml.github.io/autoplex/dev/dev_install.html">here</a>.</p>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">autoplex documentation</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="setup.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Quick-start</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Overview</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#workflow-overview">Workflow overview</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation">Documentation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-to-cite">What to cite?</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#before-you-start-using-autoplex">Before you start using <code class="docutils literal notranslate"><span class="pre">autoplex</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-version">Python version</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#standard-installation">Standard installation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#enabling-rss-workflows">Enabling RSS workflows</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lammps-installation">LAMMPS installation</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#contributing-guidelines-developer-s-installation">Contributing guidelines / Developer’s installation</a></li>
+</ul>
+
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Author name not set
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, autoplex development team.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

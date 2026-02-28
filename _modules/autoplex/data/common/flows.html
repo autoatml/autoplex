@@ -1,0 +1,1454 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>autoplex.data.common.flows &#8212; autoplex</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=1ea92b8b" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../../_static/documentation_options.js?v=e18d2f4a"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+
+
+
+
+
+const initStyles = () => {
+    const defaultStyle = document.createElement('style');
+    defaultStyle.textContent = `pre.mermaid {
+    /* Same as .mermaid-container > pre */
+    display: block;
+    width: 100%;
+}
+
+pre.mermaid > svg {
+    /* Same as .mermaid-container > pre > svg */
+    height: 500px;
+    width: 100%;
+    max-width: 100% !important;
+}`;
+    document.head.appendChild(defaultStyle);
+
+    const fullscreenStyle = document.createElement('style');
+    fullscreenStyle.textContent = `.mermaid-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.mermaid-container > pre {
+    display: block;
+    width: 100%;
+}
+
+.mermaid-container > pre > svg {
+    height: 500px;
+    width: 100%;
+    max-width: 100% !important;
+}
+
+.mermaid-fullscreen-btn {
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+    color: #333;
+}
+
+.mermaid-fullscreen-btn:hover {
+    opacity: 100% !important;
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+    transform: scale(1.1);
+}
+
+.mermaid-fullscreen-btn.dark-theme {
+    background: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #e0e0e0;
+}
+
+.mermaid-fullscreen-btn.dark-theme:hover {
+    background: rgba(60, 60, 60, 1);
+    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-modal {
+    display: none;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 95vw;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.98);
+    z-index: 9999;
+    padding: 20px;
+    overflow: auto;
+}
+
+.mermaid-fullscreen-modal.dark-theme {
+    background: rgba(0, 0, 0, 0.98);
+}
+
+.mermaid-fullscreen-modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen {
+    position: relative;
+    width: 95vw;
+    height: 90vh;
+    max-width: 95vw;
+    max-height: 90vh;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    overflow: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen.dark-theme {
+    background: #1a1a1a;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+}
+
+.mermaid-container-fullscreen pre.mermaid {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen .mermaid svg {
+    height: 100% !important;
+    width: 100% !important;
+    cursor: grab;
+}
+
+.mermaid-fullscreen-close {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s;
+    font-size: 24px;
+    line-height: 1;
+    color: #333;
+}
+
+.mermaid-fullscreen-close:hover {
+    background: white;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    transform: scale(1.1);
+}
+
+.mermaid-fullscreen-close.dark-theme {
+    background: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #e0e0e0;
+}
+
+.mermaid-fullscreen-close.dark-theme:hover {
+    background: rgba(60, 60, 60, 1);
+    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-modal .mermaid-fullscreen-btn {
+    display: none !important;
+}`;
+    document.head.appendChild(fullscreenStyle);
+}
+
+// Detect if page has dark background
+const isDarkTheme = () => {
+    // We use a set of heuristics:
+    // 1. Check for common dark mode classes or attributes
+    // 2. Check computed background color brightness
+    if (document.documentElement.classList.contains('dark') ||
+        document.documentElement.getAttribute('data-theme') === 'dark' ||
+        document.body.classList.contains('dark') ||
+        document.body.getAttribute('data-theme') === 'dark') {
+        // console.log("Dark theme detected via class/attribute");
+        return true;
+    }
+    if (document.documentElement.classList.contains('light') ||
+        document.documentElement.getAttribute('data-theme') === 'light' ||
+        document.body.classList.contains('light') ||
+        document.body.getAttribute('data-theme') === 'light') {
+        // console.log("Light theme detected via class/attribute");
+        return false;
+    }
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        // console.log("Dark theme detected via prefers-color-scheme");
+        return true;
+    }
+    const bgColor = window.getComputedStyle(document.body).backgroundColor;
+    const match = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {
+        const r = parseInt(match[1]);
+        const g = parseInt(match[2]);
+        const b = parseInt(match[3]);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        // console.log("Background color brightness:", brightness);
+        return brightness < 128;
+    }
+    // console.log("No dark or light theme detected, defaulting to light theme");
+    return false;
+};
+
+let darkTheme = isDarkTheme();
+let modal = null;
+let modalContent = null;
+let previousScrollOffset = [window.scrollX, window.scrollY];
+
+const runMermaid = async (rerun) => {
+    console.log("Running mermaid diagrams, rerun =", rerun);
+    // clear all existing mermaid charts
+    let all_mermaids = document.querySelectorAll(".mermaid");
+
+    if (rerun) {
+        all_mermaids.forEach((el) => {
+            if(!el.hasAttribute("data-original-code")) {
+                // store original code
+                // console.log(`Storing original code for first run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+            if(el.getAttribute("data-processed") === "true") {
+                // remove and restore original
+                el.removeAttribute("data-processed");
+                // console.log(`Restoring original code for re-run: `, el.getAttribute('data-original-code'));
+                el.innerHTML = el.getAttribute('data-original-code');
+            } else {
+                // store original code
+                // console.log(`Storing original code for re-run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+        });
+        await mermaid.run();
+    }
+
+    all_mermaids = document.querySelectorAll(".mermaid");
+    const mermaids_processed = document.querySelectorAll(".mermaid[data-processed='true']");
+
+    if ("False" === "True") {
+        const mermaids_to_add_zoom = -1 === -1 ? all_mermaids.length : -1;
+        if(mermaids_to_add_zoom > 0) {
+            var svgs = d3.selectAll("");
+            if(all_mermaids.length !== mermaids_processed.length) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            } else if(svgs.size() !== mermaids_to_add_zoom) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            } else {
+                svgs.each(function() {
+                    var svg = d3.select(this);
+                    svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+                    var inner = svg.select("g");
+                    var zoom = d3.zoom().on("zoom", function(event) {
+                        inner.attr("transform", event.transform);
+                    });
+                    svg.call(zoom);
+                });
+            }
+        }
+    } else if(all_mermaids.length !== mermaids_processed.length) {
+        // Wait for mermaid to process all diagrams
+        setTimeout(() => runMermaid(false), 200);
+        return;
+    }
+
+    // Stop here if not adding fullscreen capability
+    if ("True" !== "True") return;
+
+    if (modal !== null ) {
+        // Destroy existing modal
+        modal.remove();
+        modal = null;
+        modalContent = null;
+    }
+
+    modal = document.createElement('div');
+    modal.className = 'mermaid-fullscreen-modal' + (darkTheme ? ' dark-theme' : '');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Fullscreen diagram viewer');
+    modal.innerHTML = `
+        <button class="mermaid-fullscreen-close${darkTheme ? ' dark-theme' : ''}" aria-label="Close fullscreen">✕</button>
+        <div class="mermaid-container-fullscreen${darkTheme ? ' dark-theme' : ''}"></div>
+    `;
+    document.body.appendChild(modal);
+
+    modalContent = modal.querySelector('.mermaid-container-fullscreen');
+    const closeBtn = modal.querySelector('.mermaid-fullscreen-close');
+
+    const closeModal = () => {
+        modal.classList.remove('active');
+        modalContent.innerHTML = '';
+        document.body.style.overflow = ''
+        window.scrollTo({left: previousScrollOffset[0], top: previousScrollOffset[1], behavior: 'instant'});
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+            closeModal();
+        }
+    });
+
+    document.querySelectorAll('.mermaid').forEach((mermaidDiv) => {
+        if (mermaidDiv.parentNode.classList.contains('mermaid-container') ||
+            mermaidDiv.closest('.mermaid-fullscreen-modal')) {
+            // Already processed, adjust button class if needed
+            const existingBtn = mermaidDiv.parentNode.querySelector('.mermaid-fullscreen-btn');
+            if (existingBtn) {
+                existingBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+            }
+            return;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'mermaid-container';
+        mermaidDiv.parentNode.insertBefore(container, mermaidDiv);
+        container.appendChild(mermaidDiv);
+
+        const fullscreenBtn = document.createElement('button');
+        fullscreenBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+        fullscreenBtn.setAttribute('aria-label', 'View diagram in fullscreen');
+        fullscreenBtn.textContent = '⛶';
+        fullscreenBtn.style.opacity = '50%';
+
+        // Calculate dynamic position based on diagram's margin and padding
+        const diagramStyle = window.getComputedStyle(mermaidDiv);
+        const marginTop = parseFloat(diagramStyle.marginTop) || 0;
+        const marginRight = parseFloat(diagramStyle.marginRight) || 0;
+        const paddingTop = parseFloat(diagramStyle.paddingTop) || 0;
+        const paddingRight = parseFloat(diagramStyle.paddingRight) || 0;
+        fullscreenBtn.style.top = `${marginTop + paddingTop + 4}px`;
+        fullscreenBtn.style.right = `${marginRight + paddingRight + 4}px`;
+
+        fullscreenBtn.addEventListener('click', () => {
+            previousScrollOffset = [window.scroll, window.scrollY];
+            const clone = mermaidDiv.cloneNode(true);
+            modalContent.innerHTML = '';
+            modalContent.appendChild(clone);
+
+            const svg = clone.querySelector('svg');
+            if (svg) {
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.style.width = '100%';
+                svg.style.height = 'auto';
+                svg.style.maxWidth = '100%';
+                svg.style.sdisplay = 'block';
+
+                if ("False" === "True") {
+                    setTimeout(() => {
+                        const g = svg.querySelector('g');
+                        if (g) {
+                            var svgD3 = d3.select(svg);
+                            svgD3.html("<g class='wrapper'>" + svgD3.html() + "</g>");
+                            var inner = svgD3.select("g");
+                            var zoom = d3.zoom().on("zoom", function(event) {
+                                inner.attr("transform", event.transform);
+                            });
+                            svgD3.call(zoom);
+                        }
+                    }, 100);
+                }
+            }
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        container.appendChild(fullscreenBtn);
+    });
+};
+
+const load = async () => {
+    initStyles();
+
+    await runMermaid(true);
+
+    const reRunIfThemeChanges = async () => {
+        const newDarkTheme = isDarkTheme();
+        if (newDarkTheme !== darkTheme) {
+            darkTheme = newDarkTheme;
+            console.log("Theme change detected, re-running mermaid with", darkTheme ? "dark" : "default", "theme");
+            await mermaid.initialize(
+                {...JSON.parse(
+                    `{"startOnLoad": false}`
+                ),
+                ...{ darkMode: darkTheme, theme: darkTheme ? 'dark' : 'default' },
+                }
+            );
+            await runMermaid(true);
+        }
+    };
+
+    // Update theme classes when theme changes
+    const themeObserver = new MutationObserver(reRunIfThemeChanges);
+    themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+    themeObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+};
+
+
+
+
+
+console.log("Initializing mermaid with", darkTheme ? "dark" : "default", "theme");
+mermaid.initialize(
+    {...JSON.parse(
+        `{"startOnLoad": false}`
+    ),
+    ...{ darkMode: darkTheme, theme: darkTheme ? 'dark' : 'default' },
+    }
+);
+
+window.addEventListener("load", load);</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/autoplex/data/common/flows';</script>
+    <link rel="icon" href="../../../../_static/autoplex_favicon.png"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.1.dev1+g6ffcd01a0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../../_static/autoplex_logo.png" class="logo__image only-light" alt="autoplex - Home"/>
+    <img src="../../../../_static/autoplex_logo.png" class="logo__image only-dark pst-js-only" alt="autoplex - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../user/index.html">Overview</a></li>
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../../../../user/setup.html">Quick-start</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../user/tutorials.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../user/installation/installation.html">Installation guide</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../user/rss/index.html">RSS workflow</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/rss/flow/introduction/intro.html">Brief overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/rss/flow/input/input.html">Input YAML configuration file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/rss/flow/quick_start/start.html">Quick start</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/rss/flow/example/example.html">Examples</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../user/phonon/index.html">Phonon workflow</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/phonon/flows/flows.html">Out-of-the-box workflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/phonon/flows/generation/data.html">Generating reference data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/phonon/flows/fitting/fitting.html">Fitting phonon-accurate potentials</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/phonon/flows/benchmark/benchmark.html">Benchmark of ML-based phonon structure</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../user/executable/index.html">Executable tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/executable/tutorial_phonon.html">Iterative DFT vs MLIP benchmark workflow for phonons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../user/executable/tutorial_rss.html">RSS Workflow</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../reference/index.html">API reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.auto.html">autoplex.auto</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.auto.phonons.html">autoplex.auto.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.auto.phonons.flows.html">autoplex.auto.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.auto.phonons.jobs.html">autoplex.auto.phonons.jobs</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.auto.rss.html">autoplex.auto.rss</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.auto.rss.flows.html">autoplex.auto.rss.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.auto.rss.jobs.html">autoplex.auto.rss.jobs</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.benchmark.html">autoplex.benchmark</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.benchmark.phonons.html">autoplex.benchmark.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.benchmark.phonons.flows.html">autoplex.benchmark.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.benchmark.phonons.jobs.html">autoplex.benchmark.phonons.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.benchmark.phonons.utils.html">autoplex.benchmark.phonons.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.benchmark.rss.html">autoplex.benchmark.rss</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.html">autoplex.data</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.common.html">autoplex.data.common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.common.flows.html">autoplex.data.common.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.common.jobs.html">autoplex.data.common.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.common.utils.html">autoplex.data.common.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.phonons.html">autoplex.data.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.phonons.flows.html">autoplex.data.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.phonons.jobs.html">autoplex.data.phonons.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.phonons.utils.html">autoplex.data.phonons.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.rss.html">autoplex.data.rss</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.rss.flows.html">autoplex.data.rss.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.rss.jobs.html">autoplex.data.rss.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.rss.utils.html">autoplex.data.rss.utils</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.fitting.html">autoplex.fitting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.html">autoplex.fitting.common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.flows.html">autoplex.fitting.common.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.jobs.html">autoplex.fitting.common.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.regularization.html">autoplex.fitting.common.regularization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.utils.html">autoplex.fitting.common.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.fitting.phonons.html">autoplex.fitting.phonons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.fitting.rss.html">autoplex.fitting.rss</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.misc.html">autoplex.misc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.html">autoplex.misc.castep</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.flows.html">autoplex.misc.castep.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.jobs.html">autoplex.misc.castep.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.run.html">autoplex.misc.castep.run</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.schema.html">autoplex.misc.castep.schema</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.utils.html">autoplex.misc.castep.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.misc.utils.html">autoplex.misc.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.utils.mock_castep.html">autoplex.misc.utils.mock_castep</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.settings.html">autoplex.settings</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.AutoplexBaseModel.html">AutoplexBaseModel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.AutoplexSettings.html">AutoplexSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.BcurParams.html">BcurParams</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.BuildcellOptions.html">BuildcellOptions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.CustomIncar.html">CustomIncar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.GAPGeneralSettings.html">GAPGeneralSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.GAPSettings.html">GAPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.JACESettings.html">JACESettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.LossCoeff.html">LossCoeff</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.M3GNETSettings.html">M3GNETSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.MACESettings.html">MACESettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.MLIPHypers.html">MLIPHypers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.NEPSettings.html">NEPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.NEQUIPSettings.html">NEQUIPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.Nonlinearity.html">Nonlinearity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.ResumeFromPreviousState.html">ResumeFromPreviousState</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.RssConfig.html">RssConfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.SETTINGS.html">SETTINGS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.SoapParas.html">SoapParas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.SoapSettings.html">SoapSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.ThreebSettings.html">ThreebSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.TwobSettings.html">TwobSettings</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contributing Guide</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/contributing.html">Contributing to autoplex</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/dev_install.html">Developer Installation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../about/changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../about/contributors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../about/license.html">License</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/JaGeo/autoplex" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/JaGeo/autoplex/issues/new?title=Issue%20on%20page%20%2F_modules/autoplex/data/common/flows.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for autoplex.data.common.flows</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Flows to create and check training data.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">traceback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">atomate2.aims.jobs.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseAimsMaker</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">atomate2.forcefields.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ForceFieldRelaxMaker</span><span class="p">,</span>
+    <span class="n">ForceFieldStaticMaker</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">atomate2.vasp.jobs.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseVaspMaker</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">atomate2.vasp.jobs.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">StaticMaker</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">atomate2.vasp.powerups</span><span class="w"> </span><span class="kn">import</span> <span class="n">update_user_incar_settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">atomate2.vasp.sets.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">StaticSetGenerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">emmet.core.math</span><span class="w"> </span><span class="kn">import</span> <span class="n">Matrix3D</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jobflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flow</span><span class="p">,</span> <span class="n">Maker</span><span class="p">,</span> <span class="n">Response</span><span class="p">,</span> <span class="n">job</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pymatgen.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">Lattice</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pymatgen.core.structure</span><span class="w"> </span><span class="kn">import</span> <span class="n">Structure</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pymatgen.io.ase</span><span class="w"> </span><span class="kn">import</span> <span class="n">AseAtomsAdaptor</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.data.common.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">convert_to_extxyz</span><span class="p">,</span>
+    <span class="n">generate_randomized_structures</span><span class="p">,</span>
+    <span class="n">get_supercell_job</span><span class="p">,</span>
+    <span class="n">plot_force_distribution</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.data.common.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ElementCollection</span><span class="p">,</span>
+    <span class="n">flatten</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.misc.castep.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">CastepStaticMaker</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;DFTStaticLabelling&quot;</span><span class="p">,</span> <span class="s2">&quot;GenerateTrainingDataForTesting&quot;</span><span class="p">]</span>
+
+
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;[</span><span class="si">%(levelname)s</span><span class="s2">] </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="GenerateTrainingDataForTesting">
+<a class="viewcode-back" href="../../../../reference/autoplex.data.common.flows.GenerateTrainingDataForTesting.html#autoplex.data.common.flows.GenerateTrainingDataForTesting">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GenerateTrainingDataForTesting</span><span class="p">(</span><span class="n">Maker</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Maker for generating training data to test it and check the forces.</span>
+
+<span class="sd">    This Maker will first generate training data based on the chosen ML model (default is GAP)</span>
+<span class="sd">    by randomizing (ase rattle) atomic displacements in supercells of the provided input structures.</span>
+<span class="sd">    Then it will proceed with MLIP-based Phonon calculations (based on atomate2 PhononMaker), collect</span>
+<span class="sd">    all structure data in extended xyz files and plot the forces in histograms (per rescaling cell_factor</span>
+<span class="sd">    and total).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name: str</span>
+<span class="sd">        Name of the flow.</span>
+<span class="sd">    bulk_relax_maker: ForceFieldRelaxMaker | None</span>
+<span class="sd">        Maker for the relax jobs.</span>
+<span class="sd">    static_energy_maker: ForceFieldStaticMaker | ForceFieldRelaxMaker | None</span>
+<span class="sd">        Maker for the static jobs.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;generate_training_data_for_testing&quot;</span>
+    <span class="n">bulk_relax_maker</span><span class="p">:</span> <span class="n">ForceFieldRelaxMaker</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">static_energy_maker</span><span class="p">:</span> <span class="n">ForceFieldStaticMaker</span> <span class="o">|</span> <span class="n">ForceFieldRelaxMaker</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="GenerateTrainingDataForTesting.make">
+<a class="viewcode-back" href="../../../../reference/autoplex.data.common.flows.GenerateTrainingDataForTesting.html#autoplex.data.common.flows.GenerateTrainingDataForTesting.make">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">make</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">train_structure_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Structure</span><span class="p">],</span>
+        <span class="n">cell_factor_sequence</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">potential_filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gap.xml&quot;</span><span class="p">,</span>
+        <span class="n">n_structures</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+        <span class="n">rattle_std</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span>
+        <span class="n">relax_cell</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
+        <span class="n">supercell_matrix</span><span class="p">:</span> <span class="n">Matrix3D</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">config_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;train&quot;</span><span class="p">,</span>
+        <span class="n">x_min</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">x_max</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="n">bin_width</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.125</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">relax_kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate ase.rattled structures from the training data and returns histogram plots of the forces.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        train_structure_list: list[Structure].</span>
+<span class="sd">            List of pymatgen structures object.</span>
+<span class="sd">        cell_factor_sequence: list[float]</span>
+<span class="sd">            List of factor to resize cell parameters.</span>
+<span class="sd">        potential_filename: str</span>
+<span class="sd">            The param_file_name for :obj:`quippy.potential.Potential()&#39;`.</span>
+<span class="sd">        n_structures : int.</span>
+<span class="sd">            Total number of randomly displaced structures to be generated.</span>
+<span class="sd">        rattle_std: float.</span>
+<span class="sd">            Rattle amplitude (standard deviation in normal distribution).</span>
+<span class="sd">            Default=0.01.</span>
+<span class="sd">        relax_cell : bool</span>
+<span class="sd">            Whether to allow the cell shape/volume to change during relaxation.</span>
+<span class="sd">        steps : int</span>
+<span class="sd">            Maximum number of ionic steps allowed during relaxation.</span>
+<span class="sd">        supercell_matrix: Matrix3D | None</span>
+<span class="sd">            The matrix to generate the supercell.</span>
+<span class="sd">        config_type: str</span>
+<span class="sd">            Configuration type of the data.</span>
+<span class="sd">        x_min: int</span>
+<span class="sd">            Minimum value for the plot x-axis.</span>
+<span class="sd">        x_max: int</span>
+<span class="sd">            Maximum value for the plot x-axis.</span>
+<span class="sd">        bin_width: float</span>
+<span class="sd">            Width of the plot bins.</span>
+<span class="sd">        relax_kwargs : dict</span>
+<span class="sd">            Keyword arguments that will get passed to :obj:`Relaxer.relax`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Matplotlib plots &quot;count vs. forces&quot;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">jobs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">cell_factor_sequence</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cell_factor_sequence</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.975</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.025</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">structure</span> <span class="ow">in</span> <span class="n">train_structure_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bulk_relax_maker</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bulk_relax_maker</span> <span class="o">=</span> <span class="n">ForceFieldRelaxMaker</span><span class="p">(</span>
+                    <span class="n">calculator_kwargs</span><span class="o">=</span><span class="p">{</span>
+                        <span class="s2">&quot;args_str&quot;</span><span class="p">:</span> <span class="s2">&quot;IP GAP&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;param_filename&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">potential_filename</span><span class="p">),</span>
+                    <span class="p">},</span>
+                    <span class="n">force_field_name</span><span class="o">=</span><span class="s2">&quot;GAP&quot;</span><span class="p">,</span>
+                    <span class="n">relax_cell</span><span class="o">=</span><span class="n">relax_cell</span><span class="p">,</span>
+                    <span class="n">steps</span><span class="o">=</span><span class="n">steps</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="n">supercell_matrix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">supercell_matrix</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">]]</span>
+
+            <span class="n">bulk_relax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bulk_relax_maker</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">structure</span><span class="o">=</span><span class="n">structure</span><span class="p">)</span>
+            <span class="n">jobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bulk_relax</span><span class="p">)</span>
+            <span class="n">supercell</span> <span class="o">=</span> <span class="n">get_supercell_job</span><span class="p">(</span>
+                <span class="n">structure</span><span class="o">=</span><span class="n">bulk_relax</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">structure</span><span class="p">,</span>
+                <span class="n">supercell_matrix</span><span class="o">=</span><span class="n">supercell_matrix</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">jobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">supercell</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">cell_factor</span> <span class="ow">in</span> <span class="n">cell_factor_sequence</span><span class="p">:</span>
+                <span class="n">rattled_job</span> <span class="o">=</span> <span class="n">generate_randomized_structures</span><span class="p">(</span>
+                    <span class="n">structure</span><span class="o">=</span><span class="n">supercell</span><span class="o">.</span><span class="n">output</span><span class="p">,</span>
+                    <span class="n">n_structures</span><span class="o">=</span><span class="n">n_structures</span><span class="p">,</span>
+                    <span class="n">volume_custom_scale_factors</span><span class="o">=</span><span class="p">[</span><span class="n">cell_factor</span><span class="p">],</span>
+                    <span class="n">rattle_std</span><span class="o">=</span><span class="n">rattle_std</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">jobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rattled_job</span><span class="p">)</span>
+                <span class="n">static_conv_jobs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">static_run_and_convert</span><span class="p">(</span>
+                    <span class="n">rattled_job</span><span class="o">.</span><span class="n">output</span><span class="p">,</span>
+                    <span class="n">cell_factor</span><span class="p">,</span>
+                    <span class="n">config_type</span><span class="p">,</span>
+                    <span class="n">potential_filename</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">relax_kwargs</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">jobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">static_conv_jobs</span><span class="p">)</span>
+                <span class="n">plots</span> <span class="o">=</span> <span class="n">plot_force_distribution</span><span class="p">(</span>
+                    <span class="n">cell_factor</span><span class="p">,</span> <span class="n">static_conv_jobs</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">,</span> <span class="n">bin_width</span>
+                <span class="p">)</span>
+                <span class="n">jobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plots</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">Flow</span><span class="p">(</span><span class="n">jobs</span><span class="o">=</span><span class="n">jobs</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>  <span class="c1"># , plots.output)</span></div>
+
+
+<div class="viewcode-block" id="GenerateTrainingDataForTesting.static_run_and_convert">
+<a class="viewcode-back" href="../../../../reference/autoplex.data.common.flows.GenerateTrainingDataForTesting.html#autoplex.data.common.flows.GenerateTrainingDataForTesting.static_run_and_convert">[docs]</a>
+    <span class="nd">@job</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">static_run_and_convert</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">structure_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Structure</span><span class="p">],</span>
+        <span class="n">cell_factor</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">config_type</span><span class="p">,</span>
+        <span class="n">potential_filename</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">relax_kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Job for the static runs and the data conversion to the extxyz format.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        structure_list: list[Structure].</span>
+<span class="sd">            List of pymatgen structures object.</span>
+<span class="sd">        cell_factor: float</span>
+<span class="sd">            Factor to resize cell parameters.</span>
+<span class="sd">        config_type: str</span>
+<span class="sd">            Configuration type of the data.</span>
+<span class="sd">        potential_filename: str</span>
+<span class="sd">            The param_file_name for :obj:`quippy.potential.Potential()&#39;`.</span>
+<span class="sd">        relax_kwargs : dict</span>
+<span class="sd">            Keyword arguments that will get passed to :obj:`Relaxer.relax`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">jobs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">rattled</span> <span class="ow">in</span> <span class="n">structure_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">relax_kwargs</span> <span class="o">==</span> <span class="p">{}:</span>
+                <span class="n">relax_kwargs</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;interval&quot;</span><span class="p">:</span> <span class="mi">50000</span><span class="p">,</span>
+                    <span class="s2">&quot;fmax&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+                    <span class="s2">&quot;traj_file&quot;</span><span class="p">:</span> <span class="n">rattled</span><span class="o">.</span><span class="n">reduced_formula</span>
+                    <span class="o">+</span> <span class="s2">&quot;_&quot;</span>
+                    <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cell_factor</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                    <span class="o">+</span> <span class="s2">&quot;.pkl&quot;</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">static_energy_maker</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">static_energy_maker</span> <span class="o">=</span> <span class="n">ForceFieldRelaxMaker</span><span class="p">(</span>
+                    <span class="n">calculator_kwargs</span><span class="o">=</span><span class="p">{</span>
+                        <span class="s2">&quot;args_str&quot;</span><span class="p">:</span> <span class="s2">&quot;IP GAP&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;param_filename&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">potential_filename</span><span class="p">),</span>
+                    <span class="p">},</span>
+                    <span class="n">force_field_name</span><span class="o">=</span><span class="s2">&quot;GAP&quot;</span><span class="p">,</span>
+                    <span class="n">relax_cell</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">relax_kwargs</span><span class="o">=</span><span class="n">relax_kwargs</span><span class="p">,</span>
+                    <span class="n">steps</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="n">static_run</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">static_energy_maker</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">structure</span><span class="o">=</span><span class="n">rattled</span><span class="p">)</span>
+            <span class="n">jobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">static_run</span><span class="p">)</span>
+            <span class="n">conv_job</span> <span class="o">=</span> <span class="n">convert_to_extxyz</span><span class="p">(</span>
+                <span class="n">static_run</span><span class="o">.</span><span class="n">output</span><span class="p">,</span>
+                <span class="n">rattled</span><span class="o">.</span><span class="n">reduced_formula</span>
+                <span class="o">+</span> <span class="s2">&quot;_&quot;</span>
+                <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cell_factor</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="o">+</span> <span class="s2">&quot;.pkl&quot;</span><span class="p">,</span>
+                <span class="n">config_type</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cell_factor</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="n">jobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">conv_job</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">replace</span><span class="o">=</span><span class="n">Flow</span><span class="p">(</span><span class="n">jobs</span><span class="p">),</span> <span class="n">output</span><span class="o">=</span><span class="n">conv_job</span><span class="o">.</span><span class="n">output</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="DFTStaticLabelling">
+<a class="viewcode-back" href="../../../../reference/autoplex.data.common.flows.DFTStaticLabelling.html#autoplex.data.common.flows.DFTStaticLabelling">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DFTStaticLabelling</span><span class="p">(</span><span class="n">Maker</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Maker to set up and run VASP static calculations for input structures, including bulk, isolated atoms, and dimers.</span>
+
+<span class="sd">    It supports custom VASP input parameters and error handlers.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name: str</span>
+<span class="sd">        Name of the flow.</span>
+<span class="sd">    isolated_atom: bool</span>
+<span class="sd">        If true, perform single-point calculations for isolated atoms. Default is False.</span>
+<span class="sd">    isolated_species: list[str] | None</span>
+<span class="sd">        List of species for which to perform isolated atom calculations. If None,</span>
+<span class="sd">        species will be automatically derived from the &#39;structures&#39; list. Default is None.</span>
+<span class="sd">    e0_spin: bool</span>
+<span class="sd">        If true, include spin polarization in isolated atom and dimer calculations.</span>
+<span class="sd">        Default is False.</span>
+<span class="sd">    isolatedatom_box: list[float]</span>
+<span class="sd">        List of the lattice constants for a isolated_atom configuration.</span>
+<span class="sd">    dimer: bool</span>
+<span class="sd">        If true, perform single-point calculations for dimers. Default is False.</span>
+<span class="sd">    dimer_box: list[float]</span>
+<span class="sd">        The lattice constants of a dimer box.</span>
+<span class="sd">    dimer_species: list[str] | None</span>
+<span class="sd">        List of species for which to perform dimer calculations. If None, species</span>
+<span class="sd">        will be derived from the &#39;structures&#39; list. Default is None.</span>
+<span class="sd">    dimer_range: list[float] | None</span>
+<span class="sd">        Range of distances for dimer calculations.</span>
+<span class="sd">    dimer_num: int</span>
+<span class="sd">        Number of different distances to consider for dimer calculations.</span>
+<span class="sd">    custom_incar: dict | None</span>
+<span class="sd">        Dictionary of custom VASP input parameters. If provided, will update the</span>
+<span class="sd">        default parameters. Default is None.</span>
+<span class="sd">    custom_potcar: dict | None</span>
+<span class="sd">        Dictionary of POTCAR settings to update. Keys are element symbols, values are the desired POTCAR labels.</span>
+<span class="sd">        Default is None.</span>
+<span class="sd">    static_energy_maker: BaseVaspMaker | CastepStaticMaker | ForceFieldStaticMaker</span>
+<span class="sd">        Maker for static energy jobs: either BaseVaspMaker (VASP-based) or CastepStaticMaker (CASTEP-based) or</span>
+<span class="sd">        ForceFieldStaticMaker (force field-based). Defaults to StaticMaker (VASP-based).</span>
+<span class="sd">    static_energy_maker_isolated_atoms: BaseVaspMaker | ForceFieldStaticMaker | None</span>
+<span class="sd">        Maker for static energy jobs of isolated atoms: either BaseVaspMaker (VASP-based) or</span>
+<span class="sd">        ForceFieldStaticMaker (force field-based) or None. If set to `None`, the parameters</span>
+<span class="sd">        from `static_energy_maker` will be used as the default for isolated atoms. In this case,</span>
+<span class="sd">        if `static_energy_maker` is a `StaticMaker`, all major settings will be inherited,</span>
+<span class="sd">        except that `kspacing` will be automatically set to 100 to enforce a Gamma-point-only calculation.</span>
+<span class="sd">        This is typically suitable for single-atom systems. Default is None. If a non-`StaticMaker` maker</span>
+<span class="sd">        is used here, its output must include a `dir_name` field to ensure compatibility with downstream workflows.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        A dictionary containing:</span>
+<span class="sd">        - &#39;dirs_of_dft&#39;: List of directories containing DFT data.</span>
+<span class="sd">        - &#39;config_type&#39;: List of configuration types corresponding to each directory.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;do_dft_labelling&quot;</span>
+    <span class="n">isolated_atom</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">isolated_species</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">e0_spin</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">isolatedatom_box</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">])</span>
+    <span class="n">dimer</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">dimer_box</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">])</span>
+    <span class="n">dimer_species</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">dimer_range</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">dimer_num</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">21</span>
+    <span class="n">custom_incar</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">custom_potcar</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">static_energy_maker</span><span class="p">:</span> <span class="p">(</span>
+        <span class="n">BaseVaspMaker</span> <span class="o">|</span> <span class="n">CastepStaticMaker</span> <span class="o">|</span> <span class="n">ForceFieldStaticMaker</span> <span class="o">|</span> <span class="n">BaseAimsMaker</span>
+    <span class="p">)</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">StaticMaker</span><span class="p">(</span>
+            <span class="n">input_set_generator</span><span class="o">=</span><span class="n">StaticSetGenerator</span><span class="p">(</span>
+                <span class="n">user_incar_settings</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;ADDGRID&quot;</span><span class="p">:</span> <span class="s2">&quot;True&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;ENCUT&quot;</span><span class="p">:</span> <span class="mi">520</span><span class="p">,</span>
+                    <span class="s2">&quot;EDIFF&quot;</span><span class="p">:</span> <span class="mf">1e-06</span><span class="p">,</span>
+                    <span class="s2">&quot;ISMEAR&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                    <span class="s2">&quot;SIGMA&quot;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span>
+                    <span class="s2">&quot;PREC&quot;</span><span class="p">:</span> <span class="s2">&quot;Accurate&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;ISYM&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="s2">&quot;KSPACING&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
+                    <span class="s2">&quot;NPAR&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+                    <span class="s2">&quot;LWAVE&quot;</span><span class="p">:</span> <span class="s2">&quot;False&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;LCHARG&quot;</span><span class="p">:</span> <span class="s2">&quot;False&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;ENAUG&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="s2">&quot;GGA&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="s2">&quot;ISPIN&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="s2">&quot;LAECHG&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="s2">&quot;LELF&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="s2">&quot;LORBIT&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="s2">&quot;LVTOT&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="s2">&quot;NSW&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="s2">&quot;SYMPREC&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="s2">&quot;NELM&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+                    <span class="s2">&quot;LMAXMIX&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="s2">&quot;LASPH&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="s2">&quot;AMIN&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">),</span>
+            <span class="n">run_vasp_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;handlers&quot;</span><span class="p">:</span> <span class="p">()},</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">static_energy_maker_isolated_atoms</span><span class="p">:</span> <span class="p">(</span>
+        <span class="n">BaseVaspMaker</span> <span class="o">|</span> <span class="n">CastepStaticMaker</span> <span class="o">|</span> <span class="n">ForceFieldStaticMaker</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="DFTStaticLabelling.make">
+<a class="viewcode-back" href="../../../../reference/autoplex.data.common.flows.DFTStaticLabelling.html#autoplex.data.common.flows.DFTStaticLabelling.make">[docs]</a>
+    <span class="nd">@job</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">make</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">structures</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+        <span class="n">config_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Maker to set up and run VASP static calculations.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        structures : list[Structure] | list[list[Structure]]</span>
+<span class="sd">            List of structures for which to run the VASP static calculations. If None,</span>
+<span class="sd">            no bulk calculations will be performed. Default is None.</span>
+<span class="sd">        config_type : str</span>
+<span class="sd">            Configuration types corresponding to the structures. If None, defaults</span>
+<span class="sd">            to &#39;bulk&#39;. Default is None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">job_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">structures</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">structures</span> <span class="o">=</span> <span class="n">flatten</span><span class="p">(</span><span class="n">structures</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">dirs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;dirs_of_dft&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;config_type&quot;</span><span class="p">:</span> <span class="p">[]}</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">static_energy_maker</span><span class="p">,</span> <span class="n">StaticMaker</span><span class="p">):</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">custom_incar</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">static_energy_maker</span><span class="o">.</span><span class="n">input_set_generator</span><span class="o">.</span><span class="n">user_incar_settings</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">custom_incar</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">custom_potcar</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">static_energy_maker</span><span class="o">.</span><span class="n">input_set_generator</span><span class="o">.</span><span class="n">user_potcar_settings</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">custom_potcar</span>
+                <span class="p">)</span>
+
+        <span class="n">st_m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">static_energy_maker</span>
+
+        <span class="k">if</span> <span class="n">structures</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">struct</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">structures</span><span class="p">):</span>
+                <span class="n">static_job</span> <span class="o">=</span> <span class="n">st_m</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">structure</span><span class="o">=</span><span class="n">struct</span><span class="p">)</span>
+                <span class="n">static_job</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;static_bulk_</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">dirs</span><span class="p">[</span><span class="s2">&quot;dirs_of_dft&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">static_job</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">dir_name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">config_type</span><span class="p">:</span>
+                    <span class="n">dirs</span><span class="p">[</span><span class="s2">&quot;config_type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">config_type</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">dirs</span><span class="p">[</span><span class="s2">&quot;config_type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;bulk&quot;</span><span class="p">)</span>
+                <span class="n">job_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">static_job</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isolated_atom</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isolated_species</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">syms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">isolated_species</span>
+
+                <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">isolated_species</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">structures</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                    <span class="c1"># Get the species from the database</span>
+                    <span class="n">atoms</span> <span class="o">=</span> <span class="p">[</span><span class="n">AseAtomsAdaptor</span><span class="p">()</span><span class="o">.</span><span class="n">get_atoms</span><span class="p">(</span><span class="n">at</span><span class="p">)</span> <span class="k">for</span> <span class="n">at</span> <span class="ow">in</span> <span class="n">structures</span><span class="p">]</span>
+                    <span class="n">syms</span> <span class="o">=</span> <span class="n">ElementCollection</span><span class="p">(</span><span class="n">atoms</span><span class="p">)</span><span class="o">.</span><span class="n">get_species</span><span class="p">()</span>
+
+                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">sym</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">syms</span><span class="p">):</span>
+                    <span class="n">lattice</span> <span class="o">=</span> <span class="n">Lattice</span><span class="o">.</span><span class="n">orthorhombic</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">isolatedatom_box</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">isolatedatom_box</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">isolatedatom_box</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                    <span class="p">)</span>
+                    <span class="n">isolated_atom_struct</span> <span class="o">=</span> <span class="n">Structure</span><span class="p">(</span><span class="n">lattice</span><span class="p">,</span> <span class="p">[</span><span class="n">sym</span><span class="p">],</span> <span class="p">[[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]])</span>
+
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">static_energy_maker_isolated_atoms</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">static_job</span> <span class="o">=</span> <span class="n">st_m</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">structure</span><span class="o">=</span><span class="n">isolated_atom_struct</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">static_energy_maker</span><span class="p">,</span> <span class="n">StaticMaker</span><span class="p">):</span>
+                            <span class="n">static_job</span> <span class="o">=</span> <span class="n">update_user_incar_settings</span><span class="p">(</span>
+                                <span class="n">static_job</span><span class="p">,</span>
+                                <span class="p">{</span><span class="s2">&quot;KSPACING&quot;</span><span class="p">:</span> <span class="mf">100.0</span><span class="p">,</span> <span class="s2">&quot;KPAR&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+                            <span class="p">)</span>
+
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">e0_spin</span><span class="p">:</span>
+                                <span class="n">static_job</span> <span class="o">=</span> <span class="n">update_user_incar_settings</span><span class="p">(</span>
+                                    <span class="n">static_job</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;ISPIN&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
+                                <span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">static_job</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">static_energy_maker_isolated_atoms</span><span class="o">.</span><span class="n">make</span><span class="p">(</span>
+                            <span class="n">structure</span><span class="o">=</span><span class="n">isolated_atom_struct</span>
+                        <span class="p">)</span>
+
+                    <span class="n">static_job</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;static_isolated_</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="n">dirs</span><span class="p">[</span><span class="s2">&quot;dirs_of_dft&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">static_job</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">dir_name</span><span class="p">)</span>
+                    <span class="n">dirs</span><span class="p">[</span><span class="s2">&quot;config_type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;IsolatedAtom&quot;</span><span class="p">)</span>
+                    <span class="n">job_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">static_job</span><span class="p">)</span>
+
+            <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown species of isolated atoms! Exception: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimer</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">atoms</span> <span class="o">=</span> <span class="p">[</span><span class="n">AseAtomsAdaptor</span><span class="p">()</span><span class="o">.</span><span class="n">get_atoms</span><span class="p">(</span><span class="n">at</span><span class="p">)</span> <span class="k">for</span> <span class="n">at</span> <span class="ow">in</span> <span class="n">structures</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimer_species</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">dimer_syms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimer_species</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dimer_species</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">structures</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                    <span class="c1"># Get the species from the database</span>
+                    <span class="n">dimer_syms</span> <span class="o">=</span> <span class="n">ElementCollection</span><span class="p">(</span><span class="n">atoms</span><span class="p">)</span><span class="o">.</span><span class="n">get_species</span><span class="p">()</span>
+                <span class="n">pairs_list</span> <span class="o">=</span> <span class="n">ElementCollection</span><span class="p">(</span><span class="n">atoms</span><span class="p">)</span><span class="o">.</span><span class="n">find_element_pairs</span><span class="p">(</span><span class="n">dimer_syms</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">pairs_list</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">dimer_i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dimer_num</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimer_range</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">dimer_distance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimer_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">dimer_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimer_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                            <span class="p">)</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">dimer_i</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">dimer_num</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">+</span> <span class="mf">0.000000000001</span>
+                            <span class="p">)</span>
+
+                        <span class="n">lattice</span> <span class="o">=</span> <span class="n">Lattice</span><span class="o">.</span><span class="n">orthorhombic</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">dimer_box</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">dimer_box</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">dimer_box</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                        <span class="p">)</span>
+                        <span class="n">dimer_struct</span> <span class="o">=</span> <span class="n">Structure</span><span class="p">(</span>
+                            <span class="n">lattice</span><span class="p">,</span>
+                            <span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
+                            <span class="p">[[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="n">dimer_distance</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]],</span>
+                            <span class="n">coords_are_cartesian</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="p">)</span>
+
+                        <span class="n">static_energy_maker_dimer</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">static_energy_maker_isolated_atoms</span>
+                        <span class="p">)</span>
+                        <span class="k">if</span> <span class="n">static_energy_maker_dimer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">static_job</span> <span class="o">=</span> <span class="n">st_m</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">structure</span><span class="o">=</span><span class="n">dimer_struct</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">static_energy_maker</span><span class="p">,</span> <span class="n">StaticMaker</span><span class="p">):</span>
+                                <span class="n">static_job</span> <span class="o">=</span> <span class="n">update_user_incar_settings</span><span class="p">(</span>
+                                    <span class="n">static_job</span><span class="p">,</span>
+                                    <span class="p">{</span><span class="s2">&quot;KSPACING&quot;</span><span class="p">:</span> <span class="mf">100.0</span><span class="p">,</span> <span class="s2">&quot;KPAR&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+                                <span class="p">)</span>
+
+                                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">e0_spin</span><span class="p">:</span>
+                                    <span class="n">static_job</span> <span class="o">=</span> <span class="n">update_user_incar_settings</span><span class="p">(</span>
+                                        <span class="n">static_job</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;ISPIN&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
+                                    <span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">static_job</span> <span class="o">=</span> <span class="n">static_energy_maker_dimer</span><span class="o">.</span><span class="n">make</span><span class="p">(</span>
+                                <span class="n">structure</span><span class="o">=</span><span class="n">dimer_struct</span>
+                            <span class="p">)</span>
+
+                        <span class="n">static_job</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;static_dimer_</span><span class="si">{</span><span class="n">dimer_i</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="n">dirs</span><span class="p">[</span><span class="s2">&quot;dirs_of_dft&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">static_job</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">dir_name</span><span class="p">)</span>
+                        <span class="n">dirs</span><span class="p">[</span><span class="s2">&quot;config_type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;dimer&quot;</span><span class="p">)</span>
+                        <span class="n">job_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">static_job</span><span class="p">)</span>
+
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unknown atom types in dimers!&quot;</span><span class="p">)</span>
+                <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">replace</span><span class="o">=</span><span class="n">Flow</span><span class="p">(</span><span class="n">job_list</span><span class="p">),</span> <span class="n">output</span><span class="o">=</span><span class="n">dirs</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Author name not set
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, autoplex development team.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

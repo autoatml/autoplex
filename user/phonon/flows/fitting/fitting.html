@@ -1,0 +1,1140 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Fitting phonon-accurate potentials &#8212; autoplex</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=1ea92b8b" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../../_static/documentation_options.js?v=e18d2f4a"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'user/phonon/flows/fitting/fitting';</script>
+    <link rel="icon" href="../../../../_static/autoplex_favicon.png"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="Benchmark of ML-based phonon structure" href="../benchmark/benchmark.html" />
+    <link rel="prev" title="Generating reference data" href="../generation/data.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.1.dev1+g6ffcd01a0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../../_static/autoplex_logo.png" class="logo__image only-light" alt="autoplex - Home"/>
+    <img src="../../../../_static/autoplex_logo.png" class="logo__image only-dark pst-js-only" alt="autoplex - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Overview</a></li>
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../../../setup.html">Quick-start</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../../tutorials.html">Tutorials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../installation/installation.html">Installation guide</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../rss/index.html">RSS workflow</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../rss/flow/introduction/intro.html">Brief overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../rss/flow/input/input.html">Input YAML configuration file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../rss/flow/quick_start/start.html">Quick start</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../rss/flow/example/example.html">Examples</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../../index.html">Phonon workflow</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../flows.html">Out-of-the-box workflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generation/data.html">Generating reference data</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">Fitting phonon-accurate potentials</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../benchmark/benchmark.html">Benchmark of ML-based phonon structure</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../executable/index.html">Executable tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../executable/tutorial_phonon.html">Iterative DFT vs MLIP benchmark workflow for phonons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../executable/tutorial_rss.html">RSS Workflow</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../reference/index.html">API reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.auto.html">autoplex.auto</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.auto.phonons.html">autoplex.auto.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.auto.phonons.flows.html">autoplex.auto.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.auto.phonons.jobs.html">autoplex.auto.phonons.jobs</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.auto.rss.html">autoplex.auto.rss</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.auto.rss.flows.html">autoplex.auto.rss.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.auto.rss.jobs.html">autoplex.auto.rss.jobs</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.benchmark.html">autoplex.benchmark</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.benchmark.phonons.html">autoplex.benchmark.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.benchmark.phonons.flows.html">autoplex.benchmark.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.benchmark.phonons.jobs.html">autoplex.benchmark.phonons.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.benchmark.phonons.utils.html">autoplex.benchmark.phonons.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.benchmark.rss.html">autoplex.benchmark.rss</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.html">autoplex.data</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.common.html">autoplex.data.common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.common.flows.html">autoplex.data.common.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.common.jobs.html">autoplex.data.common.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.common.utils.html">autoplex.data.common.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.phonons.html">autoplex.data.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.phonons.flows.html">autoplex.data.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.phonons.jobs.html">autoplex.data.phonons.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.phonons.utils.html">autoplex.data.phonons.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.rss.html">autoplex.data.rss</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.rss.flows.html">autoplex.data.rss.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.rss.jobs.html">autoplex.data.rss.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.rss.utils.html">autoplex.data.rss.utils</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.fitting.html">autoplex.fitting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.html">autoplex.fitting.common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.flows.html">autoplex.fitting.common.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.jobs.html">autoplex.fitting.common.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.regularization.html">autoplex.fitting.common.regularization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.utils.html">autoplex.fitting.common.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.fitting.phonons.html">autoplex.fitting.phonons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.fitting.rss.html">autoplex.fitting.rss</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.misc.html">autoplex.misc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.html">autoplex.misc.castep</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.flows.html">autoplex.misc.castep.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.jobs.html">autoplex.misc.castep.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.run.html">autoplex.misc.castep.run</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.schema.html">autoplex.misc.castep.schema</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.utils.html">autoplex.misc.castep.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.misc.utils.html">autoplex.misc.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.utils.mock_castep.html">autoplex.misc.utils.mock_castep</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.settings.html">autoplex.settings</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.AutoplexBaseModel.html">AutoplexBaseModel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.AutoplexSettings.html">AutoplexSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.BcurParams.html">BcurParams</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.BuildcellOptions.html">BuildcellOptions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.CustomIncar.html">CustomIncar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.GAPGeneralSettings.html">GAPGeneralSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.GAPSettings.html">GAPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.JACESettings.html">JACESettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.LossCoeff.html">LossCoeff</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.M3GNETSettings.html">M3GNETSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.MACESettings.html">MACESettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.MLIPHypers.html">MLIPHypers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.NEPSettings.html">NEPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.NEQUIPSettings.html">NEQUIPSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.Nonlinearity.html">Nonlinearity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.ResumeFromPreviousState.html">ResumeFromPreviousState</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.RssConfig.html">RssConfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.SETTINGS.html">SETTINGS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.SoapParas.html">SoapParas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.SoapSettings.html">SoapSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.ThreebSettings.html">ThreebSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.TwobSettings.html">TwobSettings</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contributing Guide</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/contributing.html">Contributing to autoplex</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/dev_install.html">Developer Installation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../about/changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../about/contributors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../about/license.html">License</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/JaGeo/autoplex" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/JaGeo/autoplex/issues/new?title=Issue%20on%20page%20%2Fuser/phonon/flows/fitting/fitting.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../../../_sources/user/phonon/flows/fitting/fitting.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Fitting phonon-accurate potentials</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#general-settings">General settings</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gap">GAP</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ace">ACE</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#nequip">Nequip</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#m3gnet">M3GNet</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mace">MACE</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#finetuning-mace-mp-0">Finetuning MACE-MP-0</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-script-for-autoplex-workflow-using-gap-to-fit-and-benchmark-a-si-database">Example script for <code class="docutils literal notranslate"><span class="pre">autoplex</span></code> workflow using GAP to fit and benchmark a Si database</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-a-mlip-fit-only">Running a MLIP fit only</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#is-it-possible-to-run-the-dft-calculations-and-the-mlip-fitting-step-on-different-machines">Is it possible to run the DFT calculations and the MLIP fitting step on different machines?</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="fitting-phonon-accurate-potentials">
+<span id="fitting"></span><h1>Fitting phonon-accurate potentials<a class="headerlink" href="#fitting-phonon-accurate-potentials" title="Link to this heading">#</a></h1>
+<p>This tutorial will show you how to control the MLIP fit settings with the <code class="docutils literal notranslate"><span class="pre">autoplex</span></code> workflow.
+The choice of the correct fit setup and hyperparameter settings has a significant influence on the final result.
+Please note that the fitting might need nodes with very large memory requirements (1 TB) in some cases.</p>
+<section id="general-settings">
+<h2>General settings<a class="headerlink" href="#general-settings" title="Link to this heading">#</a></h2>
+<p>There are two categories of fit settings that you can change. The first type concerns the general fit setup,
+that will affect the fit regardless of the chosen MLIP method, and e.g. changes database specific settings
+(like the split-up into training and test data). The other type of settings influences the MLIP specific setup
+like e.g. the choice of hyperparameters.</p>
+<p>In case of the general settings, you can pass the MLIP model you want to use with the <code class="docutils literal notranslate"><span class="pre">ml_models</span></code> parameter list.
+You can set the maximum force threshold <code class="docutils literal notranslate"><span class="pre">force_max</span></code> for filtering the data (“distillation”) in the MLIP fit preprocess step.
+In principle, the distillation step can be turned off by passing <code class="docutils literal notranslate"><span class="pre">distillation=False</span></code>,
+but it is strongly advised to filter out too high force data points.
+The hyperparameters and further parameters can be passed in the <code class="docutils literal notranslate"><span class="pre">make</span></code> call (see below) using <code class="docutils literal notranslate"><span class="pre">fit_kwargs_list</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">complete_flow</span> <span class="o">=</span> <span class="n">CompleteDFTvsMLBenchmarkWorkflow</span><span class="p">(</span>
+    <span class="n">ml_models</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;GAP&quot;</span><span class="p">,</span> <span class="s2">&quot;MACE&quot;</span><span class="p">],</span> <span class="o">...</span><span class="p">,</span> 
+    <span class="n">apply_data_preprocessing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+    <span class="n">f_max</span><span class="o">=</span><span class="mf">40.0</span><span class="p">,</span> <span class="n">split_ratio</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span>
+    <span class="n">num_processes_fit</span><span class="o">=</span><span class="mi">48</span><span class="p">,</span>
+    <span class="n">benchmark_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;relax_maker_kwargs&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;relax_cell&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;relax_kwargs&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">},</span> <span class="s2">&quot;calculator_kwargs&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="s2">&quot;cpu&quot;</span><span class="p">}}</span>
+<span class="p">)</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> 
+    <span class="n">fit_kwargs_list</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">{</span><span class="s2">&quot;general&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;two_body&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;three_body&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;soap&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}},</span>  <span class="c1"># GAP parameters</span>
+        <span class="p">{</span><span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="s2">&quot;MACE&quot;</span><span class="p">,</span> <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="s2">&quot;cuda&quot;</span><span class="p">}</span>  <span class="c1"># MACE parameters  </span>
+        <span class="c1"># fit_kwargs_list has to have the same order as in ml_models</span>
+    <span class="p">],</span>
+    <span class="o">...</span>  <span class="c1"># put the other hyperparameter commands here as shown below</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>The MLIP model specific settings and hyperparameters setup varies from model to model and is demonstrated in the next
+sections. Also, <a class="reference external" href="https://materialsproject.github.io/atomate2/reference/atomate2.forcefields.jobs.html#module-atomate2.forcefields.jobs"><code class="docutils literal notranslate"><span class="pre">atomate2</span></code>-based MLPhononMaker</a> settings can be changed via <code class="docutils literal notranslate"><span class="pre">benchmark_kwargs</span></code> as shown in the code snippet.</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">autoplex</span></code> relies on pydantic models for validating the hyperparameter sets of the supported MLIP architectures.
+Note that all the possible hyperparameters are not yet included. It is upto the user to ensure if any other parameters are supplied
+are in correct format and required datatype. To get an overview of the default hyperparameter sets,
+you can use the following code snippet.</p>
+</div></blockquote>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autoplex</span><span class="w"> </span><span class="kn">import</span> <span class="n">MLIP_HYPERS</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">MLIP_HYPERS</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">by_alias</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>ℹ️ Note that <code class="docutils literal notranslate"><span class="pre">autoplex</span></code> provides the most comprehensive features for <strong>GAP</strong>, and more features for the other models will
+follow in future versions.</p>
+</div></blockquote>
+</section>
+<section id="gap">
+<h2>GAP<a class="headerlink" href="#gap" title="Link to this heading">#</a></h2>
+<p>There are several overall settings for the GAP fit that will change the mode in which <code class="docutils literal notranslate"><span class="pre">autoplex</span></code> runs.
+When <code class="docutils literal notranslate"><span class="pre">hyper_para_loop</span></code> is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, <code class="docutils literal notranslate"><span class="pre">autoplex</span></code> wil automatically iterate through a set of several hyperparameters
+(<code class="docutils literal notranslate"><span class="pre">atomwise_regularization_list</span></code>, <code class="docutils literal notranslate"><span class="pre">soap_delta_list</span></code> and <code class="docutils literal notranslate"><span class="pre">n_sparse_list</span></code>) and repeat the GAP fit for each combination.
+More information on the atom-wise regularization parameter can be found in <a class="reference external" href="https://pubs.aip.org/aip/jcp/article/153/4/044104/1056348/Combining-phonon-accuracy-with-high">J. Chem. Phys. 153, 044104 (2020)</a>
+and a comprehensive list GAP hyperparameters can be found in the <a class="reference external" href="https://libatoms.github.io/GAP/gap_fit.html#command-line-example">QUIP/GAP user guide</a>.
+The other keywords to change <code class="docutils literal notranslate"><span class="pre">autoplex</span></code>’s mode are <code class="docutils literal notranslate"><span class="pre">glue_xml</span></code> (use glue.xml core potential instead of 2b/3b terms),
+<code class="docutils literal notranslate"><span class="pre">regularization</span></code> (use a sigma regularization) and <code class="docutils literal notranslate"><span class="pre">separated</span></code> (repeat the GAP fit for the combined database and each
+separated subset).
+The parameter <code class="docutils literal notranslate"><span class="pre">atom_wise_regularization</span></code> can turn the atom-wise regularization on and off,
+<code class="docutils literal notranslate"><span class="pre">atomwise_regularization_parameter</span></code> is the value that shall be set and <code class="docutils literal notranslate"><span class="pre">force_min</span></code> is the lower bound cutoff of forces
+taken into account for the atom-wise regularization or otherwise be replaced by the f_min value.
+<code class="docutils literal notranslate"><span class="pre">auto_delta</span></code> let’s you decide if you want to pass a fixed delta value for the 2b, 3b and SOAP terms or let <code class="docutils literal notranslate"><span class="pre">autoplex</span></code>
+automatically determine a suitable delta value based on the database’s energies.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">complete_flow</span> <span class="o">=</span> <span class="n">CompleteDFTvsMLBenchmarkWorkflow</span><span class="p">(</span>
+    <span class="n">ml_models</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;GAP&quot;</span><span class="p">],</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">apply_data_preprocessing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">atom_wise_regularization</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+    <span class="n">atomwise_regularization_parameter</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> 
+    <span class="n">force_min</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> 
+    <span class="n">auto_delta</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">hyper_para_loop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+    <span class="n">atomwise_regularization_list</span><span class="o">=</span><span class="p">[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span> 
+    <span class="n">soap_delta_list</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">],</span> 
+    <span class="n">n_sparse_list</span><span class="o">=</span><span class="p">[</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">3000</span><span class="p">,</span> <span class="mi">6000</span><span class="p">,</span> <span class="mi">9000</span><span class="p">]</span>
+<span class="p">)</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> 
+    <span class="n">structure_list</span><span class="o">=</span><span class="p">[</span><span class="n">structure</span><span class="p">],</span>
+    <span class="n">mp_ids</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;mpid&quot;</span><span class="p">],</span>
+    <span class="n">benchmark_mp_ids</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;mpid&quot;</span><span class="p">],</span>
+    <span class="n">benchmark_structures</span><span class="o">=</span><span class="p">[</span><span class="n">structure</span><span class="p">],</span>
+    <span class="n">glue_xml</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">regularization</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">separated</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">fit_kwargs_list</span><span class="o">=</span><span class="p">[{</span>
+     <span class="s2">&quot;general&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;default_sigma&quot;</span><span class="p">:</span> <span class="s2">&quot;{0.001 0.05 0.05 0.0}&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;two_body&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;three_body&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span><span class="s2">&quot;soap&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span><span class="o">...</span><span class="p">},</span>
+     <span class="s2">&quot;twob&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;cutoff&quot;</span><span class="p">:</span> <span class="mf">5.0</span><span class="p">,</span><span class="o">...</span><span class="p">},</span>
+     <span class="s2">&quot;threeb&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;cutoff&quot;</span><span class="p">:</span> <span class="mf">3.25</span><span class="p">,</span><span class="o">...</span><span class="p">},</span>
+     <span class="s2">&quot;soap&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;delta&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;l_max&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span> <span class="s2">&quot;n_max&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span><span class="o">...</span><span class="p">},</span>
+    <span class="p">}]</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">autoplex</span></code> provides a Pydantic model containing default GAP fit settings in
+<code class="docutils literal notranslate"><span class="pre">autoplex.settings.GAPSettings</span></code>,
+that can be overwritten using the fit keyword arguments as demonstrated in the code snippet.</p>
+<p><code class="docutils literal notranslate"><span class="pre">autoplex</span></code> follows a certain convention for naming files and labelling the data
+(see <code class="docutils literal notranslate"><span class="pre">autoplex.settings.GAPSettings.GeneralSettings</span></code>).</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="nt">&quot;general&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;at_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;train.extxyz&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;energy_parameter_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;REF_energy&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;force_parameter_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;REF_forces&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;virial_parameter_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;REF_virial&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;gp_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;gap_file.xml&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+</pre></div>
+</div>
+<p>You can either adapt to the <code class="docutils literal notranslate"><span class="pre">autoplex</span></code> conventions or change by passing your preferred names and label to the fit keyword arguments.</p>
+</section>
+<section id="ace">
+<h2>ACE<a class="headerlink" href="#ace" title="Link to this heading">#</a></h2>
+<p>For fitting and validating ACE potentials, one needs to install <strong>julia</strong> as <code class="docutils literal notranslate"><span class="pre">autoplex</span></code> relies on
+<a class="reference external" href="https://acesuit.github.io/ACEpotentials.jl/dev/gettingstarted/installation/">ACEpotentials.jl</a> which support fitting of linear ACE. Currently no python package exists for the same.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">complete_flow</span> <span class="o">=</span> <span class="n">CompleteDFTvsMLBenchmarkWorkflow</span><span class="p">(</span>
+    <span class="n">ml_models</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;J-ACE&quot;</span><span class="p">],</span> <span class="o">...</span><span class="p">,</span> <span class="n">apply_data_preprocessing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> 
+    <span class="n">structure_list</span><span class="o">=</span><span class="p">[</span><span class="n">structure</span><span class="p">],</span>
+    <span class="n">mp_ids</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;mpid&quot;</span><span class="p">],</span>
+    <span class="n">benchmark_mp_ids</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;mpid&quot;</span><span class="p">],</span>
+    <span class="n">benchmark_structures</span><span class="o">=</span><span class="p">[</span><span class="n">structure</span><span class="p">],</span>
+    <span class="n">fit_kwargs_list</span><span class="o">=</span><span class="p">[{</span>
+        <span class="s2">&quot;order&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="s2">&quot;totaldegree&quot;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
+        <span class="s2">&quot;cutoff&quot;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span>
+        <span class="s2">&quot;solver&quot;</span><span class="p">:</span> <span class="s2">&quot;BLR&quot;</span>
+    <span class="p">}],</span>
+    <span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The ACE fit hyperparameters can be passed in the <code class="docutils literal notranslate"><span class="pre">make</span></code> call with its distinct commands.
+Because there is no respective MLPhononMaker in <code class="docutils literal notranslate"><span class="pre">atomate2</span></code> for J-ACE, the functionalities for <code class="docutils literal notranslate"><span class="pre">autoplex</span></code> are limited to
+the data generation and ML fit in this case.</p>
+</section>
+<section id="nequip">
+<h2>Nequip<a class="headerlink" href="#nequip" title="Link to this heading">#</a></h2>
+<p>The Nequip fit procedure can be controlled by fit hyperparameters in the <code class="docutils literal notranslate"><span class="pre">make</span></code> call.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">complete_flow</span> <span class="o">=</span> <span class="n">CompleteDFTvsMLBenchmarkWorkflow</span><span class="p">(</span>
+    <span class="n">ml_models</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Nequip&quot;</span><span class="p">],</span> <span class="o">...</span><span class="p">,</span> <span class="n">apply_data_preprocessing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="o">...</span><span class="p">,</span>
+    <span class="n">structure_list</span><span class="o">=</span><span class="p">[</span><span class="n">structure</span><span class="p">],</span>
+    <span class="n">mp_ids</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;mpid&quot;</span><span class="p">],</span>
+    <span class="n">benchmark_mp_ids</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;mpid&quot;</span><span class="p">],</span>
+    <span class="n">benchmark_structures</span><span class="o">=</span><span class="p">[</span><span class="n">structure</span><span class="p">],</span>
+    <span class="n">fit_kwargs_list</span><span class="o">=</span><span class="p">[{</span>
+        <span class="s2">&quot;r_max&quot;</span><span class="p">:</span> <span class="mf">4.0</span><span class="p">,</span>
+        <span class="s2">&quot;num_layers&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="s2">&quot;l_max&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s2">&quot;num_features&quot;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+        <span class="s2">&quot;num_basis&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+        <span class="s2">&quot;invariant_layers&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s2">&quot;invariant_neurons&quot;</span><span class="p">:</span> <span class="mi">64</span><span class="p">,</span>
+        <span class="s2">&quot;batch_size&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="s2">&quot;learning_rate&quot;</span><span class="p">:</span> <span class="mf">0.005</span><span class="p">,</span>
+        <span class="s2">&quot;max_epochs&quot;</span><span class="p">:</span> <span class="mi">10000</span><span class="p">,</span>
+        <span class="s2">&quot;default_dtype&quot;</span><span class="p">:</span> <span class="s2">&quot;float32&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="s2">&quot;cuda&quot;</span>
+    <span class="p">}],</span>
+    <span class="o">...</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="m3gnet">
+<h2>M3GNet<a class="headerlink" href="#m3gnet" title="Link to this heading">#</a></h2>
+<p>In a similar way, the M3GNet fit hyperparameters can be passed using <code class="docutils literal notranslate"><span class="pre">make</span></code> as well.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">complete_flow</span> <span class="o">=</span> <span class="n">CompleteDFTvsMLBenchmarkWorkflow</span><span class="p">(</span>
+    <span class="n">ml_models</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;M3GNet&quot;</span><span class="p">],</span> <span class="o">...</span><span class="p">,</span> <span class="n">apply_data_preprocessing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="o">...</span><span class="p">,</span>
+    <span class="n">structure_list</span><span class="o">=</span><span class="p">[</span><span class="n">structure</span><span class="p">],</span>
+    <span class="n">mp_ids</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;mpid&quot;</span><span class="p">],</span>
+    <span class="n">benchmark_mp_ids</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;mpid&quot;</span><span class="p">],</span>
+    <span class="n">benchmark_structures</span><span class="o">=</span><span class="p">[</span><span class="n">structure</span><span class="p">],</span>
+    <span class="n">fit_kwargs_list</span><span class="o">=</span><span class="p">[{</span>
+        <span class="s2">&quot;cutoff&quot;</span><span class="p">:</span> <span class="mf">5.0</span><span class="p">,</span>
+        <span class="s2">&quot;threebody_cutoff&quot;</span><span class="p">:</span> <span class="mf">4.0</span><span class="p">,</span>
+        <span class="s2">&quot;batch_size&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="s2">&quot;max_epochs&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>
+        <span class="s2">&quot;include_stresses&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">&quot;hidden_dim&quot;</span><span class="p">:</span> <span class="mi">128</span><span class="p">,</span>
+        <span class="s2">&quot;num_units&quot;</span><span class="p">:</span> <span class="mi">128</span><span class="p">,</span>
+        <span class="s2">&quot;max_l&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="s2">&quot;max_n&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="s2">&quot;cuda&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;test_equal_to_val&quot;</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="p">}],</span>
+    <span class="o">...</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="mace">
+<h2>MACE<a class="headerlink" href="#mace" title="Link to this heading">#</a></h2>
+<p>Here again, you can pass the MACE fit hyperparameters to <code class="docutils literal notranslate"><span class="pre">make</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">complete_flow</span> <span class="o">=</span> <span class="n">CompleteDFTvsMLBenchmarkWorkflow</span><span class="p">(</span>
+    <span class="n">ml_models</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;MACE&quot;</span><span class="p">],</span> <span class="o">...</span><span class="p">,</span> <span class="n">apply_data_preprocessing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="o">...</span><span class="p">,</span>
+    <span class="n">structure_list</span><span class="o">=</span><span class="p">[</span><span class="n">structure</span><span class="p">],</span>
+    <span class="n">mp_ids</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;mpid&quot;</span><span class="p">],</span>
+    <span class="n">benchmark_mp_ids</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;mpid&quot;</span><span class="p">],</span>
+    <span class="n">benchmark_structures</span><span class="o">=</span><span class="p">[</span><span class="n">structure</span><span class="p">],</span>
+    <span class="n">fit_kwargs_list</span><span class="o">=</span><span class="p">[{</span>
+        <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="s2">&quot;MACE&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;config_type_weights&quot;</span><span class="p">:</span> <span class="s1">&#39;{&quot;Default&quot;: 1.0}&#39;</span><span class="p">,</span>
+        <span class="s2">&quot;hidden_irreps&quot;</span><span class="p">:</span> <span class="s2">&quot;128x0e + 128x1o&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;r_max&quot;</span><span class="p">:</span> <span class="mf">5.0</span><span class="p">,</span>
+        <span class="s2">&quot;batch_size&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="s2">&quot;max_num_epochs&quot;</span><span class="p">:</span> <span class="mi">1500</span><span class="p">,</span>
+        <span class="s2">&quot;start_swa&quot;</span><span class="p">:</span> <span class="mi">1200</span><span class="p">,</span>
+        <span class="s2">&quot;ema_decay&quot;</span><span class="p">:</span> <span class="mf">0.99</span><span class="p">,</span>
+        <span class="s2">&quot;correlation&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="s2">&quot;loss&quot;</span><span class="p">:</span> <span class="s2">&quot;huber&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;default_dtype&quot;</span><span class="p">:</span> <span class="s2">&quot;float32&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="s2">&quot;cuda&quot;</span>
+    <span class="p">}],</span>
+    <span class="o">...</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<section id="finetuning-mace-mp-0">
+<h3>Finetuning MACE-MP-0<a class="headerlink" href="#finetuning-mace-mp-0" title="Link to this heading">#</a></h3>
+<p>It is also possible to finetune MACE-MP-0. To do so, you need to install MACE-torch 0.3.7.
+Currently, this can only be done by cloning the git-repo and installing it from there:
+<a class="github reference external" href="https://github.com/ACEsuit/mace/">ACEsuit/mace</a>. We currently install the main branch from there
+automatically within autoplex.</p>
+<p>Please be careful with performing very low-data finetuning. Currently, we use a stratified split for splitting the
+data into train and test data, i.e. there will be at least one data point from the dataset including single displaced
+cells and one rattled structure.</p>
+<p>The following workflow <code class="docutils literal notranslate"><span class="pre">CompleteDFTvsMLBenchmarkWorkflowMPSettings</span></code> uses Materials Project default settings slightly adapted to phonon runs (more accurate convergence, ALGO=Normal).
+It can also be used without finetuning option. To finetune optimally, please adapt the MACE fitting parameters yourself.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">complete_workflow_mace</span> <span class="o">=</span> <span class="n">CompleteDFTvsMLBenchmarkWorkflowMPSettings</span><span class="p">(</span>
+        <span class="n">ml_models</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;MACE&quot;</span><span class="p">],</span>
+        <span class="n">volume_custom_scale_factors</span><span class="o">=</span><span class="p">[</span><span class="mf">0.95</span><span class="p">,</span><span class="mf">1.00</span><span class="p">,</span><span class="mf">1.05</span><span class="p">],</span> <span class="n">rattle_type</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">distort_type</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">apply_data_preprocessing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="o">...</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">make</span><span class="p">(</span>
+        <span class="n">structure_list</span><span class="o">=</span><span class="p">[</span><span class="n">structure</span><span class="p">],</span>
+        <span class="n">mp_ids</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;mpid&quot;</span><span class="p">],</span>
+        <span class="n">benchmark_mp_ids</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;mpid&quot;</span><span class="p">],</span>
+        <span class="n">benchmark_structures</span><span class="o">=</span><span class="p">[</span><span class="n">structure</span><span class="p">],</span>
+        <span class="n">fit_kwargs_list</span><span class="o">=</span><span class="p">[{</span>
+            <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="s2">&quot;MACE&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;MACE_final&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;foundation_model&quot;</span><span class="p">:</span> <span class="s2">&quot;large&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;multiheads_finetuning&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">&quot;r_max&quot;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
+            <span class="s2">&quot;loss&quot;</span><span class="p">:</span> <span class="s2">&quot;huber&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;energy_weight&quot;</span><span class="p">:</span> <span class="mf">1000.0</span><span class="p">,</span>
+            <span class="s2">&quot;forces_weight&quot;</span><span class="p">:</span> <span class="mf">1000.0</span><span class="p">,</span>
+            <span class="s2">&quot;stress_weight&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="s2">&quot;compute_stress&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;E0s&quot;</span><span class="p">:</span> <span class="s2">&quot;average&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;scaling&quot;</span><span class="p">:</span> <span class="s2">&quot;rms_forces_scaling&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;batch_size&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;max_num_epochs&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+            <span class="s2">&quot;ema&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;ema_decay&quot;</span><span class="p">:</span> <span class="mf">0.99</span><span class="p">,</span>
+            <span class="s2">&quot;amsgrad&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;default_dtype&quot;</span><span class="p">:</span> <span class="s2">&quot;float64&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;restart_latest&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;lr&quot;</span><span class="p">:</span> <span class="mf">0.0001</span><span class="p">,</span>
+            <span class="s2">&quot;patience&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+            <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="s2">&quot;cpu&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;save_cpu&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;seed&quot;</span><span class="p">:</span> <span class="mi">3</span>
+        <span class="p">}],</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p>If you do not have internet access on the cluster, please make sure that you have downloaded and deposited the
+model that you want to finetune on the cluster beforehand. Instead of <code class="docutils literal notranslate"><span class="pre">foundation_model=&quot;large&quot;</span></code>, you can then simply
+set <code class="docutils literal notranslate"><span class="pre">foundation_model=&quot;full_path_on_the_cluster&quot;</span></code></p>
+</section>
+</section>
+<section id="example-script-for-autoplex-workflow-using-gap-to-fit-and-benchmark-a-si-database">
+<h2>Example script for <code class="docutils literal notranslate"><span class="pre">autoplex</span></code> workflow using GAP to fit and benchmark a Si database<a class="headerlink" href="#example-script-for-autoplex-workflow-using-gap-to-fit-and-benchmark-a-si-database" title="Link to this heading">#</a></h2>
+<p>The following code snippet will demonstrate, how you can submit an <code class="docutils literal notranslate"><span class="pre">autoplex</span></code> workflow for an automated SOAP-only GAP fit
+and DFT benchmark for a Si allotrope database. The GAP fit parameters are taken from <a class="reference external" href="https://pubs.aip.org/aip/jcp/article/153/4/044104/1056348/Combining-phonon-accuracy-with-high">J. Chem. Phys. 153, 044104 (2020)</a>.
+In this example we will also use <code class="docutils literal notranslate"><span class="pre">hyper_para_loop=True</span></code> to loop through a set of given GAP fit convergence parameter
+and hyperparameters set as provided by the lists <code class="docutils literal notranslate"><span class="pre">atomwise_regularization_list</span></code>, <code class="docutils literal notranslate"><span class="pre">soap_delta_list</span></code> and <code class="docutils literal notranslate"><span class="pre">n_sparse_list</span></code>.
+In this example script, we are using <code class="docutils literal notranslate"><span class="pre">jobflow_remote</span></code> to submit the jobs to a remote cluster.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">jobflow_remote</span><span class="w"> </span><span class="kn">import</span> <span class="n">submit_flow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.auto.phonons.flows</span><span class="w"> </span><span class="kn">import</span> <span class="n">CompleteDFTvsMLBenchmarkWorkflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mp_api.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPRester</span>
+
+<span class="n">mpr</span> <span class="o">=</span> <span class="n">MPRester</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="s1">&#39;YOUR_MP_API_KEY&#39;</span><span class="p">)</span>
+<span class="n">struc_list</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">benchmark_structure_list</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">mpids</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;mp-149&quot;</span><span class="p">]</span>  <span class="c1"># add all the Si structure mpids you are interested in</span>
+<span class="n">mpbenchmark</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;mp-149&quot;</span><span class="p">]</span>  <span class="c1"># add all the Si structure mpids you are interested in</span>
+<span class="k">for</span> <span class="n">mpid</span> <span class="ow">in</span> <span class="n">mpids</span><span class="p">:</span>
+    <span class="n">struc</span> <span class="o">=</span> <span class="n">mpr</span><span class="o">.</span><span class="n">get_structure_by_material_id</span><span class="p">(</span><span class="n">mpid</span><span class="p">)</span>
+    <span class="n">struc_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">struc</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">mpbm</span> <span class="ow">in</span> <span class="n">mpbenchmark</span><span class="p">:</span>
+    <span class="n">bm_struc</span> <span class="o">=</span> <span class="n">mpr</span><span class="o">.</span><span class="n">get_structure_by_material_id</span><span class="p">(</span><span class="n">mpbm</span><span class="p">)</span>
+    <span class="n">benchmark_structure_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bm_struc</span><span class="p">)</span>
+
+<span class="n">autoplex_flow</span> <span class="o">=</span> <span class="n">CompleteDFTvsMLBenchmarkWorkflow</span><span class="p">(</span>
+    <span class="n">n_structures</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">symprec</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">volume_scale_factor_range</span><span class="o">=</span><span class="p">[</span><span class="mf">0.95</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">],</span> <span class="n">rattle_type</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">distort_type</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">hyper_para_loop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">atomwise_regularization_list</span><span class="o">=</span><span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">],</span>
+    <span class="n">apply_data_preprocessing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">soap_delta_list</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">],</span> <span class="n">n_sparse_list</span><span class="o">=</span><span class="p">[</span><span class="mi">7000</span><span class="p">,</span> <span class="mi">8000</span><span class="p">,</span> <span class="mi">9000</span><span class="p">],</span>
+    <span class="n">split_ratio</span><span class="o">=</span><span class="mf">0.33</span><span class="p">,</span> <span class="n">regularization</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">separated</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">num_processes_fit</span><span class="o">=</span><span class="mi">48</span><span class="p">,)</span><span class="o">.</span><span class="n">make</span><span class="p">(</span>
+    <span class="n">structure_list</span><span class="o">=</span><span class="n">struc_list</span><span class="p">,</span> <span class="n">mp_ids</span><span class="o">=</span><span class="n">mpids</span><span class="p">,</span> <span class="n">benchmark_structures</span><span class="o">=</span><span class="n">benchmark_structure_list</span><span class="p">,</span>
+    <span class="n">benchmark_mp_ids</span><span class="o">=</span><span class="n">mpbenchmark</span><span class="p">,</span>
+    <span class="n">fit_kwargs_list</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;soap&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;delta&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;l_max&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span> <span class="s2">&quot;n_max&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+                <span class="s2">&quot;atom_sigma&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s2">&quot;zeta&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;cutoff&quot;</span><span class="p">:</span> <span class="mf">5.0</span><span class="p">,</span>
+                <span class="s2">&quot;cutoff_transition_width&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+                <span class="s2">&quot;central_weight&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;n_sparse&quot;</span><span class="p">:</span> <span class="mi">9000</span><span class="p">,</span> <span class="s2">&quot;f0&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+                <span class="s2">&quot;covariance_type&quot;</span><span class="p">:</span> <span class="s2">&quot;dot_product&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;sparse_method&quot;</span><span class="p">:</span> <span class="s2">&quot;cur_points&quot;</span><span class="p">},</span>
+       <span class="s2">&quot;general&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;two_body&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;three_body&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;soap&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                   <span class="s2">&quot;default_sigma&quot;</span><span class="p">:</span> <span class="s2">&quot;{0.001 0.05 0.05 0.0}&quot;</span><span class="p">,</span> <span class="s2">&quot;sparse_jitter&quot;</span><span class="p">:</span> <span class="mf">1.0e-8</span><span class="p">,</span> <span class="p">}}}],</span>
+<span class="p">)</span>
+
+<span class="n">autoplex_flow</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;autoplex_wf&quot;</span>
+
+<span class="n">resources</span> <span class="o">=</span> <span class="p">{</span><span class="o">...</span><span class="p">}</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">submit_flow</span><span class="p">(</span><span class="n">autoplex_flow</span><span class="p">,</span> <span class="n">worker</span><span class="o">=</span><span class="s2">&quot;autoplex_worker&quot;</span><span class="p">,</span> <span class="n">resources</span><span class="o">=</span><span class="n">resources</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="s2">&quot;autoplex&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+<section id="running-a-mlip-fit-only">
+<h2>Running a MLIP fit only<a class="headerlink" href="#running-a-mlip-fit-only" title="Link to this heading">#</a></h2>
+<p>The following script shows an example of how you can run a sole GAP fit with <code class="docutils literal notranslate"><span class="pre">autoplex</span></code> using <code class="docutils literal notranslate"><span class="pre">run_locally</span></code> from
+<code class="docutils literal notranslate"><span class="pre">jobflow</span></code> for the job management.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">jobflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">SETTINGS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.fitting.common.flows</span><span class="w"> </span><span class="kn">import</span> <span class="n">MLIPFitMaker</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jobflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_locally</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OMP_NUM_THREADS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;48&quot;</span> 
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OPENBLAS_NUM_THREADS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span> 
+
+<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s2">&quot;/path/to/destination/directory&quot;</span><span class="p">)</span>
+<span class="n">store</span> <span class="o">=</span> <span class="n">SETTINGS</span><span class="o">.</span><span class="n">JOB_STORE</span>
+<span class="c1"># connect to the job store</span>
+<span class="n">store</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+
+
+<span class="n">fit_input_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;mp-id&quot;</span><span class="p">:</span> <span class="p">{</span>  <span class="c1"># put a mp-id or another kind of data marker here</span>
+            <span class="s2">&quot;rattled_dir&quot;</span><span class="p">:</span> <span class="p">[[</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;/path/to/randomized/supercell/structure/calculation&quot;</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;/path/to/randomized/supercell/structure/calculation&quot;</span>
+                <span class="p">),</span>
+            <span class="p">]],</span>
+            <span class="s2">&quot;phonon_dir&quot;</span><span class="p">:</span> <span class="p">[[</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;/path/to/phonopy/supercell/structure/calculation&quot;</span>
+                <span class="p">),</span>
+            <span class="p">]],</span>
+            <span class="s2">&quot;phonon_data&quot;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;IsolatedAtom&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;iso_atoms_dir&quot;</span><span class="p">:</span> <span class="p">[[</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;/path/to/isolated/atom/calculation&quot;</span>
+                <span class="p">),</span>
+            <span class="p">]]</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    
+    
+<span class="n">mlip_fit</span> <span class="o">=</span> <span class="n">MLIPFitMaker</span><span class="p">(</span>
+    <span class="n">mlip_type</span><span class="o">=</span><span class="s2">&quot;GAP&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">pre_xyz_files</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;vasp_ref.extxyz&quot;</span><span class="p">],</span>
+    <span class="n">pre_database_dir</span><span class="o">=</span><span class="s2">&quot;/path/to/pre_database&quot;</span><span class="p">,</span>
+    <span class="n">auto_delta</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">glue_xml</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">make</span><span class="p">(</span>
+        <span class="n">species_list</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Li&quot;</span><span class="p">,</span> <span class="s2">&quot;Cl&quot;</span><span class="p">],</span>
+        <span class="n">fit_input</span><span class="o">=</span><span class="n">fit_input_dict</span><span class="p">,</span>
+        <span class="o">**</span><span class="p">{</span><span class="o">...</span><span class="p">}</span>       
+        <span class="p">)</span>
+
+<span class="n">run_locally</span><span class="p">(</span><span class="n">mlip_fit</span><span class="p">,</span> <span class="n">create_folders</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Additional fit settings can again be passed using <code class="docutils literal notranslate"><span class="pre">fit_kwargs</span></code> or <code class="docutils literal notranslate"><span class="pre">**{...}</span></code>.</p>
+<blockquote>
+<div><p>ℹ️ Note that in the current setup of <code class="docutils literal notranslate"><span class="pre">autoplex</span></code>, you need to pass a <code class="docutils literal notranslate"><span class="pre">fit_input_dict</span></code> to the <code class="docutils literal notranslate"><span class="pre">MLIPFitMaker</span></code>
+containing at least one entry for “rattled_dir”, “phonon_dir” and “isolated_atom” <strong>VASP</strong> calculations,
+otherwise the code will not finish successfully.</p>
+</div></blockquote>
+</section>
+<section id="is-it-possible-to-run-the-dft-calculations-and-the-mlip-fitting-step-on-different-machines">
+<h2>Is it possible to run the DFT calculations and the MLIP fitting step on different machines?<a class="headerlink" href="#is-it-possible-to-run-the-dft-calculations-and-the-mlip-fitting-step-on-different-machines" title="Link to this heading">#</a></h2>
+<p>Very often, we might have the situation that our GPU does not share a hard drive with the compute cluster where we
+perform the VASP runs. In such situations, it is convenient to split up the computations.</p>
+<p>This can be done by e.g. using jobflow-remote and the following settings for VASP and fitting jobs.
+The <code class="docutils literal notranslate"><span class="pre">local_worker</span></code> is the local machine (e.g., a GPU without slurm queue).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.auto.phonons.flows</span><span class="w"> </span><span class="kn">import</span> <span class="n">CompleteDFTvsMLBenchmarkWorkflow</span><span class="p">,</span> <span class="n">IterativeCompleteDFTvsMLBenchmarkWorkflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jobflow_remote</span><span class="w"> </span><span class="kn">import</span> <span class="n">submit_flow</span><span class="p">,</span> <span class="n">set_run_config</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">atomate2.vasp.powerups</span><span class="w"> </span><span class="kn">import</span> <span class="n">update_user_incar_settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">atomate2.vasp.powerups</span><span class="w"> </span><span class="kn">import</span> <span class="n">update_vasp_custodian_handlers</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">atomate2.vasp.jobs.phonons</span><span class="w"> </span><span class="kn">import</span> <span class="n">PhononDisplacementMaker</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">atomate2.settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">Atomate2Settings</span>
+
+<span class="n">autoplex_flow</span> <span class="o">=</span> <span class="n">IterativeCompleteDFTvsMLBenchmarkWorkflow</span><span class="p">(</span><span class="n">max_iterations</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">rms_max</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+                                                          <span class="n">complete_dft_vs_ml_benchmark_workflow_0</span><span class="o">=</span><span class="n">CompleteDFTvsMLBenchmarkWorkflow</span><span class="p">(</span>
+                                                              <span class="n">symprec</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
+                                                              <span class="n">run_fits_on_different_cluster</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                              <span class="n">add_dft_phonon_struct</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                                              <span class="n">path_to_hyperparameters</span><span class="o">=</span><span class="s2">&quot;/local_machine/mlip-phonon-defaults.json&quot;</span><span class="p">,</span>
+                                                              <span class="n">apply_data_preprocessing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                              <span class="n">add_dft_rattled_struct</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                              <span class="n">volume_custom_scale_factors</span><span class="o">=</span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+                                                              <span class="n">rattle_type</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">distort_type</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                                              <span class="n">rattle_std</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>  <span class="c1"># maybe 0.1</span>
+                                                              <span class="n">benchmark_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;relax_maker_kwargs&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                                                  <span class="s2">&quot;relax_cell&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}},</span>
+                                                              <span class="n">supercell_settings</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;min_length&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+                                                                                  <span class="s2">&quot;max_length&quot;</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span>
+                                                                                  <span class="s2">&quot;min_atoms&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+                                                                                  <span class="s2">&quot;max_atoms&quot;</span><span class="p">:</span> <span class="mi">300</span><span class="p">,</span>
+                                                                                  <span class="s2">&quot;fallback_min_length&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">},</span>
+                                                              <span class="c1"># settings that worked with a GAP</span>
+                                                              <span class="n">split_ratio</span><span class="o">=</span><span class="mf">0.33</span><span class="p">,</span>
+                                                              <span class="n">regularization</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                                              <span class="n">separated</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                                              <span class="n">num_processes_fit</span><span class="o">=</span><span class="mi">48</span><span class="p">,</span>
+                                                              <span class="n">displacement_maker</span><span class="o">=</span><span class="n">phonon_displacement_maker</span><span class="p">,</span>
+                                                              <span class="n">phonon_bulk_relax_maker</span><span class="o">=</span><span class="n">phonon_bulk_relax_maker</span><span class="p">,</span>
+                                                              <span class="n">phonon_static_energy_maker</span><span class="o">=</span><span class="n">phonon_static_energy_maker</span><span class="p">,</span>
+                                                              <span class="n">rattled_bulk_relax_maker</span><span class="o">=</span><span class="n">phonon_bulk_relax_maker</span><span class="p">,</span>
+                                                              <span class="n">isolated_atom_maker</span><span class="o">=</span><span class="n">static_isolated_atom_maker</span><span class="p">),</span>
+                                                          <span class="n">complete_dft_vs_ml_benchmark_workflow_1</span><span class="o">=</span><span class="n">CompleteDFTvsMLBenchmarkWorkflow</span><span class="p">(</span>
+                                                              <span class="n">symprec</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
+                                                              <span class="n">run_fits_on_different_cluster</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                              <span class="n">path_to_hyperparameters</span><span class="o">=</span><span class="s2">&quot;/local_machine/mlip-phonon-defaults.json&quot;</span><span class="p">,</span>
+                                                              <span class="n">apply_data_preprocessing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                              <span class="n">add_dft_phonon_struct</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                                              <span class="n">add_dft_rattled_struct</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                              <span class="n">volume_custom_scale_factors</span><span class="o">=</span><span class="p">[</span><span class="mf">1.0</span><span class="p">],</span>
+                                                              <span class="n">rattle_type</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">distort_type</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                                              <span class="n">rattle_std</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>  
+                                                              <span class="n">benchmark_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;relax_maker_kwargs&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                                                  <span class="s2">&quot;relax_cell&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}},</span>
+                                                              <span class="n">supercell_settings</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;min_length&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+                                                                                  <span class="s2">&quot;max_length&quot;</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span>
+                                                                                  <span class="s2">&quot;min_atoms&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+                                                                                  <span class="s2">&quot;max_atoms&quot;</span><span class="p">:</span> <span class="mi">300</span><span class="p">,</span>
+                                                                                  <span class="s2">&quot;fallback_min_length&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">},</span>
+                                                              <span class="n">split_ratio</span><span class="o">=</span><span class="mf">0.33</span><span class="p">,</span>
+                                                              <span class="n">regularization</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                                              <span class="n">separated</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                                              <span class="n">num_processes_fit</span><span class="o">=</span><span class="mi">48</span><span class="p">,</span>
+                                                              <span class="n">displacement_maker</span><span class="o">=</span><span class="n">phonon_displacement_maker</span><span class="p">,</span>
+                                                              <span class="n">phonon_bulk_relax_maker</span><span class="o">=</span><span class="n">phonon_bulk_relax_maker</span><span class="p">,</span>
+                                                              <span class="n">phonon_static_energy_maker</span><span class="o">=</span><span class="n">phonon_static_energy_maker</span><span class="p">,</span>
+                                                              <span class="n">rattled_bulk_relax_maker</span><span class="o">=</span><span class="n">phonon_bulk_relax_maker</span><span class="p">,</span>
+                                                              <span class="n">isolated_atom_maker</span><span class="o">=</span><span class="n">static_isolated_atom_maker</span><span class="p">))</span><span class="o">.</span><span class="n">make</span><span class="p">(</span>
+    <span class="n">structure_list</span><span class="o">=</span><span class="n">structure_list</span><span class="p">,</span> <span class="n">mp_ids</span><span class="o">=</span><span class="n">mpids</span><span class="p">,</span> <span class="n">benchmark_structures</span><span class="o">=</span><span class="n">benchmark_structure_list</span><span class="p">,</span>
+    <span class="n">benchmark_mp_ids</span><span class="o">=</span><span class="n">mpbenchmark</span><span class="p">,</span>
+    <span class="n">rattle_seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">fit_kwargs_list</span><span class="o">=</span><span class="p">[{</span>
+        <span class="s2">&quot;soap&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;delta&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;l_max&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span> <span class="s2">&quot;n_max&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+                 <span class="s2">&quot;atom_sigma&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s2">&quot;zeta&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;cutoff&quot;</span><span class="p">:</span> <span class="mf">5.0</span><span class="p">,</span>
+                 <span class="s2">&quot;cutoff_transition_width&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+                 <span class="s2">&quot;central_weight&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;n_sparse&quot;</span><span class="p">:</span> <span class="mi">6000</span><span class="p">,</span> <span class="s2">&quot;f0&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+                 <span class="s2">&quot;covariance_type&quot;</span><span class="p">:</span> <span class="s2">&quot;dot_product&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;sparse_method&quot;</span><span class="p">:</span> <span class="s2">&quot;cur_points&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;general&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;two_body&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;three_body&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;soap&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                    <span class="s2">&quot;default_sigma&quot;</span><span class="p">:</span> <span class="s2">&quot;{0.001 0.05 0.05 0.0}&quot;</span><span class="p">,</span> <span class="s2">&quot;sparse_jitter&quot;</span><span class="p">:</span> <span class="mf">1.0e-8</span><span class="p">,</span> <span class="p">}}]</span>
+<span class="p">)</span>
+
+<span class="n">resources</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;nodes&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;partition&quot;</span><span class="p">:</span> <span class="s2">&quot;micro&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="s2">&quot;00:55:00&quot;</span><span class="p">,</span> <span class="s2">&quot;ntasks&quot;</span><span class="p">:</span> <span class="mi">48</span><span class="p">,</span> <span class="s2">&quot;qverbatim&quot;</span><span class="p">:</span> <span class="s2">&quot;#SBATCH --get-user-env&quot;</span><span class="p">,</span>
+             <span class="s2">&quot;mail_user&quot;</span><span class="p">:</span> <span class="s2">&quot;your_email@adress&quot;</span><span class="p">,</span> <span class="s2">&quot;mail_type&quot;</span><span class="p">:</span> <span class="s2">&quot;ALL&quot;</span><span class="p">,</span> <span class="s2">&quot;account&quot;</span><span class="p">:</span> <span class="s2">&quot;xxxxxx&quot;</span><span class="p">}</span>
+
+<span class="n">resources_phon</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;nodes&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;partition&quot;</span><span class="p">:</span> <span class="s2">&quot;micro&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="s2">&quot;0:55:00&quot;</span><span class="p">,</span> <span class="s2">&quot;ntasks&quot;</span><span class="p">:</span> <span class="mi">144</span><span class="p">,</span>
+                  <span class="s2">&quot;qverbatim&quot;</span><span class="p">:</span> <span class="s2">&quot;#SBATCH --get-user-env&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;mail_user&quot;</span><span class="p">:</span> <span class="s2">&quot;your_email@adress&quot;</span><span class="p">,</span> <span class="s2">&quot;mail_type&quot;</span><span class="p">:</span> <span class="s2">&quot;ALL&quot;</span><span class="p">,</span> <span class="s2">&quot;account&quot;</span><span class="p">:</span> <span class="s2">&quot;xxxxxx&quot;</span><span class="p">}</span>
+
+<span class="n">resources_ratt</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;nodes&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;partition&quot;</span><span class="p">:</span> <span class="s2">&quot;micro&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="s2">&quot;0:55:00&quot;</span><span class="p">,</span> <span class="s2">&quot;ntasks&quot;</span><span class="p">:</span> <span class="mi">144</span><span class="p">,</span>
+                  <span class="s2">&quot;qverbatim&quot;</span><span class="p">:</span> <span class="s2">&quot;#SBATCH --get-user-env&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;mail_user&quot;</span><span class="p">:</span> <span class="s2">&quot;your_email@adress&quot;</span><span class="p">,</span> <span class="s2">&quot;mail_type&quot;</span><span class="p">:</span> <span class="s2">&quot;ALL&quot;</span><span class="p">,</span> <span class="s2">&quot;account&quot;</span><span class="p">:</span> <span class="s2">&quot;xxxxxx&quot;</span><span class="p">}</span>
+
+<span class="n">resources_mlip</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">autoplex_flow</span> <span class="o">=</span> <span class="n">set_run_config</span><span class="p">(</span><span class="n">autoplex_flow</span><span class="p">,</span> <span class="n">name_filter</span><span class="o">=</span><span class="s2">&quot;dft static&quot;</span><span class="p">,</span> <span class="n">resources</span><span class="o">=</span><span class="n">resources</span><span class="p">,</span> <span class="n">worker</span><span class="o">=</span><span class="s2">&quot;supermuc_worker&quot;</span><span class="p">)</span>
+<span class="n">autoplex_flow</span> <span class="o">=</span> <span class="n">set_run_config</span><span class="p">(</span><span class="n">autoplex_flow</span><span class="p">,</span> <span class="n">name_filter</span><span class="o">=</span><span class="s2">&quot;stat_iso_atom&quot;</span><span class="p">,</span> <span class="n">resources</span><span class="o">=</span><span class="n">resources</span><span class="p">,</span> <span class="n">worker</span><span class="o">=</span><span class="s2">&quot;supermuc_worker&quot;</span><span class="p">)</span>
+
+<span class="n">autoplex_flow</span> <span class="o">=</span> <span class="n">set_run_config</span><span class="p">(</span><span class="n">autoplex_flow</span><span class="p">,</span> <span class="n">name_filter</span><span class="o">=</span><span class="s2">&quot;dft phonon static&quot;</span><span class="p">,</span> <span class="n">resources</span><span class="o">=</span><span class="n">resources_phon</span><span class="p">,</span> <span class="n">worker</span><span class="o">=</span><span class="s2">&quot;supermuc_worker&quot;</span><span class="p">)</span>
+<span class="n">autoplex_flow</span> <span class="o">=</span> <span class="n">set_run_config</span><span class="p">(</span><span class="n">autoplex_flow</span><span class="p">,</span> <span class="n">name_filter</span><span class="o">=</span><span class="s2">&quot;static&quot;</span><span class="p">,</span> <span class="n">resources</span><span class="o">=</span><span class="n">resources_phon</span><span class="p">,</span> <span class="n">worker</span><span class="o">=</span><span class="s2">&quot;supermuc_worker&quot;</span><span class="p">)</span>
+
+<span class="n">autoplex_flow</span> <span class="o">=</span> <span class="n">set_run_config</span><span class="p">(</span><span class="n">autoplex_flow</span><span class="p">,</span> <span class="n">name_filter</span><span class="o">=</span><span class="s2">&quot;dft rattle static&quot;</span><span class="p">,</span> <span class="n">resources</span><span class="o">=</span><span class="n">resources_ratt</span><span class="p">,</span> <span class="n">worker</span><span class="o">=</span><span class="s2">&quot;supermuc_worker&quot;</span><span class="p">)</span>
+<span class="n">autoplex_flow</span> <span class="o">=</span> <span class="n">set_run_config</span><span class="p">(</span><span class="n">autoplex_flow</span><span class="p">,</span> <span class="n">name_filter</span><span class="o">=</span><span class="s2">&quot;tight relax&quot;</span><span class="p">,</span> <span class="n">resources</span><span class="o">=</span><span class="n">resources</span><span class="p">,</span> <span class="n">worker</span><span class="o">=</span><span class="s2">&quot;supermuc_worker&quot;</span><span class="p">)</span>
+<span class="n">autoplex_flow</span> <span class="o">=</span> <span class="n">set_run_config</span><span class="p">(</span><span class="n">autoplex_flow</span><span class="p">,</span> <span class="n">name_filter</span><span class="o">=</span><span class="s2">&quot;dft tight relax&quot;</span><span class="p">,</span> <span class="n">resources</span><span class="o">=</span><span class="n">resources</span><span class="p">,</span> <span class="n">worker</span><span class="o">=</span><span class="s2">&quot;supermuc_worker&quot;</span><span class="p">)</span>
+
+<span class="n">autoplex_flow</span> <span class="o">=</span> <span class="n">set_run_config</span><span class="p">(</span><span class="n">autoplex_flow</span><span class="p">,</span> <span class="n">name_filter</span><span class="o">=</span><span class="s2">&quot;machine_learning_fit&quot;</span><span class="p">,</span> <span class="n">resources</span><span class="o">=</span><span class="n">resources_mlip</span><span class="p">,</span> <span class="n">worker</span><span class="o">=</span><span class="s2">&quot;local_worker&quot;</span><span class="p">)</span>
+<span class="n">autoplex_flow</span> <span class="o">=</span> <span class="n">set_run_config</span><span class="p">(</span><span class="n">autoplex_flow</span><span class="p">,</span> <span class="n">name_filter</span><span class="o">=</span><span class="s2">&quot;gap phonon static&quot;</span><span class="p">,</span> <span class="n">resources</span><span class="o">=</span><span class="n">resources_mlip</span><span class="p">,</span> <span class="n">worker</span><span class="o">=</span><span class="s2">&quot;local_worker&quot;</span><span class="p">)</span>
+<span class="n">autoplex_flow</span> <span class="o">=</span> <span class="n">set_run_config</span><span class="p">(</span><span class="n">autoplex_flow</span><span class="p">,</span> <span class="n">name_filter</span><span class="o">=</span><span class="s2">&quot;Force field&quot;</span><span class="p">,</span> <span class="n">resources</span><span class="o">=</span><span class="n">resources_mlip</span><span class="p">,</span> <span class="n">worker</span><span class="o">=</span><span class="s2">&quot;local_worker&quot;</span><span class="p">)</span>
+<span class="n">autoplex_flow</span> <span class="o">=</span> <span class="n">set_run_config</span><span class="p">(</span><span class="n">autoplex_flow</span><span class="p">,</span> <span class="n">name_filter</span><span class="o">=</span><span class="s2">&quot;data_preprocessing_for_fitting&quot;</span><span class="p">,</span> <span class="n">resources</span><span class="o">=</span><span class="n">resources</span><span class="p">,</span> <span class="n">worker</span><span class="o">=</span><span class="s2">&quot;supermuc_worker&quot;</span><span class="p">)</span>
+
+
+<span class="n">autoplex_flow</span> <span class="o">=</span> <span class="n">update_user_incar_settings</span><span class="p">(</span><span class="n">autoplex_flow</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;NPAR&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">})</span>
+
+<span class="n">autoplex_flow</span> <span class="o">=</span> <span class="n">update_vasp_custodian_handlers</span><span class="p">(</span><span class="n">autoplex_flow</span><span class="p">,</span> <span class="n">custom_handlers</span><span class="o">=</span><span class="p">{})</span>
+
+<span class="n">autoplex_flow</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;small Sn test, test without phonon2&quot;</span>
+
+<span class="c1"># submit the workflow to jobflow-remote</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">submit_flow</span><span class="p">(</span><span class="n">autoplex_flow</span><span class="p">,</span> <span class="n">worker</span><span class="o">=</span><span class="s2">&quot;local_worker&quot;</span><span class="p">,</span> <span class="n">resources</span><span class="o">=</span><span class="n">resources_mlip</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="s2">&quot;phonons_qha&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../generation/data.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Generating reference data</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../benchmark/benchmark.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Benchmark of ML-based phonon structure</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#general-settings">General settings</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gap">GAP</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ace">ACE</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#nequip">Nequip</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#m3gnet">M3GNet</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mace">MACE</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#finetuning-mace-mp-0">Finetuning MACE-MP-0</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-script-for-autoplex-workflow-using-gap-to-fit-and-benchmark-a-si-database">Example script for <code class="docutils literal notranslate"><span class="pre">autoplex</span></code> workflow using GAP to fit and benchmark a Si database</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-a-mlip-fit-only">Running a MLIP fit only</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#is-it-possible-to-run-the-dft-calculations-and-the-mlip-fitting-step-on-different-machines">Is it possible to run the DFT calculations and the MLIP fitting step on different machines?</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Author name not set
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, autoplex development team.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
