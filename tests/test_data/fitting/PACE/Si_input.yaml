@@ -9,7 +9,7 @@ backend:
 cutoff: 8
 data:
   filename: ./Si_rss-train.pckl.gzip
-  #test_filename: /u/vld/scat7402/xpop-sims/xpot-ace-si/input_data/new_data_fixed/test_data_fixed.pkl.gzip
+
 fit:
   loss:
     L1_coeffs: 1.0e-08

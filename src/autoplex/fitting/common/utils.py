@@ -1948,11 +1948,6 @@ class AutoplexPyACECalculator(PyACECalculator):
         """Call the base PyACECalculator calculate which populates self.results."""
         res = super().calculate(*args, **kwargs)
 
-        # Retrieve the atoms object
-        # if "atoms" in kwargs:
-        #     atoms_obj = kwargs["atoms"]
-        # else:
-        #     atoms_obj = args[0]
         atoms_obj = kwargs["atoms"] if "atoms" in kwargs else args[0]
 
         # Sync standard properties back to atoms object containers
@@ -2274,21 +2269,9 @@ def convert_to_pacemaker_pickle(
     data = []
     atoms_for_export = []
 
-    # Pre-fetch E0 map
-    # e0_map = {}
-    # if isolated_atom_energies:
-    #     for k, v in isolated_atom_energies.items():
-    #         # Handle atomic number (int) or symbol (str) keys
-    #         if isinstance(k, int):
-    #             sym = chemical_symbols[k]
-    #             e0_map[sym] = v
-    #         else:
-    #             e0_map[k] = v
-
     e0_map = {}
     if isolated_atom_energies:
         for k, v in isolated_atom_energies.items():
-            # Handle atomic number: int (14) OR string ("14") which often comes from JSON/YAML
             if isinstance(k, int):
                 sym = chemical_symbols[k]
                 e0_map[sym] = v
@@ -2296,7 +2279,6 @@ def convert_to_pacemaker_pickle(
                 sym = chemical_symbols[int(k)]
                 e0_map[sym] = v
             else:
-                # Assume it's already a symbol like "Si"
                 e0_map[k] = v
         logging.info(f"Isolated atom energy map prepared for correction: {e0_map}")
     else:
@@ -2312,25 +2294,16 @@ def convert_to_pacemaker_pickle(
             )
         energy = at.info.get(ref_energy_name, 0.0)
 
-        # 2. Forces (eV/A) - Must be 2D array
+        # 2. Forces (eV/A)
         if ref_force_name in at.arrays:
             forces = np.array(at.arrays[ref_force_name])
         else:
-            # Fallback only if strictly necessary, but ideally should exist
             logging.warning(f"Force key '{ref_force_name}' missing. Setting zeros.")
             forces = np.zeros((len(at), 3))
 
         # 3. Energy Corrected (Cohesive Energy)
         # energy_corrected = E_total - sum(E_isolated)
         energy_corrected = energy
-
-        # if e0_map:
-        #     symbols = at.get_chemical_symbols()
-        #     for s in symbols:
-        #         if s in e0_map:
-        #             energy_corrected -= e0_map[s]
-
-        # Track if correction actually happened for at least one atom
 
         if e0_map:
             symbols = at.get_chemical_symbols()
@@ -2351,18 +2324,16 @@ def convert_to_pacemaker_pickle(
 
         atoms_for_export.append(at_export)
 
-        # 4. ASE Atoms Object (Clean copy preferred, but simple copy works)
+        # 4. ASE Atoms Object
         # Pacemaker needs positions, numbers/symbols, cell, pbc.
-        # We strip calculator/info to keep pickle clean and avoid confusion.
         at_clean = at.copy()
         at_clean.calc = None
-        # We keep info/arrays empty to save space, Pacemaker relies on the DF columns
+        # Keep info/arrays empty to save space, Pacemaker relies on the DF columns
         at_clean.info = {}
         at_clean.arrays = {
             "numbers": at.arrays["numbers"],
             "positions": at.arrays["positions"],
         }
-        # Restore PBC/Cell
         at_clean.set_pbc(at.get_pbc())
         at_clean.set_cell(at.get_cell())
 
@@ -2375,13 +2346,13 @@ def convert_to_pacemaker_pickle(
         data.append(record)
 
     df = pd.DataFrame(data)
-    # Ensure column order matches Pacemaker expectations
+    # Ensure column order matches Pacemaker requirements
     df = df[["energy", "forces", "ase_atoms", "energy_corrected"]]
 
     # Save as compressed pickle, Protocol 4 is safe default
     df.to_pickle(output_filename, compression="gzip", protocol=4)
 
-    # Save as .extxyz for users to check the actual data going into Pacemaker
+    # Save as .extxyz for users to use
     extxyz_filename = output_filename.replace(".pckl.gzip", ".extxyz")
     if extxyz_filename == output_filename:
         extxyz_filename = f"{output_filename}.extxyz"
@@ -2451,17 +2422,13 @@ def pace_fitting(
     try:
         hyperparameters = hyperparameters.model_copy(deep=True)
     except AttributeError:
-        # if isinstance(hyperparameters, dict):
-        #     hyperparameters = hyperparameters.copy()
-        # else:
-        #     hyperparameters = PacemakerSettings()
         hyperparameters = (
             hyperparameters.copy()
             if isinstance(hyperparameters, dict)
             else PacemakerSettings()
         )
 
-    # 1. Prepare Data Conversion
+    # 1. Prepare data conversion
     train_bin_name = "train.pckl.gzip"
     test_bin_name = "test.pckl.gzip"
 
@@ -2500,7 +2467,7 @@ def pace_fitting(
         logging.info("species_list not provided. Inferring from training data...")
         all_symbols = set()
         for at in train_atoms:
-            # Skip isolated atoms for inference (they might have special treatment)
+            # Skip isolated atoms for inference
             if "config_type" in at.info and "IsolatedAtom" in at.info.get(
                 "config_type", ""
             ):
@@ -2541,15 +2508,11 @@ def pace_fitting(
             ref_force_name,
         )
 
-    # 2. Configure Hyperparameters
+    # 3. Configure hyperparameters
     if fit_kwargs:
         try:
             hyperparameters.update_parameters(fit_kwargs)
         except AttributeError:
-            # try:
-            #     hyperparameters.update(fit_kwargs)
-            # except AttributeError:
-            #     pass
             with contextlib.suppress(AttributeError):
                 hyperparameters.update(fit_kwargs)
 
@@ -2585,10 +2548,10 @@ def pace_fitting(
     }
     pace_config = {k: v for k, v in pace_config.items() if k in allowed_top_level_keys}
 
-    # Write input.yaml
+    # 6. Write input.yaml
     dumpfn(pace_config, "input.yaml")
 
-    # Run Pacemaker
+    # 7. Run Pacemaker
     run_pacemaker("input.yaml", "pacemaker.log", num_processes=num_processes_fit)
 
     # Locate the output potential file
@@ -2612,7 +2575,7 @@ def pace_fitting(
         )
 
     # Optional: Convert to .yace format for LAMMPS compatibility
-    # This is not required for autoplex workflows (which use PyACE with .yaml directly)
+    # This is not required for autoplex workflows (which use PyACE with .yaml directly via ASE)
     output_yace_path = Path.cwd() / "output_potential.yace"
     if potential_yaml_path.exists() and shutil.which("pace_yaml2yace"):
         try:
@@ -2634,7 +2597,6 @@ def pace_fitting(
         logging.debug("pace_yaml2yace not found. Skipping optional .yace conversion.")
 
     # Parse errors from the pacemaker log file
-    # Default to high values to ensure RSS loops continue if parsing fails
     train_error = 1.0  # eV/atom
     test_error = 1.0  # eV/atom
 
@@ -2642,13 +2604,6 @@ def pace_fitting(
         log_path = Path("pacemaker.log")
         if log_path.exists():
             log_content = log_path.read_text()
-
-            # Pacemaker logs RMSE in meV/at format in statistics tables
-            # We look for the final "Cycle last iteration" sections which contain the final metrics
-            # Pattern: "RMSE:          431.29" in the table after "Energy/at, meV/at"
-
-            # Strategy: Find the last occurrence of "Cycle last iteration:" for TRAIN
-            # and "TEST Cycle last iteration:" for TEST
 
             # Parse TRAIN error from "----Cycle last iteration:----" section
             train_section_match = re.search(
@@ -2672,7 +2627,6 @@ def pace_fitting(
             )
             if test_section_match:
                 test_section = test_section_match.group(1)
-                # Look for RMSE line
                 test_rmse_match = re.search(r"RMSE:\s+([\d.]+)", test_section)
                 if test_rmse_match:
                     # Convert from meV/at to eV/at
@@ -2781,45 +2735,3 @@ def run_pacemaker(
                 print("=" * 60 + "\n")
 
             raise
-
-    # ##if need to print real-time output to console and log file simultaneously | for debugging
-
-    # with open(log_file, "w") as f_log:
-    #     process = subprocess.Popen(
-    #         ["pacemaker", input_file],
-    #         stdout=subprocess.PIPE,
-    #         stderr=subprocess.STDOUT,  # Merge stderr into stdout
-    #         text=True,
-    #         bufsize=1,  # Line buffered
-    #     )
-
-    #     # Real-time output: read line by line
-    #     for line in process.stdout:
-    #         sys.stdout.write(line)  # Print to console in real-time
-    #         sys.stdout.flush()
-    #         f_log.write(line)       # Also write to log file
-    #         f_log.flush()
-
-    #     # Wait for process to complete
-    #     return_code = process.wait()
-
-    #     if return_code != 0:
-    #         # Read and print the log file content for debugging
-    #         log_path = Path(log_file)
-    #         if log_path.exists():
-    #             print(f"\n{'='*60}")
-    #             print(f"PACEMAKER FAILED! Log file content ({log_file}):")
-    #             print('='*60)
-    #             print(log_path.read_text())
-    #             print('='*60 + "\n")
-
-    #         # Also print input.yaml for debugging
-    #         input_path = Path(input_file)
-    #         if input_path.exists():
-    #             print(f"\n{'='*60}")
-    #             print(f"Input YAML content ({input_file}):")
-    #             print('='*60)
-    #             print(input_path.read_text())
-    #             print('='*60 + "\n")
-
-    #         raise subprocess.CalledProcessError(return_code, ["pacemaker", input_file])

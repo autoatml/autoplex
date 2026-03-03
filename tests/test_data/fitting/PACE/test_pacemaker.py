@@ -33,7 +33,7 @@ def test_pacemaker_fit_maker_rss_data(test_dir, memory_jobstore, clean_dir):
         mlip_type="P-ACE",
         num_processes_fit=1,
         apply_data_preprocessing=False,
-        ref_energy_name="REF_energy", # User confirmed these keys
+        ref_energy_name="REF_energy", 
         ref_force_name="REF_forces",
     ).make(
         database_dir=database_dir,
@@ -44,7 +44,7 @@ def test_pacemaker_fit_maker_rss_data(test_dir, memory_jobstore, clean_dir):
         cutoff=6.31, # specific rcut from bond settings in reference yaml
         
         fit={
-            "maxiter": 5, # REDUCED for testing speed (orig: 800)
+            "maxiter": 5, 
             "optimizer": "BFGS",
             "repulsion": "auto",
             "trainable_parameters": "ALL",
@@ -79,13 +79,13 @@ def test_pacemaker_fit_maker_rss_data(test_dir, memory_jobstore, clean_dir):
                     "radbase": "SBessel",
                     "radparameters": [3.3135],
                     "rcut": 6.311,
-                    # "NameofCutoffFunction": "cos" # Optional depending on version
+                    # "NameofCutoffFunction": "cos" 
                 }
             },
             "functions": {
-                "number_of_functions_per_element": 100, # Reduced from 3000 for speed
+                "number_of_functions_per_element": 100, 
                 "ALL": {
-                    "nradmax_by_orders": [15, 6, 4, 2], # Simplified basis for speed
+                    "nradmax_by_orders": [15, 6, 4, 2], 
                     "lmax_by_orders": [0, 2, 2, 1]
                 }
             }
@@ -112,8 +112,6 @@ def test_pacemaker_fit_maker_rss_data(test_dir, memory_jobstore, clean_dir):
     assert (Path(result_path) / "input.yaml").exists()
     assert (Path(result_path) / "pacemaker.log").exists()
     # Check for outcome potential conversion
-    # Note: If version <= 0.2.7 conversion might produce 'output_potential.yace' or 'output.yace'
-    # Checking for the one standard in utils
     potential_file = Path(result_path) / "output_potential.yace"
     if not potential_file.exists():
          potential_file = Path(result_path) / "output.yace"
