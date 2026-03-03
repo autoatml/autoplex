@@ -36,10 +36,12 @@ def machine_learning_fit(
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",
+    ref_stress_name: str = "REF_stress",
     device: str = "cuda",
     database_dict: dict | None = None,
     hyperpara_opt: bool = False,
     hyperparameters: MLIP_HYPERS = MLIP_HYPERS,
+    disable_testing: bool = False,
     **fit_kwargs,
 ):
     """
@@ -86,6 +88,8 @@ def machine_learning_fit(
     run_fits_on_different_cluster: bool
         Indicates if fits are to be run on a different cluster.
         If True, the fitting data (train.extxyz, test.extxyz) is stored in the database.
+    disable_testing: bool
+        Whether to disable running the model on test data. Default is False.
     fit_kwargs: dict
         Additional keyword arguments for MLIP fitting.
     """
@@ -127,8 +131,9 @@ def machine_learning_fit(
     if mlip_type == "GAP":
         for train_name, test_name in zip(train_files, test_files):
             if (database_dir / train_name).exists() and (
-                database_dir / test_name
-            ).exists():
+                (database_dir / test_name).exists() or disable_testing
+            ):
+
                 train_test_error = gap_fitting(
                     db_dir=database_dir,
                     hyperparameters=hyperparameters.GAP,
@@ -142,6 +147,7 @@ def machine_learning_fit(
                     ref_virial_name=ref_virial_name,
                     train_name=train_name,
                     test_name=test_name,
+                    disable_testing=disable_testing,
                     fit_kwargs=fit_kwargs,
                 )
                 mlip_paths.append(train_test_error["mlip_path"])
@@ -155,6 +161,7 @@ def machine_learning_fit(
             ref_force_name=ref_force_name,
             ref_virial_name=ref_virial_name,
             num_processes_fit=num_processes_fit,
+            disable_testing=disable_testing,
             fit_kwargs=fit_kwargs,
         )
         mlip_paths.append(train_test_error["mlip_path"])
@@ -209,6 +216,7 @@ def machine_learning_fit(
             ref_virial_name=ref_virial_name,
             species_list=species_list,
             gpu_identifier_indices=gpu_identifier_indices,
+            disable_testing=disable_testing,
             fit_kwargs=fit_kwargs,
         )
 
@@ -222,6 +230,7 @@ def machine_learning_fit(
             ref_energy_name=ref_energy_name,
             ref_force_name=ref_force_name,
             ref_virial_name=ref_virial_name,
+            disable_testing=disable_testing,
             fit_kwargs=fit_kwargs,
             device=device,
         )
@@ -234,6 +243,7 @@ def machine_learning_fit(
             ref_energy_name=ref_energy_name,
             ref_force_name=ref_force_name,
             ref_virial_name=ref_virial_name,
+            disable_testing=disable_testing,
             fit_kwargs=fit_kwargs,
             device=device,
         )
@@ -251,7 +261,12 @@ def machine_learning_fit(
         )
         mlip_paths.append(train_test_error["mlip_path"])
 
-    check_conv = check_convergence(train_test_error["test_error"])
+    error = (
+        train_test_error["train_error"]
+        if disable_testing
+        else train_test_error["test_error"]
+    )
+    check_conv = check_convergence(error)
 
     return {
         "mlip_path": mlip_paths,

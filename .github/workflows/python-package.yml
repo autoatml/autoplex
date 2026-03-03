@@ -47,7 +47,7 @@ jobs:
           bash -c "
           python -m pip install --upgrade pip && \
           python -m uv cache clean
-          python -m uv pip install --prerelease=allow .[strict,tests] && \
+          python -m uv pip install --prerelease=allow .[strict,tests,aims] && \
           OMP_NUM_THREADS=1 pytest --cache-clear --cov=autoplex --cov-report term-missing --cov-append --splits 5 --group ${{ matrix.split }} -vv --durations-path /workspace/tests/test_data/.pytest-split-durations --store-durations 
         "
         
@@ -166,7 +166,7 @@ jobs:
         run: |
             micromamba activate autoplex_docs
             uv pip install --upgrade pip
-            uv pip install --prerelease=allow .[docs,strict,tests]
+            uv pip install --prerelease=allow .[docs,strict,tests,aims]
 
       - name: Copy tutorials
         run: |
