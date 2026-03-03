@@ -176,9 +176,14 @@ def machine_learning_fit(
             PacemakerSettings(**pace_kwargs) if pace_kwargs else hyperparameters.P_ACE
         )
 
-        if not species_list:
-            if pace_hypers.potential and "elements" in pace_hypers.potential:
-                species_list = pace_hypers.potential["elements"]
+        # if not species_list:
+        #     if pace_hypers.potential and "elements" in pace_hypers.potential:
+        if (
+            not species_list
+            and pace_hypers.potential
+            and "elements" in pace_hypers.potential
+        ):
+            species_list = pace_hypers.potential["elements"]
 
         remaining_fit_kwargs = {
             k: v for k, v in fit_kwargs.items() if k not in pace_specific_keys
