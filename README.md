@@ -93,7 +93,7 @@ julia -e 'using Pkg; Pkg.Registry.add("General"); Pkg.Registry.add(Pkg.Registry.
 
 > ℹ️ To fit and validate `Pacemaker ACE` potentials, please refer to the official [Pacemaker](https://pacemaker.readthedocs.io/en/latest/pacemaker/install/) installation guide.
 > Below is a summary of the installation steps for tensorpotential (GPU-accelerated optimization) and pyace.
-> Please note that Pacemaker ACE fitting can be run on both CPU and GPU. 
+> Please note that Pacemaker ACE fitting can be run on both CPU and GPU.
 
 First install `TensorFlow` (with CUDA support recommended), and then install `TensorPotential`:
 
