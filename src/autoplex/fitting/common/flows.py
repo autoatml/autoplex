@@ -53,6 +53,8 @@ class MLIPFitMaker(Maker):
         Reference force name.
     ref_virial_name : str
         Reference virial name.
+    ref_stress_name : str
+        Reference stress name.
     glue_file_path: str
         Name of the glue.xml file path.
     split_ratio: float
@@ -86,6 +88,8 @@ class MLIPFitMaker(Maker):
         Determine whether to preprocess the data.
     run_fits_on_different_cluster: bool
         If true, run fits on different clusters.
+    disable_testing: bool
+        Whether to disable running the model on test data.
     """
 
     name: str = "MLpotentialFit"
@@ -96,6 +100,7 @@ class MLIPFitMaker(Maker):
     ref_energy_name: str = "REF_energy"
     ref_force_name: str = "REF_forces"
     ref_virial_name: str = "REF_virial"
+    ref_stress_name: str = "REF_stress"
     glue_file_path: str = "glue.xml"
     split_ratio: float = 0.4
     force_max: float = 40.0
@@ -112,6 +117,7 @@ class MLIPFitMaker(Maker):
     num_processes_fit: int | None = None
     apply_data_preprocessing: bool = True
     run_fits_on_different_cluster: bool = False
+    disable_testing: bool = False
 
     def make(
         self,
@@ -174,6 +180,7 @@ class MLIPFitMaker(Maker):
                 ref_virial_name=self.ref_virial_name,
                 ref_force_name=self.ref_force_name,
                 ref_energy_name=self.ref_energy_name,
+                ref_stress_name=self.ref_stress_name,
                 atomwise_regularization_parameter=self.atomwise_regularization_parameter,
                 atom_wise_regularization=self.atom_wise_regularization,
                 run_fits_on_different_cluster=self.run_fits_on_different_cluster,
@@ -195,10 +202,12 @@ class MLIPFitMaker(Maker):
                 hyperparameters=hyperparameters,
                 ref_energy_name=self.ref_energy_name,
                 ref_force_name=self.ref_force_name,
+                ref_stress_name=self.ref_stress_name,
                 ref_virial_name=self.ref_virial_name,
                 device=device,
                 species_list=species_list,
                 database_dict=data_prep_job.output["database_dict"],
+                disable_testing=self.disable_testing,
                 **fit_kwargs,
             )
             jobs.append(mlip_fit_job)
@@ -232,6 +241,7 @@ class MLIPFitMaker(Maker):
             ref_virial_name=self.ref_virial_name,
             device=device,
             species_list=species_list,
+            disable_testing=self.disable_testing,
             **fit_kwargs,
         )
 
@@ -270,6 +280,8 @@ class DataPreprocessing(Maker):
         Reference force name in xyz file.
     ref_virial_name : str
         Reference virial name in xyz file.
+    ref_stress_name : str
+        Reference stress name in xyz file.
     force_max: float
         Maximally allowed force in the data set.
     force_min: float
@@ -299,6 +311,7 @@ class DataPreprocessing(Maker):
     ref_energy_name: str = "REF_energy"
     ref_force_name: str = "REF_forces"
     ref_virial_name: str = "REF_virial"
+    ref_stress_name: str = "REF_stress"
     force_max: float = 40.0
     force_min: float = 0.01  # unit: eV Å-1
     pre_database_dir: str | None = None

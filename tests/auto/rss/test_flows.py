@@ -1,5 +1,7 @@
 import os
 from pathlib import Path
+
+import pytest
 from jobflow import run_locally, Flow
 from tests.conftest import mock_rss, mock_do_rss_iterations, mock_do_rss_iterations_multi_jobs
 from autoplex.settings import RssConfig
@@ -141,7 +143,7 @@ def test_rss_workflow_ml_potentials(test_dir, memory_jobstore, clean_dir):
                   'isolatedatom_box': [20.0, 20.0, 20.0], 'e0_spin': False, 'include_dimer': False,
                   'dimer_box': [20.0, 20.0, 20.0], 'dimer_range': [1.0, 5.0], 'dimer_num': 21, 'dft_ref_file': 'vasp_ref.extxyz', 
                   'config_types': ['initial', 'traj_early', 'traj'], 'rss_group': ['traj'], 'test_ratio': 0.0,
-                  'regularization': True, 'retain_existing_sigma': False, 'scheme': 'linear-hull',
+                  'regularization': True, 'retain_existing_sigma': False, 'scheme': 'linear-hull', 'disable_testing': True,
                   'reg_minmax': [[0.1, 1.0], [0.001, 0.1], [0.0316, 0.316], [0.0632, 0.632]], 'distillation': False,
                   'force_max': None, 'force_label': None, 'pre_database_dir': None, 'mlip_type': 'GAP',
                   'ref_energy_name': 'REF_energy', 'ref_force_name': 'REF_forces', 'ref_virial_name': 'REF_virial',
