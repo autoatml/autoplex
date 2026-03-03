@@ -341,7 +341,7 @@ def test_pace_fit_maker_defaults(test_dir, memory_jobstore, clean_dir):
     assert input_yaml.exists()
     with open(input_yaml) as f:
         config = yaml.safe_load(f)
-        assert config.get("cutoff") == 7.0 
+        assert config.get("cutoff") == 5.0 
 
 
 def test_pace_fit_maker_custom(test_dir, memory_jobstore, clean_dir):
