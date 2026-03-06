@@ -206,7 +206,7 @@ aims_maker = AimsStaticMaker(
     ),
 )
 ```
-Here we need to choose the flavor of the [species defaults](https://fhi-aims.org/uploads/manual/Ch2/S2.html), exchange-correlation approach, and set boolean flags that turn on computation of forces and analytical stress. Species defaults is a set of parameters controlling computational accuracy. They are pre-constructed for every element with $Z=1..102$ and shipped with FHI-aims. To use it here, `pymatgen` needs to be [configured](https://workflows-with-atomate2-fhi-aims-club-tutorials-a0acc2efc2fba83.gitlab.io/Tutorial-2/Pymatgen/) first. After that, `species_dir` can contain any subfolder in either `AIMS_SPECIES_DIR` or `AIMS_SPECIES_DIR/defaults_2020` folders (so `light` and `defaults_2020/light` point to the same species defaults).
+Here we need to choose the flavor of the [species defaults](https://fhi-aims.org/uploads/manual/Ch2/S2.html), exchange-correlation approach, and set boolean flags that turn on computation of forces and analytical stress. Species defaults is a set of parameters controlling computational accuracy. They are pre-constructed for every element with $Z=1..102$ and shipped with FHI-aims. To use it here, `pymatgen` needs to be [configured](https://workflows-with-atomate2-fhi-aims-club-tutorials-a0acc2efc2fba83.gitlab.io/Tutorial-2/Pymatgen/) first. After that, `species_dir` can contain any subfolder in either `$AIMS_SPECIES_DIR` or `$AIMS_SPECIES_DIR/defaults_2020` folders (so `light` and `defaults_2020/light` point to the same species defaults).
 
 Also note that we use `override_kgid_checks` keyword and do not put any k-grid information. When no k-grid information is given to the `InputSetGenerator` for FHI-aims, it adds an even k-point grid with the density of 5Å⁻¹. This is usually sufficient to produce converged results. However, there are two considerations to be kept in mind. First, YMMV — this might not be sufficient. As it is said in the Disclaimer above, _always check if the calculations are in fact converged with respect to input parameters_. If you want to change the k-grid added by default, do so in `user_kpoints_settings` argument to the input set generator:
 ```python
@@ -217,9 +217,9 @@ input_set_generator=AimsStaticSetGenerator(
     }
 ),
 ```
-The second consideration is that RSS can provide us with the very skewed cell, and in this case the constructed k_point grid might not conform to the internal checks that FHI-aims runs against the structure. In this case the run stops with an error. This happens very rarely, but we override the checks just in case.
+The second consideration is that RSS can provide us with the very skewed cell, and in this case the constructed k-point grid might not conform to the internal checks that FHI-aims runs against the structure. In this case the run stops with an error. This happens very rarely, but we override the checks just in case.
 
-If you want to add other keywords for FHI-aims run, just add them alongside exising ones to the `user_params` dictionary.
+If you want to add other keywords for FHI-aims run, just add them alongside existing ones to the `user_params` dictionary.
 
 Then, to set up the RSS job:
 ```python
