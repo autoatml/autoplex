@@ -518,7 +518,207 @@ def test_mock_workflow_for_GAP(test_dir, mock_vasp, memory_jobstore, clean_dir):
     selected_atoms = job2.output.resolve(memory_jobstore)
 
     assert len(selected_atoms) == 3
+
+
+def test_mock_workflow_for_PACE(test_dir, mock_vasp, memory_jobstore, clean_dir):
+    """
+    Test the full RSS iterative workflow using Pacemaker (P-ACE).
+    This ensures the cycle of Fitting -> RSS -> Selection -> Refitting works for P-ACE.
+    """
+    test_files_dir = test_dir / "data/rss.extxyz"
+
+    ref_paths = {
+        **{f"static_bulk_{i}": f"rss/Si_bulk_{i + 1}/" for i in range(18)},
+        "static_isolated_0": "rss/Si_isolated_1/",
+        "static_dimer_0": "rss/Si_dimer_1/",
+        "static_dimer_1": "rss/Si_dimer_2/",
+        "static_dimer_2": "rss/Si_dimer_3/",
+    }
+
+    fake_run_vasp_kwargs = {
+        "static_isolated_0": {"incar_settings": {"ISPIN": 2, "KSPACINGS": 2.0}},
+        "static_dimer_0": {"incar_settings": {"ISPIN": 2, "KSPACINGS": 2.0}},
+        "static_dimer_1": {"incar_settings": {"ISPIN": 2, "KSPACINGS": 2.0}},
+        "static_dimer_2": {"incar_settings": {"ISPIN": 2, "KSPACINGS": 2.0}},
+    }
+
+    mock_vasp(ref_paths, fake_run_vasp_kwargs)
+
+    custom_fit_settings = {
+        "optimizer": "BFGS",
+        "maxiter": 10,
+        "repulsion": "auto", 
+        "trainable_parameters": "ALL",
+        "loss": {
+            "kappa": 0.75,
+            "L1_coeffs": 1.0e-08, "L2_coeffs": 1.0e-08, "w0_rad": 1.0e-08,
+            "w1_coeffs": 0, "w1_rad": 1.0e-08, "w2_coeffs": 0, "w2_rad": 1.0e-08
+        }
+    }
     
+    custom_potential = {
+        "elements": ["Si"],
+        "deltaSplineBins": 0.001,
+        "embeddings": {
+            "ALL": {
+                "npot": "FinnisSinclairShiftedScaled",
+                "fs_parameters": [1, 1, 7.5577, 0.101],
+                "ndensity": 2,
+                "rho_core_cut": 3000, "drho_core_cut": 500
+            }
+        },
+        "bonds": {
+             "ALL": {
+                "radbase": "SBessel",
+                "radparameters": [3.3135],
+                "rcut": 5.0, # Slightly reduced rcut for mock cells
+                "dcut": 0.0189, "NameofCutoffFunction": "cos"
+            }
+        },
+        "functions": {
+            # Low order for stability
+            "ALL": {"nradmax_by_orders": [15, 3], "lmax_by_orders": [0, 2]},  
+            "number_of_functions_per_element": 100
+        }
+    }
+
+    # Job 1: Initial Fitting
+    job1 = mock_rss(input_dir=test_files_dir,
+                    selection_method='cur',
+                    num_of_selection=18,
+                    bcur_params={'soap_paras': {'l_max': 3,
+                                                'n_max': 3,
+                                                'atom_sigma': 0.5,
+                                                'cutoff': 4.0,
+                                                'cutoff_transition_width': 1.0,
+                                                'zeta': 4.0,
+                                                'average': True,
+                                                'species': True,
+                                                },
+                                 },
+                    random_seed=42,
+                    e0_spin=True,
+                    isolated_atom=True,
+                    dimer=False,
+                    dimer_range=None,
+                    dimer_num=None,
+                    custom_incar={
+                        "ADDGRID": None,
+                        "ENCUT": 200,
+                        "EDIFF": 1E-04,
+                        "ISMEAR": 0,
+                        "SIGMA": 0.05,
+                        "PREC": "Normal",
+                        "ISYM": None,
+                        "KSPACING": 0.3,
+                        "NPAR": 8,
+                        "LWAVE": "False",
+                        "LCHARG": "False",
+                        "ENAUG": None,
+                        "GGA": None,
+                        "ISPIN": None,
+                        "LAECHG": None,
+                        "LELF": None,
+                        "LORBIT": None,
+                        "LVTOT": None,
+                        "NSW": None,
+                        "SYMPREC": None,
+                        "NELM": 50,
+                        "LMAXMIX": None,
+                        "LASPH": None,
+                        "AMIN": None,
+                    },
+                    dft_ref_file='vasp_ref.extxyz',
+                    test_ratio=0.1,
+                    regularization=True,
+                    distillation=False,
+                    f_max=0.7,
+                    pre_database_dir=None,
+                    mlip_type='P-ACE',
+                    ref_energy_name="REF_energy",
+                    ref_force_name="REF_forces",
+                    ref_virial_name="REF_virial",
+                    num_processes_fit=4,
+                    kt=0.6,
+                    
+                    fit=custom_fit_settings,
+                    potential=custom_potential,
+                    cutoff=5.0, # Must match rcut above
+                    
+                    backend={
+                        "evaluator": "tensorpot", 
+                        "batch_size_training": 5,
+                        "batch_size_evaluation": 5,
+                        "display_step": 1
+                    }
+                    )
+
+    # Job 2: RSS Search & Iteration
+    job2 = mock_do_rss_iterations(input=job1.output,
+                                  input_dir=test_files_dir,
+                                  selection_method1='cur',
+                                  selection_method2='bcur1s',
+                                  num_of_selection1=5,
+                                  num_of_selection2=3,
+                                  bcur_params={'soap_paras': {'l_max': 3,
+                                                              'n_max': 3,
+                                                              'atom_sigma': 0.5,
+                                                              'cutoff': 4.0,
+                                                              'cutoff_transition_width': 1.0,
+                                                              'zeta': 4.0,
+                                                              'average': True,
+                                                              'species': True,
+                                                              },
+                                               'frac_of_bcur': 0.8,
+                                               'bolt_max_num': 3000,
+                                               'kernel_exp': 4.0,
+                                               'energy_label': 'energy'},
+                                  random_seed=None,
+                                  e0_spin=False,
+                                  isolated_atom=False,
+                                  dimer=False,
+                                  dimer_range=None,
+                                  dimer_num=None,
+                                  custom_incar=None,
+                                  dft_ref_file='vasp_ref.extxyz',
+                                  rss_group='initial',
+                                  test_ratio=0.1,
+                                  regularization=True,
+                                  distillation=False,
+                                  f_max=200,
+                                  pre_database_dir=None,
+                                  mlip_type='P-ACE',
+                                  ref_energy_name="REF_energy",
+                                  ref_force_name="REF_forces",
+                                  ref_virial_name="REF_virial",
+                                  num_processes_fit=None,
+                                  scalar_pressure_method='exp',
+                                  scalar_exp_pressure=100,
+                                  scalar_pressure_exponential_width=0.2,
+                                  scalar_pressure_low=0,
+                                  scalar_pressure_high=50,
+                                  max_steps=100, 
+                                  force_tol=0.6,
+                                  stress_tol=0.6,
+                                  Hookean_repul=False,
+                                #   hookean_paras={(14, 14): (1.5, 5.0)},
+                                  num_processes_rss=4,
+                                  device="cpu",
+                                  stop_criterion=0.01,
+                                  max_iteration_number=9
+                                  )
+
+    response = run_locally(
+        Flow([job1, job2]),
+        create_folders=True,
+        ensure_success=True,
+        store=memory_jobstore
+    )
+
+    assert Path(job1.output["mlip_path"][0].resolve(memory_jobstore)).exists()
+
+    selected_atoms = job2.output.resolve(memory_jobstore)
+    assert len(selected_atoms) == 3 
     
 def test_mock_workflow_for_MACE(test_dir, mock_vasp, memory_jobstore, clean_dir):
     test_files_dir = test_dir / "data/rss.extxyz"
@@ -842,3 +1042,4 @@ def test_rssmaker_custom_config_file(test_dir):
     assert rss.rss_config.device_for_rss == "cuda"
     assert rss.rss_config.isolatedatom_box == [10, 10, 10]
     assert rss.rss_config.dimer_box == [10, 10, 10]
+

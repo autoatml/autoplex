@@ -16,7 +16,9 @@ from autoplex.fitting.common.utils import (
     mace_fitting,
     nep_fitting,
     nequip_fitting,
+    pace_fitting,
 )
+from autoplex.settings import PacemakerSettings
 
 
 @job
@@ -67,7 +69,7 @@ def machine_learning_fit(
         List of GPU indices to be used for fitting. Only used for NEP fitting.
     mlip_type: str
         Choose one specific MLIP type to be fitted:
-        'GAP' | 'J-ACE' | 'NEQUIP' | 'NEP' | 'M3GNET' | 'MACE'
+        'GAP' | 'J-ACE' | 'P-ACE' | 'NEQUIP' | 'NEP' | 'M3GNET' | 'MACE'
     ref_energy_name: str
         Reference energy name.
     ref_force_name: str
@@ -161,6 +163,49 @@ def machine_learning_fit(
             num_processes_fit=num_processes_fit,
             disable_testing=disable_testing,
             fit_kwargs=fit_kwargs,
+        )
+        mlip_paths.append(train_test_error["mlip_path"])
+
+    elif mlip_type == "P-ACE":
+
+        pace_specific_keys = {
+            "cutoff",
+            "seed",
+            "metadata",
+            "potential",
+            "data",
+            "fit",
+            "backend",
+        }
+        pace_kwargs = {k: v for k, v in fit_kwargs.items() if k in pace_specific_keys}
+
+        pace_hypers = (
+            PacemakerSettings(**pace_kwargs) if pace_kwargs else hyperparameters.P_ACE
+        )
+
+        # if not species_list:
+        #     if pace_hypers.potential and "elements" in pace_hypers.potential:
+        if (
+            not species_list
+            and pace_hypers.potential
+            and "elements" in pace_hypers.potential
+        ):
+            species_list = pace_hypers.potential["elements"]
+
+        remaining_fit_kwargs = {
+            k: v for k, v in fit_kwargs.items() if k not in pace_specific_keys
+        }
+
+        train_test_error = pace_fitting(
+            db_dir=database_dir,
+            species_list=species_list,
+            hyperparameters=pace_hypers,
+            fit_kwargs=remaining_fit_kwargs,  # Pass only non-P-ACE params
+            isolated_atom_energies=isolated_atom_energies,
+            ref_energy_name=ref_energy_name,
+            ref_force_name=ref_force_name,
+            ref_virial_name=ref_virial_name,
+            num_processes_fit=num_processes_fit,
         )
         mlip_paths.append(train_test_error["mlip_path"])
 

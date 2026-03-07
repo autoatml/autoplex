@@ -1,0 +1,65 @@
+backend:
+  batch_size: 16
+  batch_size_reduction: 'True'
+  batch_size_reduction_factor: 2
+  display_step: 100
+  evaluator: tensorpot
+  gpu_config:
+    mem_limit: 0
+cutoff: 5.5
+data:
+  filename: ./C_rss-train.pckl.gzip
+fit:
+  loss:
+    L1_coeffs: 1.0e-08
+    L2_coeffs: 1.0e-08
+    kappa: 0.95
+    w0_rad: 1.0e-08
+    w1_coeffs: 0
+    w1_rad: 1.0e-08
+    w2_coeffs: 0
+    w2_rad: 1.0e-08
+  maxiter: 2000
+  optimizer: BFGS
+  repulsion: auto
+  trainable_parameters: ALL
+metadata:
+  purpose: Potential fit
+potential:
+  bonds:
+    ALL:
+      NameofCutoffFunction: cos
+      dcut: 0.01
+      radbase: ChebExpCos
+      radparameters:
+      - 5.25
+      rcut: 5.5
+  deltaSplineBins: 0.001
+  elements:
+  - C
+  embeddings:
+    ALL:
+      drho_core_cut: 500
+      fs_parameters:
+      - 1
+      - 1
+      - 1
+      - 0.5
+      ndensity: 2
+      npot: FinnisSinclairShiftedScaled
+      rho_core_cut: 3000
+  functions:
+    ALL:
+      lmax_by_orders:
+      - 0
+      - 6
+      - 4
+      - 2
+      nradmax_by_orders:
+      - 20
+      - 6
+      - 3
+      - 2
+    number_of_functions_per_element: 1000
+seed: 42
+
