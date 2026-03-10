@@ -1,0 +1,74 @@
+backend:
+  batch_size: 8
+  batch_size_reduction: 'True'
+  batch_size_reduction_factor: 2
+  display_step: 50
+  evaluator: tensorpot
+  gpu_config:
+    mem_limit: 0
+cutoff: 8
+data:
+  filename: ./Si_rss-train.pckl.gzip
+
+fit:
+  loss:
+    L1_coeffs: 1.0e-08
+    L2_coeffs: 1.0e-08
+    kappa: 0.75
+    w0_rad: 1.0e-08
+    w1_coeffs: 0
+    w1_rad: 1.0e-08
+    w2_coeffs: 0
+    w2_rad: 1.0e-08
+  maxiter: 800
+  optimizer: BFGS
+  repulsion: auto
+  trainable_parameters: ALL
+  ladder_step: 600
+  ladder_type: power_order
+metadata:
+  purpose: Potential fit
+potential:
+  bonds:
+    ALL:
+      NameofCutoffFunction: cos
+      dcut: 0.018905380302626437
+      radbase: SBessel
+      radparameters:
+      - 3.3135018034502046
+      rcut: 6.311052419794955
+  deltaSplineBins: 0.001
+  elements:
+  - Si
+  embeddings:
+    ALL:
+      drho_core_cut: 500
+      fs_parameters:
+      - 1
+      - 1
+      - 7.5577494194990145
+      - 0.101
+      ndensity: 2
+      npot: FinnisSinclairShiftedScaled
+      rho_core_cut: 3000
+  functions:
+    ALL:
+      lmax_by_orders:
+      - 0
+      - 7
+      - 6
+      - 4
+      - 2
+      - 1
+      - 0
+      nradmax_by_orders:
+      - 20
+      - 12
+      - 8
+      - 6
+      - 3
+      - 2
+      - 1
+    number_of_functions_per_element: 200
+seed: 42
+
