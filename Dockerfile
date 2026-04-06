@@ -83,5 +83,8 @@ COPY . /workspace
 RUN python -m pip install --upgrade pip \
  && pip install uv \
  && uv pip install --system pre-commit pytest pytest-mock pytest-split pytest-cov types-setuptools \
+ && uv pip install --system tensorflow==2.8.0 \
+ && uv pip install --system --no-deps git+https://github.com/ICAMS/TensorPotential.git@1e44b2558356800ae070658c0bb856ff9bf74538 \
+ && uv pip install --system --no-deps git+https://github.com/ICAMS/python-ace.git@d1c213a7d9c5b809a3ae83b2e5a916be26d921f0 \
  && uv pip install --system --prerelease=allow ".[strict,docs]" \
  && uv cache clean && rm -rf /tmp/*

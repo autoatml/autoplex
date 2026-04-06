@@ -46,7 +46,10 @@ jobs:
           ghcr.io/autoatml/autoplex/autoplex-python-${{ matrix.python-version }}:${{ env.VERSION }} \
           bash -c "
           python -m pip install --upgrade pip && \
-          python -m uv cache clean
+          python -m uv cache clean && \
+          python -m uv pip install tensorflow==2.8.0 && \
+          python -m uv pip install --no-deps git+https://github.com/ICAMS/TensorPotential.git@1e44b2558356800ae070658c0bb856ff9bf74538 && \
+          python -m uv pip install --no-deps git+https://github.com/ICAMS/python-ace.git@d1c213a7d9c5b809a3ae83b2e5a916be26d921f0 && \
           python -m uv pip install --prerelease=allow .[strict,tests,aims] && \
           OMP_NUM_THREADS=1 pytest --cache-clear --cov=autoplex --cov-report term-missing --cov-append --splits 5 --group ${{ matrix.split }} -vv --durations-path /workspace/tests/test_data/.pytest-split-durations --store-durations 
         "
@@ -93,6 +96,9 @@ jobs:
       run: |
           micromamba activate autoplex_tests
           uv pip install --upgrade pip
+          uv pip install tensorflow==2.8.0
+          uv pip install --no-deps git+https://github.com/ICAMS/TensorPotential.git@1e44b2558356800ae070658c0bb856ff9bf74538
+          uv pip install --no-deps git+https://github.com/ICAMS/python-ace.git@d1c213a7d9c5b809a3ae83b2e5a916be26d921f0
           uv pip install --prerelease=allow .[tests,strict]
           
     - name: Download test duration artifacts
@@ -166,6 +172,9 @@ jobs:
         run: |
             micromamba activate autoplex_docs
             uv pip install --upgrade pip
+            uv pip install tensorflow==2.8.0
+            uv pip install --no-deps git+https://github.com/ICAMS/TensorPotential.git@1e44b2558356800ae070658c0bb856ff9bf74538
+            uv pip install --no-deps git+https://github.com/ICAMS/python-ace.git@d1c213a7d9c5b809a3ae83b2e5a916be26d921f0
             uv pip install --prerelease=allow .[docs,strict,tests,aims]
 
       - name: Copy tutorials

@@ -42,13 +42,19 @@ from monty.dev import requires
 from monty.serialization import dumpfn
 from nequip.ase import NequIPCalculator
 from numpy import ndarray
-from pyace.asecalc import PyACECalculator
 from pydantic import Field
 from pymatgen.io.ase import AseAtomsAdaptor
 from pytorch_lightning.loggers import CSVLogger
 from quippy import descriptors
 from scipy.spatial import ConvexHull
 from threadpoolctl import threadpool_limits
+
+try:
+    from pyace.asecalc import PyACECalculator
+    has_ypace = True
+except ImportError:
+    PyACECalculator = object
+    has_ypace = False
 
 from autoplex import (
     GAP_HYPERS,
@@ -2152,6 +2158,7 @@ class CustomPotential(quippy.potential.Potential):
         return res
 
 
+@requires(has_ypace, "pyace package must be installed to use PACEMAKER calculator.")
 class AutoplexPyACECalculator(PyACECalculator):
     """
     A specific wrapper for PyACECalculator to sync results back to atoms object.

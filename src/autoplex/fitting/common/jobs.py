@@ -18,7 +18,6 @@ from autoplex.fitting.common.utils import (
     nequip_fitting,
     pace_fitting,
 )
-from autoplex.settings import PacemakerSettings
 
 
 @job
@@ -167,6 +166,8 @@ def machine_learning_fit(
         mlip_paths.append(train_test_error["mlip_path"])
 
     elif mlip_type == "P-ACE":
+
+        from autoplex.settings import PacemakerSettings
 
         pace_specific_keys = {
             "cutoff",

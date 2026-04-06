@@ -30,7 +30,6 @@ from pymatgen.io.ase import AseAtomsAdaptor
 from threadpoolctl import threadpool_limits
 
 from autoplex.fitting.common.utils import (
-    AutoplexPyACECalculator,
     CustomPotential,
     extract_gap_label,
 )
@@ -437,6 +436,10 @@ def process_rss(
             raise FileNotFoundError(
                 f"Could not find 'output_potential.yaml' in {mlip_path} for P-ACE."
             )
+        
+        from autoplex.fitting.common.utils import (
+            AutoplexPyACECalculator,
+        )
 
         pot = AutoplexPyACECalculator(basis_set=str(potential_file.resolve()))
 

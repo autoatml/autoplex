@@ -14,5 +14,5 @@
         "ms-azuretools.vscode-docker"]
     },
   },
-  "postCreateCommand": "pip cache purge && uv pip install --prerelease=allow -e .[strict,docs] && pre-commit install",
+  "postCreateCommand": "pip cache purge && uv pip install tensorflow==2.8.0 && uv pip install --no-deps git+https://github.com/ICAMS/TensorPotential.git@1e44b2558356800ae070658c0bb856ff9bf74538 && uv pip install --no-deps git+https://github.com/ICAMS/python-ace.git@d1c213a7d9c5b809a3ae83b2e5a916be26d921f0 && uv pip install --prerelease=allow -e .[strict,docs] && pre-commit install",
 }
