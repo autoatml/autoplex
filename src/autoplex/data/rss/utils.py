@@ -436,7 +436,7 @@ def process_rss(
             raise FileNotFoundError(
                 f"Could not find 'output_potential.yaml' in {mlip_path} for P-ACE."
             )
-        
+
         from autoplex.fitting.common.utils import (
             AutoplexPyACECalculator,
         )

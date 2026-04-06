@@ -51,6 +51,7 @@ from threadpoolctl import threadpool_limits
 
 try:
     from pyace.asecalc import PyACECalculator
+
     has_ypace = True
 except ImportError:
     PyACECalculator = object
