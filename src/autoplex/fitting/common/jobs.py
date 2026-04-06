@@ -167,7 +167,7 @@ def machine_learning_fit(
 
     elif mlip_type == "P-ACE":
 
-        from autoplex.settings import PacemakerSettings
+        from autoplex.settings import PacemakerSettings  # noqa: PLC0415
 
         pace_specific_keys = {
             "cutoff",
