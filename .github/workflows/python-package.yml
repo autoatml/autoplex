@@ -45,6 +45,7 @@ jobs:
           -w /workspace \
           ghcr.io/autoatml/autoplex/autoplex-python-${{ matrix.python-version }}:${{ env.VERSION }} \
           bash -c "
+          git config --global --add safe.directory /workspace '*' && \
           python -m pip install --upgrade pip && \
           python -m uv cache clean
           python -m uv pip install --prerelease=allow .[strict,tests,aims] && \
