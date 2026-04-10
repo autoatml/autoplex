@@ -41,7 +41,7 @@ jobs:
       run: |
         docker pull ghcr.io/autoatml/autoplex/autoplex-python-${{ matrix.python-version }}:${{ env.VERSION }}
 
-        BASE_TEST_CMD = "OMP_NUM_THREADS=1 pytest --cache-clear --cov=autoplex --cov-report term-missing --cov-append --splits 5 --group ${{ matrix.split }} -vv --durations-path /workspace/tests/test_data/.pytest-split-durations --store-durations"
+        BASE_TEST_CMD="OMP_NUM_THREADS=1 pytest --cache-clear --cov=autoplex --cov-report term-missing --cov-append --splits 5 --group ${{ matrix.split }} -vv --durations-path /workspace/tests/test_data/.pytest-split-durations --store-durations"
 
         if [ "${{ matrix.python-version }}" == "3.10" ]; then
           docker run --rm \
@@ -68,7 +68,7 @@ jobs:
             python -m uv pip install --prerelease=allow '.[strict,tests,aims,pacemaker]' && \
             $BASE_TEST_CMD -k 'not PACE'
           "
-          
+
         fi
         
     - name: Upload test durations artifact
