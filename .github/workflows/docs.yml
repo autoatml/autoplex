@@ -39,12 +39,10 @@ jobs:
         run: |
             micromamba activate autoplex_docs
             uv pip install --upgrade pip
-            uv pip install --prerelease=allow .[docs,strict,tests]
+            uv pip install --prerelease=allow .[docs,strict,tests,pacemaker]
             uv pip install --upgrade monty
             uv pip install numpy==1.26.4
-            uv pip install tensorflow==2.8.0
-            uv pip install --no-deps git+https://github.com/ICAMS/TensorPotential.git@1e44b2558356800ae070658c0bb856ff9bf74538
-            uv pip install --no-deps git+https://github.com/ICAMS/python-ace.git@d1c213a7d9c5b809a3ae83b2e5a916be26d921f0
+            
 
       - name: Copy tutorials
         run: |

@@ -40,20 +40,36 @@ jobs:
     - name: Run tests using Docker image for Python ${{ matrix.python-version }}
       run: |
         docker pull ghcr.io/autoatml/autoplex/autoplex-python-${{ matrix.python-version }}:${{ env.VERSION }}
-        docker run --rm \
-          -v ${{ github.workspace }}:/workspace \
-          -w /workspace \
-          ghcr.io/autoatml/autoplex/autoplex-python-${{ matrix.python-version }}:${{ env.VERSION }} \
-          bash -c "
-          git config --global --add safe.directory /workspace '*' && \
-          python -m pip install --upgrade pip && \
-          python -m uv cache clean && \
-          python -m uv pip install 'protobuf<3.20' tensorflow==2.8.0 && \
-          python -m uv pip install --no-deps git+https://github.com/ICAMS/TensorPotential.git@1e44b2558356800ae070658c0bb856ff9bf74538 && \
-          python -m uv pip install --no-deps git+https://github.com/ICAMS/python-ace.git@d1c213a7d9c5b809a3ae83b2e5a916be26d921f0 && \
-          python -m uv pip install --prerelease=allow .[strict,tests,aims] && \
-          OMP_NUM_THREADS=1 pytest --cache-clear --cov=autoplex --cov-report term-missing --cov-append --splits 5 --group ${{ matrix.split }} -vv --durations-path /workspace/tests/test_data/.pytest-split-durations --store-durations 
-        "
+
+        BASE_TEST_CMD = "OMP_NUM_THREADS=1 pytest --cache-clear --cov=autoplex --cov-report term-missing --cov-append --splits 5 --group ${{ matrix.split }} -vv --durations-path /workspace/tests/test_data/.pytest-split-durations --store-durations"
+
+        if [ "${{ matrix.python-version }}" == "3.10" ]; then
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
+            ghcr.io/autoatml/autoplex/autoplex-python-${{ matrix.python-version }}:${{ env.VERSION }} \
+            bash -c "
+            git config --global --add safe.directory /workspace && \
+            python -m pip install --upgrade pip && \
+            python -m uv cache clean && \
+            python -m uv pip install --prerelease=allow .[strict,tests,aims,pacemaker] && \
+            $BASE_TEST_CMD
+          "
+
+        else
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
+            ghcr.io/autoatml/autoplex/autoplex-python-${{ matrix.python-version }}:${{ env.VERSION }} \
+            bash -c "
+            git config --global --add safe.directory /workspace && \
+            python -m pip install --upgrade pip && \
+            python -m uv cache clean && \
+            python -m uv pip install --prerelease=allow '.[strict,tests,aims,pacemaker]' && \
+            $BASE_TEST_CMD -k 'not PACE'
+          "
+          
+        fi
         
     - name: Upload test durations artifact
       if: matrix.python-version == '3.10'
