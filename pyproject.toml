@@ -30,7 +30,12 @@ dependencies = [
      "calorine>=3.0",
      "matgl>=1.2.6",
      "mace-torch>=0.3.12",
-     "numpy",
+     "pandas>=2.2",
+     "numpy<=1.26.4",
+     "scipy",
+     "ruamel.yaml",
+     "psutil",
+     "scikit-learn<=1.4.2",
      "lightning-utilities==0.14.3",
      "typing",
      "nequip",
@@ -76,7 +81,12 @@ strict = [
      "ase==3.24.0",
      "mace-torch==0.3.13",
      "lightning-utilities==0.14.3",
-     "numpy",
+     "numpy==1.26.4",
+     "pandas>=2.2",
+     "scipy",
+     "ruamel.yaml",
+     "psutil",
+     "scikit-learn==1.4.2",
      "typing",
      "dgl<=2.2.0; sys.platform != 'linux'",
      "dgl<=2.4; sys.platform == 'linux'",
@@ -90,6 +100,12 @@ strict = [
 dev = ["pre-commit>=2.12.1"]
 tests = ["pytest", "pytest-mock", "pytest-split", "pytest-cov", "types-setuptools", "nbmake"]
 aims = ["pyfhiaims"]
+pacemaker = [
+    "protobuf<3.20 ; python_version == '3.10'",
+    "tensorflow==2.8.0 ; python_version == '3.10'",
+    "tensorpotential @ git+https://github.com/ICAMS/TensorPotential.git@1e44b2558356800ae070658c0bb856ff9bf74538 ; python_version == '3.10'",
+    "pyace @ git+https://github.com/ICAMS/python-ace.git@d1c213a7d9c5b809a3ae83b2e5a916be26d921f0 ; python_version == '3.10'"
+]
 
 [tool.setuptools_scm]
 

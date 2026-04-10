@@ -1,0 +1,85 @@
+backend:
+  batch_size: 50
+  batch_size_reduction: 'True'
+  batch_size_reduction_factor: 2
+  display_step: 100
+  evaluator: tensorpot
+  gpu_config:
+    mem_limit: 0
+cutoff: 8
+data:
+  filename: training_data.pckl.gzip
+  test_filename: testing_data.pckl.gzip
+fit:
+  loss:
+    L1_coeffs: 1.0e-08
+    L2_coeffs: 1.0e-08
+    kappa: 0.8
+    w0_rad: 1.0e-08
+    w1_coeffs: 0
+    w1_rad: 1.0e-08
+    w2_coeffs: 0
+    w2_rad: 1.0e-08
+  maxiter: 1000
+  optimizer: BFGS
+  #repulsion: auto
+  trainable_parameters: ALL
+  #ladder_step: 250
+  #ladder_type: power_order
+  # weighting:
+  #   type: EnergyBasedWeightingPolicy
+  #   nfit: 1000000
+  #   DEup: 50
+  #   DElow: 1.0
+  #   DE: 1
+  #   DF: 1
+  #   energy: convex_hull
+  #   reftype: all
+  #   seed: 42
+metadata:
+  purpose: Potential fit
+potential:
+  #filename: ./output_potential.yaml
+  bonds:
+    ALL:
+      NameofCutoffFunction: cos
+      dcut: 0.001
+      radbase: SBessel
+      radparameters:
+      - 10.0
+      rcut: 8
+  deltaSplineBins: 0.001
+  elements:
+  - Ge
+  - Sb
+  - Te
+  embeddings:
+    ALL:
+      drho_core_cut: 500
+      fs_parameters:
+      - 1
+      - 1
+      - 4.576635454294125
+      - 0.5
+      - 0.101
+      - 2
+      ndensity: 3
+      npot: FinnisSinclairShiftedScaled
+      rho_core_cut: 3000
+  functions:
+    ALL:
+      lmax_by_orders:
+      - 0
+      - 6
+      - 4
+      - 3
+      - 2
+      nradmax_by_orders:
+      - 16
+      - 8
+      - 6
+      - 4
+      - 3
+    number_of_functions_per_element: 4000
+seed: 42
+

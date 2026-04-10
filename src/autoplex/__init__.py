@@ -16,6 +16,7 @@ from autoplex.settings import (
     MLIPHypers,
     NEPSettings,
     NEQUIPSettings,
+    PacemakerSettings,
     RssConfig,
 )
 
@@ -27,3 +28,4 @@ M3GNET_HYPERS = M3GNETSettings()
 MACE_HYPERS = MACESettings()
 NEQUIP_HYPERS = NEQUIPSettings()
 NEP_HYPERS = NEPSettings()
+PACEMAKER_HYPERS = PacemakerSettings()
