@@ -4,7 +4,10 @@ import logging
 import traceback
 from dataclasses import dataclass, field
 
-from atomate2.aims.jobs.base import BaseAimsMaker
+try: 
+    from atomate2.aims.jobs.base import BaseAimsMaker
+except: 
+    BaseAimsMaker = None
 from atomate2.forcefields.jobs import (
     ForceFieldRelaxMaker,
     ForceFieldStaticMaker,
