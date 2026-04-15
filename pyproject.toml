@@ -22,11 +22,11 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "Operating System :: OS Independent",
 ]
-requires-python = ">=3.10,<3.12"
+requires-python = ">=3.10,<3.13"
 dependencies = [
      "pymatgen>=2024.11.13",
      "atomate2[strict]>=0.0.21",
-     "ase==3.24.0",
+     "ase>=3.24.0",
      "calorine>=3.0",
      "matgl>=1.2.6",
      "mace-torch>=0.3.12",
@@ -90,8 +90,6 @@ strict = [
      "torch<=2.2.1; sys.platform == 'linux'",
      "nequip==0.6.1",
      "hiphive",
-     "f90wrap>=0.3.0; python_version >= '3.12'",
-      "f90wrap==0.2.16; python_version < '3.12'",
 ]
 dev = ["pre-commit>=2.12.1"]
 tests = ["pytest", "pytest-mock", "pytest-split", "pytest-cov", "types-setuptools", "nbmake"]
