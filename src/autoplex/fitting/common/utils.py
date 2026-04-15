@@ -26,9 +26,10 @@ import quippy.potential
 import torch
 from ase.atoms import Atoms
 from ase.calculators.singlepoint import SinglePointCalculator
-try: 
+
+try:
     from ase.constraints import voigt_6_to_full_3x3_stress
-except ImportError: 
+except ImportError:
     from ase.stress import voigt_6_to_full_3x3_stress
 from ase.data import chemical_symbols
 from ase.io import read, write
