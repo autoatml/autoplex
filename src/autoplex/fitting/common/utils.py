@@ -14,11 +14,12 @@ import xml.etree.ElementTree as ET
 from collections.abc import Iterable
 from functools import partial
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import Literal
 
 import ase
-#import lightning as pl
-#import matgl
+
+# import lightning as pl
+# import matgl
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -33,21 +34,24 @@ from ase.data import chemical_symbols
 from ase.io import read, write
 from ase.io.extxyz import XYZError
 from atomate2.utils.path import strip_hostname
-#from calorine.nep import read_loss, write_nepfile, write_structures
-#from dgl.data.utils import split_dataset
-#from matgl.apps.pes import Potential
-#from matgl.ext.pymatgen import Structure2Graph, get_element_list
-#from matgl.graph.data import MGLDataLoader, MGLDataset, collate_fn_pes
-#from matgl.models import M3GNet
-#from matgl.utils.training import PotentialLightningModule
+
+# from calorine.nep import read_loss, write_nepfile, write_structures
+# from dgl.data.utils import split_dataset
+# from matgl.apps.pes import Potential
+# from matgl.ext.pymatgen import Structure2Graph, get_element_list
+# from matgl.graph.data import MGLDataLoader, MGLDataset, collate_fn_pes
+# from matgl.models import M3GNet
+# from matgl.utils.training import PotentialLightningModule
 from monty.dev import requires
 from monty.serialization import dumpfn
-#from nequip.ase import NequIPCalculator
+
+# from nequip.ase import NequIPCalculator
 from numpy import ndarray
 from pydantic import Field
 from pymatgen.io.ase import AseAtomsAdaptor
-#from pytorch_lightning.loggers import CSVLogger
-#from quippy import descriptors
+
+# from pytorch_lightning.loggers import CSVLogger
+# from quippy import descriptors
 from scipy.spatial import ConvexHull
 from threadpoolctl import threadpool_limits
 
@@ -65,7 +69,6 @@ from autoplex.data.common.utils import (
     rms_dict,
     stratified_dataset_split,
 )
-
 
 
 def gap_fitting(
@@ -125,7 +128,6 @@ def gap_fitting(
         A dictionary with train_error, test_error, path_to_mlip
 
     """
-
     hyperparameters = hyperparameters.model_copy(deep=True)
     # keep additional pre- and suffixes
     gap_file_xml = train_name.replace("train", "gap_file").replace(".extxyz", ".xml")
@@ -1156,8 +1158,9 @@ def m3gnet_fitting(
         logger = CSVLogger(name=exp_name, save_dir=os.path.join(results_dir, "logs"))
         # Inference mode = False is required for calculating forces, stress in test mode and prediction mode
         if device == "cuda":
-            import torch
             import lightning as pl
+            import torch
+
             if torch.cuda.is_available():
                 gpu_id = os.environ.get("CUDA_VISIBLE_DEVICES", "0")
                 torch.cuda.set_device(torch.device(f"cuda:{gpu_id}"))
@@ -2130,7 +2133,6 @@ def run_gap(num_processes_fit: int, parameters) -> None:
         subprocess.call(["gap_fit", *parameters], stdout=file_std, stderr=file_err)
 
 
-
 def _compute_gap_energy(atom, gap_control: str, gap_label: str):
     """
     Compute potential energy of a single ASE Atoms object.
@@ -2145,11 +2147,6 @@ def _compute_gap_energy(atom, gap_control: str, gap_label: str):
     gap_label : str
         The GAP XML potential file.
     """
-
-    
-
-
-
     pot = CustomPotential(args_str=gap_control, param_filename=gap_label)
     atom.calc = pot
     atom.info["energy"] = atom.get_potential_energy()
@@ -2157,7 +2154,9 @@ def _compute_gap_energy(atom, gap_control: str, gap_label: str):
     atom.calc = None
     return atom
 
+
 from quippy.potential import Potential
+
 
 class CustomPotential(Potential):
     """A custom potential class that modifies the outputs of potentials."""
