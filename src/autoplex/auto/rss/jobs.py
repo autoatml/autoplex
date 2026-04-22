@@ -95,7 +95,9 @@ def initial_rss(
     force_max: float | None = None,
     force_label: str = "REF_forces",
     pre_database_dir: str | None = None,
-    mlip_type: Literal["GAP", "J-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"] = "GAP",
+    mlip_type: Literal[
+        "GAP", "J-ACE", "P-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"
+    ] = "GAP",
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",
@@ -197,7 +199,7 @@ def initial_rss(
         The label of force values to use for distillation. Default is 'REF_forces'.
     pre_database_dir: str | None
         Directory where the previous database was saved. Default is None.
-    mlip_type: Literal["GAP", "J-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"]
+    mlip_type: Literal["GAP", "J-ACE", "P-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"]
         Choose one specific MLIP type to be fitted. Default is 'GAP'.
     ref_energy_name: str
         Reference energy name. Default is 'REF_energy'.
@@ -366,7 +368,9 @@ def do_rss_iterations(
     distillation: bool = True,
     force_max: float = 200,
     force_label: str = "REF_forces",
-    mlip_type: Literal["GAP", "J-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"] = "GAP",
+    mlip_type: Literal[
+        "GAP", "J-ACE", "P-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"
+    ] = "GAP",
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",
@@ -508,7 +512,7 @@ def do_rss_iterations(
         Maximum force value to exclude structures. Default is 200.
     force_label: str
         The label of force values to use for distillation. Default is 'REF_forces'.
-    mlip_type: Literal["GAP", "J-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"]
+    mlip_type: Literal["GAP", "J-ACE", "P-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"]
         Choose one specific MLIP type to be fitted. Default is 'GAP'.
     ref_energy_name: str
         Reference energy name. Default is 'REF_energy'.
