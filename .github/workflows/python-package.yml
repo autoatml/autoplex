@@ -9,9 +9,6 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-  workflow_run:
-    workflows: ["Testing Pacemaker (Python 3.10)"]
-    types: [completed]
 
 permissions:
   contents: write
@@ -19,7 +16,6 @@ permissions:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -74,7 +70,7 @@ jobs:
         path: ./.coverage
 
   commit-durations:
-    if: github.repository_owner == 'autoatml' && github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main'
+    if: github.repository_owner == 'autoatml' && github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
     defaults:
@@ -105,15 +101,6 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         pattern: test-durations-*
-
-    - name: Download pacemaker test duration artifact
-      uses: actions/download-artifact@v4
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        repository: ${{ github.repository }}
-        run-id: ${{ github.event.workflow_run.id }}
-        name: test-durations-pacemaker
-        path: test-durations-pacemaker
 
 
     - name: Compute average of test durations
