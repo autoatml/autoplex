@@ -30,12 +30,7 @@ dependencies = [
      "calorine>=3.0",
      "matgl>=1.2.6",
      "mace-torch>=0.3.12",
-     "pandas>=2.2",
-     "numpy<=1.26.4",
-     "scipy",
-     "ruamel.yaml",
-     "psutil",
-     "scikit-learn<=1.4.2",
+     "numpy",
      "lightning-utilities==0.14.3",
      "typing",
      "nequip",
@@ -81,12 +76,7 @@ strict = [
      "ase==3.24.0",
      "mace-torch==0.3.13",
      "lightning-utilities==0.14.3",
-     "numpy==1.26.4",
-     "pandas>=2.2",
-     "scipy",
-     "ruamel.yaml",
-     "psutil",
-     "scikit-learn==1.4.2",
+     "numpy",
      "typing",
      "dgl<=2.2.0; sys.platform != 'linux'",
      "dgl<=2.4; sys.platform == 'linux'",
@@ -100,6 +90,14 @@ strict = [
 dev = ["pre-commit>=2.12.1"]
 tests = ["pytest", "pytest-mock", "pytest-split", "pytest-cov", "types-setuptools", "nbmake"]
 aims = ["pyfhiaims"]
+pacemaker = [
+     "numpy==1.26.4",
+     "pandas>=2.2",
+     "scipy",
+     "ruamel.yaml",
+     "psutil",
+     "scikit-learn==1.4.2",
+]
 
 [tool.setuptools_scm]
 

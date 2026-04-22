@@ -96,6 +96,7 @@ julia -e 'using Pkg; Pkg.Registry.add("General"); Pkg.Registry.add(Pkg.Registry.
 > ⚠️ Please also note on versioning: to prevent dependency conflicts (e.g., with `pandas` versions) and ensure stability, please install the exact commit hashes listed below using the `--no-deps` flag. These specific versions have been fully tested and validated for use with Autoplex.
 
 ```bash
+pip install autoplex[pacemaker]
 pip install tensorflow==2.8.0
 pip install --no-deps git+https://github.com/ICAMS/TensorPotential.git@1e44b2558356800ae070658c0bb856ff9bf74538
 # Ensure CMake is available before running this:

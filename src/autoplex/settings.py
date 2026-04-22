@@ -865,12 +865,6 @@ class PacemakerSettings(AutoplexBaseModel):
         default_factory=lambda: {
             "filename": "train.pckl.gzip",
             "test_filename": None,
-            # "energy_key": "REF_energy",
-            # "forces_key": "REF_forces",
-            # "virial_key": "REF_virial",
-            # "energy_unit": "eV",
-            # "distance_unit": "Ang",
-            # "reference_energy": None
         },
         description="Data configuration block. If provided by user, completely replaces default.",
     )

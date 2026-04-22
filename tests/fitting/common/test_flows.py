@@ -431,6 +431,15 @@ def test_mlip_fit_maker_pace(
     # check if P-ACE potential file is generated
     # This also implicitly checks that converting .xyz -> .pckl.gzip worked
     assert Path(pacefit.output["mlip_path"][0].resolve(memory_jobstore)).exists()
+    
+    # check if model outputs are as expected
+    test_error = pacefit.output["test_error"].resolve(memory_jobstore)
+    train_error = pacefit.output["train_error"].resolve(memory_jobstore)
+    
+    assert isinstance(test_error, float)
+    assert isinstance(train_error, float)
+    assert test_error < 0.05 
+    assert train_error < 0.01 
 
 
 def test_mlip_fit_maker_glue_xml(
