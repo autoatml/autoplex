@@ -42,7 +42,7 @@ dependencies = [
      "torch<=2.2.1; sys.platform == 'linux'",
      # quippy-ase support for py3.12 tracked in https://github.com/libAtoms/QUIP/issues/645
      "quippy-ase==0.9.14; python_version < '3.12'",
-     "f90wrap==0.2.16"
+     "f90wrap==0.3.0"
 ]
 
 [tool.setuptools.packages.find]
@@ -85,7 +85,7 @@ strict = [
      "torch<=2.2.1; sys.platform == 'linux'",
      "nequip==0.6.1",
      "hiphive==1.4",
-     "f90wrap==0.2.16",
+     "f90wrap==0.3.0",
 ]
 dev = ["pre-commit>=2.12.1"]
 tests = ["pytest", "pytest-mock", "pytest-split", "pytest-cov", "types-setuptools", "nbmake"]
