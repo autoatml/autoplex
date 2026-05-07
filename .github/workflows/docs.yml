@@ -42,6 +42,7 @@ jobs:
             uv pip install --prerelease=allow .[docs,strict,tests]
             uv pip install --upgrade monty
             uv pip install numpy==1.26.4
+            
 
       - name: Copy tutorials
         run: |

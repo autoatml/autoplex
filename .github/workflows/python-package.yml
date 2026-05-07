@@ -16,7 +16,6 @@ permissions:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -40,6 +39,7 @@ jobs:
     - name: Run tests using Docker image for Python ${{ matrix.python-version }}
       run: |
         docker pull ghcr.io/autoatml/autoplex/autoplex-python-${{ matrix.python-version }}:${{ env.VERSION }}
+
         docker run --rm \
           -v ${{ github.workspace }}:/workspace \
           -w /workspace \
@@ -48,9 +48,10 @@ jobs:
           git config --global --add safe.directory /workspace && \
           python -m pip install --upgrade pip && \
           python -m uv cache clean && \
-          python -m uv pip install --prerelease=allow .[strict,tests,aims] && \
-          OMP_NUM_THREADS=1 pytest --cache-clear --cov=autoplex --cov-report term-missing --cov-append --splits 5 --group ${{ matrix.split }} -vv --durations-path /workspace/tests/test_data/.pytest-split-durations --store-durations 
+          python -m uv pip install --prerelease=allow '.[strict,tests,aims]' && \
+          OMP_NUM_THREADS=1 pytest --cache-clear --cov=autoplex --cov-report term-missing --cov-append --splits 5 --group ${{ matrix.split }} -vv --durations-path /workspace/tests/test_data/.pytest-split-durations --store-durations -k 'not PACE'
         "
+
         
     - name: Upload test durations artifact
       if: matrix.python-version == '3.10'
@@ -68,9 +69,30 @@ jobs:
         include-hidden-files: true
         path: ./.coverage
 
+  get-pacemaker-run:
+    needs: build
+    runs-on: ubuntu-latest
+    outputs:
+      run_id: ${{ steps.get-run.outputs.run_id }}
+    steps:
+      - name: Get latest successful Pacemaker run ID
+        id: get-run
+        run: |
+          RUN_ID=$(gh run list \
+            --repo ${{ github.repository }} \
+            --workflow="Testing Pacemaker (Python 3.10)" \
+            --branch=main \
+            --status=success \
+            --limit=1 \
+            --json databaseId \
+            -q '.[0].databaseId')
+          echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   commit-durations:
     if: github.repository_owner == 'autoatml' && github.ref == 'refs/heads/main'
-    needs: build
+    needs: [build, get-pacemaker-run]
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -101,6 +123,13 @@ jobs:
       with:
         pattern: test-durations-*
 
+    - name: Download Pacemaker test duration artifacts
+      continue-on-error: true
+      uses: actions/download-artifact@v4
+      with:
+        pattern: test-durations-pacemaker
+        run-id: ${{ needs.get-pacemaker-run.outputs.run_id }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Compute average of test durations
       run: |
@@ -122,22 +151,33 @@ jobs:
         base: main
 
   coverage:
-      needs: build
+      needs: [build, get-pacemaker-run]
       runs-on: ubuntu-latest
       steps:
-        - uses: actions/checkout@v3
+        - uses: actions/checkout@v4
         - name: Set up Python 3.10
           uses: actions/setup-python@v4
           with:
             python-version: '3.10'
+
         - name: Install Coverage
           run: |
            python -m pip install coverage[toml]
+
         - name: Download coverage artifacts
           continue-on-error: true
           uses: actions/download-artifact@v4
           with:
             pattern: coverage-*
+
+        - name: Download Pacemaker coverage artifacts
+          continue-on-error: true
+          uses: actions/download-artifact@v4
+          with:
+            pattern: coverage-pacemaker
+            run-id: ${{ needs.get-pacemaker-run.outputs.run_id }}
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+
         - name: Run coverage
           continue-on-error: true
           run: |

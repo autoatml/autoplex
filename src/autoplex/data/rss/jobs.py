@@ -424,7 +424,7 @@ class RandomizedStructure(Maker):
 
 @job
 def do_rss_single_node(
-    mlip_type: Literal["GAP", "J-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"],
+    mlip_type: Literal["GAP", "J-ACE", "P-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"],
     mlip_path: str | Path,
     iteration_index: str,
     structures: list[Structure],
@@ -451,7 +451,7 @@ def do_rss_single_node(
 
     Parameters
     ----------
-    mlip_type: Literal["GAP", "J-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"]
+    mlip_type: Literal["GAP", "J-ACE", "P-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"]
         Choose one specific MLIP type to be fitted.
     mlip_path: str | Path
         Path to the MLIP model.
@@ -527,7 +527,7 @@ def do_rss_single_node(
 
 @job
 def do_rss_multi_node(
-    mlip_type: Literal["GAP", "J-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"],
+    mlip_type: Literal["GAP", "J-ACE", "P-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"],
     mlip_path: str | Path,
     iteration_index: str,
     structure: list[Structure] | list[list[Structure]] | None = None,
@@ -555,7 +555,7 @@ def do_rss_multi_node(
 
     Parameters
     ----------
-    mlip_type: Literal["GAP", "J-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"]
+    mlip_type: Literal["GAP", "J-ACE", "P-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"]
         Choose one specific MLIP type to be fitted.
     mlip_path: str | Path
         Path to the MLIP model.

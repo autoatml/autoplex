@@ -1,8 +1,9 @@
 import pytest
-from autoplex.fitting.common.flows import MLIPFitMaker
+import yaml
 from pathlib import Path
+from shutil import which
 from jobflow import run_locally
-
+from autoplex.fitting.common.flows import MLIPFitMaker
 from tests.auto.phonons.test_jobs import fake_run_vasp_kwargs
 
 
@@ -307,3 +308,118 @@ def test_mace_finetuning_maker(test_dir, memory_jobstore, clean_dir, caplog):
     assert "Energies are not used for training or validation." not in caplog.text
     assert "Forces are not used for training or validation." not in caplog.text
 
+    
+def test_pace_fit_maker_defaults(test_dir, memory_jobstore, clean_dir):
+
+    print("\n--- Running P-ACE Defaults Test ---")
+    database_dir = test_dir / "fitting/rss_training_dataset/"
+    
+    pacefit = MLIPFitMaker(
+        mlip_type="P-ACE",
+        num_processes_fit=4,
+        apply_data_preprocessing=False, 
+    ).make(
+        database_dir=database_dir,
+        species_list=["Si"],
+        isolated_atom_energies={14: -0.84696938},
+        backend={
+            "evaluator": "tensorpot", 
+            "batch_size_training": 5,
+            "batch_size_evaluation": 5
+        }
+    )
+
+    run_locally(
+        pacefit, ensure_success=True, create_folders=True, store=memory_jobstore
+    )
+
+    # Standard assertion style matching other tests
+    resolved_path = Path(pacefit.output["mlip_path"][0].resolve(memory_jobstore))
+    assert resolved_path.exists()
+    
+    input_yaml = resolved_path / "input.yaml"
+    assert input_yaml.exists()
+    with open(input_yaml) as f:
+        config = yaml.safe_load(f)
+        assert config.get("cutoff") == 5.0 
+
+
+def test_pace_fit_maker_custom(test_dir, memory_jobstore, clean_dir):
+    database_dir = test_dir / "fitting/rss_training_dataset/"
+    
+    custom_fit_settings = {
+        "optimizer": "BFGS",
+        "maxiter": 10,
+        "repulsion": "auto",
+        "trainable_parameters": "ALL",
+        "ladder_step": 5, 
+        "ladder_type": "power_order",
+        "loss": {
+            "kappa": 0.75,
+            "L1_coeffs": 1.0e-08, "L2_coeffs": 1.0e-08, "w0_rad": 1.0e-08,
+            "w1_coeffs": 0, "w1_rad": 1.0e-08, "w2_coeffs": 0, "w2_rad": 1.0e-08
+        }
+    }
+    
+    custom_potential = {
+        "elements": ["Si"],
+        "deltaSplineBins": 0.001,
+        "embeddings": {
+            "ALL": {
+                "npot": "FinnisSinclairShiftedScaled",
+                "fs_parameters": [1, 1, 7.5577, 0.101],
+                "ndensity": 2,
+                "rho_core_cut": 3000, "drho_core_cut": 500
+            }
+        },
+        "bonds": {
+             "ALL": {
+                "radbase": "SBessel",
+                "radparameters": [3.3135],
+                "rcut": 6.0,
+                "dcut": 0.0189, "NameofCutoffFunction": "cos"
+            }
+        },
+        "functions": {
+            "ALL": {"nradmax_by_orders": [15, 3], "lmax_by_orders": [0, 2]},
+            "number_of_functions_per_element": 200
+        }
+    }
+
+    pacefit = MLIPFitMaker(
+        mlip_type="P-ACE",
+        num_processes_fit=4,
+        apply_data_preprocessing=False, 
+    ).make(
+        database_dir=database_dir,
+        species_list=["Si"],
+        isolated_atom_energies={14: -0.84696938},
+        cutoff=6.0, 
+        fit=custom_fit_settings,
+        potential=custom_potential,
+        backend={ 
+            "evaluator": "tensorpot", 
+            "batch_size_training": 5, 
+            "batch_size_evaluation": 5,
+            "batch_size_reduction": "True",
+            "batch_size_reduction_factor": 2,
+            "display_step": 1
+        }
+    )
+
+    run_locally(
+        pacefit, ensure_success=True, create_folders=True, store=memory_jobstore
+    )
+
+    # Standard assertion style matching other tests
+    resolved_path = Path(pacefit.output["mlip_path"][0].resolve(memory_jobstore))
+    assert resolved_path.exists()
+    
+    # Specific assertions to ensure custom parameters were passed correctly
+    input_yaml = resolved_path / "input.yaml"
+    with open(input_yaml) as f:
+        config = yaml.safe_load(f)
+        assert config.get("cutoff") == 6.0
+        assert config["fit"]["loss"]["kappa"] == 0.75
+        assert config["fit"]["optimizer"] == "BFGS"
+        assert config["potential"]["bonds"]["ALL"]["radbase"] == "SBessel"

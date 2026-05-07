@@ -395,6 +395,53 @@ def test_mlip_fit_maker_mace(
     assert Path(macefit.output["mlip_path"][0].resolve(memory_jobstore)).exists()
 
 
+def test_mlip_fit_maker_pace(
+        test_dir, memory_jobstore, vasp_test_dir, fit_input_dict, clean_dir
+):
+    from pathlib import Path
+    from jobflow import run_locally
+
+    test_files_dir = Path(test_dir / "fitting").resolve()
+
+    # Test P-ACE fit runs with pre_database_dir (mimicking real flow with preprocessing)
+    pacefit = MLIPFitMaker(
+        mlip_type="P-ACE",
+        pre_database_dir=str(test_files_dir),
+        pre_xyz_files=["pre_xyz_train.extxyz", "pre_xyz_test.extxyz"],
+        apply_data_preprocessing=True,
+        num_processes_fit=4,
+    ).make(
+        fit_input=fit_input_dict,
+        species_list=["Li", "Cl"],
+        # Provide isolated atom energies since preprocessing is mocked or needs help
+        isolated_atom_energies={3: -0.28649227, 17: -0.25638457},
+        
+        # Override backend batch size for small test dataset
+        backend={
+            "evaluator": "tensorpot", 
+            "batch_size_training": 5,
+            "batch_size_evaluation": 5
+        }
+    )
+
+    run_locally(
+        pacefit, ensure_success=True, create_folders=True, store=memory_jobstore
+    )
+
+    # check if P-ACE potential file is generated
+    # This also implicitly checks that converting .xyz -> .pckl.gzip worked
+    assert Path(pacefit.output["mlip_path"][0].resolve(memory_jobstore)).exists()
+    
+    # check if model outputs are as expected
+    test_error = pacefit.output["test_error"].resolve(memory_jobstore)
+    train_error = pacefit.output["train_error"].resolve(memory_jobstore)
+    
+    assert isinstance(test_error, float)
+    assert isinstance(train_error, float)
+    assert test_error < 0.05 
+    assert train_error < 0.01 
+
+
 def test_mlip_fit_maker_glue_xml(
         test_dir, memory_jobstore, vasp_test_dir, fit_input_dict_glue_xml, clean_dir
 ):
