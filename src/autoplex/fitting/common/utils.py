@@ -2183,7 +2183,6 @@ class AutoplexPyACECalculator(PyACECalculator):
         return res
 
 
-
 def _compute_gap_energy(atom, gap_control: str, gap_label: str):
     """
     Compute potential energy of a single ASE Atoms object.
