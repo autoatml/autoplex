@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING, Literal
 
 import matplotlib.pyplot as plt
 import numpy as np
+
 try:
     from ase.constraints import voigt_6_to_full_3x3_stress
 except ImportError:

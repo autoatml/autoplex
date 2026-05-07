@@ -15,7 +15,8 @@ from ase.constraints import (
     FixConstraint,
     FixSymmetry,
 )
-try: 
+
+try:
     from ase.constraints import UnitCellFilter
 except ImportError:
     from ase.filters import UnitCellFilter
@@ -27,9 +28,10 @@ from ase.data import atomic_numbers, chemical_symbols
 from ase.geometry import find_mic
 from ase.optimize.precon import Exp, PreconLBFGS
 from ase.units import GPa
-#from mace.calculators import MACECalculator
-#from matgl.ext.ase import M3GNetCalculator
-#from nequip.ase import NequIPCalculator
+
+# from mace.calculators import MACECalculator
+# from matgl.ext.ase import M3GNetCalculator
+# from nequip.ase import NequIPCalculator
 from pymatgen.core import Structure
 from pymatgen.io.ase import AseAtomsAdaptor
 from threadpoolctl import threadpool_limits
@@ -444,6 +446,7 @@ def process_rss(
     elif mlip_type == "M3GNET":
         import matgl
         from matgl.ext.ase import M3GNetCalculator
+
         pot_file = matgl.load_model(path=mlip_path)
         pot = M3GNetCalculator(potential=pot_file)
 

@@ -12,8 +12,6 @@ from monty.json import MontyDecoder, jsanitize
 from monty.serialization import loadfn
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
-
 from torch.optim import Optimizer  # noqa: TC002
 from torch.optim.lr_scheduler import LRScheduler  # noqa: TC002
 
