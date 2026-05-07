@@ -47,7 +47,6 @@ from numpy import ndarray
 from pydantic import Field
 from pymatgen.io.ase import AseAtomsAdaptor
 #from pytorch_lightning.loggers import CSVLogger
-#from quippy import descriptors
 from scipy.spatial import ConvexHull
 from threadpoolctl import threadpool_limits
 
@@ -2072,6 +2071,8 @@ def compute_num_of_descriptor(atom: Atoms, nb: int, cutoff: float) -> list[float
         Returns a list of the number of pairs or triplets a structure is involved in.
 
     """
+    import quippy.descriptors as descriptors
+
     if nb == 2:
         desc = descriptors.Descriptor(f"distance_2b add_species=T cutoff={cutoff}")
     elif nb == 3:

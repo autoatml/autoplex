@@ -76,7 +76,7 @@ strict = [
      "atomate2[strict]==0.0.21; python_version < '3.12'",
      "atomate2[strict]==0.1.1; python_version >= '3.12'",
      #"matgl==1.2.7",
-     "quippy-ase==0.10.2; python_version >= '3.12'",
+     "quippy-ase==0.10.3; python_version >= '3.12'",
      "quippy-ase==0.9.14; python_version < '3.12'",
      #"ase==3.24.0; python_version < '3.12'",
      #"ase>=3.26.0; python_version >= '3.12'",
