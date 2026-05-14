@@ -14,38 +14,41 @@ import xml.etree.ElementTree as ET
 from collections.abc import Iterable
 from functools import partial
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import Literal
 
 import ase
-import lightning as pl
-import matgl
+
+# import lightning as pl
+# import matgl
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import quippy.potential
-import torch
 from ase.atoms import Atoms
 from ase.calculators.singlepoint import SinglePointCalculator
-from ase.constraints import voigt_6_to_full_3x3_stress
+
+try:
+    from ase.constraints import voigt_6_to_full_3x3_stress
+except ImportError:
+    from ase.stress import voigt_6_to_full_3x3_stress
 from ase.data import chemical_symbols
 from ase.io import read, write
 from ase.io.extxyz import XYZError
 from atomate2.utils.path import strip_hostname
-from calorine.nep import read_loss, write_nepfile, write_structures
-from dgl.data.utils import split_dataset
-from matgl.apps.pes import Potential
-from matgl.ext.pymatgen import Structure2Graph, get_element_list
-from matgl.graph.data import MGLDataLoader, MGLDataset, collate_fn_pes
-from matgl.models import M3GNet
-from matgl.utils.training import PotentialLightningModule
+
+# from calorine.nep import read_loss, write_nepfile, write_structures
+# from dgl.data.utils import split_dataset
+# from matgl.apps.pes import Potential
+# from matgl.ext.pymatgen import Structure2Graph, get_element_list
+# from matgl.graph.data import MGLDataLoader, MGLDataset, collate_fn_pes
+# from matgl.models import M3GNet
+# from matgl.utils.training import PotentialLightningModule
 from monty.dev import requires
 from monty.serialization import dumpfn
-from nequip.ase import NequIPCalculator
+
+# from nequip.ase import NequIPCalculator
 from numpy import ndarray
 from pydantic import Field
 from pymatgen.io.ase import AseAtomsAdaptor
-from pytorch_lightning.loggers import CSVLogger
-from quippy import descriptors
 from scipy.spatial import ConvexHull
 from threadpoolctl import threadpool_limits
 
@@ -73,15 +76,6 @@ from autoplex.data.common.utils import (
     stratified_dataset_split,
 )
 from autoplex.settings import PacemakerSettings
-
-if TYPE_CHECKING:
-    from pymatgen.core import Structure
-
-    from autoplex.settings import AutoplexBaseModel
-
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
 
 
 def gap_fitting(
@@ -1171,6 +1165,9 @@ def m3gnet_fitting(
         logger = CSVLogger(name=exp_name, save_dir=os.path.join(results_dir, "logs"))
         # Inference mode = False is required for calculating forces, stress in test mode and prediction mode
         if device == "cuda":
+            import lightning as pl
+            import torch
+
             if torch.cuda.is_available():
                 gpu_id = os.environ.get("CUDA_VISIBLE_DEVICES", "0")
                 torch.cuda.set_device(torch.device(f"cuda:{gpu_id}"))
@@ -2085,6 +2082,8 @@ def compute_num_of_descriptor(atom: Atoms, nb: int, cutoff: float) -> list[float
         Returns a list of the number of pairs or triplets a structure is involved in.
 
     """
+    import quippy.descriptors as descriptors
+
     if nb == 2:
         desc = descriptors.Descriptor(f"distance_2b add_species=T cutoff={cutoff}")
     elif nb == 3:
@@ -2143,7 +2142,10 @@ def run_gap(num_processes_fit: int, parameters) -> None:
         subprocess.call(["gap_fit", *parameters], stdout=file_std, stderr=file_err)
 
 
-class CustomPotential(quippy.potential.Potential):
+from quippy.potential import Potential
+
+
+class CustomPotential(Potential):
     """A custom potential class that modifies the outputs of potentials."""
 
     def calculate(self, *args, **kwargs):
@@ -2204,6 +2206,25 @@ def _compute_gap_energy(atom, gap_control: str, gap_label: str):
     atom.arrays["force"] = atom.get_forces()
     atom.calc = None
     return atom
+
+
+from quippy.potential import Potential
+
+
+class CustomPotential(Potential):
+    """A custom potential class that modifies the outputs of potentials."""
+
+    def calculate(self, *args, **kwargs):
+        """Update the atoms object with forces, energy, and virial information."""
+        res = super().calculate(*args, **kwargs)
+        atoms = kwargs["atoms"] if "atoms" in kwargs else args[0]
+        if "forces" in self.results:
+            atoms.arrays["forces"] = self.results["forces"].copy()
+        if "energy" in self.results:
+            atoms.info["energy"] = self.results["energy"].copy()
+        if "stress" in self.results:
+            atoms.info["stress"] = self.results["stress"].copy()
+        return res
 
 
 def run_ase_gap(

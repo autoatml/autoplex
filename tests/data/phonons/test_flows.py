@@ -1,7 +1,7 @@
 from atomate2.vasp.powerups import update_user_incar_settings
 from atomate2.forcefields.jobs import (
-    GAPRelaxMaker,
-    GAPStaticMaker,
+    ForceFieldRelaxMaker,
+    ForceFieldStaticMaker,
 )
 from atomate2.common.schemas.phonons import PhononBSDOSDoc
 from atomate2.vasp.jobs.core import TightRelaxMaker
@@ -272,9 +272,9 @@ def test_ml_phonon_maker(test_dir, clean_dir, memory_jobstore):
     structure = Structure.from_file(path_to_struct)
 
     gap_phonon_jobs = MLPhononMaker(
-        bulk_relax_maker=GAPRelaxMaker(relax_cell=True, relax_kwargs={"interval": 500}),
-        phonon_displacement_maker=GAPStaticMaker(name="gap phonon static"),
-        static_energy_maker=GAPStaticMaker(),
+        bulk_relax_maker=ForceFieldStaticMaker(force_field_name="gap", relax_cell=True, relax_kwargs={"interval": 500}),
+        phonon_displacement_maker=ForceFieldStaticMaker(force_field_name="gap", name="gap phonon static"),
+        static_energy_maker=ForceFieldStaticMaker(force_field_name="gap"),
 
     ).make_from_ml_model(
         structure=structure, potential_file=potential_file, supercell_settings={"min_length": 20}
