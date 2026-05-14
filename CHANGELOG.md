@@ -1,5 +1,46 @@
 # Changelog
 
+## v0.3.0
+
+<!-- Release notes generated using configuration in .github/release.yml at main -->
+
+# v0.3.0: Pacemaker Integration (Fitting) and FHI-aims Integration (DFT Labelling) into the RSS Workflow
+
+## Pacemaker Integration
+Pacemaker is now integrated into the Autoplex RSS (Random Structure Searching) workflow for fitting ML interatomic potentials. (implemented by @yuxzhou)
+
+## FHI-aims Integration
+In addition to VASP and CASTEP, the RSS workflow now supports DFT labelling with FHI-aims. (implemented by @ansobolev)
+
+## What's Changed
+### 🚀 New Features
+* Add support for FHI-aims by @ansobolev in https://github.com/autoatml/autoplex/pull/479
+* Feature/pacemaker implementation by @yuxzhou in https://github.com/autoatml/autoplex/pull/485
+### 🐛 Bug Fixes
+* Fix test_ratio = 0 case by @ansobolev in https://github.com/autoatml/autoplex/pull/478
+* Resolve MACE bug by @JaGeo in https://github.com/autoatml/autoplex/pull/483
+### 🧹 House-Keeping
+* fix uv install command by @naik-aakash in https://github.com/autoatml/autoplex/pull/461
+* Add mamba cache cleanup step by @naik-aakash in https://github.com/autoatml/autoplex/pull/464
+* Housekeeping by @JaGeo in https://github.com/autoatml/autoplex/pull/490
+* Add .gitattributes to mark tests as vendored by @naik-aakash in https://github.com/autoatml/autoplex/pull/491
+* Merge test durations by @naik-aakash in https://github.com/autoatml/autoplex/pull/493
+* remove duplicate run triggers of test workflows by @naik-aakash in https://github.com/autoatml/autoplex/pull/494
+* include pacemaker test-durations and coverage  by @naik-aakash in https://github.com/autoatml/autoplex/pull/495
+### 🔄 Other Changes
+* Revise changelog for v0.2.0 release by @JaGeo in https://github.com/autoatml/autoplex/pull/460
+* Add f90wrap dependency to pyproject.toml by @JaGeo in https://github.com/autoatml/autoplex/pull/468
+* Aims docs by @ansobolev in https://github.com/autoatml/autoplex/pull/487
+* Add downloads badge to README by @JaGeo in https://github.com/autoatml/autoplex/pull/488
+* A PR to request developer access by @yuxzhou in https://github.com/autoatml/autoplex/pull/489
+
+## New Contributors
+* @ansobolev made their first contribution in https://github.com/autoatml/autoplex/pull/478
+* @yuxzhou made their first contribution in https://github.com/autoatml/autoplex/pull/489
+
+**Full Changelog**: https://github.com/autoatml/autoplex/compare/v0.2.0...v0.3.0
+
+
 ## v0.2.0
 
 Previously, **autoplex** supported DFT labelling of structures primarily via **VASP**.
