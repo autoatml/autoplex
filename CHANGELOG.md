@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.3.1
+
+<!-- Release notes generated using configuration in .github/release.yml at main -->
+
+## What's Changed
+### 🔄 Other Changes
+* Implement error handling for matgl model loading by @JaGeo in https://github.com/autoatml/autoplex/pull/503
+
+
+**Full Changelog**: https://github.com/autoatml/autoplex/compare/v0.3.0...v0.3.1
+
+
 ## v0.3.0
 
 <!-- Release notes generated using configuration in .github/release.yml at main -->
