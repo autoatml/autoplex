@@ -4,8 +4,6 @@
 
 <!-- Release notes generated using configuration in .github/release.yml at main -->
 
-# v0.3.0: Pacemaker Integration (Fitting) and FHI-aims Integration (DFT Labelling) into the RSS Workflow
-
 ## Pacemaker Integration
 Pacemaker is now integrated into the Autoplex RSS (Random Structure Searching) workflow for fitting ML interatomic potentials. (implemented by @yuxzhou)
 
