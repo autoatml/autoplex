@@ -1141,7 +1141,7 @@ def m3gnet_fitting(
             )
             try:
                 m3gnet_nnp = matgl.load_model(m3gnet_hypers["foundation_model"])
-            except:
+            except ValueError:
                 base_matgl_url = "https://github.com/materialyzeai/matgl/raw/v2.1.1/pretrained_models/"
                 matgl.config.PRETRAINED_MODELS_BASE_URL = base_matgl_url
                 matgl.utils.io.PRETRAINED_MODELS_BASE_URL = base_matgl_url
