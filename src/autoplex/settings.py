@@ -240,7 +240,7 @@ class RssConfig(AutoplexBaseModel):
         description="Command to be called when using 'custom' option for builder. "
         "Must be either an absolute path to executable, or accessible via $PATH",
     )
-    custom_builder_args: str | dict[str] | None = Field(
+    custom_builder_args: str | dict[str, str] | None = Field(
         default=None, description="Arguments to be passed to custom builder command"
     )
     cell_seed_paths: list[str] | None = Field(

@@ -437,11 +437,11 @@ class CustomRandomizedStructure(Maker):
         Name of the file to store all generated structures.
     """
 
+    custom_builder_cmd: str
+    custom_builder_args: str
     name: str = "build_random_cells"
     tag: str = "Si"
     struct_number: int = 20
-    custom_builder_cmd: str
-    custom_builder_args: str
     remove_tmp_files: bool = True
     output_file_name: str = "random_structs.extxyz"
 
