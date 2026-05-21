@@ -63,6 +63,9 @@ _DEFAULT_STATIC_ENERGY_MAKER = StaticMaker(
 def initial_rss(
     tag: str,
     generated_struct_numbers: list[int],
+    builder: str = "buildcell",
+    custom_builder_cmd: str | None = None,
+    custom_builder_args: str | None = None,
     jobprefix: str = "",
     num_of_initial_selected_structs: list[int] | None = None,
     cell_seed_paths: list[str] | None = None,
@@ -248,6 +251,9 @@ def initial_rss(
 
     do_randomized_structure_generation = BuildMultiRandomizedStructure(
         generated_struct_numbers=generated_struct_numbers,
+        builder=builder,
+        custom_builder_cmd=custom_builder_cmd,
+        custom_builder_args=custom_builder_args,
         cell_seed_paths=cell_seed_paths,
         buildcell_options=buildcell_options,
         fragment_file=fragment_file,
@@ -343,6 +349,9 @@ def do_rss_iterations(
     input: dict,
     tag: str,
     generated_struct_numbers: list[int],
+    builder: str = "buildcell",
+    custom_builder_cmd: str | None = None,
+    custom_builder_args: str | None = None,
     jobprefix: str = "",
     num_of_initial_selected_structs: list[int] | None = None,
     cell_seed_paths: list[str] | None = None,
@@ -636,6 +645,9 @@ def do_rss_iterations(
 
         do_randomized_structure_generation = BuildMultiRandomizedStructure(
             generated_struct_numbers=generated_struct_numbers,
+            builder=builder,
+            custom_builder_cmd=custom_builder_cmd,
+            custom_builder_args=custom_builder_args,
             cell_seed_paths=cell_seed_paths,
             buildcell_options=buildcell_options,
             fragment_file=fragment_file,

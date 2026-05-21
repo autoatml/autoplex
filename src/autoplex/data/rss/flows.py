@@ -7,7 +7,7 @@ from jobflow import Flow, Maker, Response, job
 from autoplex.data.common.jobs import (
     sample_data,
 )
-from autoplex.data.rss.jobs import RandomizedStructure
+from autoplex.data.rss.jobs import RandomizedStructure, CustomRandomizedStructure
 
 __all__ = ["BuildMultiRandomizedStructure"]
 
@@ -58,6 +58,9 @@ class BuildMultiRandomizedStructure(Maker):
 
     tag: str
     generated_struct_numbers: list[int]
+    builder: str
+    custom_builder_cmd: str | None = None
+    custom_builder_args: str | None = None
     cell_seed_paths: list[str] | None = None
     buildcell_options: list[dict] | None = None
     fragment_file: str | None = None
@@ -80,24 +83,37 @@ class BuildMultiRandomizedStructure(Maker):
         job_list = []
         final_structures = []
         for i, struct_number in enumerate(self.generated_struct_numbers):
-            cell_seed_path = None
-            buildcell_option = None
-            if self.cell_seed_paths is not None:
-                assert len(self.generated_struct_numbers) == len(self.cell_seed_paths)
-                cell_seed_path = self.cell_seed_paths[i]
-            elif self.buildcell_options is not None:
-                assert len(self.generated_struct_numbers) == len(self.buildcell_options)
-                buildcell_option = self.buildcell_options[i]
-            job_struct = RandomizedStructure(
-                tag=self.tag,
-                struct_number=struct_number,
-                remove_tmp_files=self.remove_tmp_files,
-                cell_seed_path=cell_seed_path,
-                buildcell_option=buildcell_option,
-                fragment_file=self.fragment_file,
-                fragment_numbers=self.fragment_numbers,
-                num_processes=self.num_processes,
-            ).make()
+            if self.builder == "buildcell":
+                cell_seed_path = None
+                buildcell_option = None
+                if self.cell_seed_paths is not None:
+                    assert len(self.generated_struct_numbers) == len(
+                        self.cell_seed_paths
+                    )
+                    cell_seed_path = self.cell_seed_paths[i]
+                elif self.buildcell_options is not None:
+                    assert len(self.generated_struct_numbers) == len(
+                        self.buildcell_options
+                    )
+                    buildcell_option = self.buildcell_options[i]
+                job_struct = RandomizedStructure(
+                    tag=self.tag,
+                    struct_number=struct_number,
+                    remove_tmp_files=self.remove_tmp_files,
+                    cell_seed_path=cell_seed_path,
+                    buildcell_option=buildcell_option,
+                    fragment_file=self.fragment_file,
+                    fragment_numbers=self.fragment_numbers,
+                    num_processes=self.num_processes,
+                ).make()
+            elif self.builder == "custom":
+                job_struct = CustomRandomizedStructure(
+                    tag=self.tag,
+                    struct_number=struct_number,
+                    remove_tmp_files=self.remove_tmp_files,
+                    custom_builder_cmd=self.custom_builder_cmd,
+                    custom_builder_args=self.custom_builder_args,
+                ).make()
             job_struct.name = f"{self.name}_{i}"
 
             if self.initial_selection_enabled:
