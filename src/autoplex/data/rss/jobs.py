@@ -440,15 +440,15 @@ class CustomRandomizedStructure(Maker):
     custom_builder_cmd: str
     custom_builder_args: str
     name: str = "build_random_cells"
-    tag: str = "Si"
     struct_number: int = 20
-    remove_tmp_files: bool = True
+    tag: str = "Si"
     output_file_name: str = "random_structs.extxyz"
+    remove_tmp_files: bool = True
+    num_processes: int = 32
 
     @job
     def make(self):
         """Maker to create random structures by a specified 3rd party tool."""
-
         with Pool(processes=self.num_processes) as pool:
             args = [
                 (

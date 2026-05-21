@@ -7,7 +7,7 @@ from jobflow import Flow, Maker, Response, job
 from autoplex.data.common.jobs import (
     sample_data,
 )
-from autoplex.data.rss.jobs import RandomizedStructure, CustomRandomizedStructure
+from autoplex.data.rss.jobs import CustomRandomizedStructure, RandomizedStructure
 
 __all__ = ["BuildMultiRandomizedStructure"]
 
