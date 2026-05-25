@@ -2141,7 +2141,10 @@ def run_gap(num_processes_fit: int, parameters) -> None:
     ):
         subprocess.call(["gap_fit", *parameters], stdout=file_std, stderr=file_err)
 
+
 from quippy.potential import Potential
+
+
 class CustomPotential(Potential):
     """A custom potential class that modifies the outputs of potentials."""
 
