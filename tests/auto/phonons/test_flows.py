@@ -812,7 +812,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_gap_ml_potential_for_data(
 
     complete_workflow = CompleteDFTvsMLBenchmarkWorkflow(
         symprec=1e-2, displacements=[0.01],
-        volume_custom_scale_factors=[0.975, 1.0, 1.025, 1.05],
+        volume_custom_scale_factors=[0.96, 0.99, 1.0, 1.01, 1.04],
         supercell_settings={"min_length": 8, "min_atoms": 20},
         apply_data_preprocessing=True,
         displacement_maker=ForceFieldStaticMaker(force_field_name="MACE_MP_0B3"),

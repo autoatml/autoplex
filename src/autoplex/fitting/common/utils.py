@@ -2150,11 +2150,11 @@ class CustomPotential(Potential):
         res = super().calculate(*args, **kwargs)
         atoms = kwargs["atoms"] if "atoms" in kwargs else args[0]
         if "forces" in self.results:
-            atoms.arrays["forces"] = self.results["forces"].copy()
+            atoms.arrays["forces"] = self.results["forces"]
         if "energy" in self.results:
-            atoms.info["energy"] = self.results["energy"].copy()
+            atoms.info["energy"] = self.results["energy"]
         if "stress" in self.results:
-            atoms.info["stress"] = self.results["stress"].copy()
+            atoms.info["stress"] = self.results["stress"]
         return res
 
 
@@ -2174,11 +2174,11 @@ class AutoplexPyACECalculator(PyACECalculator):
 
         # Sync standard properties back to atoms object containers
         if "forces" in self.results:
-            atoms_obj.arrays["forces"] = self.results["forces"].copy()
+            atoms_obj.arrays["forces"] = self.results["forces"]
         if "energy" in self.results:
             atoms_obj.info["energy"] = self.results["energy"]
         if "stress" in self.results:
-            atoms_obj.info["stress"] = self.results["stress"].copy()
+            atoms_obj.info["stress"] = self.results["stress"]
 
         return res
 
@@ -2216,11 +2216,11 @@ class CustomPotential(Potential):
         res = super().calculate(*args, **kwargs)
         atoms = kwargs["atoms"] if "atoms" in kwargs else args[0]
         if "forces" in self.results:
-            atoms.arrays["forces"] = self.results["forces"].copy()
+            atoms.arrays["forces"] = self.results["forces"]
         if "energy" in self.results:
-            atoms.info["energy"] = self.results["energy"].copy()
+            atoms.info["energy"] = self.results["energy"]
         if "stress" in self.results:
-            atoms.info["stress"] = self.results["stress"].copy()
+            atoms.info["stress"] = self.results["stress"]
         return res
 
 
