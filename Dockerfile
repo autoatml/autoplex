@@ -49,7 +49,7 @@ RUN curl -fsSL https://www.mtg.msm.cam.ac.uk/files/airss-0.9.4.tgz -o /opt/airss
     && rm /opt/airss-0.9.4.tgz \
     && cd /opt/airss \
     && make spglib \
-    && make internal
+    && make internal \
     && make install_internal \
     && make neat
 
