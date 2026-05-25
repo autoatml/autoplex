@@ -38,7 +38,7 @@ jobs:
     
     - name: Extract version from release tag
       run: |
-        echo "VERSION=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
+        echo "VERSION=${{ github.event.release.tag_name ||  github.ref_name }}" >> $GITHUB_ENV
 
     # Build Docker image with a custom Python version
     - name: Build Docker image (Python ${{ matrix.python-version }})
