@@ -44,12 +44,13 @@ RUN curl -fsSL https://julialang-s3.julialang.org/bin/linux/x64/1.9/julia-1.9.2-
 RUN julia -e 'using Pkg; Pkg.Registry.add("General"); Pkg.Registry.add(Pkg.Registry.RegistrySpec(url="https://github.com/ACEsuit/ACEregistry")); Pkg.add(Pkg.PackageSpec(;name="ACEpotentials", version="0.6.7")); Pkg.add("DataFrames"); Pkg.add("CSV")'
 
 # Install Buildcell (airss)
-RUN curl -fsSL https://www.mtg.msm.cam.ac.uk/files/airss-0.9.4.tgz -o /opt/airss-0.9.3.tgz \
+RUN curl -fsSL https://www.mtg.msm.cam.ac.uk/files/airss-0.9.4.tgz -o /opt/airss-0.9.4.tgz \
     && tar -xf /opt/airss-0.9.4.tgz -C /opt \
     && rm /opt/airss-0.9.4.tgz \
     && cd /opt/airss \
-    && make \
-    && make install \
+    && make spglib \
+    && make internal
+    && make install_internal \
     && make neat
 
 # Add Buildcell to PATH
