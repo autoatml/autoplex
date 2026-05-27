@@ -53,7 +53,7 @@ cmake  -C ../cmake/presets/clang.cmake -D BUILD_SHARED_LIBS=on -D BUILD_MPI=yes 
 -DMLIAP_ENABLE_PYTHON=yes -D PKG_PYTHON=on -D PKG_KOKKOS=yes -D Kokkos_ARCH_ZEN3=yes \
 -D PKG_PHONON=yes -D PKG_MOLECULE=yes -D PKG_MANYBODY=yes \
 -D Kokkos_ENABLE_OPENMP=yes -D BUILD_OMP=yes -D LAMMPS_EXCEPTIONS=yes \
--D PKG_ML-PACE=yes -D PACELIB_MD5=$(md5sum libpace.tar3gz | awk '{print $1}') \
+-D PKG_ML-PACE=yes -D PACELIB_MD5=$(md5sum libpace.tar.gz | awk '{print $1}') \
 -D CMAKE_INSTALL_PREFIX=$LAMMPS_INSTALL -D CMAKE_EXE_LINKER_FLAGS:STRING="-lgfortran" \
 ../cmake
 
