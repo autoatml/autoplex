@@ -97,6 +97,7 @@ julia -e 'using Pkg; Pkg.Registry.add("General"); Pkg.Registry.add(Pkg.Registry.
 
 ```bash
 pip install autoplex[pacemaker]
+pip install setuptools==81.0.0
 pip install tensorflow==2.8.0
 pip install --no-deps git+https://github.com/ICAMS/TensorPotential.git@1e44b2558356800ae070658c0bb856ff9bf74538
 # Ensure CMake is available before running this:
@@ -117,7 +118,7 @@ apt install -y build-essential gfortran
 ````
 
 ```bash
-curl -O https://www.mtg.msm.cam.ac.uk/files/airss-0.9.3.tgz; tar -xf airss-0.9.3.tgz; rm airss-0.9.3.tgz; cd airss; make ; make install ; make neat; cd ..
+curl -O https://www.mtg.msm.cam.ac.uk/files/airss-0.9.3.tgz; tar -xf airss-0.9.3.tgz; rm airss-0.9.3.tgz; cd airss; make spglib; make internal; make install_internal; make neat; cd ..
 ```
 
 Please find out about licenses and citation requirements here: [https://airss-docs.github.io/](https://airss-docs.github.io/)
