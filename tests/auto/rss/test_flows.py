@@ -385,7 +385,7 @@ def test_mock_workflow_for_GAP(test_dir, mock_vasp, memory_jobstore, clean_dir):
     }
 
     fake_run_vasp_kwargs = {
-        **{f"static_bulk_{i}": {"check_inputs": ["incar", "potcar"]}},
+        **{f"static_bulk_{i}": {"check_inputs": ["incar", "potcar"]} for i in range(18)},
         "static_isolated_0": {"incar_settings": {"ISPIN": 2, "KSPACINGS": 2.0}},
         "static_dimer_0": {"incar_settings": {"ISPIN": 2, "KSPACINGS": 2.0}},
         "static_dimer_1": {"incar_settings": {"ISPIN": 2, "KSPACINGS": 2.0}},
