@@ -117,7 +117,7 @@ apt install -y build-essential gfortran
 ````
 
 ```bash
-curl -O https://www.mtg.msm.cam.ac.uk/files/airss-0.9.4.tgz; tar -xf airss-0.9.4.tgz; rm airss-0.9.4.tgz; cd airss; make spglib; make internal; make install_internal; make neat; cd ..
+curl -O https://www.mtg.msm.cam.ac.uk/files/airss-0.9.3.tgz; tar -xf airss-0.9.3.tgz; rm airss-0.9.3.tgz; cd airss; make spglib; make internal; make install_internal; make neat; cd ..
 ```
 
 Please find out about licenses and citation requirements here: [https://airss-docs.github.io/](https://airss-docs.github.io/)
