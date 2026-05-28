@@ -17,8 +17,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
 import ase
-import lightning as pl
-import matgl
+
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -31,23 +31,29 @@ from ase.data import chemical_symbols
 from ase.io import read, write
 from ase.io.extxyz import XYZError
 from atomate2.utils.path import strip_hostname
-from calorine.nep import read_loss, write_nepfile, write_structures
-from dgl.data.utils import split_dataset
-from matgl.apps.pes import Potential
-from matgl.ext.pymatgen import Structure2Graph, get_element_list
-from matgl.graph.data import MGLDataLoader, MGLDataset, collate_fn_pes
-from matgl.models import M3GNet
-from matgl.utils.training import PotentialLightningModule
+
 from monty.dev import requires
 from monty.serialization import dumpfn
-from nequip.ase import NequIPCalculator
+
 from numpy import ndarray
 from pydantic import Field
 from pymatgen.io.ase import AseAtomsAdaptor
-from pytorch_lightning.loggers import CSVLogger
 from quippy import descriptors
 from scipy.spatial import ConvexHull
 from threadpoolctl import threadpool_limits
+
+try: 
+    from matgl.models import M3GNET
+    has_m3gnet=True
+except:
+    has_m3gnet = False
+
+
+try: 
+    from calorine.nep import read_loss, write_nepfile, write_structures
+    has_nep=True
+except:
+    has_nep=False
 
 try:
     from pyace.asecalc import PyACECalculator
@@ -57,15 +63,6 @@ except ImportError:
     PyACECalculator = object
     has_ypace = False
 
-from autoplex import (
-    GAP_HYPERS,
-    JACE_HYPERS,
-    M3GNET_HYPERS,
-    MACE_HYPERS,
-    NEP_HYPERS,
-    NEQUIP_HYPERS,
-    PACEMAKER_HYPERS,
-)
 from autoplex.data.common.utils import (
     data_distillation,
     plot_energy_forces,
@@ -87,7 +84,7 @@ logging.basicConfig(
 def gap_fitting(
     db_dir: Path,
     species_list: list | None = None,
-    hyperparameters: GAP_HYPERS = GAP_HYPERS,
+    hyperparameters = None,
     num_processes_fit: int = 32,
     auto_delta: bool = True,
     glue_xml: bool = False,
@@ -141,6 +138,12 @@ def gap_fitting(
         A dictionary with train_error, test_error, path_to_mlip
 
     """
+    
+    if hyperparameters is None:
+        from autoplex import GAP_HYPERS
+
+        hyperparameters = GAP_HYPERS
+
     hyperparameters = hyperparameters.model_copy(deep=True)
     # keep additional pre- and suffixes
     gap_file_xml = train_name.replace("train", "gap_file").replace(".extxyz", ".xml")
@@ -354,7 +357,7 @@ def gap_fitting(
 )
 def jace_fitting(
     db_dir: str | Path,
-    hyperparameters: JACE_HYPERS = JACE_HYPERS,
+    hyperparameters= None,
     isolated_atom_energies: dict | None = None,
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
@@ -413,6 +416,11 @@ def jace_fitting(
     ------
     - ValueError: If the `isolated_atom_energies` dictionary is empty or not provided when required.
     """
+    if hyperparameters is None:
+        from autoplex import JACE_HYPERS
+
+        hyperparameters = JACE_HYPERS
+        
     hyperparameters = hyperparameters.model_copy(deep=True)
     train_atoms = ase.io.read(os.path.join(db_dir, "train.extxyz"), index=":")
     if not disable_testing:
@@ -535,7 +543,7 @@ export2lammps("acemodel.yace", model)
 
 def nep_fitting(
     db_dir: str | Path,
-    hyperparameters: NEP_HYPERS = NEP_HYPERS,
+    hyperparameters = None,
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",
@@ -636,6 +644,11 @@ def nep_fitting(
     dict[str, float]
         A dictionary mapping 'train_error', 'test_error', and 'mlip_path'.
     """
+    if hyperparameters is None:
+        from autoplex import NEP_HYPERS
+
+        hyperparameters = NEP_HYPERS
+        
     hyperparameters = hyperparameters.model_copy(deep=True)
 
     train_data = ase.io.read(os.path.join(db_dir, "train.extxyz"), index=":")
@@ -704,7 +717,7 @@ def nep_fitting(
 
 def nequip_fitting(
     db_dir: Path,
-    hyperparameters: NEQUIP_HYPERS = NEQUIP_HYPERS,
+    hyperparameters = None,
     isolated_atom_energies: dict | None = None,
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
@@ -777,6 +790,11 @@ def nequip_fitting(
     """
     [TODO] train Nequip on virials
     """
+    if hyperparameters is None:
+        from autoplex import NEQUIP_HYPERS
+
+        hyperparameters = NEQUIP_HYPERS
+    
     hyperparameters = hyperparameters.model_copy(deep=True)
 
     train_data = ase.io.read(os.path.join(db_dir, "train.extxyz"), index=":")
@@ -833,7 +851,7 @@ def nequip_fitting(
         "nequip-deploy build --train-dir results/autoplex ./deployed_nequip_model.pth",
         "nequip_deploy",
     )
-
+    from nequip.ase import NequIPCalculator
     calc = NequIPCalculator.from_deployed_model(
         model_path="deployed_nequip_model.pth",
         device=device,
@@ -871,10 +889,10 @@ def nequip_fitting(
         "mlip_path": Path.cwd(),
     }
 
-
+@requires(has_m3gnet, "matgl package must be installed to use M3GNET.")
 def m3gnet_fitting(
     db_dir: Path,
-    hyperparameters: M3GNET_HYPERS = M3GNET_HYPERS,
+    hyperparameters = None,
     device: str = "cuda",
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
@@ -949,6 +967,20 @@ def m3gnet_fitting(
     *    Availability: https://matgl.ai/tutorials%2FTraining%20a%20M3GNet%20Potential%20with%20PyTorch%20Lightning.html
     *    License: BSD 3-Clause License
     """
+    import matgl
+    import lightning as pl
+    from dgl.data.utils import split_dataset
+    from matgl.apps.pes import Potential
+    from matgl.ext.pymatgen import Structure2Graph, get_element_list
+    from matgl.graph.data import MGLDataLoader, MGLDataset, collate_fn_pes
+    from matgl.models import M3GNet
+    from matgl.utils.training import PotentialLightningModule
+    from pytorch_lightning.loggers import CSVLogger
+
+    if hyperparameters is None:
+        from autoplex import M3GNET_HYPERS
+
+        hyperparameters = M3GNET_HYPERS
     hyperparameters = hyperparameters.model_copy(deep=True)
 
     if fit_kwargs:
@@ -1297,7 +1329,7 @@ def m3gnet_fitting(
 
 def mace_fitting(
     db_dir: Path,
-    hyperparameters: AutoplexBaseModel = MACE_HYPERS,
+    hyperparameters = None,
     device: Literal["cpu", "cuda", "mps", "xpu"] = Field(
         default="cpu", description="Device to be used for model fitting"
     ),
@@ -1368,6 +1400,10 @@ def mace_fitting(
         A dictionary containing train_error, test_error, and the path to the fitted MLIP.
 
     """
+    if hyperparameters is None:
+        from autoplex import MACE_HYPERS
+
+        hyperparameters = MACE_HYPERS
     hyperparameters = hyperparameters.model_copy(deep=True)
 
     # at the moment, we simply use energies, forces and virials/stresses for fitting.
@@ -2611,7 +2647,7 @@ def convert_to_pacemaker_pickle(
 def pace_fitting(
     db_dir: Path | str,
     species_list: list[str] | None = None,
-    hyperparameters: PacemakerSettings = PACEMAKER_HYPERS,
+    hyperparameters = None,
     fit_kwargs: dict | None = None,
     isolated_atom_energies: dict | None = None,
     ref_energy_name: str = "REF_energy",
@@ -2655,6 +2691,11 @@ def pace_fitting(
     dict
         A dictionary containing 'train_error', 'test_error', and 'mlip_path'.
     """
+    if hyperparameters is None:
+        from autoplex import PACEMAKER_HYPERS
+
+        hyperparameters = PACEMAKER_HYPERS
+    
     # Defensive copy of hyperparameters
     try:
         hyperparameters = hyperparameters.model_copy(deep=True)
