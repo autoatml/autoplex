@@ -92,7 +92,7 @@ def test_gap_fixed_delta_fit_maker(test_dir, memory_jobstore, clean_dir):
             check=False,
         ).stdout.strip()
     )
-    == "true",
+    == "true", reason="J-ACE is not installed"
 )
 def test_jace_fit_maker(test_dir, memory_jobstore, clean_dir):
 
@@ -116,7 +116,7 @@ def test_jace_fit_maker(test_dir, memory_jobstore, clean_dir):
     assert Path(jacefit.output["mlip_path"][0].resolve(memory_jobstore)).exists()
 
 @pytest.mark.skipif(
-  not has_nequip
+  not has_nequip, reason="NequIP is not installed"
 )
 def test_nequip_fit_maker(test_dir, memory_jobstore, clean_dir):
     database_dir = test_dir / "fitting/rss_training_dataset/"
@@ -140,7 +140,7 @@ def test_nequip_fit_maker(test_dir, memory_jobstore, clean_dir):
     assert Path(nequipfit.output["mlip_path"][0].resolve(memory_jobstore)).exists()
 
 @pytest.mark.skipif(
-  not has_m3gnet
+  not has_m3gnet, reason="Matgl is not installed"
 )
 def test_m3gnet_fit_maker(test_dir, memory_jobstore, clean_dir):
     database_dir = test_dir / "fitting/rss_training_dataset/"
@@ -355,7 +355,7 @@ def test_mace_finetuning_maker(test_dir, memory_jobstore, clean_dir, caplog):
 
 
 @pytest.mark.skipif(
-  not has_ypace
+  not has_ypace, reason="Pacemaker is not installed"
 )    
 def test_pace_fit_maker_defaults(test_dir, memory_jobstore, clean_dir):
 
@@ -392,7 +392,7 @@ def test_pace_fit_maker_defaults(test_dir, memory_jobstore, clean_dir):
         assert config.get("cutoff") == 5.0 
 
 @pytest.mark.skipif(
-  not has_ypace
+  not has_ypace, reason="Pacemaker is not installed."
 )
 def test_pace_fit_maker_custom(test_dir, memory_jobstore, clean_dir):
     database_dir = test_dir / "fitting/rss_training_dataset/"

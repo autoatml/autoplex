@@ -561,7 +561,7 @@ def test_mock_workflow_for_GAP(test_dir, mock_vasp, memory_jobstore, clean_dir):
             check=False,
         ).stdout.strip()
     )
-    == "true",
+    == "true", reason="J-Ace is not installed."
 )
 def test_mock_workflow_for_PACE(test_dir, mock_vasp, memory_jobstore, clean_dir):
     """

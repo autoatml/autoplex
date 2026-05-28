@@ -116,7 +116,7 @@ def fit_input_dict_glue_xml(vasp_test_dir):
                     (vasp_test_dir / "Si_glue_xml_fit" / "rattled_supercell_4")
                     .absolute()
                     .as_posix(),
-                    (vasp_test_dir / "Si_glue_xml_fit" / "rattled_supercell_5")
+                    vasp_test_dir / "Si_glue_xml_fit" / "rattled_supercell_5")
                     .absolute()
                     .as_posix(),
                 ]
@@ -254,7 +254,7 @@ def test_mlip_fit_maker_with_pre_database_dir(
             check=False,
         ).stdout.strip()
     )
-    == "true",
+    == "true",reason="J-ACE is not installed."
 )
 def test_mlip_fit_maker_jace(
         test_dir, memory_jobstore, vasp_test_dir, fit_input_dict, clean_dir
@@ -288,7 +288,7 @@ def test_mlip_fit_maker_jace(
     assert Path(jacefit.output["mlip_path"][0].resolve(memory_jobstore)).exists()
 
 @pytest.mark.skipif(
-  not has_nep
+  not has_nep, reason="NEP is not installed"
 )
 def test_mlip_fit_maker_nep(
         test_dir, memory_jobstore, vasp_test_dir, fit_input_dict, mock_nep, clean_dir
@@ -328,7 +328,7 @@ def test_mlip_fit_maker_nep(
     assert nepfit.output["convergence"].resolve(memory_jobstore)
 
 @pytest.mark.skipif(
-  not has_nequip
+  not has_nequip, reason="NEQUIP is not installed"
 )
 def test_mlip_fit_maker_nequip(
         test_dir, memory_jobstore, vasp_test_dir, fit_input_dict, clean_dir
@@ -361,7 +361,7 @@ def test_mlip_fit_maker_nequip(
     assert Path(nequipfit.output["mlip_path"][0].resolve(memory_jobstore)).exists()
 
 @pytest.mark.skipif(
-  not has_m3gnet
+  not has_m3gnet, reason="M3GNET is not installed"
 )
 def test_mlip_fit_maker_m3gnet(
         test_dir, memory_jobstore, vasp_test_dir, fit_input_dict, clean_dir
@@ -442,7 +442,7 @@ def test_mlip_fit_maker_mace(
     assert Path(macefit.output["mlip_path"][0].resolve(memory_jobstore)).exists()
 
 @pytest.mark.skipif(
-  not has_ypace
+  not has_ypace, reason="Pacemaker is not installed."
 )
 def test_mlip_fit_maker_pace(
         test_dir, memory_jobstore, vasp_test_dir, fit_input_dict, clean_dir
