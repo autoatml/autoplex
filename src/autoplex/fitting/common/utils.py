@@ -17,8 +17,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
 import ase
-
-
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -31,10 +29,8 @@ from ase.data import chemical_symbols
 from ase.io import read, write
 from ase.io.extxyz import XYZError
 from atomate2.utils.path import strip_hostname
-
 from monty.dev import requires
 from monty.serialization import dumpfn
-
 from numpy import ndarray
 from pydantic import Field
 from pymatgen.io.ase import AseAtomsAdaptor
@@ -42,18 +38,18 @@ from quippy import descriptors
 from scipy.spatial import ConvexHull
 from threadpoolctl import threadpool_limits
 
-try: 
-    from matgl.models import M3GNET
-    has_m3gnet=True
+try:
+    has_m3gnet = True
 except:
     has_m3gnet = False
 
 
-try: 
+try:
     from calorine.nep import read_loss, write_nepfile, write_structures
-    has_nep=True
+
+    has_nep = True
 except:
-    has_nep=False
+    has_nep = False
 
 try:
     from pyace.asecalc import PyACECalculator
@@ -74,7 +70,6 @@ from autoplex.settings import PacemakerSettings
 if TYPE_CHECKING:
     from pymatgen.core import Structure
 
-    from autoplex.settings import AutoplexBaseModel
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
@@ -84,7 +79,7 @@ logging.basicConfig(
 def gap_fitting(
     db_dir: Path,
     species_list: list | None = None,
-    hyperparameters = None,
+    hyperparameters=None,
     num_processes_fit: int = 32,
     auto_delta: bool = True,
     glue_xml: bool = False,
@@ -138,7 +133,6 @@ def gap_fitting(
         A dictionary with train_error, test_error, path_to_mlip
 
     """
-    
     if hyperparameters is None:
         from autoplex import GAP_HYPERS
 
@@ -357,7 +351,7 @@ def gap_fitting(
 )
 def jace_fitting(
     db_dir: str | Path,
-    hyperparameters= None,
+    hyperparameters=None,
     isolated_atom_energies: dict | None = None,
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
@@ -420,7 +414,7 @@ def jace_fitting(
         from autoplex import JACE_HYPERS
 
         hyperparameters = JACE_HYPERS
-        
+
     hyperparameters = hyperparameters.model_copy(deep=True)
     train_atoms = ase.io.read(os.path.join(db_dir, "train.extxyz"), index=":")
     if not disable_testing:
@@ -543,7 +537,7 @@ export2lammps("acemodel.yace", model)
 
 def nep_fitting(
     db_dir: str | Path,
-    hyperparameters = None,
+    hyperparameters=None,
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
     ref_virial_name: str = "REF_virial",
@@ -648,7 +642,7 @@ def nep_fitting(
         from autoplex import NEP_HYPERS
 
         hyperparameters = NEP_HYPERS
-        
+
     hyperparameters = hyperparameters.model_copy(deep=True)
 
     train_data = ase.io.read(os.path.join(db_dir, "train.extxyz"), index=":")
@@ -717,7 +711,7 @@ def nep_fitting(
 
 def nequip_fitting(
     db_dir: Path,
-    hyperparameters = None,
+    hyperparameters=None,
     isolated_atom_energies: dict | None = None,
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
@@ -794,7 +788,7 @@ def nequip_fitting(
         from autoplex import NEQUIP_HYPERS
 
         hyperparameters = NEQUIP_HYPERS
-    
+
     hyperparameters = hyperparameters.model_copy(deep=True)
 
     train_data = ase.io.read(os.path.join(db_dir, "train.extxyz"), index=":")
@@ -852,6 +846,7 @@ def nequip_fitting(
         "nequip_deploy",
     )
     from nequip.ase import NequIPCalculator
+
     calc = NequIPCalculator.from_deployed_model(
         model_path="deployed_nequip_model.pth",
         device=device,
@@ -889,10 +884,11 @@ def nequip_fitting(
         "mlip_path": Path.cwd(),
     }
 
+
 @requires(has_m3gnet, "matgl package must be installed to use M3GNET.")
 def m3gnet_fitting(
     db_dir: Path,
-    hyperparameters = None,
+    hyperparameters=None,
     device: str = "cuda",
     ref_energy_name: str = "REF_energy",
     ref_force_name: str = "REF_forces",
@@ -967,8 +963,8 @@ def m3gnet_fitting(
     *    Availability: https://matgl.ai/tutorials%2FTraining%20a%20M3GNet%20Potential%20with%20PyTorch%20Lightning.html
     *    License: BSD 3-Clause License
     """
-    import matgl
     import lightning as pl
+    import matgl
     from dgl.data.utils import split_dataset
     from matgl.apps.pes import Potential
     from matgl.ext.pymatgen import Structure2Graph, get_element_list
@@ -1329,7 +1325,7 @@ def m3gnet_fitting(
 
 def mace_fitting(
     db_dir: Path,
-    hyperparameters = None,
+    hyperparameters=None,
     device: Literal["cpu", "cuda", "mps", "xpu"] = Field(
         default="cpu", description="Device to be used for model fitting"
     ),
@@ -2647,7 +2643,7 @@ def convert_to_pacemaker_pickle(
 def pace_fitting(
     db_dir: Path | str,
     species_list: list[str] | None = None,
-    hyperparameters = None,
+    hyperparameters=None,
     fit_kwargs: dict | None = None,
     isolated_atom_energies: dict | None = None,
     ref_energy_name: str = "REF_energy",
@@ -2695,7 +2691,7 @@ def pace_fitting(
         from autoplex import PACEMAKER_HYPERS
 
         hyperparameters = PACEMAKER_HYPERS
-    
+
     # Defensive copy of hyperparameters
     try:
         hyperparameters = hyperparameters.model_copy(deep=True)
