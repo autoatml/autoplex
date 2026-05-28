@@ -116,7 +116,7 @@ def fit_input_dict_glue_xml(vasp_test_dir):
                     (vasp_test_dir / "Si_glue_xml_fit" / "rattled_supercell_4")
                     .absolute()
                     .as_posix(),
-                    vasp_test_dir / "Si_glue_xml_fit" / "rattled_supercell_5")
+                    (vasp_test_dir / "Si_glue_xml_fit" / "rattled_supercell_5")
                     .absolute()
                     .as_posix(),
                 ]
