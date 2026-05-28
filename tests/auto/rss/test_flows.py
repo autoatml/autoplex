@@ -7,6 +7,35 @@ from tests.conftest import mock_rss, mock_do_rss_iterations, mock_do_rss_iterati
 from autoplex.settings import RssConfig
 from autoplex.auto.rss.flows import RssMaker
 
+try: 
+    from matgl.models import M3GNET
+    has_m3gnet=True
+except:
+    has_m3gnet = False
+
+
+try: 
+    from calorine.nep import read_loss, write_nepfile, write_structures
+    has_nep=True
+except:
+    has_nep=False
+
+try:
+    from pyace.asecalc import PyACECalculator
+
+    has_ypace = True
+except ImportError:
+    PyACECalculator = object
+    has_ypace = False
+
+try: 
+    from nequip.ase import NequIPCalculator
+    has_nequip=True
+except:
+    has_nequip=False
+
+
+
 os.environ["OMP_NUM_THREADS"] = "1"
 
 def test_rss_workflow(test_dir, mock_vasp, memory_jobstore, clean_dir):
@@ -521,6 +550,19 @@ def test_mock_workflow_for_GAP(test_dir, mock_vasp, memory_jobstore, clean_dir):
     assert len(selected_atoms) == 3
 
 
+@pytest.mark.skipif(
+  not (
+        subprocess.run(
+            'julia -e "using Pkg; println(haskey(Pkg.dependencies(), '
+            'Base.UUID(\\"3b96b61c-0fcc-4693-95ed-1ef9f35fcc53\\")))"',
+            shell=True,
+            capture_output=True,
+            text=True,
+            check=False,
+        ).stdout.strip()
+    )
+    == "true",
+)
 def test_mock_workflow_for_PACE(test_dir, mock_vasp, memory_jobstore, clean_dir):
     """
     Test the full RSS iterative workflow using Pacemaker (P-ACE).

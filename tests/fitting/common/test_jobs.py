@@ -5,6 +5,34 @@ from shutil import which
 from jobflow import run_locally
 from autoplex.fitting.common.flows import MLIPFitMaker
 from tests.auto.phonons.test_jobs import fake_run_vasp_kwargs
+import subprocess
+try: 
+    from matgl.models import M3GNET
+    has_m3gnet=True
+except:
+    has_m3gnet = False
+
+
+try: 
+    from calorine.nep import read_loss, write_nepfile, write_structures
+    has_nep=True
+except:
+    has_nep=False
+
+try:
+    from pyace.asecalc import PyACECalculator
+
+    has_ypace = True
+except ImportError:
+    PyACECalculator = object
+    has_ypace = False
+
+try: 
+    from nequip.ase import NequIPCalculator
+    has_nequip=True
+except:
+    has_nequip=False
+
 
 
 def test_gap_auto_delta_fit_maker(test_dir, memory_jobstore, clean_dir):
@@ -53,6 +81,19 @@ def test_gap_fixed_delta_fit_maker(test_dir, memory_jobstore, clean_dir):
     assert Path(gapfit.output["mlip_path"][0].resolve(memory_jobstore)).exists()
 
 
+@pytest.mark.skipif(
+  not (
+        subprocess.run(
+            'julia -e "using Pkg; println(haskey(Pkg.dependencies(), '
+            'Base.UUID(\\"3b96b61c-0fcc-4693-95ed-1ef9f35fcc53\\")))"',
+            shell=True,
+            capture_output=True,
+            text=True,
+            check=False,
+        ).stdout.strip()
+    )
+    == "true",
+)
 def test_jace_fit_maker(test_dir, memory_jobstore, clean_dir):
 
     database_dir = test_dir / "fitting/rss_training_dataset/"
@@ -74,7 +115,9 @@ def test_jace_fit_maker(test_dir, memory_jobstore, clean_dir):
 
     assert Path(jacefit.output["mlip_path"][0].resolve(memory_jobstore)).exists()
 
-
+@pytest.mark.skipif(
+  not has_nequip
+)
 def test_nequip_fit_maker(test_dir, memory_jobstore, clean_dir):
     database_dir = test_dir / "fitting/rss_training_dataset/"
 
@@ -96,7 +139,9 @@ def test_nequip_fit_maker(test_dir, memory_jobstore, clean_dir):
 
     assert Path(nequipfit.output["mlip_path"][0].resolve(memory_jobstore)).exists()
 
-
+@pytest.mark.skipif(
+  not has_m3gnet
+)
 def test_m3gnet_fit_maker(test_dir, memory_jobstore, clean_dir):
     database_dir = test_dir / "fitting/rss_training_dataset/"
 
@@ -308,7 +353,10 @@ def test_mace_finetuning_maker(test_dir, memory_jobstore, clean_dir, caplog):
     assert "Energies are not used for training or validation." not in caplog.text
     assert "Forces are not used for training or validation." not in caplog.text
 
-    
+
+@pytest.mark.skipif(
+  not has_ypace
+)    
 def test_pace_fit_maker_defaults(test_dir, memory_jobstore, clean_dir):
 
     print("\n--- Running P-ACE Defaults Test ---")
@@ -343,7 +391,9 @@ def test_pace_fit_maker_defaults(test_dir, memory_jobstore, clean_dir):
         config = yaml.safe_load(f)
         assert config.get("cutoff") == 5.0 
 
-
+@pytest.mark.skipif(
+  not has_ypace
+)
 def test_pace_fit_maker_custom(test_dir, memory_jobstore, clean_dir):
     database_dir = test_dir / "fitting/rss_training_dataset/"
     
