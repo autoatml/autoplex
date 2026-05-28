@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-
+import subprocess
 import pytest
 from jobflow import run_locally, Flow
 from tests.conftest import mock_rss, mock_do_rss_iterations, mock_do_rss_iterations_multi_jobs

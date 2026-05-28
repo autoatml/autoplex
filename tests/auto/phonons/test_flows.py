@@ -932,6 +932,9 @@ def test_complete_dft_vs_gap_benchmark_workflow_database(
             assert expected_soap_dict in results_file, f"Expected soap_dict not found in {file_path}"
 
 
+@pytest.mark.skipif(
+  not has_m3gnet
+)
 def test_complete_dft_vs_ml_benchmark_workflow_m3gnet(
         vasp_test_dir, mock_vasp, test_dir, memory_jobstore, ref_paths4_mpid, fake_run_vasp_kwargs4_mpid, clean_dir
 ):
@@ -982,7 +985,9 @@ def test_complete_dft_vs_ml_benchmark_workflow_m3gnet(
         5.2622804443539355, abs=3.0  # bad fit data, fluctuates between 4 and 7
     )
 
-
+@pytest.mark.skipif(
+  not has_m3gnet
+)
 def test_complete_dft_vs_ml_benchmark_workflow_m3gnet_finetuning(
         vasp_test_dir, mock_vasp, test_dir, memory_jobstore, ref_paths4_mpid, fake_run_vasp_kwargs4_mpid, clean_dir
 ):
@@ -1029,6 +1034,9 @@ def test_complete_dft_vs_ml_benchmark_workflow_m3gnet_finetuning(
         4.6, abs=0.5,
     )
 
+@pytest.mark.skipif(
+  not has_nep
+)
 def test_complete_dft_vs_ml_benchmark_workflow_nep(
         vasp_test_dir, mock_vasp, mock_nep, test_dir, memory_jobstore,
         ref_paths4_mpid, fake_run_vasp_kwargs4_mpid, clean_dir
@@ -1270,6 +1278,9 @@ def test_complete_dft_vs_ml_benchmark_workflow_mace_finetuning_mp_settings(
     )
 
 
+@pytest.mark.skipif(
+  not has_nequip
+)
 def test_complete_dft_vs_ml_benchmark_workflow_nequip(
         vasp_test_dir, mock_vasp, test_dir, memory_jobstore, ref_paths4_mpid, fake_run_vasp_kwargs4_mpid, clean_dir
 ):
