@@ -27,19 +27,19 @@ dependencies = [
      "pymatgen>=2024.11.13",
      "atomate2[strict]>=0.0.21",
      "ase==3.24.0",
-     #"calorine>=3.0",
-     #"matgl>=1.2.6",
+     "calorine>=3.0",
+     "matgl>=1.2.6",
      "mace-torch>=0.3.12",
      "numpy",
      "lightning-utilities==0.14.3",
      "typing",
-     #"nequip",
+     "nequip",
      "hiphive",
-     #"dgl<=2.2.0; sys.platform != 'linux'",
-     #"dgl<=2.4; sys.platform == 'linux'",
-     #"torchdata<=0.7.1",
-     #"torch<=2.2.0; sys.platform != 'linux'",
-     #"torch<=2.2.1; sys.platform == 'linux'",
+     "dgl<=2.2.0; sys.platform != 'linux'",
+     "dgl<=2.4; sys.platform == 'linux'",
+     "torchdata<=0.7.1",
+     "torch<=2.2.0; sys.platform != 'linux'",
+     "torch<=2.2.1; sys.platform == 'linux'",
      # quippy-ase support for py3.12 tracked in https://github.com/libAtoms/QUIP/issues/645
      "quippy-ase==0.9.14; python_version < '3.12'",
      "f90wrap==0.2.16"
@@ -67,26 +67,36 @@ workflow-managers = [
     "FireWorks==2.0.4",
     "jobflow-remote==0.1.7"
 ]
-strict = [
-     #"calorine==3.0",
+strict_all = [
+     "calorine==3.0",
      "pymatgen==2025.2.18",
      "atomate2[strict]==0.0.21",
-     #"matgl==1.2.7",
+     "matgl==1.2.7",
      "quippy-ase==0.9.14; python_version < '3.12'",
      "ase==3.24.0",
      "mace-torch==0.3.13",
      "lightning-utilities==0.14.3",
      "numpy",
      "typing",
-     #"dgl<=2.2.0; sys.platform != 'linux'",
-     #"dgl<=2.4; sys.platform == 'linux'",
-     #"torchdata<=0.7.1",
-     #"torch<=2.2.0; sys.platform != 'linux'",
-     #"torch<=2.2.1; sys.platform == 'linux'",
-     #"nequip==0.6.1",
+     "dgl<=2.2.0; sys.platform != 'linux'",
+     "dgl<=2.4; sys.platform == 'linux'",
+     "torchdata<=0.7.1",
+     "torch<=2.2.0; sys.platform != 'linux'",
+     "torch<=2.2.1; sys.platform == 'linux'",
+     "nequip==0.6.1",
      "hiphive==1.4",
      "f90wrap==0.2.16",
 ]
+strict = [
+     "pymatgen==2025.2.18",
+     "atomate2[strict]==0.0.21",
+     "quippy-ase==0.9.14; python_version < '3.12'",
+     "ase==3.24.0",
+     "mace-torch==0.3.13",
+     "numpy",
+     "typing",
+ ]
+
 dev = ["pre-commit>=2.12.1"]
 tests = ["pytest", "pytest-mock", "pytest-split", "pytest-cov", "types-setuptools", "nbmake"]
 aims = ["pyfhiaims"]
