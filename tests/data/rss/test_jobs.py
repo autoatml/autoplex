@@ -1,6 +1,7 @@
 import os
 from jobflow import run_locally
 from autoplex.data.rss.jobs import RandomizedStructure, do_rss_single_node, do_rss_multi_node
+import subprocess
 from ase.io import read
 from pymatgen.io.ase import AseAtomsAdaptor
 import numpy as np
