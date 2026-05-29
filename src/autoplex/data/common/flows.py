@@ -4,7 +4,7 @@ import logging
 import traceback
 from dataclasses import dataclass, field
 
-#from atomate2.aims.jobs.base import BaseAimsMaker
+from atomate2.aims.jobs.base import BaseAimsMaker
 from atomate2.forcefields.jobs import (
     ForceFieldRelaxMaker,
     ForceFieldStaticMaker,
@@ -298,7 +298,7 @@ class DFTStaticLabelling(Maker):
     custom_incar: dict | None = None
     custom_potcar: dict | None = None
     static_energy_maker: (
-        BaseVaspMaker | CastepStaticMaker | ForceFieldStaticMaker 
+        BaseVaspMaker | CastepStaticMaker | ForceFieldStaticMaker | BaseAimsMaker
     ) = field(
         default_factory=lambda: StaticMaker(
             input_set_generator=StaticSetGenerator(
