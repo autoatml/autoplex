@@ -4,6 +4,35 @@ from autoplex.data.rss.jobs import RandomizedStructure, do_rss_single_node, do_r
 from ase.io import read
 from pymatgen.io.ase import AseAtomsAdaptor
 import numpy as np
+import pytest
+
+try: 
+    from matgl.models import M3GNET
+    has_m3gnet=True
+except:
+    has_m3gnet = False
+
+
+try: 
+    from calorine.nep import read_loss, write_nepfile, write_structures
+    has_nep=True
+except:
+    has_nep=False
+
+try:
+    from pyace.asecalc import PyACECalculator
+
+    has_ypace = True
+except ImportError:
+    PyACECalculator = object
+    has_ypace = False
+
+try: 
+    from nequip.ase import NequIPCalculator
+    has_nequip=True
+except:
+    has_nequip=False
+
 
 
 def test_vasp_static(test_dir, memory_jobstore, clean_dir):
@@ -128,7 +157,19 @@ def test_gap_rss_multi_jobs(test_dir, memory_jobstore, clean_dir):
 
     assert round(enthalpy_pseudo, 3) == round(enthalpy_cal, 3)
 
-
+@pytest.mark.skipif(
+  not (
+        subprocess.run(
+            'julia -e "using Pkg; println(haskey(Pkg.dependencies(), '
+            'Base.UUID(\\"3b96b61c-0fcc-4693-95ed-1ef9f35fcc53\\")))"',
+            shell=True,
+            capture_output=True,
+            text=True,
+            check=False,
+        ).stdout.strip()
+    )
+    == "true",reason="J-ACE is not installed."
+)
 def test_jace_rss(test_dir, memory_jobstore, clean_dir):
     np.random.seed(42)
     test_files_dir = test_dir / "data/rss.extxyz"
@@ -168,7 +209,9 @@ def test_jace_rss(test_dir, memory_jobstore, clean_dir):
 
     assert len(output_filter) == 5
 
-
+@pytest.mark.skipif(
+  not has_nequip, reason="Nequip is not installed"
+)
 def test_nequip_rss(test_dir, memory_jobstore, clean_dir):
     np.random.seed(42)
     test_files_dir = test_dir / "data/rss.extxyz"
@@ -208,7 +251,9 @@ def test_nequip_rss(test_dir, memory_jobstore, clean_dir):
 
     assert len(output_filter) == 1
 
-
+@pytest.mark.skipif(
+  not has_m3gnet, reason="Matgl is not installed"
+)
 def test_m3gnet_rss(test_dir, memory_jobstore, clean_dir):
     np.random.seed(42)
     test_files_dir = test_dir / "data/rss.extxyz"
@@ -288,7 +333,9 @@ def test_mace_rss(test_dir, memory_jobstore, clean_dir):
 
     assert len(output_filter) == 1
 
-
+@pytest.mark.skipif(
+  not has_ypace, reason="Pacemaker is not installed"
+)
 def test_pace_rss(test_dir, memory_jobstore, clean_dir):
 
     np.random.seed(42)

@@ -9,7 +9,6 @@ from pathlib import Path
 from typing import Literal
 
 import ase.io
-import matgl
 import numpy as np
 from ase import Atoms
 from ase.constraints import (
@@ -22,9 +21,8 @@ from ase.data import atomic_numbers, chemical_symbols
 from ase.geometry import find_mic
 from ase.optimize.precon import Exp, PreconLBFGS
 from ase.units import GPa
-from mace.calculators import MACECalculator
-from matgl.ext.ase import M3GNetCalculator
-from nequip.ase import NequIPCalculator
+
+
 from pymatgen.core import Structure
 from pymatgen.io.ase import AseAtomsAdaptor
 from threadpoolctl import threadpool_limits
@@ -452,6 +450,7 @@ def process_rss(
 
         else:
             raise ValueError("isol_es is empty or not defined!")
+        from nequip.ase import NequIPCalculator
         pot = NequIPCalculator.from_deployed_model(
             model_path=nequip_label,
             device=device,
@@ -460,11 +459,14 @@ def process_rss(
         )
 
     elif mlip_type == "M3GNET":
+        import matgl
+        from matgl.ext.ase import M3GNetCalculator
         pot_file = matgl.load_model(path=mlip_path)
         pot = M3GNetCalculator(potential=pot_file)
 
     elif mlip_type == "MACE":
         mace_label = os.path.join(mlip_path, "checkpoints/MACE_model_run-123.model")
+        from mace.calculators import MACECalculator
         pot = MACECalculator(model_paths=mace_label, device=device)
 
     unique_starting_index = atom.info["unique_starting_index"]
