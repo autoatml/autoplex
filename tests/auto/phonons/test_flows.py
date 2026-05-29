@@ -986,7 +986,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_m3gnet(
     )
 
 @pytest.mark.skipif(
-  not has_m3gnet
+  not has_m3gnet, reason="Matgl is not installed."
 )
 def test_complete_dft_vs_ml_benchmark_workflow_m3gnet_finetuning(
         vasp_test_dir, mock_vasp, test_dir, memory_jobstore, ref_paths4_mpid, fake_run_vasp_kwargs4_mpid, clean_dir
