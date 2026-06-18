@@ -84,7 +84,7 @@ strict_all = [
 strict = [
      "pymatgen==2025.2.18; python_version < '3.12'",
      "pymatgen==2026.5.4; python_version >= '3.12'",
-     "atomate2[strict]==0.0.21; python_version < '3.12'", 
+     "atomate2[strict]==0.0.21; python_version < '3.12'",
      "atomate2[strict]==0.1.4; python_version >= '3.12'",
      "quippy-ase==0.9.14; python_version < '3.12'",
      "quippy-ase==0.10.3; python_version >= '3.12'",

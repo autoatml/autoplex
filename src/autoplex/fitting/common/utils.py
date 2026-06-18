@@ -2194,12 +2194,12 @@ class CustomPotential(quippy.potential.Potential):
         res = super().calculate(*args, **kwargs)
         atoms = kwargs["atoms"] if "atoms" in kwargs else args[0]
         if "forces" in self.results:
-            try: 
+            try:
                 atoms.arrays["forces"] = self.results["forces"].copy()
             except AttributeError:
                 atoms.arrays["forces"] = self.results["forces"]
         if "energy" in self.results:
-            try: 
+            try:
                 atoms.info["energy"] = self.results["energy"].copy()
             except AttributeError:
                 atoms.info["energy"] = self.results["energy"]
@@ -2227,7 +2227,7 @@ class AutoplexPyACECalculator(PyACECalculator):
 
         # Sync standard properties back to atoms object containers
         if "forces" in self.results:
-            try: 
+            try:
                 atoms_obj.arrays["forces"] = self.results["forces"].copy()
             except AttributeError:
                 atoms_obj.arrays["forces"] = self.results["forces"]
