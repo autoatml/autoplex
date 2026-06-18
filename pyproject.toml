@@ -27,20 +27,10 @@ dependencies = [
      "pymatgen>=2024.11.13",
      "atomate2[strict]>=0.0.21",
      "ase==3.24.0",
-     #"calorine>=3.0",
-     #"matgl>=1.2.6",
      "mace-torch>=0.3.12",
      "numpy",
-     #"lightning-utilities==0.14.3",
      "typing",
-     #"nequip",
      "hiphive",
-     #"dgl<=2.2.0; sys.platform != 'linux'",
-     #"dgl<=2.4; sys.platform == 'linux'",
-     #"torchdata<=0.7.1",
-     #"torch<=2.2.0; sys.platform != 'linux'",
-     #"torch<=2.2.1; sys.platform == 'linux'",
-     # quippy-ase support for py3.12 tracked in https://github.com/libAtoms/QUIP/issues/645
      "quippy-ase==0.9.14; python_version < '3.12'",
      "f90wrap==0.2.16"
 ]
@@ -93,6 +83,7 @@ strict = [
      "quippy-ase==0.9.14; python_version < '3.12'",
      "ase==3.24.0",
      "mace-torch==0.3.13",
+     "hiphive==1.4",
      "numpy",
      "typing",
  ]
