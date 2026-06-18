@@ -24,7 +24,6 @@ import quippy.potential
 import torch
 from ase.atoms import Atoms
 from ase.calculators.singlepoint import SinglePointCalculator
-from ase.constraints import voigt_6_to_full_3x3_stress
 from ase.data import chemical_symbols
 from ase.io import read, write
 from ase.io.extxyz import XYZError
@@ -37,6 +36,11 @@ from pymatgen.io.ase import AseAtomsAdaptor
 from quippy import descriptors
 from scipy.spatial import ConvexHull
 from threadpoolctl import threadpool_limits
+
+try:
+    from ase.constraints import voigt_6_to_full_3x3_stress
+except ImportError:
+    from ase.stress import voigt_6_to_full_3x3_stress
 
 try:
     has_m3gnet = True
@@ -2190,11 +2194,20 @@ class CustomPotential(quippy.potential.Potential):
         res = super().calculate(*args, **kwargs)
         atoms = kwargs["atoms"] if "atoms" in kwargs else args[0]
         if "forces" in self.results:
-            atoms.arrays["forces"] = self.results["forces"].copy()
+            try: 
+                atoms.arrays["forces"] = self.results["forces"].copy()
+            except AttributeError:
+                atoms.arrays["forces"] = self.results["forces"]
         if "energy" in self.results:
-            atoms.info["energy"] = self.results["energy"].copy()
+            try: 
+                atoms.info["energy"] = self.results["energy"].copy()
+            except AttributeError:
+                atoms.info["energy"] = self.results["energy"]
         if "stress" in self.results:
-            atoms.info["stress"] = self.results["stress"].copy()
+            try:
+                atoms.info["stress"] = self.results["stress"].copy()
+            except AttributeError:
+                atoms.info["stress"] = self.results["stress"]
         return res
 
 
@@ -2214,11 +2227,20 @@ class AutoplexPyACECalculator(PyACECalculator):
 
         # Sync standard properties back to atoms object containers
         if "forces" in self.results:
-            atoms_obj.arrays["forces"] = self.results["forces"].copy()
+            try: 
+                atoms_obj.arrays["forces"] = self.results["forces"].copy()
+            except AttributeError:
+                atoms_obj.arrays["forces"] = self.results["forces"]
         if "energy" in self.results:
-            atoms_obj.info["energy"] = self.results["energy"]
+            try:
+                atoms_obj.info["energy"] = self.results["energy"].copy()
+            except AttributeError:
+                atoms_obj.info["energy"] = self.results["energy"]
         if "stress" in self.results:
-            atoms_obj.info["stress"] = self.results["stress"].copy()
+            try:
+                atoms_obj.info["stress"] = self.results["stress"].copy()
+            except AttributeError:
+                atoms_obj.info["stress"] = self.results["stress"]
 
         return res
 

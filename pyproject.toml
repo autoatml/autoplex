@@ -18,21 +18,25 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Science/Research",
     "Operating System :: OS Independent",
 ]
-requires-python = ">=3.10,<3.12"
+requires-python = ">=3.10,<3.13"
 dependencies = [
      "pymatgen>=2024.11.13",
      "atomate2[strict]>=0.0.21",
-     "ase==3.24.0",
+     "ase>=3.24.0",
      "mace-torch>=0.3.12",
      "numpy",
      "typing",
      "hiphive",
      "quippy-ase==0.9.14; python_version < '3.12'",
-     "f90wrap==0.2.16"
+     "quippy-ase==0.10.3; python_version >= '3.12'",
+     "f90wrap==0.2.16; python_version <'3.12'",
+     "f90wrap==0.3.0; python_version >='3.12'"
+
 ]
 
 [tool.setuptools.packages.find]
@@ -78,12 +82,17 @@ strict_all = [
      "f90wrap==0.2.16",
 ]
 strict = [
-     "pymatgen==2025.2.18",
-     "atomate2[strict]==0.0.21",
+     "pymatgen==2025.2.18; python_version < '3.12'",
+     "pymatgen==2026.5.4; python_version >= '3.12'",
+     "atomate2[strict]==0.0.21; python_version < '3.12'", 
+     "atomate2[strict]==0.1.4; python_version >= '3.12'",
      "quippy-ase==0.9.14; python_version < '3.12'",
-     "ase==3.24.0",
-     "mace-torch==0.3.13",
-     "hiphive==1.4",
+     "quippy-ase==0.10.3; python_version >= '3.12'",
+     "ase==3.24.0; python_version < '3.12'",
+     "ase>=3.26.0; python_version > '3.12'",
+     "mace-torch==0.3.13; python_version < '3.12'",
+     "mace-torch==0.3.15; python_version >='3.12'",
+     "hiphive==1.4; python_version < '3.12'",
      "numpy",
      "typing",
  ]

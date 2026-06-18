@@ -14,8 +14,6 @@ from ase import Atoms
 from ase.constraints import (
     FixConstraint,
     FixSymmetry,
-    UnitCellFilter,
-    slice2enlist,
 )
 from ase.data import atomic_numbers, chemical_symbols
 from ase.geometry import find_mic
@@ -29,6 +27,15 @@ from autoplex.fitting.common.utils import (
     CustomPotential,
     extract_gap_label,
 )
+
+try:
+    from ase.constraints import UnitCellFilter
+except ImportError:
+    from ase.filters import UnitCellFilter
+try:
+    from ase.constraints import slice2enlist
+except ImportError:
+    from ase.constraints.constraint import slice2enlist
 
 
 def extract_pairstyle(
