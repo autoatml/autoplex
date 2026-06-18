@@ -1,8 +1,14 @@
 from atomate2.vasp.powerups import update_user_incar_settings
-from atomate2.forcefields.jobs import (
-    GAPRelaxMaker,
-    GAPStaticMaker,
+try:
+    from atomate2.forcefields.jobs import (
+        GAPRelaxMaker,
+        GAPStaticMaker,
 )
+except ImportError:
+    from atomate2.forcefields.jobs import (
+        ForceFieldRelaxMaker,
+        ForceFieldStaticMaker
+    )
 from atomate2.common.schemas.phonons import PhononBSDOSDoc
 from atomate2.vasp.jobs.core import TightRelaxMaker
 from atomate2.vasp.sets.core import TightRelaxSetGenerator
@@ -270,15 +276,24 @@ def test_ml_phonon_maker(test_dir, clean_dir, memory_jobstore):
     potential_file = test_dir / "fitting" / "ref_files" / "gap_file.xml"
     path_to_struct = test_dir / "fitting" / "ref_files" / "POSCAR"
     structure = Structure.from_file(path_to_struct)
+    try: 
+        gap_phonon_jobs = MLPhononMaker(
+            bulk_relax_maker=GAPRelaxMaker(relax_cell=True, relax_kwargs={"interval": 500}),
+            phonon_displacement_maker=GAPStaticMaker(name="gap phonon static"),
+            static_energy_maker=GAPStaticMaker(),
 
-    gap_phonon_jobs = MLPhononMaker(
-        bulk_relax_maker=GAPRelaxMaker(relax_cell=True, relax_kwargs={"interval": 500}),
-        phonon_displacement_maker=GAPStaticMaker(name="gap phonon static"),
-        static_energy_maker=GAPStaticMaker(),
+        ).make_from_ml_model(
+            structure=structure, potential_file=potential_file, supercell_settings={"min_length": 20}
+        )
+    except NameError:
+                gap_phonon_jobs = MLPhononMaker(
+            bulk_relax_maker=ForceFieldRelaxMaker(relax_cell=True, relax_kwargs={"interval": 500}),
+            phonon_displacement_maker=ForceFieldStaticMaker(name="gap phonon static"),
+            static_energy_maker=ForceFieldStaticMaker(),
 
-    ).make_from_ml_model(
-        structure=structure, potential_file=potential_file, supercell_settings={"min_length": 20}
-    )
+        ).make_from_ml_model(
+            structure=structure, potential_file=potential_file, supercell_settings={"min_length": 20}
+        )
 
     responses = run_locally(
         gap_phonon_jobs, create_folders=True, ensure_success=True, store=memory_jobstore
