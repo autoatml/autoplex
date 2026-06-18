@@ -44,7 +44,14 @@ You can install `autoplex` simply by:
 ``` 
 pip install autoplex[strict]
 ```
-This will install all the Python packages and dependencies needed for MLIP fits. 
+
+This will install all basic Python packages and dependencies needed for MLIP fits.
+
+In the current development version, this command will only install all packages required for GAP and MACE fits. All supported MLIPs can be installed with:
+
+``` 
+pip install autoplex[strict_all]
+```
 
 > ℹ️ To fit and validate `ACEpotentials`, one also needs to install Julia, as `autoplex` relies on [ACEpotentials](https://acesuit.github.io/ACEpotentials.jl/dev/gettingstarted/installation/), which supports fitting of linear ACE. Currently, no Python package exists for the same.
 Please run the following commands to enable the `ACEpotentials` fitting options and further functionality.
