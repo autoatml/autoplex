@@ -3,12 +3,18 @@ from ase.build import bulk
 from ase.io import read
 from jobflow import run_locally, Flow
 from autoplex.data.common.flows import DFTStaticLabelling
-from pymatgen.io.aims.sets.core import StaticSetGenerator as AimsStaticSetGenerator
-from atomate2.aims.jobs.core import StaticMaker as AimsStaticMaker
+
 from autoplex.data.common.jobs import collect_dft_data
 from pymatgen.io.ase import AseAtomsAdaptor
 
-
+try: 
+    from pymatgen.io.aims.sets.core import StaticSetGenerator as AimsStaticSetGenerator
+    from atomate2.aims.jobs.core import StaticMaker as AimsStaticMaker
+    aims_imported = True
+except ImportError:
+    aims_imported = False
+    
+@pytest.mark.skipif(not aims_imported, reason="FHI-aims not installed; skipping tests that require it.")
 def test_dft_labelling_with_aims(memory_jobstore, mock_aims, test_dir):
     """Test DFTStaticLabelling job with FHi-aims static maker."""
     ref_paths = {
