@@ -40,7 +40,17 @@ from threadpoolctl import threadpool_limits
 
 try:
     has_m3gnet = True
-except:
+    import lightning as pl
+    import matgl
+    from dgl.data.utils import split_dataset
+    from matgl.apps.pes import Potential
+    from matgl.ext.pymatgen import Structure2Graph, get_element_list
+    from matgl.graph.data import MGLDataLoader, MGLDataset, collate_fn_pes
+    from matgl.models import M3GNet
+    from matgl.utils.training import PotentialLightningModule
+    from pytorch_lightning.loggers import CSVLogger
+
+except ImportError:
     has_m3gnet = False
 
 
@@ -48,7 +58,7 @@ try:
     from calorine.nep import read_loss, write_nepfile, write_structures
 
     has_nep = True
-except:
+except ImportError:
     has_nep = False
 
 try:
@@ -134,7 +144,7 @@ def gap_fitting(
 
     """
     if hyperparameters is None:
-        from autoplex import GAP_HYPERS
+        from autoplex import GAP_HYPERS  # noqa: PLC0415
 
         hyperparameters = GAP_HYPERS
 
@@ -411,7 +421,7 @@ def jace_fitting(
     - ValueError: If the `isolated_atom_energies` dictionary is empty or not provided when required.
     """
     if hyperparameters is None:
-        from autoplex import JACE_HYPERS
+        from autoplex import JACE_HYPERS  # noqa: PLC0415
 
         hyperparameters = JACE_HYPERS
 
@@ -639,7 +649,7 @@ def nep_fitting(
         A dictionary mapping 'train_error', 'test_error', and 'mlip_path'.
     """
     if hyperparameters is None:
-        from autoplex import NEP_HYPERS
+        from autoplex import NEP_HYPERS  # noqa: PLC0415
 
         hyperparameters = NEP_HYPERS
 
@@ -785,7 +795,7 @@ def nequip_fitting(
     [TODO] train Nequip on virials
     """
     if hyperparameters is None:
-        from autoplex import NEQUIP_HYPERS
+        from autoplex import NEQUIP_HYPERS  # noqa: PLC0415
 
         hyperparameters = NEQUIP_HYPERS
 
@@ -845,7 +855,7 @@ def nequip_fitting(
         "nequip-deploy build --train-dir results/autoplex ./deployed_nequip_model.pth",
         "nequip_deploy",
     )
-    from nequip.ase import NequIPCalculator
+    from nequip.ase import NequIPCalculator  # noqa: PLC0415
 
     calc = NequIPCalculator.from_deployed_model(
         model_path="deployed_nequip_model.pth",
@@ -963,18 +973,8 @@ def m3gnet_fitting(
     *    Availability: https://matgl.ai/tutorials%2FTraining%20a%20M3GNet%20Potential%20with%20PyTorch%20Lightning.html
     *    License: BSD 3-Clause License
     """
-    import lightning as pl
-    import matgl
-    from dgl.data.utils import split_dataset
-    from matgl.apps.pes import Potential
-    from matgl.ext.pymatgen import Structure2Graph, get_element_list
-    from matgl.graph.data import MGLDataLoader, MGLDataset, collate_fn_pes
-    from matgl.models import M3GNet
-    from matgl.utils.training import PotentialLightningModule
-    from pytorch_lightning.loggers import CSVLogger
-
     if hyperparameters is None:
-        from autoplex import M3GNET_HYPERS
+        from autoplex import M3GNET_HYPERS  # noqa: PLC0415
 
         hyperparameters = M3GNET_HYPERS
     hyperparameters = hyperparameters.model_copy(deep=True)
@@ -1397,7 +1397,7 @@ def mace_fitting(
 
     """
     if hyperparameters is None:
-        from autoplex import MACE_HYPERS
+        from autoplex import MACE_HYPERS  # noqa: PLC0415
 
         hyperparameters = MACE_HYPERS
     hyperparameters = hyperparameters.model_copy(deep=True)
@@ -2688,7 +2688,7 @@ def pace_fitting(
         A dictionary containing 'train_error', 'test_error', and 'mlip_path'.
     """
     if hyperparameters is None:
-        from autoplex import PACEMAKER_HYPERS
+        from autoplex import PACEMAKER_HYPERS  # noqa: PLC0415
 
         hyperparameters = PACEMAKER_HYPERS
 

@@ -448,7 +448,7 @@ def process_rss(
 
         else:
             raise ValueError("isol_es is empty or not defined!")
-        from nequip.ase import NequIPCalculator
+        from nequip.ase import NequIPCalculator  # noqa: PLC0415
 
         pot = NequIPCalculator.from_deployed_model(
             model_path=nequip_label,
@@ -458,15 +458,16 @@ def process_rss(
         )
 
     elif mlip_type == "M3GNET":
-        import matgl
-        from matgl.ext.ase import M3GNetCalculator
+        import matgl  # noqa: PLC0415
+        from matgl.ext.ase import M3GNetCalculator  # noqa: PLC0415
 
         pot_file = matgl.load_model(path=mlip_path)
         pot = M3GNetCalculator(potential=pot_file)
 
     elif mlip_type == "MACE":
+        from mace.calculators import MACECalculator  # noqa: PLC0415
+
         mace_label = os.path.join(mlip_path, "checkpoints/MACE_model_run-123.model")
-        from mace.calculators import MACECalculator
 
         pot = MACECalculator(model_paths=mace_label, device=device)
 
