@@ -1,13 +1,12 @@
 from autoplex.data.common.flows import GenerateTrainingDataForTesting, DFTStaticLabelling
 from ase.io import read
 from pymatgen.core.structure import Structure
-from atomate2.settings import Atomate2Settings
+
 from jobflow import run_locally, Flow
 
 
 def test_vasp_static(test_dir, mock_vasp, memory_jobstore, clean_dir):
     from autoplex.data.common.jobs import collect_dft_data
-    settings = Atomate2Settings()
 
     poscar_paths = {
         f"static_bulk_{i}": test_dir / f"vasp/rss/Si_bulk_{i + 1}/inputs/POSCAR"

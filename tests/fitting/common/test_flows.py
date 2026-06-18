@@ -1,5 +1,32 @@
 import pytest
 from autoplex.fitting.common.flows import MLIPFitMaker
+import subprocess
+try: 
+    from matgl.models import M3GNET
+    has_m3gnet=True
+except:
+    has_m3gnet = False
+
+
+try: 
+    from calorine.nep import read_loss, write_nepfile, write_structures
+    has_nep=True
+except:
+    has_nep=False
+
+try:
+    from pyace.asecalc import PyACECalculator
+
+    has_ypace = True
+except ImportError:
+    PyACECalculator = object
+    has_ypace = False
+
+try: 
+    from nequip.ase import NequIPCalculator
+    has_nequip=True
+except:
+    has_nequip=False
 
 
 @pytest.fixture(scope="class")
@@ -216,7 +243,19 @@ def test_mlip_fit_maker_with_pre_database_dir(
     test_atoms = read(Path(gapfit.output["mlip_path"][0].resolve(memory_jobstore))/ "quip_test.extxyz",':')
     assert (len(train_atoms_before) +len(test_atoms_before)+7) == (len(train_atoms) +len(test_atoms))
 
-
+@pytest.mark.skipif(
+  not (
+        subprocess.run(
+            'julia -e "using Pkg; println(haskey(Pkg.dependencies(), '
+            'Base.UUID(\\"3b96b61c-0fcc-4693-95ed-1ef9f35fcc53\\")))"',
+            shell=True,
+            capture_output=True,
+            text=True,
+            check=False,
+        ).stdout.strip()
+    )
+    == "true",reason="J-ACE is not installed."
+)
 def test_mlip_fit_maker_jace(
         test_dir, memory_jobstore, vasp_test_dir, fit_input_dict, clean_dir
 ):
@@ -248,6 +287,9 @@ def test_mlip_fit_maker_jace(
     # check if julia-ACE potential file is generated
     assert Path(jacefit.output["mlip_path"][0].resolve(memory_jobstore)).exists()
 
+@pytest.mark.skipif(
+  not has_nep, reason="NEP is not installed"
+)
 def test_mlip_fit_maker_nep(
         test_dir, memory_jobstore, vasp_test_dir, fit_input_dict, mock_nep, clean_dir
 ):
@@ -285,6 +327,9 @@ def test_mlip_fit_maker_nep(
     assert nepfit.output["train_error"].resolve(memory_jobstore) == pytest.approx(0.00191)
     assert nepfit.output["convergence"].resolve(memory_jobstore)
 
+@pytest.mark.skipif(
+  not has_nequip, reason="NEQUIP is not installed"
+)
 def test_mlip_fit_maker_nequip(
         test_dir, memory_jobstore, vasp_test_dir, fit_input_dict, clean_dir
 ):
@@ -315,7 +360,9 @@ def test_mlip_fit_maker_nequip(
     # check if NEQUIP potential file is generated
     assert Path(nequipfit.output["mlip_path"][0].resolve(memory_jobstore)).exists()
 
-
+@pytest.mark.skipif(
+  not has_m3gnet, reason="M3GNET is not installed"
+)
 def test_mlip_fit_maker_m3gnet(
         test_dir, memory_jobstore, vasp_test_dir, fit_input_dict, clean_dir
 ):
@@ -394,7 +441,9 @@ def test_mlip_fit_maker_mace(
     # check if MACE potential file is generated
     assert Path(macefit.output["mlip_path"][0].resolve(memory_jobstore)).exists()
 
-
+@pytest.mark.skipif(
+  not has_ypace, reason="Pacemaker is not installed."
+)
 def test_mlip_fit_maker_pace(
         test_dir, memory_jobstore, vasp_test_dir, fit_input_dict, clean_dir
 ):
