@@ -99,7 +99,8 @@ strict = [
 
 dev = ["pre-commit>=2.12.1"]
 tests = ["pytest", "pytest-mock", "pytest-split", "pytest-cov", "types-setuptools", "nbmake"]
-aims = ["pyfhiaims"]
+# Python 3.12 restriction depends changes required for atomate2
+aims = ["pyfhiaims; python_version < '3.12'"] 
 pacemaker = [
      "numpy==1.26.4",
      "pandas>=2.2",
