@@ -1,10 +1,9 @@
-# This workflow will install Python dependencies, run tests and lint with Python 3.10 and 3.11
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Testing Linux Minimal Installation
+name: Testing Linux
 
 on:
-  workflow_dispatch:
   push:
     branches: [ main ]
   pull_request:
@@ -14,45 +13,58 @@ permissions:
   contents: write
   pull-requests: write
 
+
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - uses: pre-commit/action@v3.0.1
+
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0} # enables conda/mamba env activation by reading bash profile
     strategy:
       fail-fast: false
       matrix:
         python-version: ["3.12"]
-        split: [1, 2, 3, 4, 5]  # Number of splits
+        split: [1, 2, 3, 4, 5]
+
 
     steps:
-    - name: Fetch Most Recent Docker Image Tag
-      run: |
-        TAG=$(curl -H "Accept: application/vnd.github.v3+json" \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            https://api.github.com/orgs/autoatml/packages/container/autoplex%2Fautoplex-python-3.10/versions \
-            | jq -r 'sort_by(.created_at) | reverse | .[0].metadata.container.tags[0]')
-        echo "VERSION=$TAG" >> $GITHUB_ENV
+    - name: Check out repo
+      uses: actions/checkout@v4
 
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0  # Fetch the entire Git history
+    - name: Set up micromamba
+      uses: mamba-org/setup-micromamba@main
+
+    - name: Create mamba environment
+      run: |
+        micromamba create -n autopl python=${{ matrix.python-version }} --yes
+
+    - name: Install uv
+      run: micromamba run -n autopl pip install uv
+
+    - name: Install Autoplex and dependencies
+      run: |
+        micromamba activate autopl
+        uv pip install --upgrade pip
+        uv pip install --editable '.[strict,tests, dev]' --prerelease=allow
+
+    - name: Test with pytest
+      run: |
+        micromamba activate autopl
+        OMP_NUM_THREADS=1 pytest --cache-clear --splits 5 --group ${{ matrix.split }} -vv 
         
-    - name: Run tests using Docker image for Python ${{ matrix.python-version }}
-      run: |
-        docker pull ghcr.io/autoatml/autoplex/autoplex-python-${{ matrix.python-version }}:${{ env.VERSION }}
 
-        docker run --rm \
-          -v ${{ github.workspace }}:/workspace \
-          -w /workspace \
-          ghcr.io/autoatml/autoplex/autoplex-python-${{ matrix.python-version }}:${{ env.VERSION }} \
-          bash -c "
-          git config --global --add safe.directory /workspace && \
-          python -m pip install --upgrade pip && \
-          python -m uv cache clean && \
-          python -m uv pip uninstall autoplex && \
-          python -m uv pip uninstall calorine && \
-          python -m uv pip uninstall nequip && \
-          python -m uv pip install numpy && \
-          python -m uv pip install --prerelease=allow '.[strict,tests]' && \
-          OMP_NUM_THREADS=1 pytest --cache-clear --cov=autoplex --cov-report term-missing --cov-append --splits 5 --group ${{ matrix.split }} -vv --durations-path /workspace/tests/test_data/.pytest-split-durations --store-durations -k 'not PACE'
-        "
+
 
