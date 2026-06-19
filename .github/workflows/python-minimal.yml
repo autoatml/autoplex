@@ -65,6 +65,3 @@ jobs:
         micromamba activate autopl
         OMP_NUM_THREADS=1 pytest --cache-clear --splits 5 --group ${{ matrix.split }} -vv 
         
-
-
-
