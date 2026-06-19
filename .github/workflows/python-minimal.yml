@@ -60,8 +60,38 @@ jobs:
         uv pip install --upgrade pip
         uv pip install --editable '.[strict,tests, dev]' --prerelease=allow
 
+        
+    - name: Install dependencies
+      run: |
+        apt-get update && sudo apt-get install -y \
+          build-essential \
+          bash \
+          bc \
+          ffmpeg \
+          unzip \
+          wget \
+          gfortran \
+          liblapack-dev \
+          libblas-dev \
+          cmake \
+          make \
+          curl \
+          git \
+
+      mkdir -p /opt
+      curl -fsSL https://www.mtg.msm.cam.ac.uk/files/airss-0.9.3.tgz -o /opt/airss-0.9.3.tgz
+      tar -xf /opt/airss-0.9.3.tgz -C /opt
+      rm /opt/airss-0.9.3.tgz
+      cd /opt/airss
+      make spglib
+      make internal
+      make install_internal
+      make neat
+
+
+
     - name: Test with pytest
       run: |
         micromamba activate autopl
         OMP_NUM_THREADS=1 pytest --cache-clear --splits 5 --group ${{ matrix.split }} -vv 
-        
+
