@@ -79,15 +79,15 @@ jobs:
           git
 
 
-      mkdir -p /opt
-      curl -fsSL https://www.mtg.msm.cam.ac.uk/files/airss-0.9.3.tgz -o /opt/airss-0.9.3.tgz
-      tar -xf /opt/airss-0.9.3.tgz -C /opt
-      rm /opt/airss-0.9.3.tgz
-      cd /opt/airss
-      make spglib
-      make internal
-      make install_internal
-      make neat
+        mkdir -p /opt
+        curl -fsSL https://www.mtg.msm.cam.ac.uk/files/airss-0.9.3.tgz -o /opt/airss-0.9.3.tgz
+        tar -xf /opt/airss-0.9.3.tgz -C /opt
+        rm /opt/airss-0.9.3.tgz
+        cd /opt/airss
+        make spglib
+        make internal
+        make install_internal
+        make neat
 
 
 
