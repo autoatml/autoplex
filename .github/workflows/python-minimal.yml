@@ -63,7 +63,7 @@ jobs:
         
     - name: Install dependencies
       run: |
-        apt-get update && sudo apt-get install -y \
+        sudo apt-get update && sudo apt-get install -y \
           build-essential \
           bash \
           bc \
@@ -76,7 +76,8 @@ jobs:
           cmake \
           make \
           curl \
-          git \
+          git
+
 
       mkdir -p /opt
       curl -fsSL https://www.mtg.msm.cam.ac.uk/files/airss-0.9.3.tgz -o /opt/airss-0.9.3.tgz
