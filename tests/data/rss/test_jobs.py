@@ -479,6 +479,43 @@ def test_fragment_buildcell(test_dir, memory_jobstore, clean_dir):
     assert len(ats) == 4 and np.all(ats[0].positions[0] != ats[0].positions[1])
 
 
+def test_fragment_buildcell_multifrags(test_dir, memory_jobstore):
+    from ase.io import read
+    import numpy as np
+    from ase import Atoms
+    from ase.io import write
+   
+    Li=Atoms('Li') 
+    PS4=Atoms('PS4', positions=
+    [[    0.00941764  ,    -0.00341252  ,    -0.03256453],
+    [    -1.66997738  ,     0.96618661  ,     0.65304559],
+    [     0.00941761  ,    -0.00341254  ,    -2.08939495],
+    [     0.00941761  ,    -1.94261084  ,     0.65304559],
+    [     1.68881260  ,     0.96618661  ,     0.65304559], 
+    ])
+    frags=[Li, PS4]
+
+    os.system(f'rm {test_dir}/data/fragments.extxyz')
+    for frag in frags:
+        frag.write(f'{test_dir}/data/fragments.extxyz', append=True)
+    
+    job_rss = RandomizedStructure(struct_number=4,
+                                  tag='LiPS',
+                                  output_file_name='random_LPS_structs.extxyz',
+                                  buildcell_option={'TARGVOL':'20-200',
+                                                    'NFORM': '{1,2,3,4}',
+                                                    'MINSEP': '2 P-P=5.0-7.0',
+                                                    },
+                                  fragment_file=os.path.join(f'{test_dir}/data/', 'fragments.extxyz'),
+                                  fragment_numbers=[3,1],
+                                  remove_tmp_files=False,
+                                  num_processes=4).make()
+    
+    run_locally(job_rss, ensure_success=True, create_folders=True, store=memory_jobstore)
+    ats = read(job_rss.output.resolve(memory_jobstore), index=":")
+    assert len(ats) == 4 and np.all(ats[0].positions[0] != ats[0].positions[1])
+
+
 def test_output_from_cell_seed(test_dir, memory_jobstore, clean_dir):
     from ase.io import read
     test_files_dir = test_dir / "data/SiO2.cell"
