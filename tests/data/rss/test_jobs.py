@@ -479,7 +479,7 @@ def test_fragment_buildcell(test_dir, memory_jobstore, clean_dir):
     assert len(ats) == 4 and np.all(ats[0].positions[0] != ats[0].positions[1])
 
 
-def test_fragment_buildcell_multifrags(test_dir, memory_jobstore):
+def test_fragment_buildcell_multifrags(test_dir, memory_jobstore, clean_dir):
     from ase.io import read
     import numpy as np
     from ase import Atoms
