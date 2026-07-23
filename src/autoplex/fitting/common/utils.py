@@ -1396,6 +1396,8 @@ def mace_fitting(
         A dictionary containing train_error, test_error, and the path to the fitted MLIP.
 
     """
+    from mace.tools.arg_parser import build_default_arg_parser
+
     if hyperparameters is None:
         from autoplex import MACE_HYPERS  # noqa: PLC0415
 
@@ -1423,19 +1425,24 @@ def mace_fitting(
     hyperparameters.update_parameters(fit_kwargs)
 
     mace_hypers = hyperparameters.model_dump(by_alias=True, exclude_none=True)
-
+    
+    parser = build_default_arg_parser()
+    allowed_mace_args = []
+    for action in parser._actions:
+        allowed_mace_args.extend(action.option_strings)
+    allowed_mace_args=[i.split('--')[-1] for i in allowed_mace_args]
+    
     boolean_hypers = [
         "distributed",
         "pair_repulsion",
         "amsgrad",
         "swa",
         "stage_two",
-        "keep_checkpoint",
+        "keep_checkpoints",
         "save_all_checkpoints",
         "restart_latest",
         "save_cpu",
         "wandb",
-        "compute_statistics",
         "foundation_model_readout",
         "ema",
     ]
@@ -1451,8 +1458,12 @@ def mace_fitting(
         "shuffle",
     ]
 
+
     hypers = []
     for hyper in mace_hypers:
+        if hyper not in allowed_mace_args:
+            print(f'Ignoring keyword {hyper} as it is no allowed mace keyword.')
+            continue
         if hyper in boolean_hypers:
             if mace_hypers[hyper] is True:
                 hypers.append(f"--{hyper}")
@@ -1462,8 +1473,6 @@ def mace_fitting(
             logging.info("Train and test files have default names.")
         elif hyper in ["energy_key", "virial_key", "forces_key", "device"]:
             logging.info("energy_key, virial_key and forces_key have default names.")
-        else:
-            hypers.append(f"--{hyper}={mace_hypers[hyper]}")
 
     # we have now saved the train and test files in the current directory
     # with default names "train.extxyz" and "test.extxyz"

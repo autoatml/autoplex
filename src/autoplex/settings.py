@@ -680,7 +680,6 @@ class MACESettings(AutoplexBaseModel):
     compute_stress: (
         bool | Literal["yes", "true", "t", "y", "1", "no", "false", "f", "n", "0"]
     ) = Field(default=False, description="Compute stress")
-    compute_statistics: bool = Field(default=False, description="Compute statistics")
     correlation: int = Field(default=3, description="Correlation order at each layer")
     default_dtype: Literal["float32", "float64"] = Field(
         default="float32", description="Default data type"
@@ -708,7 +707,7 @@ class MACESettings(AutoplexBaseModel):
     foundation_model_readout: bool = Field(
         default=True, description="Use readout of foundation model for finetuning"
     )
-    keep_checkpoint: bool = Field(default=False, description="Keep all checkpoints")
+    keep_checkpoints: bool = Field(default=False, description="Keep all checkpoints")
     keep_isolated_atoms: (
         bool | Literal["yes", "true", "t", "y", "1", "no", "false", "f", "n", "0"]
     ) = Field(
