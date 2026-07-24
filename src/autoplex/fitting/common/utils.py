@@ -1462,7 +1462,10 @@ def mace_fitting(
     hypers = []
     for hyper in mace_hypers:
         if hyper not in allowed_mace_args:
-            print(f'Ignoring keyword {hyper} as it is no allowed mace keyword.')
+            logging.error(
+                f"Ignoring keyword {hyper} as it is no allowed mace keyword."
+            )
+
             continue
         if hyper in boolean_hypers:
             if mace_hypers[hyper] is True:
