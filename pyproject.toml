@@ -32,7 +32,8 @@ dependencies = [
      "typing",
      "hiphive",
      "quippy-ase==0.9.14; python_version < '3.12'",
-     "f90wrap==0.2.16"
+     "f90wrap==0.2.16",
+     "scikit-build-core<0.10",
 ]
 
 [tool.setuptools.packages.find]
