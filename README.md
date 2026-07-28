@@ -70,7 +70,15 @@ Before the installation, please make sure that you are using one of the supporte
 
 ## Standard installation
 
-You can install `autoplex` simply by:
+`phonopy` is normally installed automatically as a dependency through `atomate2`. However, build failures with newer `scikit-build-core` versions may prevent this. To avoid installation issues, install the `phonopy` build dependencies and `phonopy` separately before installing this package. Use the following commands:
+
+```
+pip install "scikit-build-core<0.10"
+pip install setuptools-scm nanobind
+pip install --no-build-isolation phonopy==2.30.1
+```
+
+Once this is done, you can install `autoplex` simply by:
 
 ```
 pip install autoplex[strict]

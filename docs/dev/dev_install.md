@@ -5,6 +5,9 @@ Install autoplex from source, by cloning the repository via [github](https://git
 ```bash
 git clone https://github.com/autoatml/autoplex.git
 cd autoplex
+pip install "scikit-build-core<0.10"
+pip install setuptools-scm nanobind
+pip install --no-build-isolation phonopy==2.30.1
 pip install -e .[strict_all,dev,tests,docs]
 ```
 This will install autoplex will all dependencies for tests, pre-commit and docs building. 
