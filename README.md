@@ -74,7 +74,7 @@ Before the installation, please make sure that you are using one of the supporte
 
 ```
 pip install "scikit-build-core<0.10"
-pip install setuptools-scm nanobind
+pip install setuptools-scm>=8.0 nanobind
 pip install --no-build-isolation phonopy==2.30.1
 ```
 

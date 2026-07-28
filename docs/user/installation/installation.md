@@ -45,7 +45,7 @@ When you have completed all these preparation steps, it's time to install `autop
 
 ```
 pip install "scikit-build-core<0.10"
-pip install setuptools-scm nanobind
+pip install setuptools-scm>=8.0 nanobind
 pip install --no-build-isolation phonopy==2.30.1
 ```
 
