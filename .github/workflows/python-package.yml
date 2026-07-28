@@ -116,6 +116,9 @@ jobs:
       run: |
           micromamba activate autoplex_tests
           uv pip install --upgrade pip
+          uv pip install "scikit-build-core<0.10"
+          uv pip install setuptools-scm>=8.0 nanobind
+          uv pip install --no-build-isolation phonopy==2.30.1
           uv pip install --prerelease=allow .[tests,strict_all]
           
     - name: Download test duration artifacts
@@ -207,6 +210,9 @@ jobs:
         run: |
             micromamba activate autoplex_docs
             uv pip install --upgrade pip
+            uv pip install "scikit-build-core<0.10"
+            uv pip install setuptools-scm>=8.0 nanobind
+            uv pip install --no-build-isolation phonopy==2.30.1
             uv pip install --prerelease=allow .[docs,strict_all,tests,aims]
 
       - name: Copy tutorials

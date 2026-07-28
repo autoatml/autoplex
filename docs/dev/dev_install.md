@@ -5,8 +5,12 @@ Install autoplex from source, by cloning the repository via [github](https://git
 ```bash
 git clone https://github.com/autoatml/autoplex.git
 cd autoplex
+pip install "scikit-build-core<0.10"
+pip install setuptools-scm>=8.0 nanobind
+pip install --no-build-isolation phonopy==2.30.1
 pip install -e .[strict_all,dev,tests,docs]
 ```
+
 This will install autoplex will all dependencies for tests, pre-commit and docs building. 
 However, note that non-python programs like `buildcell`, `lammps` and `julia` needed for ACE potential fitting 
 will not be installed with above command. One needs to install these separately. 

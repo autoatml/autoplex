@@ -84,5 +84,8 @@ COPY . /workspace
 RUN python -m pip install --upgrade pip \
  && pip install uv \
  && uv pip install --system pre-commit pytest pytest-mock pytest-split pytest-cov types-setuptools \
+ && uv pip install --system "scikit-build-core<0.10" \
+ && uv pip install --system setuptools-scm>=8.0 nanobind \
+ && uv pip install --system --no-build-isolation "phonopy==2.30.1" \
  && uv pip install --system --prerelease=allow ".[strict,docs]" \
  && uv cache clean && rm -rf /tmp/*
