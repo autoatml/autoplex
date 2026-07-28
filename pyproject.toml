@@ -58,7 +58,6 @@ workflow-managers = [
     "jobflow-remote==0.1.7"
 ]
 strict_all = [
-     "scikit-build-core<0.10",
      "calorine==3.0",
      "pymatgen==2025.2.18",
      "atomate2[strict]==0.0.21",
