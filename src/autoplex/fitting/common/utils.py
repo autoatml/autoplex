@@ -1469,6 +1469,7 @@ def mace_fitting(
             continue
         if hyper in boolean_hypers:
             if mace_hypers[hyper] is True:
+                print('deleteme', hyper, mace_hypers[hyper])
                 hypers.append(f"--{hyper}")
         elif hyper in boolean_str_hypers:
             hypers.append(f"--{hyper}={mace_hypers[hyper]}")
@@ -1476,6 +1477,8 @@ def mace_fitting(
             logging.info("Train and test files have default names.")
         elif hyper in ["energy_key", "virial_key", "forces_key", "device"]:
             logging.info("energy_key, virial_key and forces_key have default names.")
+        else:
+            hypers.append(f"--{hyper}={mace_hypers[hyper]}")
 
     # we have now saved the train and test files in the current directory
     # with default names "train.extxyz" and "test.extxyz"
