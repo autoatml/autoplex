@@ -353,7 +353,6 @@ mlip_hypers:
     compute_forces: true
     config_type_weights: "{'Default':1.0}"
     compute_stress: false
-    compute_statistics: false
     correlation: 3
     default_dtype: float32
     device: cpu
@@ -366,6 +365,7 @@ mlip_hypers:
     foundation_filter_elements: true
     foundation_model:
     foundation_model_readout: true
+    keep_checkpoints: false
     keep_isolated_atoms: false
     hidden_irreps: 128x0e + 128x1o
     loss: huber

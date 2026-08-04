@@ -356,8 +356,6 @@ class RssMaker(Maker):
                 "remove_traj_files",
                 "num_processes_rss",
                 "device_for_rss",
-                "initial_kt",
-                "write_traj"
             ]
             initial_params = {
                 k: v for k, v in config_params.items() if k not in initial_exclude_keys
