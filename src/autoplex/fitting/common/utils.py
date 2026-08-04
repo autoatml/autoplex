@@ -1466,7 +1466,6 @@ def mace_fitting(
             continue
         if hyper in boolean_hypers:
             if mace_hypers[hyper] is True:
-                print("deleteme", hyper, mace_hypers[hyper])
                 hypers.append(f"--{hyper}")
         elif hyper in boolean_str_hypers:
             hypers.append(f"--{hyper}={mace_hypers[hyper]}")
