@@ -1425,13 +1425,13 @@ def mace_fitting(
     hyperparameters.update_parameters(fit_kwargs)
 
     mace_hypers = hyperparameters.model_dump(by_alias=True, exclude_none=True)
-    
+
     parser = build_default_arg_parser()
     allowed_mace_args = []
     for action in parser._actions:
         allowed_mace_args.extend(action.option_strings)
-    allowed_mace_args=[i.split('--')[-1] for i in allowed_mace_args]
-    
+    allowed_mace_args = [i.split("--")[-1] for i in allowed_mace_args]
+
     boolean_hypers = [
         "distributed",
         "pair_repulsion",
@@ -1458,18 +1458,15 @@ def mace_fitting(
         "shuffle",
     ]
 
-
     hypers = []
     for hyper in mace_hypers:
         if hyper not in allowed_mace_args:
-            logging.error(
-                f"Ignoring keyword {hyper} as it is no allowed mace keyword."
-            )
+            logging.error(f"Ignoring keyword {hyper} as it is no allowed mace keyword.")
 
             continue
         if hyper in boolean_hypers:
             if mace_hypers[hyper] is True:
-                print('deleteme', hyper, mace_hypers[hyper])
+                print("deleteme", hyper, mace_hypers[hyper])
                 hypers.append(f"--{hyper}")
         elif hyper in boolean_str_hypers:
             hypers.append(f"--{hyper}={mace_hypers[hyper]}")
