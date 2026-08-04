@@ -1396,7 +1396,7 @@ def mace_fitting(
         A dictionary containing train_error, test_error, and the path to the fitted MLIP.
 
     """
-    from mace.tools.arg_parser import build_default_arg_parser
+    from mace.tools.arg_parser import build_default_arg_parser  # noqa: PLC0415
 
     if hyperparameters is None:
         from autoplex import MACE_HYPERS  # noqa: PLC0415
