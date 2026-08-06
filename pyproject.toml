@@ -80,6 +80,7 @@ strict_all = [
      "nequip==0.6.1",
      "hiphive==1.4",
      "f90wrap==0.2.16",
+     "scipy<=1.17.1",
 ]
 strict = [
      "pymatgen==2025.2.18; python_version < '3.12'",
@@ -95,6 +96,7 @@ strict = [
      "hiphive==1.4; python_version < '3.12'",
      "numpy",
      "typing",
+     "scipy<=1.17.1",
  ]
 
 dev = ["pre-commit>=2.12.1"]
