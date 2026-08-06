@@ -525,6 +525,7 @@ def do_rss_single_node(
 
 @job
 def do_rss_multi_node(
+    jobprefix: str,
     mlip_type: Literal["GAP", "J-ACE", "P-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"],
     mlip_path: str | Path,
     iteration_index: str,
@@ -650,7 +651,7 @@ def do_rss_multi_node(
             config_type=config_type,
             keep_symmetry=keep_symmetry,
         )
-
+        rss.name=f"{jobprefix}{rss.name}"
         struct_start_index += len(structure_groups[i])
 
         job_list.append(rss)

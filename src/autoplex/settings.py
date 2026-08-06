@@ -1079,7 +1079,10 @@ class CustomIncar(AutoplexBaseModel):
 
 class RssConfig(AutoplexBaseModel):
     """A model describing the complete RSS configuration."""
-
+    jobprefix: str | None = Field(
+        default='autoplex_',
+        description="Name of the calculation used in the jobmanager as prefix."
+    )
     tag: str | None = Field(
         default=None,
         description="Tag of systems. It can also be used for setting up elements "
@@ -1322,6 +1325,10 @@ class RssConfig(AutoplexBaseModel):
     mlip_hypers: MLIPHypers = Field(
         default_factory=MLIPHypers, description="MLIP hyperparameters"
     )
+
+    def __post_init__(self):
+        if self.jobprefix[-1]!='_':
+            self.jobprefix=f"{self.jobprefix}_"
 
     @classmethod
     def from_file(cls, filename: str):

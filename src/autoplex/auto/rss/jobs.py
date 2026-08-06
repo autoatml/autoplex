@@ -63,6 +63,7 @@ _DEFAULT_STATIC_ENERGY_MAKER = StaticMaker(
 def initial_rss(
     tag: str,
     generated_struct_numbers: list[int],
+    jobprefix: str = '',
     num_of_initial_selected_structs: list[int] | None = None,
     cell_seed_paths: list[str] | None = None,
     buildcell_options: list[dict] | None = None,
@@ -124,6 +125,8 @@ def initial_rss(
         if the stoichiometric ratio of elements is defined in the 'cell_seed_paths' or 'buildcell_options'.
     generated_struct_numbers: list[int]
         Expected number of generated randomized unit cells.
+    jobprefix: str
+        Prefix that precedes the jobname in the jobmanager.
     num_of_initial_selected_structs: list[int] | None
         Number of structures to be sampled. Default is None.
     cell_seed_paths: list[str]
@@ -251,6 +254,7 @@ def initial_rss(
         fragment_numbers=fragment_numbers,
         selected_struct_numbers=num_of_initial_selected_structs,
         tag=tag,
+        jobprefix=jobprefix,
         num_processes=num_processes_buildcell,
         initial_selection_enabled=initial_selection_enabled,
         bcur_params=bcur_params,
@@ -260,6 +264,7 @@ def initial_rss(
     # TODO: this needs to be generalized beyond VASP and instead be able to use a different dft calculator,
     # or a force field
     do_dft_static = DFTStaticLabelling(
+        jobprefix=jobprefix,
         e0_spin=e0_spin,
         isolatedatom_box=isolatedatom_box,
         isolated_atom=include_isolated_atom,
@@ -277,6 +282,7 @@ def initial_rss(
     do_data_collection = collect_dft_data(
         dft_ref_file=dft_ref_file, rss_group=rss_group, dft_dirs=do_dft_static.output
     )
+    do_data_collection.name=f'{jobprefix}{do_data_collection.name}'
     do_data_preprocessing = preprocess_data(
         test_ratio=test_ratio,
         disable_testing=disable_testing,
@@ -292,7 +298,9 @@ def initial_rss(
         reg_minmax=reg_minmax,
         isolated_atom_energies=do_data_collection.output["isolated_atom_energies"],
     )
+    do_data_preprocessing.name=f'{jobprefix}{do_data_preprocessing.name}'
     do_mlip_fit = MLIPFitMaker(
+        jobprefix=jobprefix,
         mlip_type=mlip_type,
         ref_energy_name=ref_energy_name,
         ref_force_name=ref_force_name,
@@ -335,6 +343,7 @@ def do_rss_iterations(
     input: dict,
     tag: str,
     generated_struct_numbers: list[int],
+    jobprefix: str | None = None,
     num_of_initial_selected_structs: list[int] | None = None,
     cell_seed_paths: list[str] | None = None,
     buildcell_options: list[dict] | None = None,
@@ -429,6 +438,8 @@ def do_rss_iterations(
             kt: float
                 The value of kt.
 
+    jobprefix: str
+        The prefix that precedes the jobname in the jobmanager.
     tag: str
         Tag of systems. It can also be used for setting up elements and stoichiometry.
         For example, the tag of 'SiO2' will be recognized as a 1:2 ratio of Si to O and
@@ -631,6 +642,7 @@ def do_rss_iterations(
             fragment_numbers=fragment_numbers,
             selected_struct_numbers=num_of_initial_selected_structs,
             tag=tag,
+            jobprefix=jobprefix,
             num_processes=num_processes_buildcell,
             initial_selection_enabled=initial_selection_enabled,
             bcur_params=bcur_params,
@@ -657,6 +669,7 @@ def do_rss_iterations(
             num_groups=num_groups,
             config_type=config_type,
         )
+        do_rss.name=f'{jobprefix}{do_rss.name}'
         do_data_sampling = sample_data(
             selection_method=rss_selection_method,
             num_of_selection=num_of_rss_selected_structs,
@@ -666,7 +679,9 @@ def do_rss_iterations(
             isolated_atom_energies=input["isolated_atom_energies"],
             remove_traj_files=remove_traj_files,
         )
+        do_data_sampling.name=f'{jobprefix}{do_data_sampling.name}'
         do_dft_static = DFTStaticLabelling(
+            jobprefix=jobprefix,
             e0_spin=e0_spin,
             isolatedatom_box=isolatedatom_box,
             isolated_atom=include_isolated_atom,
@@ -684,6 +699,7 @@ def do_rss_iterations(
             rss_group=rss_group,
             dft_dirs=do_dft_static.output,
         )
+        do_data_collection.name=f'{jobprefix}{do_data_collection.name}'
         do_data_preprocessing = preprocess_data(
             test_ratio=test_ratio,
             disable_testing=disable_testing,
@@ -699,7 +715,9 @@ def do_rss_iterations(
             reg_minmax=reg_minmax,
             isolated_atom_energies=input["isolated_atom_energies"],
         )
+        do_data_preprocessing.name=f'{jobprefix}{do_data_preprocessing.name}'
         do_mlip_fit = MLIPFitMaker(
+            jobprefix=jobprefix,
             mlip_type=mlip_type,
             ref_energy_name=ref_energy_name,
             ref_force_name=ref_force_name,
@@ -735,6 +753,7 @@ def do_rss_iterations(
             generated_struct_numbers=generated_struct_numbers,
             num_of_initial_selected_structs=num_of_initial_selected_structs,
             tag=tag,
+            jobprefix=jobprefix,
             cell_seed_paths=cell_seed_paths,
             buildcell_options=buildcell_options,
             fragment_file=fragment_file,

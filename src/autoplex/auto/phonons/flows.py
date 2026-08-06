@@ -62,6 +62,8 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
 
     Parameters
     ----------
+    jobprefix : str
+        The prefix that precedes a jobname in the jobmanager.
     name : str
         Name of the flow produced by this maker.
     add_dft_phonon_struct: bool.
@@ -177,6 +179,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         fit database via MongoDB, might be slow).
     """
 
+    jobprefix: str | None = None
     name: str = "add_data"
     add_dft_phonon_struct: bool = True
     add_dft_rattled_struct: bool = True
@@ -185,7 +188,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
     phonon_bulk_relax_maker: BaseVaspMaker | AseMaker | None = field(
         default_factory=lambda: DoubleRelaxMaker.from_relax_maker(
             TightRelaxMaker(
-                name="dft tight relax",
+                name=f"dft tight relax",
                 run_vasp_kwargs={"handlers": {}},
                 input_set_generator=TightRelaxSetGenerator(
                     user_incar_settings={
@@ -276,6 +279,9 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
     glue_xml: bool = False
     glue_file_path: str = "glue.xml"
     run_fits_on_different_cluster: bool = False
+
+    def __post_init__(self):
+        self.name=f"{self.jobprefix}{self.name}"
 
     def make(
         self,
@@ -436,6 +442,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
 
         for ml_model, fit_kwargs in zip(self.ml_models, fit_kwargs_list or [{}]):
             add_data_fit = MLIPFitMaker(
+                jobprefix=self.jobprefix,
                 mlip_type=ml_model,
                 glue_xml=self.glue_xml,
                 glue_file_path=self.glue_file_path,
@@ -521,6 +528,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                                 "delta": delta,
                             }
                             loop_data_fit = MLIPFitMaker(
+                                jobprefix=self.jobprefix,
                                 mlip_type=ml_model,
                                 glue_xml=self.glue_xml,
                                 glue_file_path=self.glue_file_path,
@@ -772,6 +780,8 @@ class CompleteDFTvsMLBenchmarkWorkflowMPSettings(CompleteDFTvsMLBenchmarkWorkflo
 
     Parameters
     ----------
+    jobprefix: str
+        The prefix that precedes the jobname in the jobmanager.
     name : str
         Name of the flow produced by this maker.
     add_dft_phonon_struct: bool.
@@ -926,7 +936,7 @@ class CompleteDFTvsMLBenchmarkWorkflowMPSettings(CompleteDFTvsMLBenchmarkWorkflo
     displacement_maker: BaseVaspMaker = field(
         default_factory=lambda: MPGGAStaticMaker(
             run_vasp_kwargs={"handlers": ()},
-            name="dft phonon static",
+            name=f"dft phonon static",
             input_set_generator=MPStaticSet(
                 force_gamma=True,
                 auto_metal_kpoints=True,
@@ -981,15 +991,21 @@ class DFTSupercellSettingsMaker(Maker):
 
     Parameters
     ----------
+    jobprefix : str
+        The prefix that precedes the jobname in the jobmanager.
     name (str): The name of the maker. Default is "test dft and supercell settings".
     supercell_settings (dict): Settings for the supercells. Default is {"min_length": 15}.
     DFT_Maker (BaseVaspMaker): The DFT maker to be used. Default is TightDFTStaticMaker.
 
     """
 
+    jobprefix: str | None = None
     name: str = "test dft and supercell settings"
     supercell_settings: dict = field(default_factory=lambda: {"min_length": 15})
     DFT_Maker: BaseVaspMaker = field(default_factory=TightDFTStaticMaker)
+
+    def __post_init__(self):
+        self.name=f"{self.jobprefix}{self.name}"
 
     def make(self, structure_list: list[Structure], mp_ids: list[str]) -> Flow:
         """
@@ -1027,6 +1043,8 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
 
     Parameters
     ----------
+    jobprefix : str
+        The prefix that precedes the jobname in the jobmanager.
     name : str
         Name of the flow produced by this maker.
     max_iterations: int.
@@ -1040,6 +1058,7 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
         All Iterations after the first one will be performed with this flow.
     """
 
+    jobprefix: str | None = None
     name: str = "IterativeCompleteDFTvsMLBenchmarkWorkflow"
     max_iterations: int = 10
     rms_max: float = 0.2
@@ -1053,6 +1072,8 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
             )
         )
     )
+    def __post_init__(self):
+        self.name=f"{self.jobprefix}{job.name}"
 
     def make(
         self,

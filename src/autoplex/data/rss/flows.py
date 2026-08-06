@@ -19,6 +19,8 @@ class BuildMultiRandomizedStructure(Maker):
 
     Parameters
     ----------
+    jobprefix : str
+        The prefix that precedes the jobname displayed in the jobmanager.
     tag: str
         Tag of systems. It can also be used for setting up elements and stoichiometry.
         For example, the tag of 'SiO2' will be recognized as a 1:2 ratio of Si to O and
@@ -54,6 +56,7 @@ class BuildMultiRandomizedStructure(Maker):
 
     """
 
+    jobprefix: str
     tag: str
     generated_struct_numbers: list[int]
     cell_seed_paths: list[str] | None = None
@@ -66,7 +69,10 @@ class BuildMultiRandomizedStructure(Maker):
     bcur_params: dict | None = None
     random_seed: int | None = None
     num_processes: int = 1
-    name: str = "do_randomized_structure_generation"
+    name: str | None = None 
+
+    def __post_init__(self):
+        self.name=f"{self.jobprefix}do_randomized_structure_generation"
 
     @job
     def make(self):
@@ -105,7 +111,7 @@ class BuildMultiRandomizedStructure(Maker):
                     dir=job_struct.output,
                     random_seed=self.random_seed,
                 )
-                job_cur.name = f"sampling_{i}"
+                job_cur.name = f"{self.jobprefix}sampling_{i}"
                 job_list.append(job_struct)
                 job_list.append(job_cur)
                 final_structures.append(job_cur.output)

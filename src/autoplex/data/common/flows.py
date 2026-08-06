@@ -58,9 +58,13 @@ class GenerateTrainingDataForTesting(Maker):
 
     """
 
-    name: str = "generate_training_data_for_testing"
+    jobprefix: str | None = None
+    name: str = 'generate_training_data_for_testing'
     bulk_relax_maker: ForceFieldRelaxMaker | None = None
     static_energy_maker: ForceFieldStaticMaker | ForceFieldRelaxMaker | None = None
+
+    def __post_init__(self):
+        self.name=f"{self.jobprefix}{self.name}"
 
     def make(
         self,
@@ -161,7 +165,7 @@ class GenerateTrainingDataForTesting(Maker):
                 )
                 jobs.append(plots)
 
-        return Flow(jobs=jobs, name=self.name)  # , plots.output)
+        return Flow(jobs=jobs, name=f"{self.jobprefix}{self.name}")  # , plots.output)
 
     @job
     def static_run_and_convert(
@@ -285,7 +289,8 @@ class DFTStaticLabelling(Maker):
         - 'config_type': List of configuration types corresponding to each directory.
     """
 
-    name: str = "do_dft_labelling"
+    jobprefix: str | None = None
+    name: str | None = None
     isolated_atom: bool = False
     isolated_species: list[str] | None = None
     e0_spin: bool = False
@@ -336,6 +341,9 @@ class DFTStaticLabelling(Maker):
         BaseVaspMaker | CastepStaticMaker | ForceFieldStaticMaker | None
     ) = None
 
+    def __post_init__(self):
+        self.name=f"{self.jobprefix}do_dft_labelling"
+
     @job
     def make(
         self,
@@ -378,7 +386,7 @@ class DFTStaticLabelling(Maker):
         if structures:
             for idx, struct in enumerate(structures):
                 static_job = st_m.make(structure=struct)
-                static_job.name = f"static_bulk_{idx}"
+                static_job.name = f"{self.jobprefix}static_bulk_{idx}"
                 dirs["dirs_of_dft"].append(static_job.output.dir_name)
                 if config_type:
                     dirs["config_type"].append(config_type)
@@ -421,7 +429,7 @@ class DFTStaticLabelling(Maker):
                             structure=isolated_atom_struct
                         )
 
-                    static_job.name = f"static_isolated_{idx}"
+                    static_job.name = f"{self.jobprefix}static_isolated_{idx}"
                     dirs["dirs_of_dft"].append(static_job.output.dir_name)
                     dirs["config_type"].append("IsolatedAtom")
                     job_list.append(static_job)
@@ -480,7 +488,7 @@ class DFTStaticLabelling(Maker):
                                 structure=dimer_struct
                             )
 
-                        static_job.name = f"static_dimer_{dimer_i}"
+                        static_job.name = f"{self.jobprefix}static_dimer_{dimer_i}"
                         dirs["dirs_of_dft"].append(static_job.output.dir_name)
                         dirs["config_type"].append("dimer")
                         job_list.append(static_job)

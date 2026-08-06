@@ -40,6 +40,8 @@ class MLIPFitMaker(Maker):
 
     Parameters
     ----------
+    jobprefix : str
+        The prefix that precedes the jobname displayed in the jobmanager.
     name : str
         Name of the flows produced by this maker.
     mlip_type: Literal["GAP", "J-ACE", "P-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"]
@@ -92,6 +94,7 @@ class MLIPFitMaker(Maker):
         Whether to disable running the model on test data.
     """
 
+    jobprefix: str | None = None
     name: str = "MLpotentialFit"
     mlip_type: Literal["GAP", "J-ACE", "P-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"] = (
         "GAP"
@@ -118,6 +121,9 @@ class MLIPFitMaker(Maker):
     apply_data_preprocessing: bool = True
     run_fits_on_different_cluster: bool = False
     disable_testing: bool = False
+
+    def __post_init__(self):
+        self.name=f"{self.jobprefix}MLpotentialFit"
 
     def make(
         self,
@@ -210,6 +216,7 @@ class MLIPFitMaker(Maker):
                 disable_testing=self.disable_testing,
                 **fit_kwargs,
             )
+            mlip_fit_job.name=f'{self.jobprefix}{mlip_fit_job.name}'
             jobs.append(mlip_fit_job)
             output = {
                 "mlip_path": mlip_fit_job.output["mlip_path"],
@@ -244,6 +251,7 @@ class MLIPFitMaker(Maker):
             disable_testing=self.disable_testing,
             **fit_kwargs,
         )
+        mlip_fit_job.name=f'{self.jobprefix}{mlip_fit_job.name}'
 
         output = {
             "mlip_path": mlip_fit_job.output["mlip_path"],
@@ -263,6 +271,8 @@ class DataPreprocessing(Maker):
 
     Parameters
     ----------
+    jobprefix : str
+        The prefix that precedes the jobname in the jobmanager.
     name : str
         Name of the flows produced by this maker.
     split_ratio: float
@@ -303,6 +313,7 @@ class DataPreprocessing(Maker):
 
     """
 
+    jobprefix: str | None = None
     name: str = "data_preprocessing_for_fitting"
     split_ratio: float = 0.5
     regularization: bool = False
@@ -321,6 +332,9 @@ class DataPreprocessing(Maker):
     train_data_file: str = "train.extxyz"
     test_data_file: str = "test.extxyz"
     run_fits_on_different_cluster: bool = False
+
+    def __post_init__(self):
+        self.name=f"{self.jobprefix}data_preprocessing_for_fitting"
 
     @job(data=["database_dict"])
     def make(
