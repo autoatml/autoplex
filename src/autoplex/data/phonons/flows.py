@@ -67,7 +67,7 @@ class TightDFTStaticMaker(PhononDisplacementMaker):
         ``{"my_file:txt": "contents of the file"}``.
     """
 
-    jobprefix: str | None = None
+    jobprefix: str = ""
     name: str = "dft static"
     run_vasp_kwargs: dict = field(default_factory=lambda: {"handlers": ()})
 
@@ -182,7 +182,7 @@ class DFTPhononMaker(PhononMaker):
         If True, force constants will be stored
     """
 
-    jobprefix: str | None = None
+    jobprefix: str = ""
     name: str = "dft phonon"
     sym_reduce: bool = True
     symprec: float = 1e-4
@@ -291,7 +291,7 @@ class RandomStructuresDataGenerator(Maker):
         Settings for supercells.
     """
 
-    jobprefix: str | None = None
+    jobprefix: str = ""
     name: str = "RandomStruturesDataGeneratorForML"
     displacement_maker: BaseVaspMaker | None = field(
         default_factory=TightDFTStaticMaker

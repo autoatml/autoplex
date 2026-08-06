@@ -94,7 +94,7 @@ class MLIPFitMaker(Maker):
         Whether to disable running the model on test data.
     """
 
-    jobprefix: str | None = None
+    jobprefix: str = ""
     name: str = "MLpotentialFit"
     mlip_type: Literal["GAP", "J-ACE", "P-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"] = (
         "GAP"
@@ -313,7 +313,7 @@ class DataPreprocessing(Maker):
 
     """
 
-    jobprefix: str | None = None
+    jobprefix: str = ""
     name: str = "data_preprocessing_for_fitting"
     split_ratio: float = 0.5
     regularization: bool = False

@@ -1327,7 +1327,9 @@ class RssConfig(AutoplexBaseModel):
     )
 
     def __post_init__(self):
-        if self.jobprefix[-1]!='_':
+        if self.jobprefix==None:
+            self.jobprefix=""
+        elif self.jobprefix[-1]!='_':
             self.jobprefix=f"{self.jobprefix}_"
 
     @classmethod

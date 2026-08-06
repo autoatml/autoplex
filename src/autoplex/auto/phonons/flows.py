@@ -179,7 +179,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         fit database via MongoDB, might be slow).
     """
 
-    jobprefix: str | None = None
+    jobprefix: str = ""
     name: str = "add_data"
     add_dft_phonon_struct: bool = True
     add_dft_rattled_struct: bool = True
@@ -999,7 +999,7 @@ class DFTSupercellSettingsMaker(Maker):
 
     """
 
-    jobprefix: str | None = None
+    jobprefix: str = ""
     name: str = "test dft and supercell settings"
     supercell_settings: dict = field(default_factory=lambda: {"min_length": 15})
     DFT_Maker: BaseVaspMaker = field(default_factory=TightDFTStaticMaker)
@@ -1058,7 +1058,7 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
         All Iterations after the first one will be performed with this flow.
     """
 
-    jobprefix: str | None = None
+    jobprefix: str = ""
     name: str = "IterativeCompleteDFTvsMLBenchmarkWorkflow"
     max_iterations: int = 10
     rms_max: float = 0.2

@@ -95,7 +95,7 @@ class BaseCastepMaker(Maker):
         Path to store pseudopotentials.
     """
 
-    jobprefix: str | None = None
+    jobprefix: str = ""
     name: str = "castep_job"
     input_set_generator: CastepInputGenerator = field(
         default_factory=CastepInputGenerator
@@ -227,7 +227,7 @@ class CastepStaticMaker(BaseCastepMaker):
         (default: CastepStaticSetGenerator()).
     """
 
-    jobprefix: str | None = None
+    jobprefix: str = ""
     name: str = "static"
     input_set_generator: CastepInputGenerator = field(
         default_factory=CastepStaticSetGenerator

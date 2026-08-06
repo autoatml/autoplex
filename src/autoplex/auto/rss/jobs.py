@@ -343,7 +343,7 @@ def do_rss_iterations(
     input: dict,
     tag: str,
     generated_struct_numbers: list[int],
-    jobprefix: str | None = None,
+    jobprefix: str = "",
     num_of_initial_selected_structs: list[int] | None = None,
     cell_seed_paths: list[str] | None = None,
     buildcell_options: list[dict] | None = None,

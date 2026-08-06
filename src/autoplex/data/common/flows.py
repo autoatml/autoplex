@@ -58,7 +58,7 @@ class GenerateTrainingDataForTesting(Maker):
 
     """
 
-    jobprefix: str | None = None
+    jobprefix: str = ""
     name: str = 'generate_training_data_for_testing'
     bulk_relax_maker: ForceFieldRelaxMaker | None = None
     static_energy_maker: ForceFieldStaticMaker | ForceFieldRelaxMaker | None = None
@@ -289,7 +289,7 @@ class DFTStaticLabelling(Maker):
         - 'config_type': List of configuration types corresponding to each directory.
     """
 
-    jobprefix: str | None = None
+    jobprefix: str = ""
     name: str | None = None
     isolated_atom: bool = False
     isolated_species: list[str] | None = None
