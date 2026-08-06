@@ -63,12 +63,17 @@ workflow-managers = [
 ]
 strict_all = [
      "calorine==3.0",
-     "pymatgen==2025.2.18",
-     "atomate2[strict]==0.0.21",
-     "matgl==1.2.7",
+     "pymatgen==2025.2.18; python_version < '3.12'",
+     "pymatgen==2026.5.4; python_version >= '3.12'",
+     "atomate2[strict]==0.0.21; python_version < '3.12'",
+     "atomate2[strict]==0.1.4; python_version >= '3.12'",
+     "matgl>=4.0.3",
      "quippy-ase==0.9.14; python_version < '3.12'",
-     "ase==3.24.0",
-     "mace-torch==0.3.13",
+     "quippy-ase==0.10.3; python_version >= '3.12'",
+     "ase==3.24.0; python_version < '3.12'",
+     "ase>=3.26.0; python_version > '3.12'",
+     "mace-torch==0.3.13; python_version < '3.12'",
+     "mace-torch==0.3.15; python_version >='3.12'",
      "lightning-utilities==0.14.3",
      "numpy",
      "typing",
@@ -79,7 +84,8 @@ strict_all = [
      "torch<=2.2.1; sys.platform == 'linux'",
      "nequip==0.6.1",
      "hiphive==1.4",
-     "f90wrap==0.2.16",
+     "f90wrap==0.2.16; python_version <'3.12'",
+     "f90wrap==0.3.0; python_version >='3.12'",
      "scipy<=1.17.1",
 ]
 strict = [
