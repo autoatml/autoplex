@@ -285,23 +285,26 @@ def test_ml_phonon_maker(test_dir, clean_dir, memory_jobstore):
         ).make_from_ml_model(
             structure=structure, potential_file=potential_file, supercell_settings={"min_length": 20}
         )
+        job_name = "MLFF.GAP"
     except NameError:
-                gap_phonon_jobs = MLPhononMaker(
-            bulk_relax_maker=ForceFieldRelaxMaker(relax_cell=True, relax_kwargs={"interval": 500}),
-            phonon_displacement_maker=ForceFieldStaticMaker(name="gap phonon static"),
-            static_energy_maker=ForceFieldStaticMaker(),
+        gap_phonon_jobs = MLPhononMaker(
+            bulk_relax_maker=ForceFieldRelaxMaker(force_field_name="GAP", relax_cell=True, relax_kwargs={"interval": 500}),
+            phonon_displacement_maker=ForceFieldStaticMaker(force_field_name="GAP", name="gap phonon static"),
+            static_energy_maker=ForceFieldStaticMaker(force_field_name="GAP"),
 
         ).make_from_ml_model(
             structure=structure, potential_file=potential_file, supercell_settings={"min_length": 20}
         )
+        job_name = "Force field"
 
     responses = run_locally(
         gap_phonon_jobs, create_folders=True, ensure_success=True, store=memory_jobstore
     )
 
     assert gap_phonon_jobs.name == "ml phonon"
-    assert responses[gap_phonon_jobs.output.uuid][1].replace[0].name == "MLFF.GAP relax"
-    assert responses[gap_phonon_jobs.output.uuid][1].replace[1].name == "MLFF.GAP static"
+    assert responses[gap_phonon_jobs.output.uuid][1].replace[0].name == f"{job_name} relax"
+    assert responses[gap_phonon_jobs.output.uuid][1].replace[1].name == f"{job_name} static"
+
 
     ml_phonon_bs_doc = responses[gap_phonon_jobs.output.uuid][1].output.resolve(store=memory_jobstore)
     assert isinstance(ml_phonon_bs_doc, PhononBSDOSDoc)
