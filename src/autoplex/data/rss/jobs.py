@@ -180,6 +180,8 @@ class RandomizedStructure(Maker):
                         self.fragment.arrays["fragment_id"] = [
                             f"{1}-f" for i in self.fragment
                         ]
+                    symbols = [self.fragment.get_chemical_symbols()]
+                    self.fragment = [self.fragment]
 
                 elif isinstance(self.fragment, list):
                     if self.fragment_numbers is None:
@@ -188,29 +190,25 @@ class RandomizedStructure(Maker):
                         ]
                     else:
                         fragment_numbers = self.fragment_numbers
-                    write_fragment = self.fragment[0]
-                    for frag in self.fragment[
-                        1:
-                    ]:  # merge all separate fragments into one Atoms object
-                        write_fragment += frag
+                    symbols = [i.get_chemical_symbols() for i in self.fragment]
 
                 fragment_parameters = [
                     "%BLOCK POSITIONS_ABS",
                 ]
-                symbols = self.fragment.get_chemical_symbols()
-                for i, val in enumerate(self.fragment.get_positions(wrap=True)):
-                    if i == 0:
-                        newline = (
-                            f"{symbols[i]} {val[0]:.8f} {val[1]:.8f} {val[2]:.8f}"
-                            f" # {self.fragment.arrays['fragment_id'][i]}"
-                            f" % NUM={fragment_numbers[i]}"
-                        )
-                    else:
-                        newline = (
-                            f"{symbols[i]} {val[0]:.8f} {val[1]:.8f} {val[2]:.8f}"
-                            f" # {self.fragment.arrays['fragment_id'][i]}"
-                        )
-                    fragment_parameters.append(newline)
+                for ifrag, frag in enumerate(self.fragment):
+                    for i, val in enumerate(frag.get_positions(wrap=True)):
+                        if i == 0:
+                            newline = (
+                                f"{symbols[ifrag][i]} {val[0]:.8f} {val[1]:.8f} {val[2]:.8f}"
+                                f" # frag-{ifrag}"
+                                f" % NUM={fragment_numbers[ifrag]}"
+                            )
+                        else:
+                            newline = (
+                                f"{symbols[ifrag][i]} {val[0]:.8f} {val[1]:.8f} {val[2]:.8f}"
+                                f" # frag-{ifrag}"  # atoms with same # frag-tag stay together during rss
+                            )
+                        fragment_parameters.append(newline)
                 fragment_parameters.append("%ENDBLOCK POSITIONS_ABS")
 
                 buildcell_parameters = (
