@@ -48,7 +48,7 @@ jobs:
           git config --global --add safe.directory /workspace && \
           python -m pip install --upgrade pip && \
           python -m uv cache clean && \
-          python -m uv pip install --prerelease=allow '.[strict_all,tests,aims]' && \
+          python -m uv pip install '.[strict_all,tests,aims]' && \
           OMP_NUM_THREADS=1 pytest --cache-clear --cov=autoplex --cov-report term-missing --cov-append --splits 5 --group ${{ matrix.split }} -vv --durations-path /workspace/tests/test_data/.pytest-split-durations --store-durations -k 'not PACE'
         "
 
@@ -119,7 +119,7 @@ jobs:
           uv pip install "scikit-build-core<0.10"
           uv pip install "setuptools-scm>=8.0" nanobind
           uv pip install --no-build-isolation phonopy==2.30.1
-          uv pip install --prerelease=allow .[tests,strict_all]
+          uv pip install .[tests,strict_all]
           
     - name: Download test duration artifacts
       uses: actions/download-artifact@v4
