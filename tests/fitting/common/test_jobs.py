@@ -7,7 +7,7 @@ from autoplex.fitting.common.flows import MLIPFitMaker
 from tests.auto.phonons.test_jobs import fake_run_vasp_kwargs
 import subprocess
 try: 
-    from matgl.models import M3GNET
+    from matgl.models import M3GNet
     has_m3gnet=True
 except:
     has_m3gnet = False
