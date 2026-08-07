@@ -1,6 +1,6 @@
 {
   "name": "DeveloperEnv",
-  "image": "ghcr.io/autoatml/autoplex/autoplex-python-3.10:v0.1.4",
+  "image": "ghcr.io/autoatml/autoplex/autoplex-python-3.12:main",
   "initializeCommand": "docker system prune --all --force",
   "hostRequirements": {
    "cpus": 4,
@@ -14,5 +14,5 @@
         "ms-azuretools.vscode-docker"]
     },
   },
-  "postCreateCommand": "pip cache purge && uv pip install  --system --prerelease=allow -e '.[strict,docs,tests]' && pre-commit install",
+  "postCreateCommand": "pip cache purge && uv pip install --system -e '.[strict,docs,tests]' && pre-commit install",
 }

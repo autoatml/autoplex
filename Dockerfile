@@ -87,5 +87,5 @@ RUN python -m pip install --upgrade pip \
  && uv pip install --system "scikit-build-core<0.10" \
  && uv pip install --system "setuptools-scm>=8.0" nanobind \
  && uv pip install --system --no-build-isolation "phonopy==2.30.1" \
- && uv pip install --system --prerelease=allow ".[strict_all,docs]" \
+ && uv pip install --system ".[strict_all,docs]" \
  && uv cache clean && rm -rf /tmp/*
