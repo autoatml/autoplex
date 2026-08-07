@@ -85,8 +85,8 @@ strict_all = [
      "torch<=2.2.1; sys.platform == 'linux'",
      "nequip==0.6.1",
      "hiphive==1.4",
-     "f90wrap==0.2.16; python_version <'3.11'",
-     "f90wrap==0.3.0; python_version >='3.11'",
+     "f90wrap==0.2.16; python_version <'3.12'",
+     "f90wrap==0.3.0; python_version >='3.12'",
      "scipy<=1.17.1",
 ]
 strict = [
