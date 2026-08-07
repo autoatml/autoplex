@@ -1080,7 +1080,7 @@ class CustomIncar(AutoplexBaseModel):
 class RssConfig(AutoplexBaseModel):
     """A model describing the complete RSS configuration."""
     jobprefix: str | None = Field(
-        default='autoplex_',
+        default='',
         description="Name of the calculation used in the jobmanager as prefix."
     )
     tag: str | None = Field(

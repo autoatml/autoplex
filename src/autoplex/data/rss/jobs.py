@@ -525,7 +525,6 @@ def do_rss_single_node(
 
 @job
 def do_rss_multi_node(
-    jobprefix: str,
     mlip_type: Literal["GAP", "J-ACE", "P-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"],
     mlip_path: str | Path,
     iteration_index: str,
@@ -548,6 +547,7 @@ def do_rss_multi_node(
     num_groups: int = 1,
     config_type: str = "traj",
     keep_symmetry: bool = True,
+    jobprefix: str = "",
 ) -> list[list | None]:
     """
     Perform sandom structure searching (RSS) on multiple nodes using a machine learning interatomic potential (MLIP).
@@ -600,6 +600,8 @@ def do_rss_multi_node(
         Specify the type of configurations generated from RSS
     keep_symmetry: bool
         If true, preserve symmetry during relaxation.
+    jobprefix: str
+        Prefix that precedes the jobname.
 
     Returns
     -------

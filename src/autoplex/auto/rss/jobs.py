@@ -63,7 +63,7 @@ _DEFAULT_STATIC_ENERGY_MAKER = StaticMaker(
 def initial_rss(
     tag: str,
     generated_struct_numbers: list[int],
-    jobprefix: str = '',
+    jobprefix: str = "",
     num_of_initial_selected_structs: list[int] | None = None,
     cell_seed_paths: list[str] | None = None,
     buildcell_options: list[dict] | None = None,
@@ -126,7 +126,7 @@ def initial_rss(
     generated_struct_numbers: list[int]
         Expected number of generated randomized unit cells.
     jobprefix: str
-        Prefix that precedes the jobname in the jobmanager.
+        Prefix that precedes the jobname.
     num_of_initial_selected_structs: list[int] | None
         Number of structures to be sampled. Default is None.
     cell_seed_paths: list[str]
@@ -439,7 +439,7 @@ def do_rss_iterations(
                 The value of kt.
 
     jobprefix: str
-        The prefix that precedes the jobname in the jobmanager.
+        The prefix that precedes the jobname.
     tag: str
         Tag of systems. It can also be used for setting up elements and stoichiometry.
         For example, the tag of 'SiO2' will be recognized as a 1:2 ratio of Si to O and
@@ -668,6 +668,7 @@ def do_rss_iterations(
             device=device_for_rss,
             num_groups=num_groups,
             config_type=config_type,
+            jobprefix=jobprefix,
         )
         do_rss.name=f'{jobprefix}{do_rss.name}'
         do_data_sampling = sample_data(

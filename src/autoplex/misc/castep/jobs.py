@@ -84,8 +84,6 @@ class BaseCastepMaker(Maker):
 
     Parameters
     ----------
-    jobprefix : str
-        The prefix that precedes the jobname displayed in the jobmanager.
     name : str
         The job name.
     input_set_generator : CastepInputGenerator
@@ -93,14 +91,16 @@ class BaseCastepMaker(Maker):
         including .param and .cell settings.
     pspot: str | None
         Path to store pseudopotentials.
+    jobprefix: str
+        The prefix that precedes the jobname.
     """
 
-    jobprefix: str = ""
     name: str = "castep_job"
     input_set_generator: CastepInputGenerator = field(
         default_factory=CastepInputGenerator
     )
     pspot: str | None = None
+    jobprefix: str = ""
 
     def __post_init__(self):
         self.name=f"{self.jobprefix}{self.name}"
@@ -217,20 +217,20 @@ class CastepStaticMaker(BaseCastepMaker):
 
     Parameters
     ----------
-    jobprefix : str
-        The prefix that precedes the jobname displayed in the jobmanager.
     name : str
         The job name (default: "static").
     input_set_generator : CastepInputGenerator
         Generator used to create the CASTEP input set,
         including .param and .cell settings.
         (default: CastepStaticSetGenerator()).
+    jobprefix: str
+        The prefix that precedes the jobname.
     """
 
-    jobprefix: str = ""
     name: str = "static"
     input_set_generator: CastepInputGenerator = field(
         default_factory=CastepStaticSetGenerator
     )
+    jobprefix: str = ""
     def __post_init__(self):
         self.name=f"{self.jobprefix}{job.name}"

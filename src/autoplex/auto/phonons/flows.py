@@ -63,7 +63,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
     Parameters
     ----------
     jobprefix : str
-        The prefix that precedes a jobname in the jobmanager.
+        The prefix that precedes a jobname.
     name : str
         Name of the flow produced by this maker.
     add_dft_phonon_struct: bool.
@@ -781,7 +781,7 @@ class CompleteDFTvsMLBenchmarkWorkflowMPSettings(CompleteDFTvsMLBenchmarkWorkflo
     Parameters
     ----------
     jobprefix: str
-        The prefix that precedes the jobname in the jobmanager.
+        The prefix that precedes the jobname.
     name : str
         Name of the flow produced by this maker.
     add_dft_phonon_struct: bool.
@@ -992,7 +992,7 @@ class DFTSupercellSettingsMaker(Maker):
     Parameters
     ----------
     jobprefix : str
-        The prefix that precedes the jobname in the jobmanager.
+        The prefix that precedes the jobname.
     name (str): The name of the maker. Default is "test dft and supercell settings".
     supercell_settings (dict): Settings for the supercells. Default is {"min_length": 15}.
     DFT_Maker (BaseVaspMaker): The DFT maker to be used. Default is TightDFTStaticMaker.
@@ -1044,7 +1044,7 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
     Parameters
     ----------
     jobprefix : str
-        The prefix that precedes the jobname in the jobmanager.
+        The prefix that precedes the jobname.
     name : str
         Name of the flow produced by this maker.
     max_iterations: int.

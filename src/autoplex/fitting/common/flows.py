@@ -40,8 +40,6 @@ class MLIPFitMaker(Maker):
 
     Parameters
     ----------
-    jobprefix : str
-        The prefix that precedes the jobname displayed in the jobmanager.
     name : str
         Name of the flows produced by this maker.
     mlip_type: Literal["GAP", "J-ACE", "P-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"]
@@ -92,9 +90,10 @@ class MLIPFitMaker(Maker):
         If true, run fits on different clusters.
     disable_testing: bool
         Whether to disable running the model on test data.
+    jobprefix: str
+        The prefix that precedes the jobname displayed.
     """
 
-    jobprefix: str = ""
     name: str = "MLpotentialFit"
     mlip_type: Literal["GAP", "J-ACE", "P-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"] = (
         "GAP"
@@ -121,6 +120,7 @@ class MLIPFitMaker(Maker):
     apply_data_preprocessing: bool = True
     run_fits_on_different_cluster: bool = False
     disable_testing: bool = False
+    jobprefix: str = ""
 
     def __post_init__(self):
         self.name=f"{self.jobprefix}MLpotentialFit"
@@ -271,8 +271,6 @@ class DataPreprocessing(Maker):
 
     Parameters
     ----------
-    jobprefix : str
-        The prefix that precedes the jobname in the jobmanager.
     name : str
         Name of the flows produced by this maker.
     split_ratio: float
@@ -310,10 +308,11 @@ class DataPreprocessing(Maker):
         Name of the test xyz data file.
     run_fits_on_different_cluster: bool
         If True, will copy the fitting database to the MongoDB
+    jobprefix: str
+        The prefix that precedes the jobname.
 
     """
 
-    jobprefix: str = ""
     name: str = "data_preprocessing_for_fitting"
     split_ratio: float = 0.5
     regularization: bool = False
@@ -332,6 +331,7 @@ class DataPreprocessing(Maker):
     train_data_file: str = "train.extxyz"
     test_data_file: str = "test.extxyz"
     run_fits_on_different_cluster: bool = False
+    jobprefix: str = ""
 
     def __post_init__(self):
         self.name=f"{self.jobprefix}data_preprocessing_for_fitting"
@@ -524,7 +524,7 @@ class DataPreprocessing(Maker):
                 "phonon/train.extxyz",
                 "phonon/test.extxyz",
                 "rattled/train.extxyz",
-                "rattled/test.extxyz",
+               "rattled/test.extxyz",
                 "without_regularization/train.extxyz",
                 "without_regularization/test.extxyz",
             ]

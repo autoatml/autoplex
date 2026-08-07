@@ -55,13 +55,15 @@ class GenerateTrainingDataForTesting(Maker):
         Maker for the relax jobs.
     static_energy_maker: ForceFieldStaticMaker | ForceFieldRelaxMaker | None
         Maker for the static jobs.
+    jobprefix: str
+        Prefix that precedes the jobname.
 
     """
 
-    jobprefix: str = ""
     name: str = 'generate_training_data_for_testing'
     bulk_relax_maker: ForceFieldRelaxMaker | None = None
     static_energy_maker: ForceFieldStaticMaker | ForceFieldRelaxMaker | None = None
+    jobprefix: str = ""
 
     def __post_init__(self):
         self.name=f"{self.jobprefix}{self.name}"
@@ -280,6 +282,8 @@ class DFTStaticLabelling(Maker):
         except that `kspacing` will be automatically set to 100 to enforce a Gamma-point-only calculation.
         This is typically suitable for single-atom systems. Default is None. If a non-`StaticMaker` maker
         is used here, its output must include a `dir_name` field to ensure compatibility with downstream workflows.
+    jobprefix: str
+        Prefix that precedes the jobname.
 
     Returns
     -------
@@ -289,7 +293,6 @@ class DFTStaticLabelling(Maker):
         - 'config_type': List of configuration types corresponding to each directory.
     """
 
-    jobprefix: str = ""
     name: str | None = None
     isolated_atom: bool = False
     isolated_species: list[str] | None = None
@@ -340,6 +343,7 @@ class DFTStaticLabelling(Maker):
     static_energy_maker_isolated_atoms: (
         BaseVaspMaker | CastepStaticMaker | ForceFieldStaticMaker | None
     ) = None
+    jobprefix: str = ""
 
     def __post_init__(self):
         self.name=f"{self.jobprefix}do_dft_labelling"
