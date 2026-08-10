@@ -1018,7 +1018,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_m3gnet_finetuning(
             "include_stresses": True,
             "device": "cpu",
             "test_equal_to_val": True,
-            "foundation_model": "M3GNet-MP-2021.2.8-DIRECT-PES",
+            "foundation_model": "M3GNet-PES-MatPES-PBE-2025.2",
             "use_foundation_model_element_refs": True,
         }]
     )
