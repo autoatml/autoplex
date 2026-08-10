@@ -68,7 +68,7 @@ class BuildMultiRandomizedStructure(Maker):
     bcur_params: dict | None = None
     random_seed: int | None = None
     num_processes: int = 1
-    name: str = "do_randomized_structure_generation" 
+    name: str = "do_randomized_structure_generation"
     jobprefix: str = ""
 
     def __post_init__(self):  # noqa: D105
