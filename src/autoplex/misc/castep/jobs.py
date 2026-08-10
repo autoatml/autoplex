@@ -103,7 +103,7 @@ class BaseCastepMaker(Maker):
     jobprefix: str = ""
 
     def __post_init__(self):
-        self.name=f"{self.jobprefix}{self.name}"
+        self.name = f"{self.jobprefix}{self.name}"
 
     @job
     def make(self, structure: Structure):
@@ -234,4 +234,4 @@ class CastepStaticMaker(BaseCastepMaker):
     jobprefix: str = ""
 
     def __post_init__(self):
-        self.name=f"{self.jobprefix}{self.name}"
+        self.name = f"{self.jobprefix}{self.name}"

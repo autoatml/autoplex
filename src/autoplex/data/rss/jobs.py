@@ -653,7 +653,7 @@ def do_rss_multi_node(
             config_type=config_type,
             keep_symmetry=keep_symmetry,
         )
-        rss.name=f"{jobprefix}{rss.name}"
+        rss.name = f"{jobprefix}{rss.name}"
         struct_start_index += len(structure_groups[i])
 
         job_list.append(rss)

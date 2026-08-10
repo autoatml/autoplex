@@ -60,13 +60,13 @@ class GenerateTrainingDataForTesting(Maker):
 
     """
 
-    name: str = 'generate_training_data_for_testing'
+    name: str = "generate_training_data_for_testing"
     bulk_relax_maker: ForceFieldRelaxMaker | None = None
     static_energy_maker: ForceFieldStaticMaker | ForceFieldRelaxMaker | None = None
     jobprefix: str = ""
 
     def __post_init__(self):
-        self.name=f"{self.jobprefix}{self.name}"
+        self.name = f"{self.jobprefix}{self.name}"
 
     def make(
         self,
@@ -346,7 +346,7 @@ class DFTStaticLabelling(Maker):
     jobprefix: str = ""
 
     def __post_init__(self):
-        self.name=f"{self.jobprefix}do_dft_labelling"
+        self.name = f"{self.jobprefix}do_dft_labelling"
 
     @job
     def make(

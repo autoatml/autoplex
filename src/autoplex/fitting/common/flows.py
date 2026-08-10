@@ -123,7 +123,7 @@ class MLIPFitMaker(Maker):
     jobprefix: str = ""
 
     def __post_init__(self):
-        self.name=f"{self.jobprefix}MLpotentialFit"
+        self.name = f"{self.jobprefix}MLpotentialFit"
 
     def make(
         self,
@@ -216,7 +216,7 @@ class MLIPFitMaker(Maker):
                 disable_testing=self.disable_testing,
                 **fit_kwargs,
             )
-            mlip_fit_job.name=f'{self.jobprefix}{mlip_fit_job.name}'
+            mlip_fit_job.name = f"{self.jobprefix}{mlip_fit_job.name}"
             jobs.append(mlip_fit_job)
             output = {
                 "mlip_path": mlip_fit_job.output["mlip_path"],
@@ -251,7 +251,7 @@ class MLIPFitMaker(Maker):
             disable_testing=self.disable_testing,
             **fit_kwargs,
         )
-        mlip_fit_job.name=f'{self.jobprefix}{mlip_fit_job.name}'
+        mlip_fit_job.name = f"{self.jobprefix}{mlip_fit_job.name}"
 
         output = {
             "mlip_path": mlip_fit_job.output["mlip_path"],
@@ -334,7 +334,7 @@ class DataPreprocessing(Maker):
     jobprefix: str = ""
 
     def __post_init__(self):
-        self.name=f"{self.jobprefix}data_preprocessing_for_fitting"
+        self.name = f"{self.jobprefix}data_preprocessing_for_fitting"
 
     @job(data=["database_dict"])
     def make(
@@ -524,7 +524,7 @@ class DataPreprocessing(Maker):
                 "phonon/train.extxyz",
                 "phonon/test.extxyz",
                 "rattled/train.extxyz",
-               "rattled/test.extxyz",
+                "rattled/test.extxyz",
                 "without_regularization/train.extxyz",
                 "without_regularization/test.extxyz",
             ]

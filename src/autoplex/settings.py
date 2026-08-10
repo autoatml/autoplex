@@ -1079,9 +1079,10 @@ class CustomIncar(AutoplexBaseModel):
 
 class RssConfig(AutoplexBaseModel):
     """A model describing the complete RSS configuration."""
+
     jobprefix: str | None = Field(
-        default='',
-        description="Name of the calculation used in the jobmanager as prefix."
+        default="",
+        description="Name of the calculation used in the jobmanager as prefix.",
     )
     tag: str | None = Field(
         default=None,
@@ -1327,10 +1328,10 @@ class RssConfig(AutoplexBaseModel):
     )
 
     def __post_init__(self):
-        if self.jobprefix==None:
-            self.jobprefix=""
-        elif self.jobprefix[-1]!='_':
-            self.jobprefix=f"{self.jobprefix}_"
+        if self.jobprefix == None:
+            self.jobprefix = ""
+        elif self.jobprefix[-1] != "_":
+            self.jobprefix = f"{self.jobprefix}_"
 
     @classmethod
     def from_file(cls, filename: str):

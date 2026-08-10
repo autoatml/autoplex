@@ -188,7 +188,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
     phonon_bulk_relax_maker: BaseVaspMaker | AseMaker | None = field(
         default_factory=lambda: DoubleRelaxMaker.from_relax_maker(
             TightRelaxMaker(
-                name=f"dft tight relax",
+                name="dft tight relax",
                 run_vasp_kwargs={"handlers": {}},
                 input_set_generator=TightRelaxSetGenerator(
                     user_incar_settings={
@@ -281,7 +281,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
     run_fits_on_different_cluster: bool = False
 
     def __post_init__(self):
-        self.name=f"{self.jobprefix}{self.name}"
+        self.name = f"{self.jobprefix}{self.name}"
 
     def make(
         self,
@@ -936,7 +936,7 @@ class CompleteDFTvsMLBenchmarkWorkflowMPSettings(CompleteDFTvsMLBenchmarkWorkflo
     displacement_maker: BaseVaspMaker = field(
         default_factory=lambda: MPGGAStaticMaker(
             run_vasp_kwargs={"handlers": ()},
-            name=f"dft phonon static",
+            name="dft phonon static",
             input_set_generator=MPStaticSet(
                 force_gamma=True,
                 auto_metal_kpoints=True,
@@ -1005,7 +1005,7 @@ class DFTSupercellSettingsMaker(Maker):
     DFT_Maker: BaseVaspMaker = field(default_factory=TightDFTStaticMaker)
 
     def __post_init__(self):
-        self.name=f"{self.jobprefix}{self.name}"
+        self.name = f"{self.jobprefix}{self.name}"
 
     def make(self, structure_list: list[Structure], mp_ids: list[str]) -> Flow:
         """
@@ -1072,8 +1072,9 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
             )
         )
     )
+
     def __post_init__(self):
-        self.name=f"{self.jobprefix}{job.name}"
+        self.name = f"{self.jobprefix}{job.name}"
 
     def make(
         self,

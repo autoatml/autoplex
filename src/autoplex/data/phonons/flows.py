@@ -186,7 +186,6 @@ class DFTPhononMaker(PhononMaker):
         Prefix that precedes the jobname.
     """
 
-
     name: str = "dft phonon"
     sym_reduce: bool = True
     symprec: float = 1e-4
@@ -298,7 +297,6 @@ class RandomStructuresDataGenerator(Maker):
         Prefix that precedes the jobname.
     """
 
-
     name: str = "RandomStruturesDataGeneratorForML"
     displacement_maker: BaseVaspMaker | None = field(
         default_factory=TightDFTStaticMaker
@@ -343,7 +341,7 @@ class RandomStructuresDataGenerator(Maker):
     jobprefix: str = ""
 
     def __post_init__(self):
-        self.name=f"{self.jobprefix} RandomStruturesDataGeneratorForML"
+        self.name = f"{self.jobprefix} RandomStruturesDataGeneratorForML"
 
     def make(
         self,

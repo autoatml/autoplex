@@ -282,7 +282,7 @@ def initial_rss(
     do_data_collection = collect_dft_data(
         dft_ref_file=dft_ref_file, rss_group=rss_group, dft_dirs=do_dft_static.output
     )
-    do_data_collection.name=f'{jobprefix}{do_data_collection.name}'
+    do_data_collection.name = f"{jobprefix}{do_data_collection.name}"
     do_data_preprocessing = preprocess_data(
         test_ratio=test_ratio,
         disable_testing=disable_testing,
@@ -298,7 +298,7 @@ def initial_rss(
         reg_minmax=reg_minmax,
         isolated_atom_energies=do_data_collection.output["isolated_atom_energies"],
     )
-    do_data_preprocessing.name=f'{jobprefix}{do_data_preprocessing.name}'
+    do_data_preprocessing.name = f"{jobprefix}{do_data_preprocessing.name}"
     do_mlip_fit = MLIPFitMaker(
         jobprefix=jobprefix,
         mlip_type=mlip_type,
@@ -670,7 +670,7 @@ def do_rss_iterations(
             config_type=config_type,
             jobprefix=jobprefix,
         )
-        do_rss.name=f'{jobprefix}{do_rss.name}'
+        do_rss.name = f"{jobprefix}{do_rss.name}"
         do_data_sampling = sample_data(
             selection_method=rss_selection_method,
             num_of_selection=num_of_rss_selected_structs,
@@ -680,7 +680,7 @@ def do_rss_iterations(
             isolated_atom_energies=input["isolated_atom_energies"],
             remove_traj_files=remove_traj_files,
         )
-        do_data_sampling.name=f'{jobprefix}{do_data_sampling.name}'
+        do_data_sampling.name = f"{jobprefix}{do_data_sampling.name}"
         do_dft_static = DFTStaticLabelling(
             jobprefix=jobprefix,
             e0_spin=e0_spin,
@@ -700,7 +700,7 @@ def do_rss_iterations(
             rss_group=rss_group,
             dft_dirs=do_dft_static.output,
         )
-        do_data_collection.name=f'{jobprefix}{do_data_collection.name}'
+        do_data_collection.name = f"{jobprefix}{do_data_collection.name}"
         do_data_preprocessing = preprocess_data(
             test_ratio=test_ratio,
             disable_testing=disable_testing,
@@ -716,7 +716,7 @@ def do_rss_iterations(
             reg_minmax=reg_minmax,
             isolated_atom_energies=input["isolated_atom_energies"],
         )
-        do_data_preprocessing.name=f'{jobprefix}{do_data_preprocessing.name}'
+        do_data_preprocessing.name = f"{jobprefix}{do_data_preprocessing.name}"
         do_mlip_fit = MLIPFitMaker(
             jobprefix=jobprefix,
             mlip_type=mlip_type,
