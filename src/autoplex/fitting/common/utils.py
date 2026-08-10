@@ -1336,7 +1336,7 @@ def m3gnet_fitting(
 
 
 @requires(
-    shutil.which("mace") is not None,
+    has_mace,
     "mace-torch package must be installed to use MACE Potential",
 )
 def mace_fitting(
