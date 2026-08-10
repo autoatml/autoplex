@@ -53,6 +53,7 @@ try:
     from matgl.models import M3GNet
     from matgl.utils.training import PotentialLightningModule
     from pytorch_lightning.loggers import CSVLogger
+
     has_m3gnet = True
 
 except ImportError:
