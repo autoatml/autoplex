@@ -53,7 +53,7 @@ jobs:
           if [ '${{ matrix.dep-group }}' = 'matgl' ]; then \
             python -m uv pip install 'dgl==2.4.0' -f 'https://data.dgl.ai/wheels/torch-2.4/repo.html'; \
           fi && \
-          OMP_NUM_THREADS=1 pytest @/workspace/tests/test_data/test-${{ matrix.dep-group }}.txt --cache-clear --cov=autoplex --cov-report term-missing --cov-append --splits 5 --group ${{ matrix.split }} -vv --durations-path /workspace/tests/test_data/.pytest-split-durations --store-durations
+          OMP_NUM_THREADS=1 pytest @/workspace/tests/test_data/test-${{ matrix.dep-group }}.txt --cache-clear --cov=autoplex --cov-report term-missing --cov-append --splits 1 --group ${{ matrix.split }} -vv --durations-path /workspace/tests/test_data/.pytest-split-durations --store-durations
         "
 
         
