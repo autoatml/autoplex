@@ -68,11 +68,11 @@ class BuildMultiRandomizedStructure(Maker):
     bcur_params: dict | None = None
     random_seed: int | None = None
     num_processes: int = 1
-    name: str | None = None
+    name: str = "do_randomized_structure_generation" 
     jobprefix: str = ""
 
     def __post_init__(self):  # noqa: D105
-        self.name = f"{self.jobprefix}do_randomized_structure_generation"
+        self.name = f"{self.jobprefix}{self.name}"
 
     @job
     def make(self):

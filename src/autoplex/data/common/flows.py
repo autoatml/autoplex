@@ -293,7 +293,7 @@ class DFTStaticLabelling(Maker):
         - 'config_type': List of configuration types corresponding to each directory.
     """
 
-    name: str | None = None
+    name: str = "do_dft_labelling"
     isolated_atom: bool = False
     isolated_species: list[str] | None = None
     e0_spin: bool = False
@@ -346,7 +346,7 @@ class DFTStaticLabelling(Maker):
     jobprefix: str = ""
 
     def __post_init__(self):  # noqa: D105
-        self.name = f"{self.jobprefix}do_dft_labelling"
+        self.name = f"{self.jobprefix}{self.name}"
 
     @job
     def make(
