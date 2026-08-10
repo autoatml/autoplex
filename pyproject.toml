@@ -94,6 +94,7 @@ strict-nep = [
 
 strict-nequip = [
     "nequip==0.6.1",
+    "numpy<2.4",
  ]
 
 
