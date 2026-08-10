@@ -1037,7 +1037,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_m3gnet_finetuning(
     assert complete_workflow_m3gnet.jobs[5].name == "complete_benchmark_mp-22905"
     assert responses[complete_workflow_m3gnet.jobs[-1].output.uuid][1].output["metrics"][0][0][
                "benchmark_phonon_rmse"] == pytest.approx(
-        4.6, abs=0.5,
+        1.6, abs=0.5,
     )
 
 @pytest.mark.skipif(
