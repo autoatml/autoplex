@@ -58,7 +58,7 @@ jobs:
       run: |
         micromamba activate autopl
         uv pip install --upgrade pip
-        uv pip install --editable '.[strict,tests, dev]'
+        uv pip install --editable '.[strict-base,strict-mace]'
 
         
     - name: Install dependencies

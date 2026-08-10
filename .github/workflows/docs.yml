@@ -42,7 +42,7 @@ jobs:
             uv pip install "scikit-build-core<0.10"
             uv pip install "setuptools-scm>=8.0" nanobind
             uv pip install --no-build-isolation phonopy==2.30.1
-            uv pip install .[docs,strict,tests]
+            uv pip install .[docs,strict-base,tests]
             uv pip install --upgrade monty
             uv pip install numpy==1.26.4
             

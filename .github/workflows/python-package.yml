@@ -22,6 +22,7 @@ jobs:
       matrix:
         python-version: ["3.10", "3.11", "3.12"]
         split: [1, 2, 3, 4, 5]  # Number of splits
+        dep-group: ["base", "matgl", "mace", "nep", "nequip"]
 
     steps:
     - name: Fetch Most Recent Docker Image Tag
@@ -48,7 +49,7 @@ jobs:
           git config --global --add safe.directory /workspace && \
           python -m pip install --upgrade pip && \
           python -m uv cache clean && \
-          python -m uv pip install '.[strict_all,tests,aims]' && \
+          python -m uv pip install '.[strict-${{ matrix.dep-group }},tests,aims]' && \
           OMP_NUM_THREADS=1 pytest --cache-clear --cov=autoplex --cov-report term-missing --cov-append --splits 5 --group ${{ matrix.split }} -vv --durations-path /workspace/tests/test_data/.pytest-split-durations --store-durations -k 'not PACE'
         "
 
@@ -57,7 +58,7 @@ jobs:
       if: matrix.python-version == '3.10'
       uses: actions/upload-artifact@v4
       with:
-        name: test-durations-${{ matrix.python-version }}-${{ matrix.split }}
+        name: test-durations-${{ matrix.python-version }}-${{ matrix.dep-group }}
         include-hidden-files: true
         path: ./tests/test_data/.pytest-split-durations
 
@@ -65,7 +66,7 @@ jobs:
       if: matrix.python-version == '3.10'
       uses: actions/upload-artifact@v4
       with:
-        name: coverage-${{ matrix.python-version }}-${{ matrix.split }}
+        name: coverage-${{ matrix.python-version }}-${{ matrix.split }}-${{ matrix.dep-group }}
         include-hidden-files: true
         path: ./.coverage
 
