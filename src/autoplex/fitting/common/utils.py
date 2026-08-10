@@ -59,6 +59,12 @@ try:
 except ImportError:
     has_m3gnet = False
 
+try:
+    from mace.tools.arg_parser import build_default_arg_parser
+
+    has_mace = True
+except ImportError:
+    has_mace = False
 
 try:
     from calorine.nep import read_loss, write_nepfile, write_structures
@@ -1329,6 +1335,10 @@ def m3gnet_fitting(
     }
 
 
+@requires(
+    shutil.which("mace") is not None,
+    "mace-torch package must be installed to use MACE Potential",
+)
 def mace_fitting(
     db_dir: Path,
     hyperparameters=None,
@@ -1402,8 +1412,6 @@ def mace_fitting(
         A dictionary containing train_error, test_error, and the path to the fitted MLIP.
 
     """
-    from mace.tools.arg_parser import build_default_arg_parser  # noqa: PLC0415
-
     if hyperparameters is None:
         from autoplex import MACE_HYPERS  # noqa: PLC0415
 
