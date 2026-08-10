@@ -43,7 +43,7 @@ except ImportError:
     from ase.stress import voigt_6_to_full_3x3_stress
 
 try:
-    has_m3gnet = True
+    os.environ["MATGL_BACKEND"] = "DGL"
     import lightning as pl
     import matgl
     from dgl.data.utils import split_dataset
@@ -53,6 +53,7 @@ try:
     from matgl.models import M3GNet
     from matgl.utils.training import PotentialLightningModule
     from pytorch_lightning.loggers import CSVLogger
+    has_m3gnet = True
 
 except ImportError:
     has_m3gnet = False
