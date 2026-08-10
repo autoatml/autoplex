@@ -340,7 +340,7 @@ class RandomStructuresDataGenerator(Maker):
     )
     jobprefix: str = ""
 
-    def __post_init__(self):
+    def __post_init__(self):  # noqa: D105
         self.name = f"{self.jobprefix} RandomStruturesDataGeneratorForML"
 
     def make(

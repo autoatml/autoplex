@@ -102,7 +102,7 @@ class BaseCastepMaker(Maker):
     pspot: str | None = None
     jobprefix: str = ""
 
-    def __post_init__(self):
+    def __post_init__(self):  # noqa: D105
         self.name = f"{self.jobprefix}{self.name}"
 
     @job
@@ -233,5 +233,5 @@ class CastepStaticMaker(BaseCastepMaker):
     )
     jobprefix: str = ""
 
-    def __post_init__(self):
+    def __post_init__(self):  # noqa: D105
         self.name = f"{self.jobprefix}{self.name}"

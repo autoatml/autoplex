@@ -280,7 +280,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
     glue_file_path: str = "glue.xml"
     run_fits_on_different_cluster: bool = False
 
-    def __post_init__(self):
+    def __post_init__(self):  # noqa: D105
         self.name = f"{self.jobprefix}{self.name}"
 
     def make(
@@ -1004,7 +1004,7 @@ class DFTSupercellSettingsMaker(Maker):
     supercell_settings: dict = field(default_factory=lambda: {"min_length": 15})
     DFT_Maker: BaseVaspMaker = field(default_factory=TightDFTStaticMaker)
 
-    def __post_init__(self):
+    def __post_init__(self):  # noqa: D105
         self.name = f"{self.jobprefix}{self.name}"
 
     def make(self, structure_list: list[Structure], mp_ids: list[str]) -> Flow:
@@ -1073,9 +1073,6 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
         )
     )
 
-    def __post_init__(self):
-        self.name = f"{self.jobprefix}{job.name}"
-
     def make(
         self,
         structure_list: list[Structure],
@@ -1142,3 +1139,4 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
                 "waste resources. It is recommended to switch this off.",
                 stacklevel=2,
             )
+        self.name = f"{self.jobprefix}{self.name}"

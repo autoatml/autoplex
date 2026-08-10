@@ -71,7 +71,7 @@ class BuildMultiRandomizedStructure(Maker):
     name: str | None = None
     jobprefix: str = ""
 
-    def __post_init__(self):
+    def __post_init__(self):  # noqa: D105
         self.name = f"{self.jobprefix}do_randomized_structure_generation"
 
     @job

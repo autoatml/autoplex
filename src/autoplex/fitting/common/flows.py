@@ -122,7 +122,7 @@ class MLIPFitMaker(Maker):
     disable_testing: bool = False
     jobprefix: str = ""
 
-    def __post_init__(self):
+    def __post_init__(self):  # noqa: D105
         self.name = f"{self.jobprefix}MLpotentialFit"
 
     def make(
@@ -333,7 +333,7 @@ class DataPreprocessing(Maker):
     run_fits_on_different_cluster: bool = False
     jobprefix: str = ""
 
-    def __post_init__(self):
+    def __post_init__(self):  # noqa: D105
         self.name = f"{self.jobprefix}data_preprocessing_for_fitting"
 
     @job(data=["database_dict"])

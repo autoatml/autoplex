@@ -1327,8 +1327,8 @@ class RssConfig(AutoplexBaseModel):
         default_factory=MLIPHypers, description="MLIP hyperparameters"
     )
 
-    def __post_init__(self):
-        if self.jobprefix == None:
+    def __post_init__(self):  # noqa: D105
+        if self.jobprefix is None:
             self.jobprefix = ""
         elif self.jobprefix[-1] != "_":
             self.jobprefix = f"{self.jobprefix}_"

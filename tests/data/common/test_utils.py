@@ -117,8 +117,10 @@ def test_energy_forces(clean_dir, test_dir):
     )
     assert os.path.isfile("energy_forces_Si.png")
 
+    print('deleteme', os.listdir(os.getcwd()))
     for file_name in os.listdir(os.getcwd()):
         if file_name not in ['train_Si.extxyz', 'test_Si.extxyz', 'quip_train_Si.extxyz', 'quip_test_Si.extxyz']:
+            print('deleteme',file_name, os.getcwd(), os.path.join(os.getcwd(), file_name))
             os.remove(os.path.join(os.getcwd(), file_name))
 
     os.chdir(parent_dir)

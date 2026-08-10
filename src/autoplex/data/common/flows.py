@@ -65,7 +65,7 @@ class GenerateTrainingDataForTesting(Maker):
     static_energy_maker: ForceFieldStaticMaker | ForceFieldRelaxMaker | None = None
     jobprefix: str = ""
 
-    def __post_init__(self):
+    def __post_init__(self):  # noqa: D105
         self.name = f"{self.jobprefix}{self.name}"
 
     def make(
@@ -345,7 +345,7 @@ class DFTStaticLabelling(Maker):
     ) = None
     jobprefix: str = ""
 
-    def __post_init__(self):
+    def __post_init__(self):  # noqa: D105
         self.name = f"{self.jobprefix}do_dft_labelling"
 
     @job
