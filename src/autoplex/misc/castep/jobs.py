@@ -232,5 +232,6 @@ class CastepStaticMaker(BaseCastepMaker):
         default_factory=CastepStaticSetGenerator
     )
     jobprefix: str = ""
+
     def __post_init__(self):
-        self.name=f"{self.jobprefix}{job.name}"
+        self.name=f"{self.jobprefix}{self.name}"
