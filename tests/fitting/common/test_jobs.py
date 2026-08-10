@@ -11,7 +11,13 @@ try:
     from matgl.models import M3GNet
     has_m3gnet=True
 except:
-    has_m3gnet = False
+    has_m3gnet=False
+    
+try:
+    import mace
+    has_mace=True
+except:
+    has_mace=False
 
 
 try: 
@@ -173,7 +179,9 @@ def test_m3gnet_fit_maker(test_dir, memory_jobstore, clean_dir):
 
     assert Path(m3gnetfit.output["mlip_path"][0].resolve(memory_jobstore)).exists()
 
-
+@pytest.mark.skipif(
+  not has_mace, reason="MACE is not installed"
+)
 def test_mace_fit_maker(test_dir, memory_jobstore, clean_dir, caplog):
     database_dir = test_dir / "fitting/rss_training_dataset/"
 
@@ -212,6 +220,9 @@ def test_mace_fit_maker(test_dir, memory_jobstore, clean_dir, caplog):
     assert "Forces are not used for training or validation." not in caplog.text
     assert "Stresses are not used for training or validation." not in caplog.text
 
+@pytest.mark.skipif(
+  not has_mace, reason="MACE is not installed"
+)
 def test_mace_fit_maker_no_stress(test_dir, memory_jobstore, clean_dir, caplog):
     database_dir = test_dir / "fitting/rss_training_dataset_without_virials/"
 
@@ -250,7 +261,9 @@ def test_mace_fit_maker_no_stress(test_dir, memory_jobstore, clean_dir, caplog):
     assert "Forces are not used for training or validation." not in caplog.text
     assert "Stresses are not used for training or validation." in caplog.text
 
-
+@pytest.mark.skipif(
+  not has_mace, reason="MACE is not installed"
+)
 def test_mace_fit_maker_passEOs(test_dir, memory_jobstore, clean_dir, caplog):
     database_dir = test_dir / "fitting/rss_training_dataset/"
     macefit = MLIPFitMaker(
@@ -301,7 +314,9 @@ def test_mace_fit_maker_passEOs(test_dir, memory_jobstore, clean_dir, caplog):
     assert "Energies are not used for training or validation." not in caplog.text
     assert "Forces are not used for training or validation." not in caplog.text
 
-
+@pytest.mark.skipif(
+  not has_mace, reason="MACE is not installed"
+)
 def test_mace_finetuning_maker(test_dir, memory_jobstore, clean_dir, caplog):
 
     

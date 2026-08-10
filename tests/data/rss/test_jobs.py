@@ -8,11 +8,16 @@ import numpy as np
 import pytest
 
 try: 
-    from matgl.models import M3GNET
+    from matgl.models import M3GNet
     has_m3gnet=True
 except:
     has_m3gnet = False
 
+try:
+    import mace
+    has_mace=True
+except:
+    has_mace=False
 
 try: 
     from calorine.nep import read_loss, write_nepfile, write_structures
@@ -253,7 +258,7 @@ def test_nequip_rss(test_dir, memory_jobstore, clean_dir):
     assert len(output_filter) == 1
 
 @pytest.mark.skipif(
-  not has_m3gnet, reason="Matgl is not installed"
+  not has_m3gnet, reason="matgl is not installed"
 )
 def test_m3gnet_rss(test_dir, memory_jobstore, clean_dir):
     np.random.seed(42)
@@ -294,7 +299,9 @@ def test_m3gnet_rss(test_dir, memory_jobstore, clean_dir):
 
     assert len(output_filter) == 1
 
-
+@pytest.mark.skipif(
+  not has_mace, reason="MACE is not installed"
+)
 def test_mace_rss(test_dir, memory_jobstore, clean_dir):
     np.random.seed(42)
     test_files_dir = test_dir / "data/rss.extxyz"

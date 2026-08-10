@@ -2,11 +2,17 @@ import pytest
 from autoplex.fitting.common.flows import MLIPFitMaker
 import subprocess
 try:
-    from dgl.data.utils import split_dataset
-    from matgl.models import M3GNET
+    #from dgl.data.utils import split_dataset
+    from matgl.models import M3GNet
     has_m3gnet=True
 except:
     has_m3gnet = False
+
+try:
+    import mace
+    has_mace=True
+except:
+    has_mace=False
 
 
 try: 
@@ -362,7 +368,7 @@ def test_mlip_fit_maker_nequip(
     assert Path(nequipfit.output["mlip_path"][0].resolve(memory_jobstore)).exists()
 
 @pytest.mark.skipif(
-  not has_m3gnet, reason="M3GNET is not installed"
+  not has_m3gnet, reason="matgl is not installed"
 )
 def test_mlip_fit_maker_m3gnet(
         test_dir, memory_jobstore, vasp_test_dir, fit_input_dict, clean_dir
@@ -403,7 +409,9 @@ def test_mlip_fit_maker_m3gnet(
     # check if M3GNET potential file is generated
     assert Path(m3gnetfit.output["mlip_path"][0].resolve(memory_jobstore)).exists()
 
-
+@pytest.mark.skipif(
+  not has_mace, reason="MACE is not installed"
+)
 def test_mlip_fit_maker_mace(
         test_dir, memory_jobstore, vasp_test_dir, fit_input_dict, clean_dir
 ):

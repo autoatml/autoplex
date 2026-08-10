@@ -13,6 +13,11 @@ try:
 except:
     has_m3gnet = False
 
+try:
+    import mace
+    has_mace=True
+except:
+    has_mace=False
 
 try: 
     from calorine.nep import read_loss, write_nepfile, write_structures
@@ -761,8 +766,11 @@ def test_mock_workflow_for_PACE(test_dir, mock_vasp, memory_jobstore, clean_dir)
 
     selected_atoms = job2.output.resolve(memory_jobstore)
     assert len(selected_atoms) == 3 
-    
-def test_mock_workflow_for_MACE(test_dir, mock_vasp, memory_jobstore, clean_dir):
+
+@pytest.mark.skipif(
+  not has_mace, reason="MACE is not installed"
+)
+def test_mock_workflow_for_mace(test_dir, mock_vasp, memory_jobstore, clean_dir):
     test_files_dir = test_dir / "data/rss.extxyz"
     # atoms = read(test_files_dir, index=':')
     # structures = [AseAtomsAdaptor.get_structure(atom) for atom in atoms]
