@@ -495,7 +495,7 @@ def test_fragment_buildcell_multifrags(test_dir, memory_jobstore, clean_dir):
     ])
     frags=[Li, PS4]
 
-    frag[0].write(f'{test_dir}/data/fragments.extxyz', )
+    frags[0].write(f'{test_dir}/data/fragments.extxyz', )
     for frag in frags[1:]:
         frag.write(f'{test_dir}/data/fragments.extxyz', append=True)
     
