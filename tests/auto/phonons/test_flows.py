@@ -997,6 +997,11 @@ def test_complete_dft_vs_ml_benchmark_workflow_m3gnet(
 def test_complete_dft_vs_ml_benchmark_workflow_m3gnet_finetuning(
         vasp_test_dir, mock_vasp, test_dir, memory_jobstore, ref_paths4_mpid, fake_run_vasp_kwargs4_mpid, clean_dir
 ):
+    import platform
+
+    py_version = platform.python_version()
+    
+    foundation_model = "M3GNet-PES-MatPES-PBE-2025.2" if not "3.10" in py_version else "M3GNet-MatPES-PBE-v2025.1-PES"
     path_to_struct = vasp_test_dir / "dft_ml_data_generation" / "POSCAR"
     structure = Structure.from_file(path_to_struct)
 
@@ -1018,7 +1023,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_m3gnet_finetuning(
             "include_stresses": True,
             "device": "cpu",
             "test_equal_to_val": True,
-            "foundation_model": "M3GNet-PES-MatPES-PBE-2025.2",
+            "foundation_model": foundation_model, #"M3GNet-PES-MatPES-PBE-2025.2",
             "use_foundation_model_element_refs": True,
         }]
     )
@@ -1033,12 +1038,15 @@ def test_complete_dft_vs_ml_benchmark_workflow_m3gnet_finetuning(
         ensure_success=True,
         store=memory_jobstore,
     )
+    
+    expected_error = 1.6 if "3.10" not in py_version else 3.37
 
     assert complete_workflow_m3gnet.jobs[5].name == "complete_benchmark_mp-22905"
     assert responses[complete_workflow_m3gnet.jobs[-1].output.uuid][1].output["metrics"][0][0][
-               "benchmark_phonon_rmse"] == pytest.approx(
-        1.6, abs=0.5,
+            "benchmark_phonon_rmse"] == pytest.approx(
+        expected_error, abs=0.5,
     )
+        
 
 @pytest.mark.skipif(
   not has_nep, reason="NEP is not installed"
