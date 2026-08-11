@@ -21,7 +21,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.10", "3.11", "3.12"]
-        split: [1, 2, 3, 4] # Number of splits
+        split: [1, 2, 3, 4, 5] # Number of splits
         dep-group: ["base"]
 
     steps:
@@ -56,7 +56,7 @@ jobs:
           if [ '${{ matrix.python-version }}' = '3.10' ] && [ '${{ matrix.dep-group }}' = 'matgl' ]; then \
             python -m uv pip install 'ase==3.25.0'; \
           fi && \
-          OMP_NUM_THREADS=1 NEQUIP_NUM_TASKS=1 pytest --cache-clear --cov=autoplex --cov-report term-missing --cov-append --splits 4 --group ${{ matrix.split }} -vv --durations-path /workspace/tests/test_data/.pytest-split-durations --store-durations -k 'not PACE'
+          OMP_NUM_THREADS=1 NEQUIP_NUM_TASKS=1 pytest --cache-clear --cov=autoplex --cov-report term-missing --cov-append --splits 5 --group ${{ matrix.split }} -vv --durations-path /workspace/tests/test_data/.pytest-split-durations --store-durations
         "
 
         
@@ -97,9 +97,38 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  get-mlip-run:
+    needs: build
+    runs-on: ubuntu-latest
+    outputs:
+      run_id: ${{ steps.get-run.outputs.run_id }}
+
+    steps:
+      - name: Get latest successful MLIPs run ID
+        id: get-run
+        run: |
+          RUN_ID=$(gh run list \
+            --repo ${{ github.repository }} \
+            --workflow="Testing Linux MLIPs" \
+            --branch=main \
+            --status=success \
+            --limit=1 \
+            --json databaseId \
+            -q '.[0].databaseId')
+
+          if [ -z "$RUN_ID" ]; then
+            echo "No successful MLIP run found"
+            exit 1
+          fi
+
+          echo "MLIP run ID: $RUN_ID"
+          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   commit-durations:
     if: github.repository_owner == 'autoatml' && github.ref == 'refs/heads/main'
-    needs: [build, get-pacemaker-run]
+    needs: [build, get-pacemaker-run, get-mlip-run]
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -141,6 +170,13 @@ jobs:
         run-id: ${{ needs.get-pacemaker-run.outputs.run_id }}
         github-token: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Download MLIPs test duration artifacts
+      uses: actions/download-artifact@v4
+      with:
+        pattern: test-durations-3.10-*
+        run-id: ${{ needs.get-mlip-run.outputs.run_id }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Compute average of test durations
       run: |
         micromamba activate autoplex_tests
@@ -161,7 +197,7 @@ jobs:
         base: main
 
   coverage:
-      needs: [build, get-pacemaker-run]
+      needs: [build, get-pacemaker-run, get-mlip-run]
       runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@v4
@@ -179,6 +215,14 @@ jobs:
           uses: actions/download-artifact@v4
           with:
             pattern: coverage-*
+
+        - name: Download MLIPs coverage artifacts
+          continue-on-error: true
+          uses: actions/download-artifact@v4
+          with:
+            pattern: coverage-3.10-*
+            run-id: ${{ needs.get-mlip-run.outputs.run_id }}
+            github-token: ${{ secrets.GITHUB_TOKEN }}
 
         - name: Download Pacemaker coverage artifacts
           continue-on-error: true
