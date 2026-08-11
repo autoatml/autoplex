@@ -1,0 +1,233 @@
+# This workflow will install Python dependencies, run tests and lint with Python 3.10 and 3.11
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Testing Linux 
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+        split: [1, 2, 3, 4] # Number of splits
+        dep-group: ["base"]
+
+    steps:
+    - name: Fetch Most Recent Docker Image Tag
+      run: |
+        TAG=$(curl -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/orgs/autoatml/packages/container/autoplex%2Fautoplex-python-3.10/versions \
+            | jq -r 'sort_by(.created_at) | reverse | .[0].metadata.container.tags[0]')
+        echo "VERSION=$TAG" >> $GITHUB_ENV
+
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch the entire Git history
+        
+    - name: Run tests using Docker image for Python ${{ matrix.python-version }}
+      run: |
+        docker pull ghcr.io/autoatml/autoplex/autoplex-python-${{ matrix.python-version }}:${{ env.VERSION }}
+
+        docker run --rm \
+          -v ${{ github.workspace }}:/workspace \
+          -w /workspace \
+          ghcr.io/autoatml/autoplex/autoplex-python-${{ matrix.python-version }}:${{ env.VERSION }} \
+          bash -c "
+          git config --global --add safe.directory /workspace && \
+          python -m pip install --upgrade pip && \
+          python -m uv cache clean && \
+          python -m uv pip install '.[strict-${{ matrix.dep-group }},tests,aims]' && \
+          if [ '${{ matrix.dep-group }}' = 'matgl' ]; then \
+            python -m uv pip install 'dgl==2.4.0' -f 'https://data.dgl.ai/wheels/torch-2.4/repo.html'; \
+          fi && \
+          if [ '${{ matrix.python-version }}' = '3.10' ] && [ '${{ matrix.dep-group }}' = 'matgl' ]; then \
+            python -m uv pip install 'ase==3.25.0'; \
+          fi && \
+          OMP_NUM_THREADS=1 NEQUIP_NUM_TASKS=1 pytest --cache-clear --cov=autoplex --cov-report term-missing --cov-append --splits 4 --group ${{ matrix.split }} -vv --durations-path /workspace/tests/test_data/.pytest-split-durations --store-durations
+        "
+
+        
+    - name: Upload test durations artifact
+      if: matrix.python-version == '3.10'
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-durations-${{ matrix.python-version }}-${{ matrix.dep-group }}-${{ matrix.split }}
+        include-hidden-files: true
+        path: ./tests/test_data/.pytest-split-durations
+
+    - name: Upload coverage
+      if: matrix.python-version == '3.10'
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-${{ matrix.python-version }}-${{ matrix.dep-group }}-${{ matrix.split }}
+        include-hidden-files: true
+        path: ./.coverage
+
+  get-pacemaker-run:
+    needs: build
+    runs-on: ubuntu-latest
+    outputs:
+      run_id: ${{ steps.get-run.outputs.run_id }}
+    steps:
+      - name: Get latest successful Pacemaker run ID
+        id: get-run
+        run: |
+          RUN_ID=$(gh run list \
+            --repo ${{ github.repository }} \
+            --workflow="Testing Pacemaker (Python 3.10)" \
+            --branch=main \
+            --status=success \
+            --limit=1 \
+            --json databaseId \
+            -q '.[0].databaseId')
+          echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  commit-durations:
+    if: github.repository_owner == 'autoatml' && github.ref == 'refs/heads/main'
+    needs: [build, get-pacemaker-run]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0} # enables conda/mamba env activation by reading bash profile
+
+    steps:
+
+    - name: Check out repo
+      uses: actions/checkout@v4
+    - name: Set up micromamba
+      uses: mamba-org/setup-micromamba@main
+    - name: Clean mamba cache
+      run: |
+          micromamba clean -a -y
+    - name: Create mamba environment
+      run: |
+          micromamba create -n autoplex_tests python=3.10 --yes
+    - name: Install uv
+      run: micromamba run -n autoplex_tests pip install uv
+    - name: Install autoplex and dependencies
+      run: |
+          micromamba activate autoplex_tests
+          uv pip install --upgrade pip
+          uv pip install "scikit-build-core<0.10"
+          uv pip install "setuptools-scm>=8.0" nanobind
+          uv pip install --no-build-isolation phonopy==2.30.1
+          uv pip install .[docs,strict-base]
+          
+    - name: Download test duration artifacts
+      uses: actions/download-artifact@v4
+      with:
+        pattern: test-durations-*
+
+    - name: Download Pacemaker test duration artifacts
+      continue-on-error: true
+      uses: actions/download-artifact@v4
+      with:
+        pattern: test-durations-pacemaker
+        run-id: ${{ needs.get-pacemaker-run.outputs.run_id }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Compute average of test durations
+      run: |
+        micromamba activate autoplex_tests
+        python3 .github/scripts/average_test_durations.py
+        rm -rf test-durations-*
+
+    - name: Create Pull Request to push consolidated test durations
+      uses: peter-evans/create-pull-request@v7
+      with:
+        token: ${{ secrets.ACTION_SECRET }}
+        commit-message: update test durations
+        title: Update test durations file
+        body: Auto update test durations file
+        branch: update-test-durations
+        labels: |
+            automated-pr
+        delete-branch: true
+        base: main
+
+  coverage:
+      needs: [build, get-pacemaker-run]
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+        - name: Set up Python 3.10
+          uses: actions/setup-python@v4
+          with:
+            python-version: '3.10'
+
+        - name: Install Coverage
+          run: |
+           python -m pip install coverage[toml]
+
+        - name: Download coverage artifacts
+          continue-on-error: true
+          uses: actions/download-artifact@v4
+          with:
+            pattern: coverage-*
+
+        - name: Download Pacemaker coverage artifacts
+          continue-on-error: true
+          uses: actions/download-artifact@v4
+          with:
+            pattern: coverage-pacemaker
+            run-id: ${{ needs.get-pacemaker-run.outputs.run_id }}
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+
+        - name: Run coverage
+          continue-on-error: true
+          run: |
+            coverage combine coverage*/.coverage*
+            coverage report --show-missing
+
+  docs:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0} # enables conda/mamba env activation by reading bash profile
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+      - name: Set up micromamba
+        uses: mamba-org/setup-micromamba@main
+      - name: Clean mamba cache
+        run: |
+            micromamba clean -a -y
+      - name: Create mamba environment
+        run: |
+            micromamba create -n autoplex_docs python=3.10 --yes
+      - name: Install uv
+        run: micromamba run -n autoplex_docs pip install uv
+      - name: Install autoplex and dependencies
+        run: |
+            micromamba activate autoplex_docs
+            uv pip install --upgrade pip
+            uv pip install "scikit-build-core<0.10"
+            uv pip install "setuptools-scm>=8.0" nanobind
+            uv pip install --no-build-isolation phonopy==2.30.1
+            uv pip install .[docs,strict-base,strict-mace,strict-matgl,strict-nep,strict-nequip,pacemaker,tests,aims]
+            uv pip install 'dgl==2.4.0' -f 'https://data.dgl.ai/wheels/torch-2.4/repo.html'
+
+      - name: Copy tutorials
+        run: |
+          mkdir -p docs/user/executable
+          cp -r tutorials/* docs/user/executable
+          micromamba run -n autoplex_docs jupyter nbconvert --to markdown docs/user/executable/*.ipynb
+
+      - name: Build
+        run: micromamba run -n autoplex_docs sphinx-build -W docs _build
