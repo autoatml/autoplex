@@ -816,7 +816,7 @@ def do_rss_iterations(
             static_energy_maker_isolated_atoms=static_energy_maker_isolated_atoms,
             **fit_kwargs,
         )
-        do_iteration.name = f'{jobprefix}{do_iteration.name}'
+        do_iteration.name = f"{jobprefix}{do_iteration.name}"
 
         job_list = [
             do_randomized_structure_generation,
