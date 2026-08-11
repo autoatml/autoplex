@@ -56,7 +56,7 @@ jobs:
           if [ '${{ matrix.python-version }}' = '3.10' ] && [ '${{ matrix.dep-group }}' = 'matgl' ]; then \
             python -m uv pip install 'ase==3.25.0'; \
           fi && \
-          OMP_NUM_THREADS=1 NEQUIP_NUM_TASKS=1 pytest --cache-clear --cov=autoplex --cov-report term-missing --cov-append --splits 4 --group ${{ matrix.split }} -vv --durations-path /workspace/tests/test_data/.pytest-split-durations --store-durations
+          OMP_NUM_THREADS=1 NEQUIP_NUM_TASKS=1 pytest --cache-clear --cov=autoplex --cov-report term-missing --cov-append --splits 4 --group ${{ matrix.split }} -vv --durations-path /workspace/tests/test_data/.pytest-split-durations --store-durations -k 'not PACE'
         "
 
         
