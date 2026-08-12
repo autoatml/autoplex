@@ -1,3 +1,4 @@
+import sys
 import pytest
 from autoplex.fitting.common.flows import MLIPFitMaker
 import subprocess
@@ -29,11 +30,18 @@ except ImportError:
     PyACECalculator = object
     has_ypace = False
 
-try: 
-    from nequip.ase import NequIPCalculator
-    has_nequip=True
-except:
-    has_nequip=False
+if sys.version_info[:2] == (3, 10):
+    try:
+        from nequip.ase import NequIPCalculator
+        has_nequip=True
+    except:
+        has_nequip=False
+else:
+    try:
+        from nequip.integrations.ase import NequIPCalculator
+        has_nequip=True
+    except:
+        has_nequip=False
 
 
 @pytest.fixture(scope="class")
@@ -344,6 +352,26 @@ def test_mlip_fit_maker_nequip(
     from jobflow import run_locally
 
     test_files_dir = Path(test_dir / "fitting").resolve()
+    
+    is_old_nequip = not hasattr(NequIPCalculator, "from_compiled_model")
+    
+    if is_old_nequip:
+        model_kwargs = {
+            "r_max":3.14,
+            "max_epochs":10,
+            "device": "cpu",
+        }
+    else:
+        model_kwargs = {
+            "device": "cpu",
+            "cutoff_radius": 3.14,
+            "data": {
+                "split_dataset": {"train": 0.8, "val": 0.2},
+                "train_dataloader": {"num_workers": 1, "batch_size": 1},
+                "val_dataloader": {"batch_size": 5},
+            },
+            "trainer": {"max_epochs": 10}
+        }
 
     # Test NEQUIP fit runs with pre_database_dir
     nequipfit = MLIPFitMaker(
@@ -355,9 +383,7 @@ def test_mlip_fit_maker_nequip(
     ).make(
         fit_input=fit_input_dict,
         isolated_atom_energies={3: -0.28649227, 17: -0.25638457},
-        r_max=3.14,
-        max_epochs=10,
-        device="cpu",
+        **model_kwargs
     )
 
     run_locally(

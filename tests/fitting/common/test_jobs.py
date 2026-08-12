@@ -1,3 +1,4 @@
+import sys
 import pytest
 import yaml
 from pathlib import Path
@@ -34,11 +35,18 @@ except ImportError:
     PyACECalculator = object
     has_ypace = False
 
-try: 
-    from nequip.ase import NequIPCalculator
-    has_nequip=True
-except:
-    has_nequip=False
+if sys.version_info[:2] == (3, 10):
+    try:
+        from nequip.ase import NequIPCalculator
+        has_nequip=True
+    except:
+        has_nequip=False
+else:
+    try:
+        from nequip.integrations.ase import NequIPCalculator
+        has_nequip=True
+    except:
+        has_nequip=False
 
 
 
@@ -127,6 +135,25 @@ def test_jace_fit_maker(test_dir, memory_jobstore, clean_dir):
 )
 def test_nequip_fit_maker(test_dir, memory_jobstore, clean_dir):
     database_dir = test_dir / "fitting/rss_training_dataset/"
+    
+    is_old_nequip = not hasattr(NequIPCalculator, "from_compiled_model")
+    
+    if is_old_nequip:
+        model_kwargs = {
+            "r_max":3.14,
+            "max_epochs":10,
+            "device": "cpu",
+        }
+    else:
+        model_kwargs = {
+            "device": "cpu",
+            "cutoff_radius": 3.14,
+            "data": {
+                "split_dataset": {"train": 0.8, "val": 0.2},
+                "train_dataloader": {"num_workers": 1, "batch_size": 1},
+            },
+            "trainer": {"max_epochs": 10}
+        }
 
     nequipfit = MLIPFitMaker(
         mlip_type="NEQUIP",
@@ -135,9 +162,7 @@ def test_nequip_fit_maker(test_dir, memory_jobstore, clean_dir):
     ).make(
         database_dir=database_dir,
         isolated_atom_energies={14: -0.84696938},
-        r_max=3.14,
-        max_epochs=10,
-        device="cpu",
+        **model_kwargs
     )
 
     run_locally(

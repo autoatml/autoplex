@@ -1,4 +1,5 @@
 import os
+import sys
 import pytest
 from monty.serialization import loadfn
 from atomate2.common.schemas.phonons import PhononBSDOSDoc
@@ -38,12 +39,15 @@ except ImportError:
     PyACECalculator = object
     has_ypace = False
 
-try: 
-    from nequip.ase import NequIPCalculator
-    has_nequip=True
-except:
-    has_nequip=False
+try:
+    if sys.version_info[:2] == (3, 10):
+        from nequip.ase import NequIPCalculator
+    else:
+        from nequip.integrations.ase import NequIPCalculator
 
+    has_nequip = True
+except ImportError:
+    has_nequip = False
 
 
 os.environ["OMP_NUM_THREADS"] = "1"
@@ -1304,6 +1308,34 @@ def test_complete_dft_vs_ml_benchmark_workflow_mace_finetuning_mp_settings(
 def test_complete_dft_vs_ml_benchmark_workflow_nequip(
         vasp_test_dir, mock_vasp, test_dir, memory_jobstore, ref_paths4_mpid, fake_run_vasp_kwargs4_mpid, clean_dir
 ):
+    is_old_nequip = not hasattr(NequIPCalculator, "from_compiled_model")
+    
+    if is_old_nequip:
+        model_kwargs = {
+            "r_max": 4.0,
+            "num_layers": 4,
+            "l_max": 2,
+            "num_features": 32,
+            "num_basis": 8,
+            "invariant_layers": 2,
+            "invariant_neurons": 64,
+            "batch_size": 1,
+            "learning_rate": 0.005,
+            "max_epochs": 1,
+            "device": "cpu",
+        }
+    else:
+        model_kwargs = {
+                "cutoff_radius": 4,
+                "data": {
+                    "split_dataset": {"train": 0.8, "val": 0.2},
+                    "train_dataloader": {"num_workers": 1, "batch_size": 5},
+                    "val_dataloader": {"batch_size": 5},
+                },
+                "trainer": {"max_epochs": 5},
+                "device": "cpu",
+                }
+    
     path_to_struct = vasp_test_dir / "dft_ml_data_generation" / "POSCAR"
     structure = Structure.from_file(path_to_struct)
 
@@ -1320,19 +1352,9 @@ def test_complete_dft_vs_ml_benchmark_workflow_nequip(
         benchmark_structures=[structure],
         pre_xyz_files=["vasp_ref.extxyz"],
         pre_database_dir=test_dir / "fitting" / "ref_files",
-        fit_kwargs_list=[{
-            "r_max": 4.0,
-            "num_layers": 4,
-            "l_max": 2,
-            "num_features": 32,
-            "num_basis": 8,
-            "invariant_layers": 2,
-            "invariant_neurons": 64,
-            "batch_size": 1,
-            "learning_rate": 0.005,
-            "max_epochs": 1,
-            "device": "cpu",
-        }]
+         fit_kwargs_list=[
+             model_kwargs
+        ]
     )
 
     # automatically use fake VASP and write POTCAR.spec during the test
