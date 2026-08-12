@@ -2,4 +2,3 @@ tests/auto/phonons/test_flows.py::test_complete_dft_vs_ml_benchmark_workflow_neq
 tests/data/rss/test_jobs.py::test_nequip_rss
 tests/fitting/common/test_flows.py::test_mlip_fit_maker_nequip
 tests/fitting/common/test_jobs.py::test_nequip_fit_maker
-tests/test_data/fitting/NEQUIP/new/test_train.py::test_nequip_fit_maker
