@@ -81,19 +81,30 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       run_id: ${{ steps.get-run.outputs.run_id }}
+
     steps:
       - name: Get latest successful Pacemaker run ID
         id: get-run
         run: |
           RUN_ID=$(gh run list \
-            --repo ${{ github.repository }} \
-            --workflow="Testing Pacemaker (Python 3.10)" \
-            --branch=main \
-            --status=success \
-            --limit=1 \
-            --json databaseId \
-            -q '.[0].databaseId')
-          echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
+          --repo "${{ github.repository }}" \
+          --json databaseId,name,headBranch,headSha,status,conclusion,createdAt \
+          --jq '
+            [.[] |
+              select(.name == "Testing Pacemaker (Python 3.10)" and .conclusion == "success")
+            ] |
+            sort_by(.createdAt) |
+            last |
+            .databaseId
+          ')
+
+          if [ -z "$RUN_ID" ] || [ "$RUN_ID" = "null" ]; then
+            echo "No successful Pacemaker run found"
+            exit 1
+          fi
+
+          echo "Pacemaker run ID: $RUN_ID"
+          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -108,13 +119,16 @@ jobs:
         id: get-run
         run: |
           RUN_ID=$(gh run list \
-            --repo ${{ github.repository }} \
-            --workflow="Testing Linux MLIPs" \
-            --branch=main \
-            --status=success \
-            --limit=1 \
-            --json databaseId \
-            -q '.[0].databaseId')
+          --repo "${{ github.repository }}" \
+          --json databaseId,name,headBranch,headSha,status,conclusion,createdAt \
+          --jq '
+            [.[] |
+              select(.name == "Testing Linux MLIPs" and .conclusion == "success")
+            ] |
+            sort_by(.createdAt) |
+            last |
+            .databaseId
+          ')
 
           if [ -z "$RUN_ID" ]; then
             echo "No successful MLIP run found"
