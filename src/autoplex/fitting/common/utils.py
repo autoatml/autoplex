@@ -24,7 +24,6 @@ import quippy.potential
 import torch
 from ase.atoms import Atoms
 from ase.calculators.singlepoint import SinglePointCalculator
-from ase.constraints import voigt_6_to_full_3x3_stress
 from ase.data import chemical_symbols
 from ase.io import read, write
 from ase.io.extxyz import XYZError
@@ -39,7 +38,12 @@ from scipy.spatial import ConvexHull
 from threadpoolctl import threadpool_limits
 
 try:
-    has_m3gnet = True
+    from ase.constraints import voigt_6_to_full_3x3_stress
+except ImportError:
+    from ase.stress import voigt_6_to_full_3x3_stress
+
+try:
+    os.environ["MATGL_BACKEND"] = "DGL"
     import lightning as pl
     import matgl
     from dgl.data.utils import split_dataset
@@ -50,9 +54,17 @@ try:
     from matgl.utils.training import PotentialLightningModule
     from pytorch_lightning.loggers import CSVLogger
 
+    has_m3gnet = True
+
 except ImportError:
     has_m3gnet = False
 
+try:
+    from mace.tools.arg_parser import build_default_arg_parser
+
+    has_mace = True
+except ImportError:
+    has_mace = False
 
 try:
     from calorine.nep import read_loss, write_nepfile, write_structures
@@ -69,13 +81,24 @@ except ImportError:
     PyACECalculator = object
     has_ypace = False
 
+
+try:
+    if sys.version_info[:2] == (3, 10):
+        from nequip.ase import NequIPCalculator
+    else:
+        from nequip.integrations.ase import NequIPCalculator
+
+    has_nequip = True
+except ImportError:
+    has_nequip = False
+
 from autoplex.data.common.utils import (
     data_distillation,
     plot_energy_forces,
     rms_dict,
     stratified_dataset_split,
 )
-from autoplex.settings import PacemakerSettings
+from autoplex.fitting.mlip_hypers import PacemakerSettings
 
 if TYPE_CHECKING:
     from pymatgen.core import Structure
@@ -719,6 +742,7 @@ def nep_fitting(
     }
 
 
+@requires(has_nequip, "nequip package must be installed to fit NEQUIP potentials.")
 def nequip_fitting(
     db_dir: Path,
     hyperparameters=None,
@@ -794,10 +818,17 @@ def nequip_fitting(
     """
     [TODO] train Nequip on virials
     """
-    if hyperparameters is None:
-        from autoplex import NEQUIP_HYPERS  # noqa: PLC0415
+    is_old_nequip = not hasattr(NequIPCalculator, "from_compiled_model")
 
-        hyperparameters = NEQUIP_HYPERS
+    if hyperparameters is None:
+        if is_old_nequip:
+            from autoplex.fitting.mlip_hypers._nequip_hypers import (  # noqa: PLC0415
+                NEQUIPSettingsOld as NEQUIPSettings,
+            )
+        else:
+            from autoplex.fitting.mlip_hypers import NEQUIPSettings  # noqa: PLC0415
+
+        hyperparameters = NEQUIPSettings()
 
     hyperparameters = hyperparameters.model_copy(deep=True)
 
@@ -826,43 +857,73 @@ def nequip_fitting(
     else:
         raise ValueError("isolated_atom_energies is empty or not defined!")
 
-    nequip_config_updates = {
-        "dataset_key_mapping": {
-            f"{ref_energy_name}": "total_energy",
-            f"{ref_force_name}": "forces",
-        },
-        "validation_dataset_key_mapping": {
-            f"{ref_energy_name}": "total_energy",
-            f"{ref_force_name}": "forces",
-        },
-        "chemical_symbols": ele_syms,
-        "dataset_file_name": "./train_nequip.extxyz",
-        "validation_dataset_file_name": f"{db_dir}/test.extxyz",
-        "n_train": num_of_train,
-        "n_val": num_of_val,
-    }
-    hyperparameters.update_parameters(nequip_config_updates)
+    # configure hyperparameters
 
     if fit_kwargs:
         hyperparameters.update_parameters(fit_kwargs)
 
-    nequip_hypers = hyperparameters.model_dump(by_alias=True)
+    if is_old_nequip:
 
-    dumpfn(nequip_hypers, "nequip.yaml")
+        hyperparameters.update_parameters(
+            {
+                "dataset_key_mapping": {
+                    f"{ref_energy_name}": "total_energy",
+                    f"{ref_force_name}": "forces",
+                },
+                "validation_dataset_key_mapping": {
+                    f"{ref_energy_name}": "total_energy",
+                    f"{ref_force_name}": "forces",
+                },
+                "chemical_symbols": ele_syms,
+                "dataset_file_name": "./train_nequip.extxyz",
+                "validation_dataset_file_name": f"{db_dir}/test.extxyz",
+                "n_train": num_of_train,
+                "n_val": num_of_val,
+            }
+        )
+    else:
+        hyperparameters.data.split_dataset.file_path = "train_nequip.extxyz"
+        hyperparameters.data.key_mapping = {
+            ref_energy_name: "total_energy",
+            ref_force_name: "forces",
+        }
+        hyperparameters.chemical_symbols = ele_syms
 
-    run_nequip("nequip-train nequip.yaml", "nequip_train")
-    run_nequip(
-        "nequip-deploy build --train-dir results/autoplex ./deployed_nequip_model.pth",
-        "nequip_deploy",
-    )
-    from nequip.ase import NequIPCalculator  # noqa: PLC0415
+    if is_old_nequip:
+        dumpfn(hyperparameters.model_dump(by_alias=True), "nequip.yaml")
+    else:
+        hyperparameters.to_yaml("nequip.yaml")
 
-    calc = NequIPCalculator.from_deployed_model(
-        model_path="deployed_nequip_model.pth",
-        device=device,
-        species_to_type_name={s: s for s in ele_syms},
-        set_global_options=False,
-    )
+    if is_old_nequip:
+        run_nequip("nequip-train nequip.yaml", "nequip_train")
+        run_nequip(
+            "nequip-deploy build --train-dir results/autoplex ./deployed_nequip_model.pth",
+            "nequip_deploy",
+        )
+        calc = NequIPCalculator.from_deployed_model(
+            model_path="deployed_nequip_model.pth",
+            device=device,
+            species_to_type_name={s: s for s in ele_syms},
+            set_global_options=False,
+        )
+    else:
+        ckpt_path = "./nequip_model/best.ckpt"
+        model_package_path = "./nequip_model/model.nequip.zip"
+        compiled_path = "deployed_ase.nequip.pt2"
+
+        run_nequip("nequip-train -cn nequip.yaml", "nequip_train")
+        run_nequip(
+            f"nequip-package build {ckpt_path} {model_package_path}",
+            "nequip_package",
+        )
+        run_nequip(
+            f"nequip-compile --mode aotinductor --device {device} --target ase {model_package_path} {compiled_path}",
+            "nequip_package",
+        )
+        calc = NequIPCalculator.from_compiled_model(
+            compile_path="deployed_ase.nequip.pt2",
+            device=device,
+        )
 
     ener_out_train = []
     for at in train_nequip:
@@ -895,7 +956,7 @@ def nequip_fitting(
     }
 
 
-@requires(has_m3gnet, "matgl package must be installed to use M3GNET.")
+@requires(has_m3gnet, "matgl package must be installed to fit M3GNET potentials.")
 def m3gnet_fitting(
     db_dir: Path,
     hyperparameters=None,
@@ -1323,6 +1384,10 @@ def m3gnet_fitting(
     }
 
 
+@requires(
+    has_mace,
+    "mace-torch package must be installed to fit MACE Potentials",
+)
 def mace_fitting(
     db_dir: Path,
     hyperparameters=None,
@@ -1396,8 +1461,6 @@ def mace_fitting(
         A dictionary containing train_error, test_error, and the path to the fitted MLIP.
 
     """
-    from mace.tools.arg_parser import build_default_arg_parser  # noqa: PLC0415
-
     if hyperparameters is None:
         from autoplex import MACE_HYPERS  # noqa: PLC0415
 
@@ -2201,11 +2264,20 @@ class CustomPotential(quippy.potential.Potential):
         res = super().calculate(*args, **kwargs)
         atoms = kwargs["atoms"] if "atoms" in kwargs else args[0]
         if "forces" in self.results:
-            atoms.arrays["forces"] = self.results["forces"].copy()
+            try:
+                atoms.arrays["forces"] = self.results["forces"].copy()
+            except AttributeError:
+                atoms.arrays["forces"] = self.results["forces"]
         if "energy" in self.results:
-            atoms.info["energy"] = self.results["energy"].copy()
+            try:
+                atoms.info["energy"] = self.results["energy"].copy()
+            except AttributeError:
+                atoms.info["energy"] = self.results["energy"]
         if "stress" in self.results:
-            atoms.info["stress"] = self.results["stress"].copy()
+            try:
+                atoms.info["stress"] = self.results["stress"].copy()
+            except AttributeError:
+                atoms.info["stress"] = self.results["stress"]
         return res
 
 
@@ -2225,11 +2297,20 @@ class AutoplexPyACECalculator(PyACECalculator):
 
         # Sync standard properties back to atoms object containers
         if "forces" in self.results:
-            atoms_obj.arrays["forces"] = self.results["forces"].copy()
+            try:
+                atoms_obj.arrays["forces"] = self.results["forces"].copy()
+            except AttributeError:
+                atoms_obj.arrays["forces"] = self.results["forces"]
         if "energy" in self.results:
-            atoms_obj.info["energy"] = self.results["energy"]
+            try:
+                atoms_obj.info["energy"] = self.results["energy"].copy()
+            except AttributeError:
+                atoms_obj.info["energy"] = self.results["energy"]
         if "stress" in self.results:
-            atoms_obj.info["stress"] = self.results["stress"].copy()
+            try:
+                atoms_obj.info["stress"] = self.results["stress"].copy()
+            except AttributeError:
+                atoms_obj.info["stress"] = self.results["stress"]
 
         return res
 

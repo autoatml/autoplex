@@ -1,5 +1,8 @@
 import pytest
-from atomate2.utils.testing.aims import monkeypatch_aims
+try: 
+    from atomate2.utils.testing.aims import monkeypatch_aims
+except ImportError:
+    pass
 
 
 @pytest.fixture

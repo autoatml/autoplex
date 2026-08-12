@@ -1,0 +1,114 @@
+root: results
+run_name: autoplex
+seed: 123
+dataset_seed: 456
+append: true
+default_dtype: float32
+
+# network
+r_max: 4.0
+num_layers: 4
+l_max: 2
+parity: true
+num_features: 32
+nonlinearity_type: gate
+
+nonlinearity_scalars:
+  e: silu
+  o: tanh
+
+nonlinearity_gates:
+  e: silu
+  o: tanh
+
+num_basis: 8
+BesselBasis_trainable: true
+PolynomialCutoff_p: 6
+
+invariant_layers: 2
+invariant_neurons: 64
+avg_num_neighbors: auto
+
+use_sc: true
+dataset: ase
+validation_dataset: ase
+dataset_file_name: ./train_nequip.extxyz
+validation_dataset_file_name: /home/epsilon/vld/iclb0745/autoplex_code_test/rss_merge/autoplex/tests/test_data/fitting/rss_training_dataset/test.extxyz
+
+ase_args:
+  format: extxyz
+dataset_key_mapping:
+  REF_energy: total_energy
+  REF_forces: forces
+validation_dataset_key_mapping:
+  REF_energy: total_energy
+  REF_forces: forces
+
+chemical_symbols:
+  - Si
+
+wandb: False
+
+verbose: info
+log_batch_freq: 10
+log_epoch_freq: 1
+save_checkpoint_freq: -1
+save_ema_checkpoint_freq: -1
+
+n_train: 20
+n_val: 2
+learning_rate: 0.005
+batch_size: 1
+validation_batch_size: 10
+max_epochs: 1
+shuffle: true
+metrics_key: validation_loss
+use_ema: true
+ema_decay: 0.99
+ema_use_num_updates: true
+report_init_validation: true
+
+early_stopping_patiences:
+  validation_loss: 50
+
+early_stopping_lower_bounds:
+  LR: 1.0e-5
+
+loss_coeffs:
+  forces: 1
+  total_energy:
+    - 1
+    - PerAtomMSELoss
+
+metrics_components:
+  - - forces
+    - mae
+  - - forces
+    - rmse
+  - - forces
+    - mae
+    - PerSpecies: True
+      report_per_component: False
+  - - forces
+    - rmse
+    - PerSpecies: True
+      report_per_component: False
+  - - total_energy
+    - mae
+  - - total_energy
+    - mae
+    - PerAtom: True
+
+optimizer_name: Adam
+optimizer_amsgrad: true
+
+lr_scheduler_name: ReduceLROnPlateau
+lr_scheduler_patience: 100
+lr_scheduler_factor: 0.5
+
+per_species_rescale_shifts_trainable: false
+per_species_rescale_scales_trainable: false
+
+per_species_rescale_shifts: dataset_per_atom_total_energy_mean
+per_species_rescale_scales: dataset_forces_rms
+    

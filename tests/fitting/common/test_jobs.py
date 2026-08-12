@@ -1,3 +1,4 @@
+import sys
 import pytest
 import yaml
 from pathlib import Path
@@ -6,11 +7,18 @@ from jobflow import run_locally
 from autoplex.fitting.common.flows import MLIPFitMaker
 from tests.auto.phonons.test_jobs import fake_run_vasp_kwargs
 import subprocess
-try: 
-    from matgl.models import M3GNET
+try:
+    from dgl.data.utils import split_dataset
+    from matgl.models import M3GNet
     has_m3gnet=True
 except:
-    has_m3gnet = False
+    has_m3gnet=False
+    
+try:
+    import mace
+    has_mace=True
+except:
+    has_mace=False
 
 
 try: 
@@ -27,11 +35,18 @@ except ImportError:
     PyACECalculator = object
     has_ypace = False
 
-try: 
-    from nequip.ase import NequIPCalculator
-    has_nequip=True
-except:
-    has_nequip=False
+if sys.version_info[:2] == (3, 10):
+    try:
+        from nequip.ase import NequIPCalculator
+        has_nequip=True
+    except:
+        has_nequip=False
+else:
+    try:
+        from nequip.integrations.ase import NequIPCalculator
+        has_nequip=True
+    except:
+        has_nequip=False
 
 
 
@@ -120,6 +135,25 @@ def test_jace_fit_maker(test_dir, memory_jobstore, clean_dir):
 )
 def test_nequip_fit_maker(test_dir, memory_jobstore, clean_dir):
     database_dir = test_dir / "fitting/rss_training_dataset/"
+    
+    is_old_nequip = not hasattr(NequIPCalculator, "from_compiled_model")
+    
+    if is_old_nequip:
+        model_kwargs = {
+            "r_max":3.14,
+            "max_epochs":10,
+            "device": "cpu",
+        }
+    else:
+        model_kwargs = {
+            "device": "cpu",
+            "cutoff_radius": 3.14,
+            "data": {
+                "split_dataset": {"train": 0.8, "val": 0.2},
+                "train_dataloader": {"num_workers": 1, "batch_size": 1},
+            },
+            "trainer": {"max_epochs": 10}
+        }
 
     nequipfit = MLIPFitMaker(
         mlip_type="NEQUIP",
@@ -128,9 +162,7 @@ def test_nequip_fit_maker(test_dir, memory_jobstore, clean_dir):
     ).make(
         database_dir=database_dir,
         isolated_atom_energies={14: -0.84696938},
-        r_max=3.14,
-        max_epochs=10,
-        device="cpu",
+        **model_kwargs
     )
 
     run_locally(
@@ -172,7 +204,9 @@ def test_m3gnet_fit_maker(test_dir, memory_jobstore, clean_dir):
 
     assert Path(m3gnetfit.output["mlip_path"][0].resolve(memory_jobstore)).exists()
 
-
+@pytest.mark.skipif(
+  not has_mace, reason="MACE is not installed"
+)
 def test_mace_fit_maker(test_dir, memory_jobstore, clean_dir, caplog):
     database_dir = test_dir / "fitting/rss_training_dataset/"
 
@@ -211,6 +245,9 @@ def test_mace_fit_maker(test_dir, memory_jobstore, clean_dir, caplog):
     assert "Forces are not used for training or validation." not in caplog.text
     assert "Stresses are not used for training or validation." not in caplog.text
 
+@pytest.mark.skipif(
+  not has_mace, reason="MACE is not installed"
+)
 def test_mace_fit_maker_no_stress(test_dir, memory_jobstore, clean_dir, caplog):
     database_dir = test_dir / "fitting/rss_training_dataset_without_virials/"
 
@@ -249,7 +286,9 @@ def test_mace_fit_maker_no_stress(test_dir, memory_jobstore, clean_dir, caplog):
     assert "Forces are not used for training or validation." not in caplog.text
     assert "Stresses are not used for training or validation." in caplog.text
 
-
+@pytest.mark.skipif(
+  not has_mace, reason="MACE is not installed"
+)
 def test_mace_fit_maker_passEOs(test_dir, memory_jobstore, clean_dir, caplog):
     database_dir = test_dir / "fitting/rss_training_dataset/"
     macefit = MLIPFitMaker(
@@ -300,7 +339,9 @@ def test_mace_fit_maker_passEOs(test_dir, memory_jobstore, clean_dir, caplog):
     assert "Energies are not used for training or validation." not in caplog.text
     assert "Forces are not used for training or validation." not in caplog.text
 
-
+@pytest.mark.skipif(
+  not has_mace, reason="MACE is not installed"
+)
 def test_mace_finetuning_maker(test_dir, memory_jobstore, clean_dir, caplog):
 
     

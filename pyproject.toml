@@ -18,27 +18,31 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Science/Research",
     "Operating System :: OS Independent",
 ]
-requires-python = ">=3.10,<3.12"
+requires-python = ">=3.10,<3.13"
 dependencies = [
      "pymatgen>=2024.11.13",
-     "atomate2[strict]>=0.0.21",
-     "ase==3.24.0",
-     "mace-torch>=0.3.12",
+     "atomate2[strict]==0.0.21; python_version < '3.11'",
+     "atomate2[strict]>=0.1.4; python_version >= '3.11'",
+     "ase>=3.24.0",
      "numpy",
      "typing",
      "hiphive",
      "quippy-ase==0.9.14; python_version < '3.12'",
-     "f90wrap==0.2.16"
+     "quippy-ase==0.10.3; python_version >= '3.12'",
+     "f90wrap==0.2.16; python_version <'3.12'",
+     "f90wrap==0.3.0; python_version >='3.12'"
 ]
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [project.optional-dependencies]
+
 docs = [
     "autodoc_pydantic==2.2.0",
     "ipython",
@@ -53,44 +57,56 @@ docs = [
     "sphinxcontrib-mermaid",
     "nbconvert==7.17.1",
 ]
+
 workflow-managers = [
     "FireWorks==2.0.4",
     "jobflow-remote==0.1.7"
 ]
-strict_all = [
-     "calorine==3.0",
-     "pymatgen==2025.2.18",
-     "atomate2[strict]==0.0.21",
-     "matgl==1.2.7",
+strict-base = [
+     "atomate2[strict]==0.0.21; python_version < '3.11'",
+     "atomate2[strict]==0.1.4; python_version >= '3.11'",
      "quippy-ase==0.9.14; python_version < '3.12'",
-     "ase==3.24.0",
-     "mace-torch==0.3.13",
-     "lightning-utilities==0.14.3",
+     "quippy-ase==0.10.3; python_version >= '3.12'",
+     "ase>=3.24.0",
+     "hiphive==1.4; python_version < '3.12'",
      "numpy",
      "typing",
-     "dgl<=2.2.0; sys.platform != 'linux'",
-     "dgl<=2.4; sys.platform == 'linux'",
-     "torchdata<=0.7.1",
-     "torch<=2.2.0; sys.platform != 'linux'",
-     "torch<=2.2.1; sys.platform == 'linux'",
-     "nequip==0.6.1",
-     "hiphive==1.4",
-     "f90wrap==0.2.16",
-]
-strict = [
-     "pymatgen==2025.2.18",
-     "atomate2[strict]==0.0.21",
-     "quippy-ase==0.9.14; python_version < '3.12'",
-     "ase==3.24.0",
-     "mace-torch==0.3.13",
-     "hiphive==1.4",
-     "numpy",
-     "typing",
+     "scipy<=1.17.1",
  ]
 
-dev = ["pre-commit>=2.12.1"]
-tests = ["pytest", "pytest-mock", "pytest-split", "pytest-cov", "types-setuptools", "nbmake"]
-aims = ["pyfhiaims"]
+strict-matgl = [
+    "matgl==1.3.0; python_version < '3.11'",
+    "matgl[dgl]==3.0.2; python_version >= '3.11'",
+    "torchdata==0.8.0; python_version >= '3.11'",
+    "torchdata<=0.7.1; python_version < '3.11'",
+    "torch==2.4.0; python_version >= '3.11'",
+    "dgl<=2.2.0; sys.platform != 'linux'",
+    "dgl<=2.4; sys.platform == 'linux'",
+
+ ]
+
+strict-mace = [
+    "mace-torch==0.3.14; python_version < '3.11'",
+    "mace-torch==0.3.16; python_version >='3.11'",
+ ]
+
+strict-nep = [
+    "calorine==3.3; python_version >= '3.12'",
+    "calorine==3.1; python_version < '3.12'",
+ ]
+
+strict-nequip = [
+    "nequip==0.17.1; python_version >='3.11'",
+    "nequip==0.6.1; python_version < '3.11'",
+    "numpy<2; python_version < '3.12'",
+ ]
+
+
+
+tests = ["pytest", "pytest-mock", "pytest-split", "pytest-cov", "types-setuptools", "nbmake", "pre-commit>=2.12.1"]
+
+# Python 3.12 restriction depends changes required for atomate2
+aims = ["pyfhiaims; python_version < '3.12'"]
 pacemaker = [
      "numpy==1.26.4",
      "pandas>=2.2",

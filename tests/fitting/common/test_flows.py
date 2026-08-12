@@ -1,11 +1,19 @@
+import sys
 import pytest
 from autoplex.fitting.common.flows import MLIPFitMaker
 import subprocess
-try: 
-    from matgl.models import M3GNET
+try:
+    #from dgl.data.utils import split_dataset
+    from matgl.models import M3GNet
     has_m3gnet=True
 except:
     has_m3gnet = False
+
+try:
+    import mace
+    has_mace=True
+except:
+    has_mace=False
 
 
 try: 
@@ -22,11 +30,18 @@ except ImportError:
     PyACECalculator = object
     has_ypace = False
 
-try: 
-    from nequip.ase import NequIPCalculator
-    has_nequip=True
-except:
-    has_nequip=False
+if sys.version_info[:2] == (3, 10):
+    try:
+        from nequip.ase import NequIPCalculator
+        has_nequip=True
+    except:
+        has_nequip=False
+else:
+    try:
+        from nequip.integrations.ase import NequIPCalculator
+        has_nequip=True
+    except:
+        has_nequip=False
 
 
 @pytest.fixture(scope="class")
@@ -337,6 +352,26 @@ def test_mlip_fit_maker_nequip(
     from jobflow import run_locally
 
     test_files_dir = Path(test_dir / "fitting").resolve()
+    
+    is_old_nequip = not hasattr(NequIPCalculator, "from_compiled_model")
+    
+    if is_old_nequip:
+        model_kwargs = {
+            "r_max":3.14,
+            "max_epochs":10,
+            "device": "cpu",
+        }
+    else:
+        model_kwargs = {
+            "device": "cpu",
+            "cutoff_radius": 3.14,
+            "data": {
+                "split_dataset": {"train": 0.8, "val": 0.2},
+                "train_dataloader": {"num_workers": 1, "batch_size": 1},
+                "val_dataloader": {"batch_size": 5},
+            },
+            "trainer": {"max_epochs": 10}
+        }
 
     # Test NEQUIP fit runs with pre_database_dir
     nequipfit = MLIPFitMaker(
@@ -348,9 +383,7 @@ def test_mlip_fit_maker_nequip(
     ).make(
         fit_input=fit_input_dict,
         isolated_atom_energies={3: -0.28649227, 17: -0.25638457},
-        r_max=3.14,
-        max_epochs=10,
-        device="cpu",
+        **model_kwargs
     )
 
     run_locally(
@@ -361,7 +394,7 @@ def test_mlip_fit_maker_nequip(
     assert Path(nequipfit.output["mlip_path"][0].resolve(memory_jobstore)).exists()
 
 @pytest.mark.skipif(
-  not has_m3gnet, reason="M3GNET is not installed"
+  not has_m3gnet, reason="matgl is not installed"
 )
 def test_mlip_fit_maker_m3gnet(
         test_dir, memory_jobstore, vasp_test_dir, fit_input_dict, clean_dir
@@ -402,7 +435,9 @@ def test_mlip_fit_maker_m3gnet(
     # check if M3GNET potential file is generated
     assert Path(m3gnetfit.output["mlip_path"][0].resolve(memory_jobstore)).exists()
 
-
+@pytest.mark.skipif(
+  not has_mace, reason="MACE is not installed"
+)
 def test_mlip_fit_maker_mace(
         test_dir, memory_jobstore, vasp_test_dir, fit_input_dict, clean_dir
 ):

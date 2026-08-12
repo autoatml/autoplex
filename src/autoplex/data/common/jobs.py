@@ -14,7 +14,6 @@ from typing import TYPE_CHECKING, Literal
 
 import matplotlib.pyplot as plt
 import numpy as np
-from ase.constraints import voigt_6_to_full_3x3_stress
 from ase.io import read, write
 from ase.io.aims import read_aims_output
 from atomate2.utils.path import strip_hostname
@@ -46,6 +45,11 @@ from autoplex.data.common.utils import (
     to_ase_trajectory,
 )
 from autoplex.fitting.common.regularization import set_custom_sigma
+
+try:
+    from ase.constraints import voigt_6_to_full_3x3_stress
+except ImportError:
+    from ase.stress import voigt_6_to_full_3x3_stress
 
 if TYPE_CHECKING:
     from ase import Atoms
