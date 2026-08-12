@@ -399,7 +399,7 @@ class NEQUIPSettings(AutoplexBaseModel):
         default=64,
         description="Number of hidden neurons in radial function, smaller is faster",
     )
-    avg_num_neighbors: None | Literal["auto"] = Field(
+    avg_num_neighbors: Literal["auto"] | None = Field(
         default="auto",
         description="Number of neighbors to divide by, "
         "None => no normalization, "
@@ -1040,9 +1040,9 @@ class BuildcellOptions(AutoplexBaseModel):
         "Ranges are allowed (e.g., #SYMMOPS=1-4).",
     )
     SYSTEM: (
-        None
-        | Literal["Rhom", "Tric", "Mono", "Cubi", "Hexa", "Orth", "Tetra"]
+        Literal["Rhom", "Tric", "Mono", "Cubi", "Hexa", "Orth", "Tetra"]
         | set[Literal["Rhom", "Tric", "Mono", "Cubi", "Hexa", "Orth", "Tetra"]]
+        | None
     ) = Field(default=None, description="Enforce a crystal system")
     SLACK: float | None = Field(default=None, description="The slack factor")
     OCTET: bool = Field(
