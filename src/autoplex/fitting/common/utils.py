@@ -81,13 +81,24 @@ except ImportError:
     PyACECalculator = object
     has_ypace = False
 
+
+try:
+    if sys.version_info[:2] == (3, 10):
+        from nequip.ase import NequIPCalculator
+    else:
+        from nequip.integrations.ase import NequIPCalculator
+
+    has_nequip = True
+except ImportError:
+    has_nequip = False
+
 from autoplex.data.common.utils import (
     data_distillation,
     plot_energy_forces,
     rms_dict,
     stratified_dataset_split,
 )
-from autoplex.settings import PacemakerSettings
+from autoplex.fitting.mlip_hypers import PacemakerSettings
 
 if TYPE_CHECKING:
     from pymatgen.core import Structure
@@ -731,6 +742,7 @@ def nep_fitting(
     }
 
 
+@requires(has_nequip, "nequip package must be installed to fit NEQUIP potentials.")
 def nequip_fitting(
     db_dir: Path,
     hyperparameters=None,
@@ -806,10 +818,17 @@ def nequip_fitting(
     """
     [TODO] train Nequip on virials
     """
-    if hyperparameters is None:
-        from autoplex import NEQUIP_HYPERS  # noqa: PLC0415
+    is_old_nequip = not hasattr(NequIPCalculator, "from_compiled_model")
 
-        hyperparameters = NEQUIP_HYPERS
+    if hyperparameters is None:
+        if is_old_nequip:
+            from autoplex.fitting.mlip_hypers._nequip_hypers import (  # noqa: PLC0415
+                NEQUIPSettingsOld as NEQUIPSettings,
+            )
+        else:
+            from autoplex.fitting.mlip_hypers import NEQUIPSettings  # noqa: PLC0415
+
+        hyperparameters = NEQUIPSettings()
 
     hyperparameters = hyperparameters.model_copy(deep=True)
 
@@ -838,43 +857,73 @@ def nequip_fitting(
     else:
         raise ValueError("isolated_atom_energies is empty or not defined!")
 
-    nequip_config_updates = {
-        "dataset_key_mapping": {
-            f"{ref_energy_name}": "total_energy",
-            f"{ref_force_name}": "forces",
-        },
-        "validation_dataset_key_mapping": {
-            f"{ref_energy_name}": "total_energy",
-            f"{ref_force_name}": "forces",
-        },
-        "chemical_symbols": ele_syms,
-        "dataset_file_name": "./train_nequip.extxyz",
-        "validation_dataset_file_name": f"{db_dir}/test.extxyz",
-        "n_train": num_of_train,
-        "n_val": num_of_val,
-    }
-    hyperparameters.update_parameters(nequip_config_updates)
+    # configure hyperparameters
 
     if fit_kwargs:
         hyperparameters.update_parameters(fit_kwargs)
 
-    nequip_hypers = hyperparameters.model_dump(by_alias=True)
+    if is_old_nequip:
 
-    dumpfn(nequip_hypers, "nequip.yaml")
+        hyperparameters.update_parameters(
+            {
+                "dataset_key_mapping": {
+                    f"{ref_energy_name}": "total_energy",
+                    f"{ref_force_name}": "forces",
+                },
+                "validation_dataset_key_mapping": {
+                    f"{ref_energy_name}": "total_energy",
+                    f"{ref_force_name}": "forces",
+                },
+                "chemical_symbols": ele_syms,
+                "dataset_file_name": "./train_nequip.extxyz",
+                "validation_dataset_file_name": f"{db_dir}/test.extxyz",
+                "n_train": num_of_train,
+                "n_val": num_of_val,
+            }
+        )
+    else:
+        hyperparameters.data.split_dataset.file_path = "train_nequip.extxyz"
+        hyperparameters.data.key_mapping = {
+            ref_energy_name: "total_energy",
+            ref_force_name: "forces",
+        }
+        hyperparameters.chemical_symbols = ele_syms
 
-    run_nequip("nequip-train nequip.yaml", "nequip_train")
-    run_nequip(
-        "nequip-deploy build --train-dir results/autoplex ./deployed_nequip_model.pth",
-        "nequip_deploy",
-    )
-    from nequip.ase import NequIPCalculator  # noqa: PLC0415
+    if is_old_nequip:
+        dumpfn(hyperparameters.model_dump(by_alias=True), "nequip.yaml")
+    else:
+        hyperparameters.to_yaml("nequip.yaml")
 
-    calc = NequIPCalculator.from_deployed_model(
-        model_path="deployed_nequip_model.pth",
-        device=device,
-        species_to_type_name={s: s for s in ele_syms},
-        set_global_options=False,
-    )
+    if is_old_nequip:
+        run_nequip("nequip-train nequip.yaml", "nequip_train")
+        run_nequip(
+            "nequip-deploy build --train-dir results/autoplex ./deployed_nequip_model.pth",
+            "nequip_deploy",
+        )
+        calc = NequIPCalculator.from_deployed_model(
+            model_path="deployed_nequip_model.pth",
+            device=device,
+            species_to_type_name={s: s for s in ele_syms},
+            set_global_options=False,
+        )
+    else:
+        ckpt_path = "./nequip_model/best.ckpt"
+        model_package_path = "./nequip_model/model.nequip.zip"
+        compiled_path = "deployed_ase.nequip.pt2"
+
+        run_nequip("nequip-train -cn nequip.yaml", "nequip_train")
+        run_nequip(
+            f"nequip-package build {ckpt_path} {model_package_path}",
+            "nequip_package",
+        )
+        run_nequip(
+            f"nequip-compile --mode aotinductor --device {device} --target ase {model_package_path} {compiled_path}",
+            "nequip_package",
+        )
+        calc = NequIPCalculator.from_compiled_model(
+            compile_path="deployed_ase.nequip.pt2",
+            device=device,
+        )
 
     ener_out_train = []
     for at in train_nequip:
@@ -907,7 +956,7 @@ def nequip_fitting(
     }
 
 
-@requires(has_m3gnet, "matgl package must be installed to use M3GNET.")
+@requires(has_m3gnet, "matgl package must be installed to fit M3GNET potentials.")
 def m3gnet_fitting(
     db_dir: Path,
     hyperparameters=None,
@@ -1337,7 +1386,7 @@ def m3gnet_fitting(
 
 @requires(
     has_mace,
-    "mace-torch package must be installed to use MACE Potential",
+    "mace-torch package must be installed to fit MACE Potentials",
 )
 def mace_fitting(
     db_dir: Path,

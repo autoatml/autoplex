@@ -1,5 +1,6 @@
 """General AutoPLEX automation jobs."""
 
+import sys
 from collections.abc import Iterable
 from dataclasses import field
 from pathlib import Path
@@ -294,7 +295,10 @@ def complete_benchmark(  # this function was put here to prevent circular import
         elif ml_model in ["NEP"]:
             ml_potential = Path(path) / "nep.txt"
         elif ml_model in ["NEQUIP"]:
-            ml_potential = Path(path) / "deployed_nequip_model.pth"
+            if sys.version_info[:2] == (3, 10):
+                ml_potential = Path(path) / "deployed_nequip_model.pth"
+            else:
+                ml_potential = Path(path) / "deployed_ase.nequip.pt2"
         else:  # MACE
             # treat finetuned potentials
             # TODO: fix this naming issue (depends on input)

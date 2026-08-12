@@ -1,5 +1,6 @@
 """General fitting jobs using several MLIPs available."""
 
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -229,9 +230,17 @@ def machine_learning_fit(
         mlip_paths.append(train_test_error["mlip_path"])
 
     elif mlip_type == "NEQUIP":
+        if sys.version_info[:2] == (3, 10):
+            from autoplex.fitting.mlip_hypers._nequip_hypers import (  # noqa: PLC0415
+                NEQUIPSettingsOld as NEQUIPSettings,
+            )
+
+            nequip_hp = NEQUIPSettings()
+        else:
+            nequip_hp = hyperparameters.NEQUIP
         train_test_error = nequip_fitting(
             db_dir=database_dir,
-            hyperparameters=hyperparameters.NEQUIP,
+            hyperparameters=nequip_hp,
             isolated_atom_energies=isolated_atom_energies,
             ref_energy_name=ref_energy_name,
             ref_force_name=ref_force_name,
