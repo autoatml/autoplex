@@ -83,7 +83,7 @@ strict-matgl = [
     "matgl[dgl]==3.0.2; python_version >= '3.11'",
     "torchdata==0.8.0; python_version >= '3.11'",
     "torchdata<=0.7.1; python_version < '3.11'",
-    "torch==2.4.0; python_version >= '3.11'",
+    "torch==2.13.0; python_version >= '3.11'",
     "dgl<=2.2.0; sys.platform != 'linux'",
     "dgl<=2.4; sys.platform == 'linux'",
     "numpy<2; python_version < '3.12'",
