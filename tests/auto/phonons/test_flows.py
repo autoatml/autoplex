@@ -10,8 +10,6 @@ from autoplex.auto.phonons.flows import (
     IterativeCompleteDFTvsMLBenchmarkWorkflow)
 from jobflow import run_locally
 
-
-
 try: 
     from matgl.models import M3GNet
     has_m3gnet=True
@@ -690,7 +688,6 @@ def fake_run_vasp_kwargs4_mpid_new():
 def fake_run_vasp_kwargs4_mpid_new2():
     return {}
 
-
 def test_iterative_complete_dft_vs_ml_benchmark_workflow_gap(vasp_test_dir, mock_vasp, test_dir, memory_jobstore,
                                                              ref_paths4_mpid_new2, fake_run_vasp_kwargs4_mpid_new2,
                                                              clean_dir):
@@ -840,7 +837,9 @@ def test_complete_dft_vs_ml_benchmark_workflow_gap(
             results_file = file.read().strip()
             assert expected_soap_dict in results_file, f"Expected soap_dict not found in {file_path}"
 
-
+@pytest.mark.skipif(
+  not has_mace, reason="MACE is not installed"
+)
 def test_complete_dft_vs_ml_benchmark_workflow_gap_ml_potential_for_data(
         vasp_test_dir, test_dir, memory_jobstore,  clean_dir
 ):

@@ -21,7 +21,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import quippy.potential
-import torch
 from ase.atoms import Atoms
 from ase.calculators.singlepoint import SinglePointCalculator
 from ase.data import chemical_symbols
@@ -46,6 +45,7 @@ try:
     os.environ["MATGL_BACKEND"] = "DGL"
     import lightning as pl
     import matgl
+    import torch
     from dgl.data.utils import split_dataset
     from matgl.apps.pes import Potential
     from matgl.ext.pymatgen import Structure2Graph, get_element_list

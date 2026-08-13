@@ -70,6 +70,8 @@ Before the installation, please make sure that you are using one of the supporte
 
 ## Standard installation
 
+**Only for Python 3.10**
+
 `phonopy` is normally installed automatically as a dependency through `atomate2`. However, build failures with newer `scikit-build-core` versions may prevent this. To avoid installation issues, install the `phonopy` build dependencies and `phonopy` separately before installing this package. Use the following commands:
 
 ```
@@ -80,15 +82,30 @@ pip install --no-build-isolation phonopy==2.30.1
 
 Once this is done, you can install `autoplex` simply by:
 
-```
-pip install autoplex[strict]
-```
-This will install all basic Python packages and dependencies needed for MLIP fits.
+**For 3.10<=Python<=3.12**
 
-In the current development version, this command will only install all packages required for GAP and MACE. All supported MLIPs can be installed with:
+Basic installation
 
 ```
-pip install autoplex[strict_all]
+pip install autoplex[strict-base]
+```
+
+This will install all Python packages dependencies needed for GAP MLIP fits.
+
+Other currently supported MLIPs fittings can be enabled as per needs with either of the following commands:
+
+```bash
+pip install autoplex[strict-matgl]
+pip install autoplex[strict-nequip]
+pip install autoplex[strict-nep]
+pip install autoplex[pacemaker]
+pip install autoplex[aims]
+```
+
+> ℹ️ For fitting M3GNet models, additionally, `dgl` needs to be installed from source repository as necessary version for `magl` is not available directly available via PyPi. This can be done using following command:
+
+```bash
+pip install 'dgl==2.4.0' -f 'https://data.dgl.ai/wheels/torch-2.4/repo.html'
 ```
 
 > ℹ️ To fit and validate `ACEpotentials`, one also needs to install Julia, as `autoplex` relies on [ACEpotentials](https://acesuit.github.io/ACEpotentials.jl/dev/gettingstarted/installation/), which supports fitting of linear ACE. Currently, no Python package exists for the same.

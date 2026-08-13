@@ -155,7 +155,9 @@ def test_rss_workflow_custom_makers(test_dir, mock_vasp, memory_jobstore, clean_
     )
     assert rss_job.name == "rss"
 
-
+@pytest.mark.skipif(
+  not has_mace, reason="MACE is not installed"
+)
 def test_rss_workflow_ml_potentials(test_dir, memory_jobstore, clean_dir):
     from atomate2.forcefields.jobs import ForceFieldStaticMaker
     from autoplex.settings import RssConfig

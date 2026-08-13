@@ -1,7 +1,9 @@
+tests/auto/phonons/test_flows.py::test_complete_dft_vs_ml_benchmark_workflow_gap_ml_potential_for_data
 tests/auto/phonons/test_flows.py::test_complete_dft_vs_ml_benchmark_workflow_mace
 tests/auto/phonons/test_flows.py::test_complete_dft_vs_ml_benchmark_workflow_mace_finetuning
 tests/auto/phonons/test_flows.py::test_complete_dft_vs_ml_benchmark_workflow_mace_finetuning_mp_settings
 tests/auto/rss/test_flows.py::test_mock_workflow_for_mace
+tests/auto/rss/test_flows.py::test_rss_workflow_ml_potentials
 tests/data/rss/test_jobs.py::test_mace_rss
 tests/fitting/common/test_flows.py::test_mlip_fit_maker_mace
 tests/fitting/common/test_jobs.py::test_mace_fit_maker
