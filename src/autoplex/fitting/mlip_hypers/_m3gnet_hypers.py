@@ -2,8 +2,13 @@ from typing import Literal
 
 import numpy as np
 from pydantic import Field
-from torch.optim import Optimizer
-from torch.optim.lr_scheduler import LRScheduler
+
+try:
+    from torch.optim import Optimizer
+    from torch.optim.lr_scheduler import LRScheduler
+except ImportError:
+    Optimizer = object  # type: ignore[misc, assignment]
+    LRScheduler = object  # type: ignore[misc, assignment]
 
 from autoplex._basemodel import AutoplexBaseModel
 
