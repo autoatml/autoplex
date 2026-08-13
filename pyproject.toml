@@ -82,12 +82,13 @@ strict-matgl = [
     "torch==2.4.0; python_version >= '3.11'",
     "dgl<=2.2.0; sys.platform != 'linux'",
     "dgl<=2.4; sys.platform == 'linux'",
-
+    "numpy<2; python_version < '3.12'",
  ]
 
 strict-mace = [
     "mace-torch==0.3.14; python_version < '3.11'",
     "mace-torch==0.3.16; python_version >='3.11'",
+    "numpy<2; python_version < '3.12'",
  ]
 
 strict-nep = [
