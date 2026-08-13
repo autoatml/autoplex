@@ -17,6 +17,8 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      MATGL_BACKEND: "DGL"
     strategy:
       fail-fast: false
       matrix:
