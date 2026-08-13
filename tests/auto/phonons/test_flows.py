@@ -837,7 +837,9 @@ def test_complete_dft_vs_ml_benchmark_workflow_gap(
             results_file = file.read().strip()
             assert expected_soap_dict in results_file, f"Expected soap_dict not found in {file_path}"
 
-
+@pytest.mark.skipif(
+  not has_mace, reason="MACE is not installed"
+)
 def test_complete_dft_vs_ml_benchmark_workflow_gap_ml_potential_for_data(
         vasp_test_dir, test_dir, memory_jobstore,  clean_dir
 ):
