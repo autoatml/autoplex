@@ -10,6 +10,11 @@ from autoplex.auto.phonons.flows import (
     IterativeCompleteDFTvsMLBenchmarkWorkflow)
 from jobflow import run_locally
 
+try:
+    import torch
+    has_torch=True
+except:
+    has_torch=False
 
 
 try: 
@@ -690,7 +695,9 @@ def fake_run_vasp_kwargs4_mpid_new():
 def fake_run_vasp_kwargs4_mpid_new2():
     return {}
 
-
+@pytest.mark.skipif(
+  not has_torch, reason="pytorch is not installed."
+)
 def test_iterative_complete_dft_vs_ml_benchmark_workflow_gap(vasp_test_dir, mock_vasp, test_dir, memory_jobstore,
                                                              ref_paths4_mpid_new2, fake_run_vasp_kwargs4_mpid_new2,
                                                              clean_dir):
@@ -744,7 +751,9 @@ def test_iterative_complete_dft_vs_ml_benchmark_workflow_gap(vasp_test_dir, mock
     assert len(vasp_xyz) == 10
     assert isinstance(complete_workflow.output.resolve(memory_jobstore)["dft_references"], list)
 
-
+@pytest.mark.skipif(
+  not has_torch, reason="pytorch is not installed."
+)
 def test_iterative_complete_dft_vs_ml_benchmark_workflow_gap_add_phonon_false(vasp_test_dir, mock_vasp, test_dir, memory_jobstore,  ref_paths4_mpid_new2, fake_run_vasp_kwargs4_mpid_new2, clean_dir):
     # first test with just one iteration (more tests need to be added)
     from ase.io import read
@@ -792,7 +801,9 @@ def test_iterative_complete_dft_vs_ml_benchmark_workflow_gap_add_phonon_false(va
     vasp_xyz = read(Path(complete_workflow.output.resolve(memory_jobstore)["pre_database_dir"])/"vasp_ref.extxyz",":")
     assert len(vasp_xyz) == 8
 
-
+@pytest.mark.skipif(
+  not has_torch, reason="pytorch is not installed."
+)
 def test_complete_dft_vs_ml_benchmark_workflow_gap(
         vasp_test_dir, mock_vasp, test_dir, memory_jobstore, ref_paths4_mpid, fake_run_vasp_kwargs4_mpid, clean_dir
 ):
@@ -840,7 +851,9 @@ def test_complete_dft_vs_ml_benchmark_workflow_gap(
             results_file = file.read().strip()
             assert expected_soap_dict in results_file, f"Expected soap_dict not found in {file_path}"
 
-
+@pytest.mark.skipif(
+  not has_torch, reason="pytorch is not installed."
+)
 def test_complete_dft_vs_ml_benchmark_workflow_gap_ml_potential_for_data(
         vasp_test_dir, test_dir, memory_jobstore,  clean_dir
 ):
@@ -892,7 +905,9 @@ def test_complete_dft_vs_ml_benchmark_workflow_gap_ml_potential_for_data(
             assert expected_soap_dict in results_file, f"Expected soap_dict not found in {file_path}"
 
 
-
+@pytest.mark.skipif(
+  not has_torch, reason="pytorch is not installed."
+)
 def test_complete_dft_vs_gap_benchmark_workflow_database(
         vasp_test_dir, mock_vasp, test_dir, memory_jobstore, ref_paths4_mpid, fake_run_vasp_kwargs4_mpid, clean_dir
 ):

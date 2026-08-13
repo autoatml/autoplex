@@ -3,3 +3,8 @@ tests/auto/phonons/test_flows.py::test_complete_dft_vs_ml_benchmark_workflow_m3g
 tests/data/rss/test_jobs.py::test_m3gnet_rss
 tests/fitting/common/test_flows.py::test_mlip_fit_maker_m3gnet
 tests/fitting/common/test_jobs.py::test_m3gnet_fit_maker
+tests/auto/phonons/test_flows.py::test_iterative_complete_dft_vs_ml_benchmark_workflow_gap
+tests/auto/phonons/test_flows.py::test_iterative_complete_dft_vs_ml_benchmark_workflow_gap_add_phonon_false
+tests/auto/phonons/test_flows.py::test_complete_dft_vs_ml_benchmark_workflow_gap
+tests/auto/phonons/test_flows.py::test_complete_dft_vs_ml_benchmark_workflow_gap_ml_potential_for_data                                         
+tests/auto/phonons/test_flows.py::test_complete_dft_vs_gap_benchmark_workflow_database
