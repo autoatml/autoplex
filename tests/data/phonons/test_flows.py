@@ -18,11 +18,6 @@ import pytest
 
 from autoplex.data.phonons.flows import IsoAtomMaker, RandomStructuresDataGenerator, MLPhononMaker
 
-try:
-    import torch
-    has_torch = True
-except:
-    has_torch = False
 
 @pytest.fixture(scope="class")
 def relax_maker():
@@ -276,9 +271,6 @@ def test_iso_atom_maker(mock_vasp, clean_dir):
             responses[job_iso.job_uuids[0]][1].output.output.energy_per_atom == -0.2563903
     )
 
-@pytest.mark.skipif(
-  not has_torch, reason="pytorch is not installed."
-)
 def test_ml_phonon_maker(test_dir, clean_dir, memory_jobstore):
 
     potential_file = test_dir / "fitting" / "ref_files" / "gap_file.xml"
