@@ -2,19 +2,29 @@
 
 Install autoplex from source, by cloning the repository via [github](https://github.com/JaGeo/autoplex.git)
 
+**For Python 3.10**
+
 ```bash
 git clone https://github.com/autoatml/autoplex.git
 cd autoplex
 pip install "scikit-build-core<0.10"
 pip install setuptools-scm>=8.0 nanobind
 pip install --no-build-isolation phonopy==2.30.1
-pip install -e .[strict_all,dev,tests,docs]
+pip install -e .[strict-base,dev,tests,docs]
 ```
 
-This will install autoplex will all dependencies for tests, pre-commit and docs building. 
+**For Python>3.10**
+
+```bash
+git clone https://github.com/autoatml/autoplex.git
+cd autoplex
+pip install -e .[strict-base,dev,tests,docs]
+```
+
+Note that this command will only install autoplex will dependencies needed for GAP MLIPs, for tests, pre-commit and docs building. 
 However, note that non-python programs like `buildcell`, `lammps` and `julia` needed for ACE potential fitting 
 will not be installed with above command. One needs to install these separately. 
-See the [installation guide](../user/installation/installation.md) for more information.
+See the [installation guide](../user/installation/installation.md) for more information on options available for fitting other currently supported MLIPs.
 
 
 Alternatively, one can use the `devcontainer` provided to have your developer environment setup automatically in your IDE. It has been tested to work in [VSCode](https://code.visualstudio.com/docs/devcontainers/containers#_quick-start-open-an-existing-folder-in-a-container) and [PyCharm](https://blog.jetbrains.com/pycharm/2023/06/2023-2-eap-4/). 

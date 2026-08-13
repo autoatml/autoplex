@@ -4,20 +4,43 @@ Quick-start
 This guide assumes that you have all the [Materials Project](https://github.com/materialsproject) framework software tools as well as a working [MongoDB](https://www.mongodb.com/) 
 database setup and have experience using [atomate2](https://github.com/materialsproject/atomate2).
 
-You can install `autoplex` simply by:
+**Only for Python 3.10**
 
-``` 
-pip install autoplex[strict]
+`phonopy` is normally installed automatically as a dependency through `atomate2`. However, build failures with newer `scikit-build-core` versions may prevent this. To avoid installation issues, install the `phonopy` build dependencies and `phonopy` separately before installing this package. Use the following commands:
+
 ```
-This will install all basic Python packages and dependencies needed for MLIP fits.
-
-In the current development version, this command will only install all packages required for GAP and MACE. All supported MLIPs can be installed with:
-
-``` 
-pip install autoplex[strict_all]
+pip install "scikit-build-core<0.10"
+pip install setuptools-scm>=8.0 nanobind
+pip install --no-build-isolation phonopy==2.30.1
 ```
 
-Additionally, to fit and validate `ACEpotentials`, one also needs to install Julia, as `autoplex` relies on [ACEpotentials](https://acesuit.github.io/ACEpotentials.jl/dev/gettingstarted/installation/), which supports fitting of linear ACE. Currently, no Python package exists for the same.
+Once this is done, you can install `autoplex` simply by:
+
+**For 3.10<=Python<=3.12**
+
+```bash
+pip install autoplex[strict-base]
+```
+
+This will install all Python packages dependencies needed for GAP MLIP fits.
+
+Other currently supported MLIPs fittings can be enabled as per needs with either of the following commands:
+
+```bash
+pip install autoplex[strict-matgl]
+pip install autoplex[strict-nequip] 
+pip install autoplex[strict-nep]
+pip install autoplex[pacemaker]
+pip install autoplex[aims]
+```
+
+> ℹ️ For fitting M3GNet models, additionally, specific version of `dgl` needs to be installed from source repository as it is used by `matgl` and is not available directly available via PyPi. This package can be installed using following command:
+
+```bash
+pip install 'dgl==2.4.0' -f 'https://data.dgl.ai/wheels/torch-2.4/repo.html' 
+```
+
+> ℹ️ To fit and validate `ACEpotentials`, one also needs to install Julia, as `autoplex` relies on [ACEpotentials](https://acesuit.github.io/ACEpotentials.jl/dev/gettingstarted/installation/), which supports fitting of linear ACE. Currently, no Python package exists for the same.
 Please run the following commands to enable the `ACEpotentials` fitting options and further functionality.
 
 Install Julia v1.9.2
