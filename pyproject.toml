@@ -62,7 +62,7 @@ docs = [
 
 workflow-managers = [
     "FireWorks==2.0.4",
-    "jobflow-remote==0.1.7"
+    "jobflow-remote==1.0.1"
 ]
 strict-base = [
      "atomate2[strict]==0.0.21; python_version < '3.11'",
