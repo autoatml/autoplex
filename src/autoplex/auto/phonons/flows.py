@@ -368,6 +368,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                 min_atoms=self.supercell_settings.get("min_atoms", 50),
                 step_size=self.supercell_settings.get("step_size", 1.0),
             )
+            supercell_matrix_job.append_name(self.jobprefix, prepend=True)
             flows.append(supercell_matrix_job)
             self.supercell_settings[mp_id][
                 "supercell_matrix"
@@ -398,6 +399,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                     supercell_settings=self.supercell_settings,
                 )
                 add_dft_ratt.append_name(f"_{mp_id}")
+                add_dft_ratt.append_name(self.jobprefix, prepend=True)
                 flows.append(add_dft_ratt)
                 if self.volume_custom_scale_factors is not None:
                     rattle_seed = rattle_seed + len(self.volume_custom_scale_factors)
@@ -415,6 +417,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                     phonon_displacement_maker=self.displacement_maker,
                     supercell_settings=self.supercell_settings,
                 )
+                add_dft_phon.append_name(self.jobprefix, prepend=True)
                 flows.append(add_dft_phon)
                 add_dft_phon.append_name(f"_{mp_id}")
                 fit_input.update({mp_id: add_dft_phon.output})
@@ -432,6 +435,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                 raise NotImplementedError
 
         isoatoms = get_iso_atom(structure_list, self.isolated_atom_maker)
+        isoatoms.append_name(self.jobprefix, prepend=True)
         flows.append(isoatoms)
 
         # isolated atoms energy needs to be added
@@ -467,6 +471,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                 fit_input=fit_input,
                 **fit_kwargs,
             )
+            add_data_fit.append_name(self.jobprefix, prepend=True)
             flows.append(add_data_fit)
 
             if (benchmark_structures is not None) and (benchmark_mp_ids is not None):
@@ -499,6 +504,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                     complete_bm.append_name(
                         f"_{benchmark_mp_ids[ibenchmark_structure]}"
                     )
+                    complete_bm.append_name(self.jobprefix, prepend=True)
                     flows.append(complete_bm)
                     bm_outputs.append(complete_bm.output["bm_output"])
                     dft_new_references.append(complete_bm.output["dft_references"])
@@ -550,6 +556,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                                 fit_input=fit_input,
                                 soap=soap_dict,
                             )
+                            loop_data_fit.append_name(self.jobprefix, prepend=True)
                             flows.append(loop_data_fit)
 
                             if (benchmark_structures is not None) and (
@@ -584,6 +591,9 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                                     complete_bm.append_name(
                                         f"_{benchmark_mp_ids[ibenchmark_structure]}"
                                     )
+                                    complete_bm.append_name(
+                                        self.jobprefix, prepend=True
+                                    )
                                     flows.append(complete_bm)
                                     bm_outputs.append(complete_bm.output["bm_output"])
                                     # save the dft references okay
@@ -599,6 +609,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         )
         # collect_bm must be extended in a way that we get access to all benchmark structures and the previous databases
 
+        collect_bm.append_name(self.jobprefix, prepend=True)
         flows.append(collect_bm)
 
         output_flow = get_phonon_output(
@@ -610,6 +621,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
             pre_database_dir=add_data_fit.output["database_dir"],
             fit_kwargs_list=fit_kwargs_list,
         )
+        output_flow.append_name(self.jobprefix, prepend=True)
         flows.append(output_flow)
         return Flow(jobs=flows, output=output_flow.output, name=self.name)
 
@@ -1140,3 +1152,9 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
                 stacklevel=2,
             )
         self.name = f"{self.jobprefix}{self.name}"
+        self.complete_dft_vs_ml_benchmark_workflow_0.name = (
+            f"{self.jobprefix}{self.complete_dft_vs_ml_benchmark_workflow_0.name}"
+        )
+        self.complete_dft_vs_ml_benchmark_workflow_1.name = (
+            f"{self.jobprefix}{self.complete_dft_vs_ml_benchmark_workflow_1.name}"
+        )
