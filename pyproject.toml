@@ -101,7 +101,7 @@ strict-nep = [
  ]
 
 strict-nequip = [
-    "nequip==0.17.1; python_version >='3.11'",
+    "nequip==0.19.0; python_version >='3.11'",
     "nequip==0.6.1; python_version < '3.11'",
     "numpy<2; python_version < '3.12'",
  ]
