@@ -4,7 +4,6 @@ import logging
 import traceback
 from dataclasses import dataclass, field
 
-from atomate2.aims.jobs.base import BaseAimsMaker
 from atomate2.forcefields.jobs import (
     ForceFieldRelaxMaker,
     ForceFieldStaticMaker,
@@ -30,6 +29,11 @@ from autoplex.data.common.utils import (
     flatten,
 )
 from autoplex.misc.castep.jobs import CastepStaticMaker
+
+try:
+    from atomate2.aims.jobs.base import BaseAimsMaker
+except ImportError:
+    BaseAimsMaker = None
 
 __all__ = ["DFTStaticLabelling", "GenerateTrainingDataForTesting"]
 

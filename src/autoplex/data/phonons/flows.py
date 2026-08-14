@@ -658,13 +658,16 @@ class MLPhononMaker(FFPhononMaker):
                 static_maker_kwargs=self.static_maker_kwargs,
             )
         elif ml_model == "NEQUIP":
+            model_key = (
+                "compile_path" if str(potential_file).endswith(".pt2") else "model_path"
+            )
             if calculator_kwargs is None:
                 calculator_kwargs = {
-                    "model_path": str(potential_file),
+                    model_key: str(potential_file),
                     "device": "cuda",
                 }
             else:
-                calculator_kwargs.update({"model_path": str(potential_file)})
+                calculator_kwargs.update({model_key: str(potential_file)})
 
             ml_prep = ml_phonon_maker_preparation(
                 bulk_relax_maker=ForceFieldRelaxMaker(

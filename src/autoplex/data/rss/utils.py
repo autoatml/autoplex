@@ -3,6 +3,7 @@
 import ast
 import json
 import os
+import sys
 from functools import partial
 from multiprocessing import Pool
 from pathlib import Path
@@ -14,8 +15,6 @@ from ase import Atoms
 from ase.constraints import (
     FixConstraint,
     FixSymmetry,
-    UnitCellFilter,
-    slice2enlist,
 )
 from ase.data import atomic_numbers, chemical_symbols
 from ase.geometry import find_mic
@@ -29,6 +28,15 @@ from autoplex.fitting.common.utils import (
     CustomPotential,
     extract_gap_label,
 )
+
+try:
+    from ase.constraints import UnitCellFilter
+except ImportError:
+    from ase.filters import UnitCellFilter
+try:
+    from ase.constraints import slice2enlist
+except ImportError:
+    from ase.constraints.constraint import slice2enlist
 
 
 def extract_pairstyle(
@@ -440,7 +448,6 @@ def process_rss(
         pot = AutoplexPyACECalculator(basis_set=str(potential_file.resolve()))
 
     elif mlip_type == "NEQUIP":
-        nequip_label = os.path.join(mlip_path, "deployed_nequip_model.pth")
         if isolated_atom_energies:
             ele_syms = [
                 chemical_symbols[int(e_num)] for e_num in isolated_atom_energies
@@ -448,14 +455,27 @@ def process_rss(
 
         else:
             raise ValueError("isol_es is empty or not defined!")
-        from nequip.ase import NequIPCalculator  # noqa: PLC0415
 
-        pot = NequIPCalculator.from_deployed_model(
-            model_path=nequip_label,
-            device=device,
-            species_to_type_name={s: s for s in ele_syms},
-            set_global_options=False,
-        )
+        # adapt imports of NequIPCalculator
+        if sys.version_info[:2] == (3, 10):
+            from nequip.ase import NequIPCalculator  # noqa: PLC0415
+        else:
+            from nequip.integrations.ase import NequIPCalculator  # noqa: PLC0415
+
+        if hasattr(NequIPCalculator, "from_compiled_model"):
+            nequip_label = os.path.join(mlip_path, "deployed_ase.nequip.pt2")
+            pot = NequIPCalculator.from_compiled_model(
+                compile_path=nequip_label,
+                device=device,
+            )
+        else:
+            nequip_label = os.path.join(mlip_path, "deployed_nequip_model.pth")
+            pot = NequIPCalculator.from_deployed_model(
+                model_path=nequip_label,
+                device=device,
+                species_to_type_name={s: s for s in ele_syms},
+                set_global_options=False,
+            )
 
     elif mlip_type == "M3GNET":
         import matgl  # noqa: PLC0415
