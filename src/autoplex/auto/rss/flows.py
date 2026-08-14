@@ -371,6 +371,7 @@ class RssMaker(Maker):
                 static_energy_maker_isolated_atoms=self.static_energy_maker_isolated_atoms,
                 **initial_params,
             )
+            initial_rss_job.name = f'{config_params["jobprefix"]}{initial_rss_job.name}'
             rss_flow.append(initial_rss_job)
 
         rss_group = config_params["rss_group"]
@@ -421,6 +422,7 @@ class RssMaker(Maker):
                 **rss_params,
             )
 
+        do_rss_job.name = f'{config_params["jobprefix"]}{do_rss_job.name}'
         rss_flow.append(do_rss_job)
 
         return Response(replace=Flow(rss_flow), output=do_rss_job.output)

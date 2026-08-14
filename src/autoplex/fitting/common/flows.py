@@ -90,6 +90,8 @@ class MLIPFitMaker(Maker):
         If true, run fits on different clusters.
     disable_testing: bool
         Whether to disable running the model on test data.
+    jobprefix: str
+        The prefix that precedes the jobname displayed.
     """
 
     name: str = "MLpotentialFit"
@@ -118,6 +120,10 @@ class MLIPFitMaker(Maker):
     apply_data_preprocessing: bool = True
     run_fits_on_different_cluster: bool = False
     disable_testing: bool = False
+    jobprefix: str = ""
+
+    def __post_init__(self):  # noqa: D105
+        self.name = f"{self.jobprefix}MLpotentialFit"
 
     def make(
         self,
@@ -210,6 +216,7 @@ class MLIPFitMaker(Maker):
                 disable_testing=self.disable_testing,
                 **fit_kwargs,
             )
+            mlip_fit_job.name = f"{self.jobprefix}{mlip_fit_job.name}"
             jobs.append(mlip_fit_job)
             output = {
                 "mlip_path": mlip_fit_job.output["mlip_path"],
@@ -244,6 +251,7 @@ class MLIPFitMaker(Maker):
             disable_testing=self.disable_testing,
             **fit_kwargs,
         )
+        mlip_fit_job.name = f"{self.jobprefix}{mlip_fit_job.name}"
 
         output = {
             "mlip_path": mlip_fit_job.output["mlip_path"],
@@ -300,6 +308,8 @@ class DataPreprocessing(Maker):
         Name of the test xyz data file.
     run_fits_on_different_cluster: bool
         If True, will copy the fitting database to the MongoDB
+    jobprefix: str
+        The prefix that precedes the jobname.
 
     """
 
@@ -321,6 +331,10 @@ class DataPreprocessing(Maker):
     train_data_file: str = "train.extxyz"
     test_data_file: str = "test.extxyz"
     run_fits_on_different_cluster: bool = False
+    jobprefix: str = ""
+
+    def __post_init__(self):  # noqa: D105
+        self.name = f"{self.jobprefix}data_preprocessing_for_fitting"
 
     @job(data=["database_dict"])
     def make(

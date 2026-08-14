@@ -62,6 +62,8 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
 
     Parameters
     ----------
+    jobprefix : str
+        The prefix that precedes a jobname.
     name : str
         Name of the flow produced by this maker.
     add_dft_phonon_struct: bool.
@@ -177,6 +179,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         fit database via MongoDB, might be slow).
     """
 
+    jobprefix: str = ""
     name: str = "add_data"
     add_dft_phonon_struct: bool = True
     add_dft_rattled_struct: bool = True
@@ -277,6 +280,9 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
     glue_file_path: str = "glue.xml"
     run_fits_on_different_cluster: bool = False
 
+    def __post_init__(self):  # noqa: D105
+        self.name = f"{self.jobprefix}{self.name}"
+
     def make(
         self,
         structure_list: list[Structure],
@@ -362,6 +368,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                 min_atoms=self.supercell_settings.get("min_atoms", 50),
                 step_size=self.supercell_settings.get("step_size", 1.0),
             )
+            supercell_matrix_job.append_name(self.jobprefix, prepend=True)
             flows.append(supercell_matrix_job)
             self.supercell_settings[mp_id][
                 "supercell_matrix"
@@ -392,6 +399,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                     supercell_settings=self.supercell_settings,
                 )
                 add_dft_ratt.append_name(f"_{mp_id}")
+                add_dft_ratt.append_name(self.jobprefix, prepend=True)
                 flows.append(add_dft_ratt)
                 if self.volume_custom_scale_factors is not None:
                     rattle_seed = rattle_seed + len(self.volume_custom_scale_factors)
@@ -409,6 +417,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                     phonon_displacement_maker=self.displacement_maker,
                     supercell_settings=self.supercell_settings,
                 )
+                add_dft_phon.append_name(self.jobprefix, prepend=True)
                 flows.append(add_dft_phon)
                 add_dft_phon.append_name(f"_{mp_id}")
                 fit_input.update({mp_id: add_dft_phon.output})
@@ -426,6 +435,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                 raise NotImplementedError
 
         isoatoms = get_iso_atom(structure_list, self.isolated_atom_maker)
+        isoatoms.append_name(self.jobprefix, prepend=True)
         flows.append(isoatoms)
 
         # isolated atoms energy needs to be added
@@ -436,6 +446,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
 
         for ml_model, fit_kwargs in zip(self.ml_models, fit_kwargs_list or [{}]):
             add_data_fit = MLIPFitMaker(
+                jobprefix=self.jobprefix,
                 mlip_type=ml_model,
                 glue_xml=self.glue_xml,
                 glue_file_path=self.glue_file_path,
@@ -460,6 +471,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                 fit_input=fit_input,
                 **fit_kwargs,
             )
+            add_data_fit.append_name(self.jobprefix, prepend=True)
             flows.append(add_data_fit)
 
             if (benchmark_structures is not None) and (benchmark_mp_ids is not None):
@@ -492,6 +504,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                     complete_bm.append_name(
                         f"_{benchmark_mp_ids[ibenchmark_structure]}"
                     )
+                    complete_bm.append_name(self.jobprefix, prepend=True)
                     flows.append(complete_bm)
                     bm_outputs.append(complete_bm.output["bm_output"])
                     dft_new_references.append(complete_bm.output["dft_references"])
@@ -521,6 +534,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                                 "delta": delta,
                             }
                             loop_data_fit = MLIPFitMaker(
+                                jobprefix=self.jobprefix,
                                 mlip_type=ml_model,
                                 glue_xml=self.glue_xml,
                                 glue_file_path=self.glue_file_path,
@@ -542,6 +556,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                                 fit_input=fit_input,
                                 soap=soap_dict,
                             )
+                            loop_data_fit.append_name(self.jobprefix, prepend=True)
                             flows.append(loop_data_fit)
 
                             if (benchmark_structures is not None) and (
@@ -576,6 +591,9 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
                                     complete_bm.append_name(
                                         f"_{benchmark_mp_ids[ibenchmark_structure]}"
                                     )
+                                    complete_bm.append_name(
+                                        self.jobprefix, prepend=True
+                                    )
                                     flows.append(complete_bm)
                                     bm_outputs.append(complete_bm.output["bm_output"])
                                     # save the dft references okay
@@ -591,6 +609,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
         )
         # collect_bm must be extended in a way that we get access to all benchmark structures and the previous databases
 
+        collect_bm.append_name(self.jobprefix, prepend=True)
         flows.append(collect_bm)
 
         output_flow = get_phonon_output(
@@ -602,6 +621,7 @@ class CompleteDFTvsMLBenchmarkWorkflow(Maker):
             pre_database_dir=add_data_fit.output["database_dir"],
             fit_kwargs_list=fit_kwargs_list,
         )
+        output_flow.append_name(self.jobprefix, prepend=True)
         flows.append(output_flow)
         return Flow(jobs=flows, output=output_flow.output, name=self.name)
 
@@ -772,6 +792,8 @@ class CompleteDFTvsMLBenchmarkWorkflowMPSettings(CompleteDFTvsMLBenchmarkWorkflo
 
     Parameters
     ----------
+    jobprefix: str
+        The prefix that precedes the jobname.
     name : str
         Name of the flow produced by this maker.
     add_dft_phonon_struct: bool.
@@ -981,15 +1003,21 @@ class DFTSupercellSettingsMaker(Maker):
 
     Parameters
     ----------
+    jobprefix : str
+        The prefix that precedes the jobname.
     name (str): The name of the maker. Default is "test dft and supercell settings".
     supercell_settings (dict): Settings for the supercells. Default is {"min_length": 15}.
     DFT_Maker (BaseVaspMaker): The DFT maker to be used. Default is TightDFTStaticMaker.
 
     """
 
+    jobprefix: str = ""
     name: str = "test dft and supercell settings"
     supercell_settings: dict = field(default_factory=lambda: {"min_length": 15})
     DFT_Maker: BaseVaspMaker = field(default_factory=TightDFTStaticMaker)
+
+    def __post_init__(self):  # noqa: D105
+        self.name = f"{self.jobprefix}{self.name}"
 
     def make(self, structure_list: list[Structure], mp_ids: list[str]) -> Flow:
         """
@@ -1027,6 +1055,8 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
 
     Parameters
     ----------
+    jobprefix : str
+        The prefix that precedes the jobname.
     name : str
         Name of the flow produced by this maker.
     max_iterations: int.
@@ -1040,6 +1070,7 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
         All Iterations after the first one will be performed with this flow.
     """
 
+    jobprefix: str = ""
     name: str = "IterativeCompleteDFTvsMLBenchmarkWorkflow"
     max_iterations: int = 10
     rms_max: float = 0.2
@@ -1120,3 +1151,10 @@ class IterativeCompleteDFTvsMLBenchmarkWorkflow:
                 "waste resources. It is recommended to switch this off.",
                 stacklevel=2,
             )
+        self.name = f"{self.jobprefix}{self.name}"
+        self.complete_dft_vs_ml_benchmark_workflow_0.name = (
+            f"{self.jobprefix}{self.complete_dft_vs_ml_benchmark_workflow_0.name}"
+        )
+        self.complete_dft_vs_ml_benchmark_workflow_1.name = (
+            f"{self.jobprefix}{self.complete_dft_vs_ml_benchmark_workflow_1.name}"
+        )

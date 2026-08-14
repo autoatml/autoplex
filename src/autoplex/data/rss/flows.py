@@ -51,6 +51,8 @@ class BuildMultiRandomizedStructure(Maker):
         Number of processes to use for parallel computation.
     name: str
         Name of the flows produced by this maker.
+    jobprefix: str
+        Prefix that precedes the jobname.
 
     """
 
@@ -67,6 +69,10 @@ class BuildMultiRandomizedStructure(Maker):
     random_seed: int | None = None
     num_processes: int = 1
     name: str = "do_randomized_structure_generation"
+    jobprefix: str = ""
+
+    def __post_init__(self):  # noqa: D105
+        self.name = f"{self.jobprefix}{self.name}"
 
     @job
     def make(self):
@@ -105,7 +111,7 @@ class BuildMultiRandomizedStructure(Maker):
                     dir=job_struct.output,
                     random_seed=self.random_seed,
                 )
-                job_cur.name = f"sampling_{i}"
+                job_cur.name = f"{self.jobprefix}sampling_{i}"
                 job_list.append(job_struct)
                 job_list.append(job_cur)
                 final_structures.append(job_cur.output)

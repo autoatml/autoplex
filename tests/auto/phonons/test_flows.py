@@ -478,37 +478,37 @@ def ref_paths4_mpid_new():
 @pytest.fixture(scope="class")
 def ref_paths4_mpid_new2():
     return {
-        "dft tight relax_test_0": "dft_ml_data_generation/strict_test/tight_relax_1_test/",
-        "dft tight relax_test_1": "dft_ml_data_generation/strict_test/tight_relax_1_test/",
-        "dft tight relax_test_2": "dft_ml_data_generation/strict_test/tight_relax_1_test/",
-        "dft tight relax 1_test_0": "dft_ml_data_generation/strict_test/tight_relax_1_test/",
-        "dft tight relax 1_test_1": "dft_ml_data_generation/strict_test/tight_relax_1_test/",
-        "dft tight relax 1_test_2": "dft_ml_data_generation/strict_test/tight_relax_1_test/",
-        "dft tight relax 1_test_3": "dft_ml_data_generation/strict_test/tight_relax_1_test/",
-        "dft tight relax 2_test_0": "dft_ml_data_generation/strict_test/tight_relax_2_test/",
-        "dft tight relax 2_test_1": "dft_ml_data_generation/strict_test/tight_relax_2_test/",
-        "dft tight relax 2_test_2": "dft_ml_data_generation/strict_test/tight_relax_2_test/",
-        "dft tight relax 2_test_3": "dft_ml_data_generation/strict_test/tight_relax_2_test/",
-        "Cl-stat_iso_atom_0": "Cl_iso_atoms/Cl-statisoatom/",
-        "Cl-stat_iso_atom_1": "Cl_iso_atoms/Cl-statisoatom/",
-        "Cl-stat_iso_atom_2": "Cl_iso_atoms/Cl-statisoatom/",
-        "Cl-stat_iso_atom_3": "Cl_iso_atoms/Cl-statisoatom/",
-        "Li-stat_iso_atom_0": "Li_iso_atoms/Li-statisoatom/",
-        "Li-stat_iso_atom_1": "Li_iso_atoms/Li-statisoatom/",
-        "Li-stat_iso_atom_2": "Li_iso_atoms/Li-statisoatom/",
-        "Li-stat_iso_atom_3": "Li_iso_atoms/Li-statisoatom/",
-        "dft phonon static 1/2_test_0": "dft_ml_data_generation/strict_test/phonon_static_1/",
-        "dft phonon static 1/2_test_1": "dft_ml_data_generation/strict_test/phonon_static_1/",
-        "dft phonon static 2/2_test_0": "dft_ml_data_generation/strict_test/phonon_static_2/",
-        "dft phonon static 2/2_test_1": "dft_ml_data_generation/strict_test/phonon_static_2/",
-        "dft rattle static 1/4_test_0": "dft_ml_data_generation/strict_test/rand_static_1/",
-        "dft rattle static 1/1_test_1": "dft_ml_data_generation/strict_test/rand_static_5/",
-        "dft rattle static 1/1_test_2": "dft_ml_data_generation/strict_test/rand_static_6/",
-        "dft rattle static 1/1_test_3": "dft_ml_data_generation/strict_test/rand_static_7/",
-        "dft rattle static 2/4_test_0": "dft_ml_data_generation/strict_test/rand_static_2/",
-        "dft rattle static 3/4_test_0": "dft_ml_data_generation/strict_test/rand_static_3/",
-        "dft rattle static 4/4_test_0": "dft_ml_data_generation/strict_test/rand_static_4/",
-        }
+            "dft tight relax_test_0": "dft_ml_data_generation/strict_test/tight_relax_1_test/",
+            "dft tight relax_test_1": "dft_ml_data_generation/strict_test/tight_relax_1_test/",
+            "dft tight relax_test_2": "dft_ml_data_generation/strict_test/tight_relax_1_test/",
+            "dft tight relax 1_test_0": "dft_ml_data_generation/strict_test/tight_relax_1_test/",
+            "dft tight relax 1_test_1": "dft_ml_data_generation/strict_test/tight_relax_1_test/",
+            "dft tight relax 1_test_2": "dft_ml_data_generation/strict_test/tight_relax_1_test/",
+            "dft tight relax 1_test_3": "dft_ml_data_generation/strict_test/tight_relax_1_test/",
+            "dft tight relax 2_test_0": "dft_ml_data_generation/strict_test/tight_relax_2_test/",
+            "dft tight relax 2_test_1": "dft_ml_data_generation/strict_test/tight_relax_2_test/",
+            "dft tight relax 2_test_2": "dft_ml_data_generation/strict_test/tight_relax_2_test/",
+            "dft tight relax 2_test_3": "dft_ml_data_generation/strict_test/tight_relax_2_test/",
+            "Cl-stat_iso_atom_0": "Cl_iso_atoms/Cl-statisoatom/",
+            "Cl-stat_iso_atom_1": "Cl_iso_atoms/Cl-statisoatom/",
+            "Cl-stat_iso_atom_2": "Cl_iso_atoms/Cl-statisoatom/",
+            "Cl-stat_iso_atom_3": "Cl_iso_atoms/Cl-statisoatom/",
+            "Li-stat_iso_atom_0": "Li_iso_atoms/Li-statisoatom/",
+            "Li-stat_iso_atom_1": "Li_iso_atoms/Li-statisoatom/",
+            "Li-stat_iso_atom_2": "Li_iso_atoms/Li-statisoatom/",
+            "Li-stat_iso_atom_3": "Li_iso_atoms/Li-statisoatom/",
+            "dft phonon static 1/2_test_0": "dft_ml_data_generation/strict_test/phonon_static_1/",
+            "dft phonon static 1/2_test_1": "dft_ml_data_generation/strict_test/phonon_static_1/",
+            "dft phonon static 2/2_test_0": "dft_ml_data_generation/strict_test/phonon_static_2/",
+            "dft phonon static 2/2_test_1": "dft_ml_data_generation/strict_test/phonon_static_2/",
+            "dft rattle static 1/4_test_0": "dft_ml_data_generation/strict_test/rand_static_1/",
+            "dft rattle static 1/1_test_1": "dft_ml_data_generation/strict_test/rand_static_5/",
+            "dft rattle static 1/1_test_2": "dft_ml_data_generation/strict_test/rand_static_6/",
+            "dft rattle static 1/1_test_3": "dft_ml_data_generation/strict_test/rand_static_7/",
+            "dft rattle static 2/4_test_0": "dft_ml_data_generation/strict_test/rand_static_2/",
+            "dft rattle static 3/4_test_0": "dft_ml_data_generation/strict_test/rand_static_3/",
+            "dft rattle static 4/4_test_0": "dft_ml_data_generation/strict_test/rand_static_4/",
+            }
 
 
 @pytest.fixture(scope="class")
@@ -2114,3 +2114,62 @@ def test_supercell_test_runs(vasp_test_dir, clean_dir, memory_jobstore, test_dir
     responses_flow = run_locally(autoplex_flow)
     assert responses_flow[autoplex_flow.jobs[-1].output.uuid][1].replace[0].name == "Force field static"
     # seems that the current atomate2 implementation doesn't distinguish in the FF flow names
+
+
+def add_prefix(paths, jobprefix=""):
+    #return dict([(f"{jobprefix}{i}",make_ref_paths4_mpid_new2[i]) for i in dict{ref_paths4_mpid_new2}.keys()])
+    return {f"{jobprefix}{k}": v for k, v in paths.items()}
+
+def test_iterative_complete_dft_vs_ml_benchmark_workflow_gap_jobprefix(vasp_test_dir, mock_vasp, test_dir, memory_jobstore,
+                                                             ref_paths4_mpid_new2, fake_run_vasp_kwargs4_mpid_new2,
+                                                             clean_dir):
+    from ase.io import read
+    from pathlib import Path
+    # first test with just one iteration (more tests need to be added)
+    path_to_struct = vasp_test_dir / "dft_ml_data_generation" / "POSCAR"
+    structure = Structure.from_file(path_to_struct)
+
+    complete_workflow = IterativeCompleteDFTvsMLBenchmarkWorkflow(
+        rms_max=0.2,
+        max_iterations=3,
+        complete_dft_vs_ml_benchmark_workflow_0=CompleteDFTvsMLBenchmarkWorkflow(
+                                                                                 jobprefix='testprefix_',
+                                                                                 symprec=1e-2, displacements=[0.01],
+                                                                                 split_ratio=0.33,
+                                                                                 volume_custom_scale_factors=[0.975,
+                                                                                                              1.0,
+                                                                                                              1.025,
+                                                                                                              1.05],
+                                                                                 supercell_settings={"min_length": 8,
+                                                                                                     "min_atoms": 20},
+                                                                                 apply_data_preprocessing=True),
+        complete_dft_vs_ml_benchmark_workflow_1=CompleteDFTvsMLBenchmarkWorkflow(
+                                                                                 jobprefix='testprefix_',
+                                                                                 symprec=1e-2, displacements=[0.01],
+                                                                                 split_ratio=0.33,
+                                                                                 volume_custom_scale_factors=[0.975],
+                                                                                 supercell_settings={"min_length": 8,
+                                                                                                     "min_atoms": 20},
+                                                                                 apply_data_preprocessing=True,
+                                                                                 add_dft_phonon_struct=False,
+                                                                                 num_processes_fit=4,
+                                                                                 ),
+
+    ).make(
+        structure_list=[structure],
+        mp_ids=["test"],
+        benchmark_mp_ids=["test"],
+        benchmark_structures=[structure],
+        rattle_seed=42,
+    )
+
+    # automatically use fake VASP and write POTCAR.spec during the test
+    mock_vasp(add_prefix(ref_paths4_mpid_new2,jobprefix='testprefix_'), fake_run_vasp_kwargs4_mpid_new2)
+
+    # run the flow or job and ensure that it finished running successfully
+    responses = run_locally(
+        complete_workflow,
+        create_folders=True,
+        ensure_success=True,
+        store=memory_jobstore,
+    )
