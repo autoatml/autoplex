@@ -118,7 +118,7 @@ pacemaker = [
      "scipy",
      "ruamel.yaml",
      "psutil",
-     "scikit-learn==1.5.0",
+     "scikit-learn==1.7.2",
 ]
 
 [tool.setuptools_scm]
