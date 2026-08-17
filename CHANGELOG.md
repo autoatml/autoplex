@@ -1,5 +1,37 @@
 # Changelog
 
+## v0.3.2
+
+<!-- Release notes generated using configuration in .github/release.yml at main -->
+
+## What's Changed
+### 🚀 New Features
+* fixed fragment list error and added test by @HannaTuerk in https://github.com/autoatml/autoplex/pull/519
+* Add jobprefix to jf jobnames by @HannaTuerk in https://github.com/autoatml/autoplex/pull/533
+### 🐛 Bug Fixes
+* pin scikit-build-core and update docs workflows > fix phonopy older build failures by @naik-aakash in https://github.com/autoatml/autoplex/pull/522
+* Fix mace rss keywords by @HannaTuerk in https://github.com/autoatml/autoplex/pull/531
+### 📚 Documentation
+* Update AIRSS installation instructions by @JaGeo in https://github.com/autoatml/autoplex/pull/511
+* Seperate and dependencies | Added python 3.12 support | Update to CI and Docker by @JaGeo in https://github.com/autoatml/autoplex/pull/515
+* Fix CI failures | Documentation updates by @naik-aakash in https://github.com/autoatml/autoplex/pull/539
+### 🧹 House-Keeping
+* Update Dockerfile by @JaGeo in https://github.com/autoatml/autoplex/pull/506
+* Update airss installation to version 0.9.4 by @JaGeo in https://github.com/autoatml/autoplex/pull/507
+* Update Buildcell installation process in Dockerfile by @JaGeo in https://github.com/autoatml/autoplex/pull/509
+* Update Dockerfile by @JaGeo in https://github.com/autoatml/autoplex/pull/510
+* Downgrade airss to stabilize tests by @JaGeo in https://github.com/autoatml/autoplex/pull/512
+* Update Dockerfile by @JaGeo in https://github.com/autoatml/autoplex/pull/513
+* next attempt to clean up ml interfaces by @JaGeo in https://github.com/autoatml/autoplex/pull/514
+* Modify installation in commit durations step of workflow by @naik-aakash in https://github.com/autoatml/autoplex/pull/525
+* update commit durations step of ci workflow by @naik-aakash in https://github.com/autoatml/autoplex/pull/540
+
+## New Contributors
+* @HannaTuerk made their first contribution in https://github.com/autoatml/autoplex/pull/519
+
+**Full Changelog**: https://github.com/autoatml/autoplex/compare/v0.3.1...v0.3.2
+
+
 ## v0.3.1
 
 <!-- Release notes generated using configuration in .github/release.yml at main -->
