@@ -61,7 +61,7 @@ docs = [
 ]
 
 workflow-managers = [
-    "FireWorks==2.0.4",
+    "FireWorks==2.1.4",
     "jobflow-remote==1.0.1"
 ]
 strict-base = [
