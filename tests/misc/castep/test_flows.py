@@ -7,6 +7,7 @@ from autoplex.misc.castep.utils import CastepStaticSetGenerator, CastepMagresSet
 from autoplex.data.common.jobs import collect_dft_data
 from pymatgen.io.ase import AseAtomsAdaptor
 from jobflow import Response
+from autoplex.misc.castep.flows import CastepMagresFlowMaker
 import numpy as np
 def test_DFTStaticLabelling_with_castep(memory_jobstore, mock_castep, clean_dir):
     
@@ -70,8 +71,8 @@ def test_MagresLabelling_with_castep(memory_jobstore, mock_castep, castep_test_d
     Test to see if MagresMaker works on multiple structures, using simplified mock version of DFTLabelling
     """
     ref_paths = {
-        "magres1": "magres/CASTEP_SNO_1",
-        "magres2": "magres/CASTEP_SNO_2",
+        "magres_1": "magres/CASTEP_SNO_1",
+        "magres_2": "magres/CASTEP_SNO_2",
     }
 
     mock_castep(ref_paths)
@@ -84,39 +85,54 @@ def test_MagresLabelling_with_castep(memory_jobstore, mock_castep, castep_test_d
 
     structures = [struct1,struct2]
     
-    job_list = []
-    dirs = []
-    for idx, struct in enumerate(structures):
-        magres_maker = CastepMagresMaker(
-            name=f"magres{idx+1}",
-            input_set_generator=CastepMagresSetGenerator(
-                useEFG=False,           # the run was shielding-only
-                user_param_settings={"xc_functional": "R2SCAN", "cut_off_energy": 1000.0},
-                user_cell_settings={"kpoint_mp_grid": "5 5 4"}
-            )
-        )
-        magres_job = magres_maker.make(structure=struct)
- 
-        job_list.append(magres_job)
-        dirs.append(magres_job.output)
+    
+    magres_maker = CastepMagresMaker(
+                    name="magres",
+                    #gives the base name of the job (jobs in flow will be called name1,name2....)
+                    input_set_generator=CastepMagresSetGenerator(
+                        useEFG=False,           # the run was shielding-only
+                        user_param_settings={"xc_functional": "R2SCAN", "cut_off_energy": 1000.0},
+                        user_cell_settings={"kpoint_mp_grid": "5 5 4"}
+                    )
+                )
+    magres_flow = CastepMagresFlowMaker(magres_maker = magres_maker).make(structures)
     
     run_locally(
-        Flow(job_list,output=dirs),
+        magres_flow,
         create_folders=True,
         ensure_success=True,
         store=memory_jobstore
     )
 
-    dicts = [job.output.resolve(memory_jobstore) for job in job_list]
+    dicts = [magres_job.output.resolve(memory_jobstore) for magres_job in magres_flow.output]
     
     assert len(dicts) == 2
     np.testing.assert_allclose(
-        dicts[1].output.ms_tensor[0],
+        dicts[1].ms_tensor[0],
         [[20.7015, 0.0, 0.0], [0.0, 20.7015, 0.0], [0.0, 0.0, -0.9801]],
         atol=1e-4,
     )
     np.testing.assert_allclose(
-        dicts[0].output.ms_tensor[0],
+        dicts[0].ms_tensor[0],
         [[23.2507, 0.0, 0.0], [0.0, 23.2507, 0.0], [0.0, 0.0, 0.9379]],
         atol=1e-4,
     )
+
+"""
+job_list = []
+dirs = []
+for idx, struct in enumerate(structures):
+    magres_maker = CastepMagresMaker(
+        name=f"magres{idx+1}",
+        input_set_generator=CastepMagresSetGenerator(
+            useEFG=False,           # the run was shielding-only
+            user_param_settings={"xc_functional": "R2SCAN", "cut_off_energy": 1000.0},
+            user_cell_settings={"kpoint_mp_grid": "5 5 4"}
+        )
+    )
+    magres_job = magres_maker.make(structure=struct)
+
+    job_list.append(magres_job)
+    dirs.append(magres_job.output)
+
+"""

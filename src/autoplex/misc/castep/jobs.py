@@ -106,7 +106,7 @@ class BaseCastepMaker(Maker):
     def __post_init__(self):  # noqa: D105
         self.name = f"{self.jobprefix}{self.name}"
 
-    @job
+    @castep_job
     def make(self, structure: Structure):
         """
         Run a CASTEP calculation.
@@ -267,7 +267,7 @@ class CastepMagresMaker(BaseCastepMaker):
     def __post_init__(self):  # noqa: D105
         self.name = f"{self.jobprefix}{self.name}"
 
-    @job
+    @castep_job
     def make(self, structure):
         """
         Run a CASTEP magres (NMR) calculation and parse the .magres output.

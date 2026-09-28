@@ -2,7 +2,7 @@ from ase import Atoms
 from pymatgen.io.ase import AseAtomsAdaptor
 from autoplex.misc.castep.utils import CastepStaticSetGenerator, CastepMagresSetGenerator
 from ase.build import bulk
-
+    
 def test_CastepStaticSetGenerator():
     atoms = Atoms("Si", positions=[[0, 0, 0]], cell=[5, 5, 5], pbc=True)
     structure = AseAtomsAdaptor.get_structure(atoms)
