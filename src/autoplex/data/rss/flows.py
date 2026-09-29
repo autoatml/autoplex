@@ -61,6 +61,7 @@ class BuildMultiRandomizedStructure(Maker):
     builder: str
     custom_builder_cmd: str | None = None
     custom_builder_args: str | None = None
+    pass_index_to_builder: bool = False
     cell_seed_paths: list[str] | None = None
     buildcell_options: list[dict] | None = None
     fragment_file: str | None = None
@@ -113,6 +114,8 @@ class BuildMultiRandomizedStructure(Maker):
                     remove_tmp_files=self.remove_tmp_files,
                     custom_builder_cmd=self.custom_builder_cmd,
                     custom_builder_args=self.custom_builder_args,
+                    pass_index_to_builder=self.pass_index_to_builder,
+                    num_processes=self.num_processes,
                 ).make()
             job_struct.name = f"{self.name}_{i}"
 

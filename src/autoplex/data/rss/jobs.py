@@ -439,6 +439,7 @@ class CustomRandomizedStructure(Maker):
 
     custom_builder_cmd: str
     custom_builder_args: str
+    pass_index_to_builder: bool = False
     name: str = "build_random_cells"
     struct_number: int = 20
     tag: str = "Si"
@@ -457,6 +458,7 @@ class CustomRandomizedStructure(Maker):
                     self.remove_tmp_files,
                     self.custom_builder_cmd,
                     self.custom_builder_args,
+                    self.pass_index_to_builder,
                 )
                 for i in range(self.struct_number)
             ]
@@ -481,6 +483,7 @@ class CustomRandomizedStructure(Maker):
         remove_tmp_files: bool,
         custom_builder_cmd: str,
         custom_builder_args: str,
+        pass_index_to_builder: bool,
     ) -> Atoms:
         """
         Run the 'buildcell' command in parallel.
@@ -495,6 +498,8 @@ class CustomRandomizedStructure(Maker):
             Tag used to differentiate temporary files.
         remove_tmp_files: bool
             If True, remove temporary files after processing.
+        pass_index_to_builder: bool
+            If True, appends index `i` to `custom_builder_args` before executing
 
         """
         tmp_file_name = "tmp." + str(i) + "." + tag + ".xyz"
@@ -507,6 +512,9 @@ class CustomRandomizedStructure(Maker):
             )
         else:
             cmd_str = custom_builder_cmd + " " + custom_builder_args
+
+        if pass_index_to_builder:
+            cmd_str = cmd_str + " " + str(i)
 
         with (
             open(tmp_file_name, "w") as tmp_file_handle,
