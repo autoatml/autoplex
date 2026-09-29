@@ -438,7 +438,7 @@ class CustomRandomizedStructure(Maker):
     """
 
     custom_builder_cmd: str
-    custom_builder_args: str
+    custom_builder_args: str | None = None
     pass_index_to_builder: bool = False
     name: str = "build_random_cells"
     struct_number: int = 20
@@ -510,8 +510,10 @@ class CustomRandomizedStructure(Maker):
             cmd_str += "".join(
                 f" {name} {param}" for name, param in custom_builder_args.items()
             )
-        else:
+        elif isinstance(custom_builder_args, str):
             cmd_str = custom_builder_cmd + " " + custom_builder_args
+        else:
+            cmd_str = custom_builder_cmd
 
         if pass_index_to_builder:
             cmd_str = cmd_str + " " + str(i)
