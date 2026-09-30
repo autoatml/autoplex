@@ -6,7 +6,6 @@ from autoplex.misc.castep.jobs import CastepStaticMaker, CastepMagresMaker
 from autoplex.misc.castep.utils import CastepStaticSetGenerator, CastepMagresSetGenerator
 from autoplex.data.common.jobs import collect_dft_data
 from pymatgen.io.ase import AseAtomsAdaptor
-from jobflow import Response
 from autoplex.misc.castep.flows import CastepMagresFlowMaker
 import numpy as np
 def test_DFTStaticLabelling_with_castep(memory_jobstore, mock_castep, clean_dir):
@@ -66,35 +65,38 @@ def test_DFTStaticLabelling_with_castep(memory_jobstore, mock_castep, clean_dir)
     assert len(config_types) == 2
 
 
-def test_MagresLabelling_with_castep(memory_jobstore, mock_castep, castep_test_dir, clean_dir):
+def test_CastepMagresFlowMaker(memory_jobstore, mock_castep, castep_test_dir, clean_dir):
     """
-    Test to see if MagresMaker works on multiple structures, using simplified mock version of DFTLabelling
+    Tests CastepMagresFlowMaker.
+    
+    Example output taken from https://github.com/cbenmahm/anistropic-nmr-parameters-data,
+    as described in https://pubs.aip.org/aip/jcp/article/163/2/024118/3351953/Graph-neural-network-predictions-of-solid-state.
     """
     ref_paths = {
-        "magres_1": "magres/CASTEP_SNO_1",
-        "magres_2": "magres/CASTEP_SNO_2",
+        "test_magres_1": "magres/CASTEP_CRISTOBALITE_ALPHA",
+        "test_magres_2": "magres/CASTEP_CRISTOBALITE_BETA",
     }
 
     mock_castep(ref_paths)
 
-    ref_out = castep_test_dir / "magres" / "CASTEP_SNO_1" / "outputs"
+    ref_out = castep_test_dir / "magres" / "CASTEP_CRISTOBALITE_ALPHA" / "outputs"
     struct1 = AseAtomsAdaptor.get_structure(read(ref_out / "castep.castep"))
 
-    ref_out = castep_test_dir / "magres" / "CASTEP_SNO_2" / "outputs"
+    ref_out = castep_test_dir / "magres" / "CASTEP_CRISTOBALITE_BETA" / "outputs"
     struct2 = AseAtomsAdaptor.get_structure(read(ref_out / "castep.castep"))
 
     structures = [struct1,struct2]
     
     
     magres_maker = CastepMagresMaker(
-                    name="magres",
-                    #gives the base name of the job (jobs in flow will be called name1,name2....)
-                    input_set_generator=CastepMagresSetGenerator(
-                        useEFG=False,           # the run was shielding-only
-                        user_param_settings={"xc_functional": "R2SCAN", "cut_off_energy": 1000.0},
-                        user_cell_settings={"kpoint_mp_grid": "5 5 4"}
+                        name="test_magres",
+                        #gives the base name of the job (jobs in flow will be called name_1,name_2....)
+                        input_set_generator=CastepMagresSetGenerator(
+                            useEFG=True,           
+                            user_param_settings={"xc_functional": "PBE", "cut_off_energy": 900.0},
+                            user_cell_settings={"kpoint_mp_spacing": 0.05}
+                        )
                     )
-                )
     magres_flow = CastepMagresFlowMaker(magres_maker = magres_maker).make(structures)
     
     run_locally(
@@ -109,30 +111,11 @@ def test_MagresLabelling_with_castep(memory_jobstore, mock_castep, castep_test_d
     assert len(dicts) == 2
     np.testing.assert_allclose(
         dicts[1].ms_tensor[0],
-        [[20.7015, 0.0, 0.0], [0.0, 20.7015, 0.0], [0.0, 0.0, -0.9801]],
+        [[230.9670, 33.2024, -33.2870], [33.2469, 230.8632, -33.2890], [-33.2720, -33.2131, 230.9253]],
         atol=1e-4,
     )
     np.testing.assert_allclose(
         dicts[0].ms_tensor[0],
-        [[23.2507, 0.0, 0.0], [0.0, 23.2507, 0.0], [0.0, 0.0, 0.9379]],
+        [[252.7565, 11.0014, -37.9952], [9.9670, 194.5567 , -7.3071], [-38.1106, -7.7682 , 222.5173]],
         atol=1e-4,
     )
-
-"""
-job_list = []
-dirs = []
-for idx, struct in enumerate(structures):
-    magres_maker = CastepMagresMaker(
-        name=f"magres{idx+1}",
-        input_set_generator=CastepMagresSetGenerator(
-            useEFG=False,           # the run was shielding-only
-            user_param_settings={"xc_functional": "R2SCAN", "cut_off_energy": 1000.0},
-            user_cell_settings={"kpoint_mp_grid": "5 5 4"}
-        )
-    )
-    magres_job = magres_maker.make(structure=struct)
-
-    job_list.append(magres_job)
-    dirs.append(magres_job.output)
-
-"""

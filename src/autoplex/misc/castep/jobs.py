@@ -268,7 +268,7 @@ class CastepMagresMaker(BaseCastepMaker):
         self.name = f"{self.jobprefix}{self.name}"
 
     @castep_job
-    def make(self, structure):
+    def make(self, structure: Structure) -> TaskDoc:
         """
         Run a CASTEP magres (NMR) calculation and parse the .magres output.
 
@@ -281,13 +281,15 @@ class CastepMagresMaker(BaseCastepMaker):
         -------
         TaskDoc
             Task document with the magnetic shielding and EFG tensors added.
+
+            Tensors follow output.structure's atom order, which can be different from the input order
+            since CASTEP rearranges it.
         """
         workdir = os.path.join(os.getcwd(), "CASTEP")
 
         BaseTaskDoc = super().make.original(self, structure)
 
         atoms = read(os.path.join(workdir, "castep.magres.gz"), format="magres")
-        # I'm not too sure what the magres file name will be
         shielding = atoms.get_array("ms").tolist() if "ms" in atoms.arrays else None
 
         efg = atoms.get_array("efg").tolist() if "efg" in atoms.arrays else None

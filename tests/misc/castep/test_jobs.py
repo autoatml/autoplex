@@ -48,27 +48,29 @@ def test_BaseCastepMaker(memory_jobstore, mock_castep, clean_dir):
 
 def test_CastepMagresMaker(memory_jobstore, mock_castep, castep_test_dir, clean_dir):
     """
-    example output taken from https://zenodo.org/records/19367933/files/CASTEP.zip?download=1
+    Example output taken from https://github.com/cbenmahm/anistropic-nmr-parameters-data,
+    as described in https://pubs.aip.org/aip/jcp/article/163/2/024118/3351953/Graph-neural-network-predictions-of-solid-state.
     """
 
-    ref_out = castep_test_dir / "magres" / "CASTEP_SNO_1" / "outputs"
-    structure = AseAtomsAdaptor.get_structure(read(ref_out / "castep.castep"))   # the SnO cell CASTEP used
+    ref_out = castep_test_dir / "magres" / "CASTEP_CRISTOBALITE_ALPHA" / "outputs"
+    structure = AseAtomsAdaptor.get_structure(read(ref_out / "castep.castep"))   
 
     ref_paths = {
-        "test_magres": "magres/CASTEP_SNO_1"
+        "test_magres": "magres/CASTEP_CRISTOBALITE_ALPHA"
     }
     
     mock_castep(ref_paths)
     
 
     magres_job = CastepMagresMaker(
-        name="test_magres",
-        input_set_generator=CastepMagresSetGenerator(
-            useEFG=False,           # the run was shielding-only
-            user_param_settings={"xc_functional": "R2SCAN", "cut_off_energy": 1000.0},
-            user_cell_settings={"kpoint_mp_grid": "5 5 4"}
-        )
-    ).make(structure=structure)
+                    name="test_magres",
+                    #gives the base name of the job (jobs in flow will be called name1,name2....)
+                    input_set_generator=CastepMagresSetGenerator(
+                        useEFG=True,           
+                        user_param_settings={"xc_functional": "PBE", "cut_off_energy": 900.0},
+                        user_cell_settings={"kpoint_mp_spacing": 0.05}
+                    )
+                ).make(structure=structure)
 
     flow = Flow(magres_job, output=magres_job.output)
     run_locally(flow,
@@ -82,12 +84,16 @@ def test_CastepMagresMaker(memory_jobstore, mock_castep, castep_test_dir, clean_
     
     np.testing.assert_allclose(
         dict_magres.output.ms_tensor[0],
-        [[23.2507, 0.0, 0.0], [0.0, 23.2507, 0.0], [0.0, 0.0, 0.9379]],
+        [[252.7565, 11.0014, -37.9952], [9.9670, 194.5567 , -7.3071], [-38.1106, -7.7682 , 222.5173]],
         atol=1e-4,
     )
-    assert len(dict_magres.output.ms_tensor) == len(dict_magres.structure)
-    assert dict_magres.output.efg_tensor is None
-    
+    np.testing.assert_allclose(
+            dict_magres.output.efg_tensor[0],
+            [[ 0.4605, 0.1927, -0.5901], [0.1927, -0.4859, -0.1454], [-0.5901, -0.1454, 0.0255]],
+            atol=1e-4,
+        )
+    assert len(dict_magres.output.ms_tensor) == len(dict_magres.structure) == 12
+
 def test_CastepStaticMaker(memory_jobstore, mock_castep, clean_dir):
     
     ref_paths = {

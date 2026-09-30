@@ -2,6 +2,7 @@ from ase import Atoms
 from pymatgen.io.ase import AseAtomsAdaptor
 from autoplex.misc.castep.utils import CastepStaticSetGenerator, CastepMagresSetGenerator
 from ase.build import bulk
+import pytest
     
 def test_CastepStaticSetGenerator():
     atoms = Atoms("Si", positions=[[0, 0, 0]], cell=[5, 5, 5], pbc=True)
@@ -23,8 +24,8 @@ def test_CastepStaticSetGenerator():
 
     assert input_set["structure"].composition.formula == "Si1"
 
-
-def test_CastepMagresSetGenerator():
+@pytest.mark.parametrize("use_efg, expected", [(True, "NMR"), (False, "SHIELDING")])
+def test_CastepMagresSetGenerator(use_efg,expected):
     """
     example input taken from https://castep-docs.github.io/castep-docs/tutorials/NMR/Example_2_-Diamond/
     """
@@ -37,9 +38,10 @@ def test_CastepMagresSetGenerator():
             "xc_functional": "LDA",
             "fix_occupancy": True,
             "opt_strategy": "speed",
-            "cut_off_energy":  600.0
+            "cut_off_energy":  600.0,
             },
         user_cell_settings={},
+        useEFG=use_efg
     )
 
     input_set = gen.get_input_set(structure=pmg_structure)
@@ -47,6 +49,6 @@ def test_CastepMagresSetGenerator():
     assert input_set["param"]["cut_off_energy"] == 600.0
     assert input_set["param"]["xc_functional"] == "LDA"
     assert input_set["param"]["task"] == "magres"
-    assert input_set["param"]["magres_task"] == "NMR"
+    assert input_set["param"]["magres_task"] == expected
 
     assert input_set["structure"].composition.formula == "C2"
