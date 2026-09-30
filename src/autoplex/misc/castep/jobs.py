@@ -287,14 +287,14 @@ class CastepMagresMaker(BaseCastepMaker):
         """
         workdir = os.path.join(os.getcwd(), "CASTEP")
 
-        BaseTaskDoc = super().make.original(self, structure)
+        base_TaskDoc = super().make.original(self, structure)
 
         atoms = read(os.path.join(workdir, "castep.magres.gz"), format="magres")
         shielding = atoms.get_array("ms").tolist() if "ms" in atoms.arrays else None
 
         efg = atoms.get_array("efg").tolist() if "efg" in atoms.arrays else None
 
-        BaseTaskDoc.output.ms_tensor = shielding
-        BaseTaskDoc.output.efg_tensor = efg
+        base_TaskDoc.output.ms_tensor = shielding
+        base_TaskDoc.output.efg_tensor = efg
 
-        return BaseTaskDoc
+        return base_TaskDoc
