@@ -234,7 +234,7 @@ class CastepMagresSetGenerator(CastepInputGenerator):
 
     Parameters
     ----------
-    useEFG: bool
+    use_efg: bool
         Whether to calculate the EFG alongside the shielding tensor, default True
     **kwargs
         Other keyword arguments passed to CastepInputGenerator
@@ -247,7 +247,7 @@ class CastepMagresSetGenerator(CastepInputGenerator):
             }
         }
     )
-    useEFG: bool = True
+    use_efg: bool = True
 
     @property
     def param_updates(self) -> dict:
@@ -264,7 +264,7 @@ class CastepMagresSetGenerator(CastepInputGenerator):
             "xc_functional": "PBE",
             "cut_off_energy": 600.0,
         }
-        if self.useEFG:
+        if self.use_efg:
             updates.update({"magres_task": "NMR"})
             # NMR includes both EFG and MS
         else:

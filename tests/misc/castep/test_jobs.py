@@ -66,7 +66,7 @@ def test_CastepMagresMaker(memory_jobstore, mock_castep, castep_test_dir, clean_
                     name="test_magres",
                     #gives the base name of the job (jobs in flow will be called name1,name2....)
                     input_set_generator=CastepMagresSetGenerator(
-                        useEFG=True,           
+                        use_efg=True,           
                         user_param_settings={"xc_functional": "PBE", "cut_off_energy": 900.0},
                         user_cell_settings={"kpoint_mp_spacing": 0.05}
                     )

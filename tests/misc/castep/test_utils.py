@@ -41,7 +41,7 @@ def test_CastepMagresSetGenerator(use_efg,expected):
             "cut_off_energy":  600.0,
             },
         user_cell_settings={},
-        useEFG=use_efg
+        use_efg=use_efg
     )
 
     input_set = gen.get_input_set(structure=pmg_structure)
