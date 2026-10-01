@@ -1,7 +1,7 @@
 import os
 import sys
 from jobflow import run_locally
-from autoplex.data.rss.jobs import RandomizedStructure, do_rss_single_node, do_rss_multi_node
+from autoplex.data.rss.jobs import RandomizedStructure, CustomRandomizedStructure, do_rss_single_node, do_rss_multi_node
 import subprocess
 from ase.io import read
 from pymatgen.io.ase import AseAtomsAdaptor
@@ -445,23 +445,56 @@ def test_update_buildcell_options():
 
 def test_output_from_scratch(memory_jobstore, clean_dir):
     from ase.io import read
-    job_rss = RandomizedStructure(struct_number=3,
-                                  tag='SiO2',
-                                  output_file_name='random_structs.extxyz',
-                                  buildcell_option={'VARVOL': 20,
-                                                    'SYMMOPS': '1-2'},
-                                  num_processes=4).make()
 
-    responses = run_locally(job_rss, ensure_success=True, create_folders=True, store=memory_jobstore)
+    job_rss = RandomizedStructure(
+        struct_number=3,
+        tag="SiO2",
+        output_file_name="random_structs.extxyz",
+        buildcell_option={"VARVOL": 20, "SYMMOPS": "1-2"},
+        num_processes=4,
+    ).make()
+
+    responses = run_locally(
+        job_rss, ensure_success=True, create_folders=True, store=memory_jobstore
+    )
     assert len(read(job_rss.output.resolve(memory_jobstore), index=":")) == 3
-    
-    
+
+
+def test_output_with_custom_builder(memory_jobstore, clean_dir):
+    from ase.io import read
+
+    bc_file = "SiO2.cell"
+    with open(bc_file, "w") as f:
+                f.writelines("#SPECIES=Si%NUM=1,O%NUM=2 #VARVOL=20 #SYMMOPS=1-2")
+
+    cmd = (
+        "buildcell < ../" + bc_file + " > tmp.${1}.cell; cabal cell xyz < tmp.${1}.cell"
+    )
+
+    job_rss = CustomRandomizedStructure(
+        custom_builder_cmd=cmd,
+        custom_builder_args=None,
+        pass_index_to_builder=True,
+        struct_number=3,
+        tag="SiO2",
+        output_file_name="random_structs.extxyz",
+        num_processes=4,
+    ).make()
+
+    responses = run_locally(
+        job_rss, ensure_success=True, create_folders=True, store=memory_jobstore
+    )
+    assert len(read(job_rss.output.resolve(memory_jobstore), index=":")) == 3
+
+
 def test_output_from_scratch_wo_buildcell_option(memory_jobstore, clean_dir):
     from ase.io import read
-    job_rss = RandomizedStructure(struct_number=3,
-                                  tag='Si').make()
 
-    responses = run_locally(job_rss, ensure_success=True, create_folders=True, store=memory_jobstore)
+    job_rss = RandomizedStructure(struct_number=3, tag="Si").make()
+
+    responses = run_locally(
+        job_rss, ensure_success=True, create_folders=True, store=memory_jobstore
+    )
     assert len(read(job_rss.output.resolve(memory_jobstore), index=":")) == 3
 
 
