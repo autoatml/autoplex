@@ -237,6 +237,3 @@ def test_ElasticMaker(memory_jobstore, mock_castep, clean_dir):
     assert abs(g_voigt - 64) < 1
     assert abs(g_reuss - 61) < 1
     assert abs(g_vrh - 62) < 1
-
-if __name__ == "__main__":
-    test_CastepStaticMaker()

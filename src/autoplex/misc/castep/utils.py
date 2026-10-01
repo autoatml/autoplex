@@ -259,7 +259,7 @@ class CastepMagresSetGenerator(CastepInputGenerator):
         dict
             Dictionary of CASTEP .param file parameters for NMR prediction
         """
-        # preliminary values from https://www.ccpnc.ac.uk/docs/castep-for-nmr-calculations#nmrcalculations
+        # preliminary parameters from https://www.ccpnc.ac.uk/docs/castep-for-nmr-calculations#nmrcalculations
         updates = {
             "xc_functional": "PBE",
             "cut_off_energy": 600.0,
