@@ -69,8 +69,9 @@ def test_CastepMagresFlowMaker(memory_jobstore, mock_castep, castep_test_dir, cl
     """
     Tests CastepMagresFlowMaker.
     
-    Example output taken from https://github.com/cbenmahm/anistropic-nmr-parameters-data,
-    as described in https://pubs.aip.org/aip/jcp/article/163/2/024118/3351953/Graph-neural-network-predictions-of-solid-state.
+    Reference structures from the dataset of Ben Mahmoud et al., J. Chem. Phys. 163, 024118 (2025),
+    https://doi.org/10.1063/5.0274240; dataset: https://doi.org/10.5281/zenodo.15775328 (CC BY 4.0).
+    
     """
     ref_paths = {
         "test_magres_1": "magres/CASTEP_CRISTOBALITE_ALPHA",

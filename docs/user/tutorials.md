@@ -37,6 +37,11 @@ phonon/index
 
 ```{toctree}
 :maxdepth: 3
+nmr/index
+```
+
+```{toctree}
+:maxdepth: 3
 executable/index
 ```
 

@@ -27,7 +27,8 @@ def test_CastepStaticSetGenerator():
 @pytest.mark.parametrize("use_efg, expected", [(True, "NMR"), (False, "SHIELDING")])
 def test_CastepMagresSetGenerator(use_efg,expected):
     """
-    example input taken from https://castep-docs.github.io/castep-docs/tutorials/NMR/Example_2_-Diamond/
+    Settings follow the CASTEP NMR tutorial (diamond example)
+    https://castep-docs.github.io/castep-docs/tutorials/NMR/Example_2_-Diamond/
     """
     atoms = bulk("C", "diamond", a=3.567)
     pmg_structure = AseAtomsAdaptor.get_structure(atoms)
