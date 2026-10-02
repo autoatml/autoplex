@@ -15,7 +15,7 @@ __all__ = ["BuildMultiRandomizedStructure"]
 @dataclass
 class BuildMultiRandomizedStructure(Maker):
     """
-    Maker to create random structures by 'buildcell'.
+    Maker to create random structures by 'buildcell', or a user-defined third party package.
 
     Parameters
     ----------
@@ -26,6 +26,17 @@ class BuildMultiRandomizedStructure(Maker):
         if the stoichiometric ratio of elements is defined in the 'cell_seed_paths' or 'buildcell_options'.
     generated_struct_numbers: list[int]
         Expected number of generated randomized unit cells.
+    builder: str | None
+        Builder to be used for generating random structures. Currently only accepts 'buildcell'
+        or 'custom'. Default is buildcell.
+    custom_builder_cmd: str | None
+        Command to be called when using 'custom' option for builder. Must be either an absolute path to
+        executable, or accessible via $PATH. Default is None.
+    custom_builder_args: str | dict[str, str] | None
+        Arguments to be passed to the custom builder command. Default is None.
+    pass_index_to_builder: bool
+        Whether the process index should be included in the final argument string for the custom builder
+        command (the index will always be appended as the last argument). Default is False.
     cell_seed_paths: list[str]
         A list of paths to the custom buildcell control files, which ends with '.cell'. If these files exist,
         the buildcell_options argument will no longer take effect.
@@ -58,7 +69,7 @@ class BuildMultiRandomizedStructure(Maker):
 
     tag: str
     generated_struct_numbers: list[int]
-    builder: str
+    builder: str | None = "buildcell"
     custom_builder_cmd: str | None = None
     custom_builder_args: str | None = None
     pass_index_to_builder: bool = False

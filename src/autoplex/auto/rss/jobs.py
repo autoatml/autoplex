@@ -129,6 +129,17 @@ def initial_rss(
         if the stoichiometric ratio of elements is defined in the 'cell_seed_paths' or 'buildcell_options'.
     generated_struct_numbers: list[int]
         Expected number of generated randomized unit cells.
+    builder: str | None
+        Builder to be used for generating random structures. Currently only accepts 'buildcell'
+        or 'custom'. Default is buildcell.
+    custom_builder_cmd: str | None
+        Command to be called when using 'custom' option for builder. Must be either an absolute path to
+        executable, or accessible via $PATH. Default is None.
+    custom_builder_args: str | dict[str, str] | None
+        Arguments to be passed to the custom builder command. Default is None.
+    pass_index_to_builder: bool
+        Whether the process index should be included in the final argument string for the custom builder
+        command (the index will always be appended as the last argument). Default is False.
     jobprefix: str
         Prefix that precedes the jobname.
     num_of_initial_selected_structs: list[int] | None

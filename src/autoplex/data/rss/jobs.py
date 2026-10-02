@@ -431,10 +431,23 @@ class CustomRandomizedStructure(Maker):
         Name of the flows produced by this maker.
     struct_number : int
         Expected number of generated randomized unit cells.
-    builder_script_path: str
-        Location of the command to initiate structure generation
+    tag: str
+        Tag of systems. This is not passed onto the custom builder subprocess call, but is
+        still used for naming of temporary files.
+    custom_builder_cmd: str
+        Command to be called when using 'custom' option for builder. Must be either an absolute path to
+        executable, or accessible via $PATH.
+    custom_builder_args: str | dict[str, str] | None
+        Arguments to be passed to the custom builder command. Default is None.
+    pass_index_to_builder: bool
+        Whether the process index should be included in the final argument string for the custom builder
+        command (the index will always be appended as the last argument). Default is False.
     output_file_name: str
         Name of the file to store all generated structures.
+    remove_tmp_files: bool
+            Remove all temporary files raised by the builder to save memory.
+    num_processes: int
+            Number of processes to use for parallel computation.
     """
 
     custom_builder_cmd: str
@@ -486,7 +499,7 @@ class CustomRandomizedStructure(Maker):
         pass_index_to_builder: bool,
     ) -> Atoms:
         """
-        Run the 'buildcell' command in parallel.
+        Run a provided builder command in parallel.
 
         Parameters
         ----------
