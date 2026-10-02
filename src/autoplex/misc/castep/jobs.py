@@ -27,6 +27,7 @@ from autoplex.misc.castep.utils import (
     CASTEP_INPUT_FILES,
     CASTEP_OUTPUT_FILES,
     CastepInputGenerator,
+    CastepMagresSetGenerator,
     CastepStaticSetGenerator,
 )
 from autoplex.settings import SETTINGS
@@ -105,7 +106,7 @@ class BaseCastepMaker(Maker):
     def __post_init__(self):  # noqa: D105
         self.name = f"{self.jobprefix}{self.name}"
 
-    @job
+    @castep_job
     def make(self, structure: Structure):
         """
         Run a CASTEP calculation.
@@ -173,6 +174,7 @@ class BaseCastepMaker(Maker):
         run_castep(calc)
 
         workdir = os.path.join(os.getcwd(), "CASTEP")
+
         atoms = read(os.path.join(workdir, "castep.castep"))
         gzip_files(directory=workdir, include_files=_FILES_TO_ZIP, allow_missing=True)
 
@@ -235,3 +237,64 @@ class CastepStaticMaker(BaseCastepMaker):
 
     def __post_init__(self):  # noqa: D105
         self.name = f"{self.jobprefix}{self.name}"
+
+
+@dataclass
+class CastepMagresMaker(BaseCastepMaker):
+    """
+    Maker to create CASTEP magres (NMR prediction) jobs.
+
+    This class creates NMR predictions using CASTEP
+
+    Parameters
+    ----------
+    name : str
+        The job name (default: "magres").
+    input_set_generator : CastepInputGenerator
+        Generator used to create the CASTEP input set,
+        including .param and .cell settings.
+        (default: CastepMagresSetGenerator()).
+    jobprefix: str
+        The prefix that precedes the jobname.
+    """
+
+    name: str = "magres"
+    input_set_generator: CastepInputGenerator = field(
+        default_factory=CastepMagresSetGenerator
+    )
+    jobprefix: str = ""
+
+    def __post_init__(self):  # noqa: D105
+        self.name = f"{self.jobprefix}{self.name}"
+
+    @castep_job
+    def make(self, structure: Structure) -> TaskDoc:
+        """
+        Run a CASTEP magres (NMR) calculation and parse the .magres output.
+
+        Parameters
+        ----------
+        structure : Structure
+            A pymatgen structure object.
+
+        Returns
+        -------
+        TaskDoc
+            Task document with the magnetic shielding and EFG tensors added.
+
+            Tensors follow output.structure's atom order, which can be different from the input order
+            since CASTEP rearranges it.
+        """
+        workdir = os.path.join(os.getcwd(), "CASTEP")
+
+        base_task_doc = super().make.original(self, structure)
+
+        atoms = read(os.path.join(workdir, "castep.magres.gz"), format="magres")
+        shielding = atoms.get_array("ms").tolist() if "ms" in atoms.arrays else None
+
+        efg = atoms.get_array("efg").tolist() if "efg" in atoms.arrays else None
+
+        base_task_doc.output.ms_tensor = shielding
+        base_task_doc.output.efg_tensor = efg
+
+        return base_task_doc

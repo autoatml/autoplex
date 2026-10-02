@@ -64,6 +64,12 @@ MS1P e.V., Berlin
 [ansobolev]: https://github.com/ansobolev
 [0000-0001-5086-6601]: https://orcid.org/0000-0001-5086-6601
 
+**Oliver Ng** [![gh]][oliver-ng01] [![orc]][0009-0008-8285-3627] (Castep NMR integration)\
+University of Oxford
+
+[oliver-ng01]: https://github.com/oliver-ng01
+[0009-0008-8285-3627]: https://orcid.org/0009-0008-8285-3627 
+
 We welcome contributions from other researchers! If you would like to contribute, please see the `How to contribute` guidelines.
 
 
