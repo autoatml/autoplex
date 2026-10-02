@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass, field
 
-from jobflow import Flow, Maker
+from jobflow import Flow, Maker, Response
 from pymatgen.core import Structure
 
 from autoplex.misc.castep.jobs import CastepMagresMaker
@@ -35,12 +35,14 @@ class CastepMagresFlowMaker(Maker):
 
         Returns
         -------
-        Flow with each job included.
+        List of directories for each .castep and .magres file
         """
-        jobs = []
+        dirs = []
+        job_list = []
         for i, structure in enumerate(structures):
             job = self.magres_maker.make(structure=structure)
             job.name = f"{self.magres_maker.name}_{i + 1}"
+            dirs.append(job.output.dir_name)
+            job_list.append(job)
 
-            jobs.append(job)
-        return Flow(jobs, output=[job.output for job in jobs], name=self.name)
+        return Response(replace=Flow(job_list), output=dirs)
