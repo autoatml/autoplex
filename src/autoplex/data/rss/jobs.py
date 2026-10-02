@@ -420,6 +420,145 @@ class RandomizedStructure(Maker):
         return atom
 
 
+@dataclass
+class CustomRandomizedStructure(Maker):
+    """
+    Maker to create random structures using a user-specified 3rd party tool.
+
+    Parameters
+    ----------
+    name: str
+        Name of the flows produced by this maker.
+    struct_number : int
+        Expected number of generated randomized unit cells.
+    tag: str
+        Tag of systems. This is not passed onto the custom builder subprocess call, but is
+        still used for naming of temporary files.
+    custom_builder_cmd: str
+        Command to be called when using 'custom' option for builder. Must be either an absolute path to
+        executable, or accessible via $PATH.
+    custom_builder_args: str | dict[str, str] | None
+        Arguments to be passed to the custom builder command. Default is None.
+    pass_index_to_builder: bool
+        Whether the process index should be included in the final argument string for the custom builder
+        command (the index will always be appended as the last argument). Default is False.
+    output_file_name: str
+        Name of the file to store all generated structures.
+    remove_tmp_files: bool
+            Remove all temporary files raised by the builder to save memory.
+    num_processes: int
+            Number of processes to use for parallel computation.
+    """
+
+    custom_builder_cmd: str
+    custom_builder_args: str | None = None
+    pass_index_to_builder: bool = False
+    name: str = "build_random_cells"
+    struct_number: int = 20
+    tag: str = "Si"
+    output_file_name: str = "random_structs.extxyz"
+    remove_tmp_files: bool = True
+    num_processes: int = 32
+
+    @job
+    def make(self):
+        """Maker to create random structures by a specified 3rd party tool."""
+        with Pool(processes=self.num_processes) as pool:
+            args = [
+                (
+                    i,
+                    self.tag,
+                    self.remove_tmp_files,
+                    self.custom_builder_cmd,
+                    self.custom_builder_args,
+                    self.pass_index_to_builder,
+                )
+                for i in range(self.struct_number)
+            ]
+            atoms_group = pool.starmap(self._parallel_process, args)
+
+        atoms_group = [
+            atom for atom in atoms_group if not np.isnan(atom.get_positions()).any()
+        ]
+
+        ase.io.write(
+            self.output_file_name, atoms_group, parallel=False, format="extxyz"
+        )
+
+        # structure = [AseAtomsAdaptor().get_structure(at) for at in atoms_group]
+        return os.path.join(Path.cwd(), self.output_file_name)
+        # return structure
+
+    def _parallel_process(
+        self,
+        i: int,
+        tag: str,
+        remove_tmp_files: bool,
+        custom_builder_cmd: str,
+        custom_builder_args: str,
+        pass_index_to_builder: bool,
+    ) -> Atoms:
+        """
+        Run a provided builder command in parallel.
+
+        Parameters
+        ----------
+        i: int
+            Unique index to differentiate temporary files.
+        bc_file: str
+            Path to the input 'buildcell' file.
+        tag: str
+            Tag used to differentiate temporary files.
+        remove_tmp_files: bool
+            If True, remove temporary files after processing.
+        pass_index_to_builder: bool
+            If True, appends index `i` to `custom_builder_args` before executing
+
+        """
+        tmp_file_name = "tmp." + str(i) + "." + tag + ".xyz"
+        tmp_error_file_name = "tmp_error." + str(i) + "." + tag + ".err"
+
+        if isinstance(custom_builder_args, dict):
+            cmd_str = custom_builder_cmd
+            cmd_str += "".join(
+                f" {name} {param}" for name, param in custom_builder_args.items()
+            )
+        elif isinstance(custom_builder_args, str):
+            cmd_str = custom_builder_cmd + " " + custom_builder_args
+        else:
+            cmd_str = custom_builder_cmd
+
+        if pass_index_to_builder:
+            cmd_str = cmd_str + " " + str(i)
+
+        with (
+            open(tmp_file_name, "w") as tmp_file_handle,
+            open(tmp_error_file_name, "w") as tmp_error_file_handle,
+        ):
+            run(
+                cmd_str,
+                stdout=tmp_file_handle,
+                stderr=tmp_error_file_handle,
+                shell=True,
+                check=True,
+            )
+
+        atom = ase.io.read(tmp_file_name, parallel=False)
+        atom.info["unique_starting_index"] = i
+
+        if "castep_labels" in atom.arrays:
+            del atom.arrays["castep_labels"]
+
+        if "initial_magmoms" in atom.arrays:
+            del atom.arrays["initial_magmoms"]
+
+        if remove_tmp_files:
+            os.remove(tmp_file_name)
+            os.remove(tmp_error_file_name)
+
+        return atom
+
+
 @job
 def do_rss_single_node(
     mlip_type: Literal["GAP", "J-ACE", "P-ACE", "NEP", "NEQUIP", "M3GNET", "MACE"],
