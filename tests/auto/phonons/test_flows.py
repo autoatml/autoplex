@@ -1004,7 +1004,7 @@ def test_complete_dft_vs_ml_benchmark_workflow_m3gnet_finetuning(
 
     py_version = platform.python_version()
     
-    foundation_model = "M3GNet-PES-MatPES-PBE-2025.2" if not "3.10" in py_version else "M3GNet-MatPES-PBE-v2025.1-PES"
+    foundation_model = test_dir / "M3GNet-PES-MatPES-PBE-2025.2" if not "3.10" in py_version else "M3GNet-MatPES-PBE-v2025.1-PES"
     path_to_struct = vasp_test_dir / "dft_ml_data_generation" / "POSCAR"
     structure = Structure.from_file(path_to_struct)
 
