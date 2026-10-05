@@ -2,11 +2,12 @@ from dataclasses import dataclass, field
 from pymatgen.io.ase import AseAtomsAdaptor
 from jobflow import run_locally, Flow
 from atomate2.common.flows.elastic import BaseElasticMaker
-from autoplex.misc.castep.jobs import BaseCastepMaker, CastepStaticMaker
-from autoplex.misc.castep.utils import CastepInputGenerator, CastepStaticSetGenerator
+from autoplex.misc.castep.jobs import BaseCastepMaker, CastepStaticMaker, CastepMagresMaker
+from autoplex.misc.castep.utils import CastepInputGenerator, CastepStaticSetGenerator, CastepMagresSetGenerator
 from ase.build import bulk
-
-
+from ase.io import read
+from pathlib import Path
+import numpy as np
 def test_BaseCastepMaker(memory_jobstore, mock_castep, clean_dir):
     
     ref_paths = {
@@ -44,6 +45,55 @@ def test_BaseCastepMaker(memory_jobstore, mock_castep, clean_dir):
     
     assert abs(-329.6080395967 - dict_castep.output.energy) < 1e-4
     
+
+def test_CastepMagresMaker(memory_jobstore, mock_castep, castep_test_dir, clean_dir):
+    """
+    Reference structures from the dataset of Ben Mahmoud et al., J. Chem. Phys. 163, 024118 (2025),
+    https://doi.org/10.1063/5.0274240; dataset: https://doi.org/10.5281/zenodo.15775328 (CC BY 4.0).
+    
+    """
+
+    ref_out = castep_test_dir / "magres" / "CASTEP_CRISTOBALITE_ALPHA" / "outputs"
+    structure = AseAtomsAdaptor.get_structure(read(ref_out / "castep.castep"))   
+
+    ref_paths = {
+        "test_magres": "magres/CASTEP_CRISTOBALITE_ALPHA"
+    }
+    
+    mock_castep(ref_paths)
+    
+
+    magres_job = CastepMagresMaker(
+                    name="test_magres",
+                    #gives the base name of the job (jobs in flow will be called name1,name2....)
+                    input_set_generator=CastepMagresSetGenerator(
+                        use_efg=True,           
+                        user_param_settings={"xc_functional": "PBE", "cut_off_energy": 900.0},
+                        user_cell_settings={"kpoint_mp_spacing": 0.05}
+                    )
+                ).make(structure=structure)
+
+    flow = Flow(magres_job, output=magres_job.output)
+    run_locally(flow,
+                ensure_success=True,
+                create_folders=True,
+                store=memory_jobstore)
+
+    dict_magres = magres_job.output.resolve(memory_jobstore)
+
+  
+    
+    np.testing.assert_allclose(
+        dict_magres.output.ms_tensor[0],
+        [[252.7565, 11.0014, -37.9952], [9.9670, 194.5567 , -7.3071], [-38.1106, -7.7682 , 222.5173]],
+        atol=1e-4,
+    )
+    np.testing.assert_allclose(
+            dict_magres.output.efg_tensor[0],
+            [[ 0.4605, 0.1927, -0.5901], [0.1927, -0.4859, -0.1454], [-0.5901, -0.1454, 0.0255]],
+            atol=1e-4,
+        )
+    assert len(dict_magres.output.ms_tensor) == len(dict_magres.structure) == 12
 
 def test_CastepStaticMaker(memory_jobstore, mock_castep, clean_dir):
     
@@ -188,4 +238,3 @@ def test_ElasticMaker(memory_jobstore, mock_castep, clean_dir):
     assert abs(g_voigt - 64) < 1
     assert abs(g_reuss - 61) < 1
     assert abs(g_vrh - 62) < 1
-    

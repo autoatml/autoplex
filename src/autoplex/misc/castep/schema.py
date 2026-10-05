@@ -61,6 +61,16 @@ class OutputDoc(BaseModel):
         None, description="The stress on the cell in units of kbar."
     )
 
+    # magnetic shielding tensor (N,3,3) where N is the number of atoms
+    ms_tensor: list[list[list[float]]] | None = Field(
+        None, description="Magnetic shielding tensor from NMR prediction runs."
+    )
+
+    # electric field gradient tensor (N,3,3)
+    efg_tensor: list[list[list[float]]] | None = Field(
+        None, description="Electric field gradient tensor from NMR prediction runs."
+    )
+
 
 class TaskDoc(StructureMetadata):
     """Document containing information on structure manipulation using CASTEP."""

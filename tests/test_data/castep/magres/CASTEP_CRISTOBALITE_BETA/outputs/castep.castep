@@ -1,0 +1,812 @@
+ +-------------------------------------------------+
+ |                                                 |
+ |      CCC   AA    SSS  TTTTT  EEEEE  PPPP        |
+ |     C     A  A  S       T    E      P   P       |
+ |     C     AAAA   SS     T    EEE    PPPP        |
+ |     C     A  A     S    T    E      P           |
+ |      CCC  A  A  SSS     T    EEEEE  P           |
+ |                                                 |
+ +-------------------------------------------------+
+ |                                                 |
+ | Welcome to Academic Release CASTEP version 21.11|          
+ | Ab Initio Total Energy Program                  |
+ |                                                 |
+ | Authors:                                        |
+ | M. Segall, M. Probert, C. Pickard, P. Hasnip,   |
+ | S. Clark, K. Refson, J. R. Yates, M. Payne      |
+ |                                                 |
+ | Contributors:                                   |
+ | P. Lindan, P. Haynes, J. White, V. Milman,      |
+ | N. Govind, M. Gibson, P. Tulip, V. Cocula,      |
+ | B. Montanari, D. Quigley, M. Glover,            |
+ | L. Bernasconi, A. Perlov, M. Plummer,           |
+ | E. McNellis, J. Meyer, J. Gale, D. Jochym       |
+ | J. Aarons, B. Walker, R. Gillen, D. Jones       |
+ | T. Green, I. J. Bush, C. J. Armstrong,          |
+ | E. J. Higgins, E. L. Brown, M. S. McFly,        |
+ | J. Wilkins, B-C. Shih, P. J. P. Byrne,          |
+ | R. J. Maurer, J. C. Womack, J. Dziedzic,        |
+ | A. Bartok-Partay, L. LeBlanc                    |
+ |                                                 |
+ | Copyright (c) 2000 - 2021                       |
+ |                                                 |
+ |     Distributed under license from Cambridge    |
+ |     Enterprise for academic use only.           |
+ |                                                 |
+ | Please cite                                     |
+ |                                                 |
+ |     "First principles methods using CASTEP"     |
+ |                                                 |
+ |         Zeitschrift fuer Kristallographie       |
+ |           220(5-6) pp. 567-570 (2005)           |
+ |                                                 |
+ | S. J. Clark, M. D. Segall, C. J. Pickard,       |
+ | P. J. Hasnip, M. J. Probert, K. Refson,         |
+ | M. C. Payne                                     |
+ |                                                 |
+ |       in all publications arising from          |
+ |              your use of CASTEP                 |
+ |                                                 |
+ +-------------------------------------------------+
+ |                                                 |
+ |              http://www.castep.org              |
+ |                                                 |
+ +-------------------------------------------------+
+ 
+ 
+ 
+ Compiled for linux_x86_64_ifort on Fri, 17 Jun 2022 10:02:44 +0100
+ from code version 7d4405a8a+  HEAD  Sat Nov 27 13:38:33 2021 +0000
+ Compiler: Intel Fortran 2021.4.0; Optimisation: fast
+ MATHLIBS: Intel MKL(2021.4-Product) (LAPACK version 3.9.0)
+ FFT Lib : default
+ Fundamental constants values: CODATA 2014
+ 
+ Run started: Tue, 29 Sep 2026 09:42:07 +0100
+ +-------------------------------------------------+
+ |                                                 |
+ |           N   N    M   M    RRRR                |
+ |           NN  N    MM MM    R   R               |
+ |           N N N    M M M    RRRR                |
+ |           N  NN    M   M    R  R                |
+ |           N   N    M   M    R   R               |
+ |                                                 |
+ +-------------------------------------------------+
+ |                                                 |
+ | Welcome to Materials Studio CASTEP-NMR          |
+ |                                                 |
+ | Authors:                                        |
+ | J.R. Yates, C.J. Pickard, F. Mauri              |
+ |                                                 |
+ | Contributors:                                   |
+ | T.F.G. Green, S.A. Joyce, R.T. Strong,          |
+ | B-C. Shih                                       |
+ |                                                 |
+ | Copyright (c) 2004 - 2021                       |
+ |                                                 |
+ | Please cite the appropriate publications in all |
+ | work arising from your use of CASTEP NMR.       |
+ |                                                 |
+ | For NMR Shielding Tensors cite:                 |
+ |    "All-electron magnetic response with         |
+ |    pseudopotentials: NMR chemical shifts",      |
+ |    C. J. Pickard, F. Mauri;                     |
+ |    Physical Review B63 245101 (2001), and       |
+ |                                                 |
+ |    "Calculation of NMR Chemical Shifts          |
+ |    for extended systems using                   |
+ |    Ultrasoft Pseudopotentials",                 |
+ |    J. R. Yates, C. J. Pickard and F. Mauri      |
+ |    Physical Review B76 024401 (2007)            |
+ |                                                 |
+ | For Electric Field Gradients cite:              |
+ |   "Accurate First Principles Prediction of 17O  |
+ |    NMR Parameters in SiO2: Assignment of the    |
+ |    Zeolite Ferrierite Spectrum"                 |
+ |    M. Profeta, F. Mauri and C. J. Pickard       |
+ |    J. Amer. Chem. Soc. 125 541 (2003)           |
+ |                                                 |
+ | For Spin-Spin (J) Couplings cite:               |
+ |   "A first principles theory of NMR J-coupling  |
+ |   in solid-state systems"                       |
+ |   S.A. Joyce, J.R. Yates, C.J. Pickard, F. Mauri|
+ |   J. Chem. Phys. 127 204107 (2007)              |
+ |                                                 |
+ |   "Relativistic NMR J-coupling with ultrasoft   |
+ |   pseudopotentials and the zeroth-order regular |
+ |   approximation"                                |
+ |   T.F.G. Green and J.R. Yates                   |
+ |   J. Chem. Phys. 140 234106 (2014)              |
+ |                                                 |
+ +-------------------------------------------------+
+ 
+ 
+ Atomic calculation performed for O: 1s2 2s2 2p4
+ 
+ Converged in 61 iterations to an ae energy of -2040.902 eV
+ 
+   ============================================================                
+   | Pseudopotential Report - Date of generation 29-09-2026   |                
+   ------------------------------------------------------------                
+   | Element: O Ionic charge:  6.00 Level of theory: PBE      |                
+   | Atomic Solver: Koelling-Harmon                           |                
+   |                                                          |                
+   |               Reference Electronic Structure             |                
+   |         Orbital         Occupation         Energy        |                
+   |            2s              2.000           -0.881        |                
+   |            2p              4.000           -0.332        |                
+   |                                                          |                
+   |                 Pseudopotential Definition               |                
+   |        Beta     l      e      Rc     scheme   norm       |                
+   |          1      0   -0.881   1.100     qc      0         |                
+   |          2      0    0.250   1.100     qc      0         |                
+   |          3      1   -0.332   1.100     qc      0         |                
+   |          4      1    0.250   1.100     qc      0         |                
+   |         loc     2    0.000   1.100     pn      0         |                
+   |                                                          |                
+   | Augmentation charge Rinner = 0.769                       |                
+   | Partial core correction Rc = 0.769                       |                
+   ------------------------------------------------------------                
+   | "2|1.1|17|20|23|20:21(qc=8)"                             |                
+   ------------------------------------------------------------                
+   |      Author: Chris J. Pickard, Cambridge University      |                
+   ============================================================                
+ 
+ Atomic calculation performed for Si: 1s2 2s2 2p6 3s2 3p2
+ 
+ Converged in 54 iterations to an ae energy of -7886.857 eV
+ 
+   ============================================================                
+   | Pseudopotential Report - Date of generation 29-09-2026   |                
+   ------------------------------------------------------------                
+   | Element: Si Ionic charge:  4.00 Level of theory: PBE     |                
+   | Atomic Solver: Koelling-Harmon                           |                
+   |                                                          |                
+   |               Reference Electronic Structure             |                
+   |         Orbital         Occupation         Energy        |                
+   |            3s              2.000           -0.397        |                
+   |            3p              2.000           -0.150        |                
+   |                                                          |                
+   |                 Pseudopotential Definition               |                
+   |        Beta     l      e      Rc     scheme   norm       |                
+   |          1      0   -0.397   1.797     qc      0         |                
+   |          2      0    0.250   1.797     qc      0         |                
+   |          3      1   -0.150   1.797     qc      0         |                
+   |          4      1    0.250   1.797     qc      0         |                
+   |          5      2    0.000   1.797     qc      0         |                
+   |          6      2    0.250   1.797     qc      0         |                
+   |         loc     3    0.000   1.797     pn      0         |                
+   |                                                          |                
+   | Augmentation charge Rinner = 1.255                       |                
+   | Partial core correction Rc = 1.255                       |                
+   ------------------------------------------------------------                
+   | "3|1.8|5|6|7|30:31:32"                                   |                
+   ------------------------------------------------------------                
+   |      Author: Chris J. Pickard, Cambridge University      |                
+   ============================================================                
+ 
+ Pseudo atomic calculation performed for O 2s2 2p4
+ 
+ Converged in 34 iterations to a total energy of -432.3399 eV
+ 
+ Pseudo atomic calculation performed for Si 3s2 3p2
+ 
+ Converged in 20 iterations to a total energy of -165.0692 eV
+ Calculation parallelised over 42 processes.
+ Data is distributed by G-vector(3-way) and k-point(14-way)
+
+ ************************************ Title ************************************
+ 
+
+ ***************************** General Parameters ******************************
+  
+ output verbosity                               : normal  (1)
+ write checkpoint data to                       : castep.check
+ type of calculation                            : Magnetic Resonance
+ stress calculation                             : off
+ density difference calculation                 : off
+ electron localisation func (ELF) calculation   : off
+ Hirshfeld analysis                             : off
+ polarisation (Berry phase) analysis            : off
+ molecular orbital projected DOS                : off
+ deltaSCF calculation                           : off
+ unlimited duration calculation
+ timing information                             : on
+ memory usage estimate                          : on
+ write extra output files                       : on
+ write final potential to formatted file        : off
+ write final density to formatted file          : off
+ write BibTeX reference list                    : on
+ write OTFG pseudopotential files               : on
+ write electrostatic potential file             : on
+ write bands file                               : on
+ checkpoint writing                             : both castep_bin and check files
+  
+ output         length unit                     : A
+ output           mass unit                     : amu
+ output           time unit                     : ps
+ output         charge unit                     : e
+ output           spin unit                     : hbar/2
+ output         energy unit                     : eV
+ output          force unit                     : eV/A
+ output       velocity unit                     : A/ps
+ output       pressure unit                     : GPa
+ output     inv_length unit                     : 1/A
+ output      frequency unit                     : cm-1
+ output force constant unit                     : eV/A**2
+ output         volume unit                     : A**3
+ output   IR intensity unit                     : (D/A)**2/amu
+ output         dipole unit                     : D
+ output         efield unit                     : eV/A/e
+ output        entropy unit                     : J/mol/K
+ output    efield chi2 unit                     : pm/V
+  
+ wavefunctions paging                           : none
+ random number generator seed                   : randomised (94207229)
+ data distribution                              : optimal for this architecture
+ optimization strategy                          : balance speed and memory
+
+ *********************** Exchange-Correlation Parameters ***********************
+  
+ using functional                               : Perdew Burke Ernzerhof
+ relativistic treatment                         : Koelling-Harmon
+ DFT+D: Semi-empirical dispersion correction    : off
+
+ ************************* Pseudopotential Parameters **************************
+  
+ pseudopotential representation                 : reciprocal space
+ <beta|phi> representation                      : reciprocal space
+ spin-orbit coupling                            : off
+
+ **************************** Basis Set Parameters *****************************
+  
+ plane wave basis set cut-off                   :   900.0000   eV
+ size of standard grid                          :     1.7500
+ size of   fine   gmax                          :    26.8966   1/A
+ finite basis set correction                    : none
+
+ **************************** Electronic Parameters ****************************
+  
+ number of  electrons                           :  128.0    
+ net charge of system                           :  0.000    
+ treating system as non-spin-polarized
+ number of bands                                :         77
+
+ ********************* Electronic Minimization Parameters **********************
+  
+ Method: Treating system as metallic with density mixing treatment of electrons,
+         and number of  SD  steps               :          1
+         and number of  CG  steps               :          4
+  
+ total energy / atom convergence tol.           : 0.1000E-07   eV
+ eigen-energy convergence tolerance             : 0.3750E-08   eV
+ max force / atom convergence tol.              : ignored
+ convergence tolerance window                   :          3   cycles
+ max. number of SCF cycles                      :         30
+ number of fixed-spin iterations                :         10
+ smearing scheme                                : Gaussian
+ smearing width                                 : 0.2000       eV
+ Fermi energy convergence tolerance             : 0.2721E-13   eV
+ periodic dipole correction                     : NONE
+
+ ************************** Density Mixing Parameters **************************
+  
+ density-mixing scheme                          : Broyden
+ max. length of mixing history                  :         20
+ charge density mixing amplitude                : 0.8000    
+ cut-off energy for mixing                      :  900.0       eV
+
+ *********************** Population Analysis Parameters ************************
+  
+ Population analysis with cutoff                :  3.000       A
+ Population analysis output                     : summary and pdos components
+
+ ************************ Magnetic Resonance Parameters ************************
+  
+ Magnetic Resonance Property                    : Chemical Shielding + EFG
+ Position Operator Method                       : crystal
+ max. number of MagRes CG steps                 :        250
+ convergence tolerance window                   :          2   cycles
+ energy convergence tolerance                   : 0.1000E-11   eV
+ band convergence tolerance                     : 0.1000E-08   eV
+
+ *******************************************************************************
+  
+ 
+                           -------------------------------
+                                      Unit Cell
+                           -------------------------------
+        Real Lattice(A)                      Reciprocal Lattice(1/A)
+     7.4000000     0.0000000     0.0000000        0.849079096   0.000000000   0.000000000
+     0.0000000     7.4000000     0.0000000        0.000000000   0.849079096   0.000000000
+     0.0000000     0.0000000     7.4000000        0.000000000   0.000000000   0.849079096
+ 
+                       Lattice parameters(A)       Cell Angles
+                    a =      7.400000          alpha =   90.000000
+                    b =      7.400000          beta  =   90.000000
+                    c =      7.400000          gamma =   90.000000
+ 
+                       Current cell volume =           405.224000       A**3
+                                   density =             1.186194   AMU/A**3
+                                           =             1.969722     g/cm^3
+ 
+                           -------------------------------
+                                     Cell Contents
+                           -------------------------------
+                         Total number of ions in cell =   24
+                      Total number of species in cell =    2
+                        Max number of any one species =   16
+ 
+            xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+            x  Element    Atom        Fractional coordinates of atoms  x
+            x            Number           u          v          w      x
+            x----------------------------------------------------------x
+            x  O            1         0.875000   0.875000   0.125000   x 
+            x  O            2         0.125000   0.625000   0.625000   x 
+            x  O            3         0.625000   0.375000   0.875000   x 
+            x  O            4         0.375000   0.125000   0.375000   x 
+            x  O            5         0.125000   0.875000   0.875000   x 
+            x  O            6         0.625000   0.125000   0.625000   x 
+            x  O            7         0.875000   0.625000   0.375000   x 
+            x  O            8         0.375000   0.375000   0.125000   x 
+            x  O            9         0.875000   0.125000   0.875000   x 
+            x  O           10         0.625000   0.625000   0.125000   x 
+            x  O           11         0.375000   0.875000   0.625000   x 
+            x  O           12         0.125000   0.375000   0.375000   x 
+            x  O           13         0.625000   0.875000   0.375000   x 
+            x  O           14         0.375000   0.625000   0.875000   x 
+            x  O           15         0.875000   0.375000   0.625000   x 
+            x  O           16         0.125000   0.125000   0.125000   x 
+            x  Si           1         0.250000   0.250000   0.250000   x 
+            x  Si           2         0.750000   0.250000   0.750000   x 
+            x  Si           3         0.250000   0.750000   0.750000   x 
+            x  Si           4         0.750000   0.750000   0.250000   x 
+            x  Si           5         0.000000   0.500000   0.500000   x 
+            x  Si           6         0.000000   0.000000   0.000000   x 
+            x  Si           7         0.500000   0.500000   0.000000   x 
+            x  Si           8         0.500000   0.000000   0.500000   x 
+            xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+ 
+ 
+                         No user defined ionic velocities
+ 
+                           -------------------------------
+                                   Details of Species
+                           -------------------------------
+ 
+                               Mass of species in AMU
+                                    O   15.9994000
+                                    Si   28.0855000
+ 
+                          Electric Quadrupole Moment (Barn)
+                                    O   -0.0255800 Isotope 17
+                                    Si    1.0000000 No Isotope Defined
+ 
+                          Files used for pseudopotentials:
+                                    O 2|1.1|17|20|23|20:21(qc=8)
+                                    Si 3|1.8|5|6|7|30:31:32
+ 
+                           -------------------------------
+                              k-Points For BZ Sampling
+                           -------------------------------
+                       MP grid size for SCF calculation is  3  3  3
+                            with an offset of   0.000  0.000  0.000
+                       Number of kpoints used =            14
+ 
+                           -------------------------------
+                               Symmetry and Constraints
+                           -------------------------------
+ 
+                      Cell is a supercell containing 4 primitive cells
+                      Maximum deviation from symmetry =  0.00000         ANG
+ 
+                      Number of symmetry operations   =           1
+                      Number of ionic constraints     =           3
+                      Point group of crystal =     1: C1, 1, 1
+                      Space group of crystal =   227: Fd-3m, F 4d 2 3 -1d
+ 
+             Set iprint > 1 for details on symmetry rotations/translations
+ 
+                         Centre of mass is constrained
+             Set iprint > 1 for details of linear ionic constraints
+ 
+                         Number of cell constraints= 0
+                         Cell constraints are:  1 2 3 4 5 6
+ 
+                         External pressure/stress (GPa)
+                          0.00000   0.00000   0.00000
+                                    0.00000   0.00000
+                                              0.00000
+  
++---------------- MEMORY AND SCRATCH DISK ESTIMATES PER PROCESS --------------+
+|                                                     Memory          Disk    |
+| Baseline code, static data and system overhead     6210.0 MB         0.0 MB |
+| BLAS internal memory storage                          0.0 MB         0.0 MB |
+| Model and support data                              218.2 MB       280.6 MB |
+| Electronic energy minimisation requirements          83.4 MB         0.0 MB |
+| Force calculation requirements                       17.1 MB         0.0 MB |
+|                                               ----------------------------- |
+| Approx. total storage required per process         6511.7 MB       280.6 MB |
+|                                                                             |
+| Requirements will fluctuate during execution and may exceed these estimates |
++-----------------------------------------------------------------------------+
+Calculating approximate eigenstates for fixed initial Hamiltonian
+Cut-off for approx. calculation is  108.886 eV
+Improving approx. states at cut-off of  450.000 eV
+Resetting cut-off to  900.000 eV
+Calculating total energy with cut-off of  900.000 eV.
+------------------------------------------------------------------------ <-- SCF
+SCF loop      Energy           Fermi           Energy gain       Timer   <-- SCF
+                               energy          per atom          (sec)   <-- SCF
+------------------------------------------------------------------------ <-- SCF
+Initial  -7.94789420E+003  0.00000000E+000                        13.27  <-- SCF
+      1  -8.44396869E+003  2.45930909E+000   2.06697707E+001      20.26  <-- SCF
+      2  -8.44429806E+003  2.45698293E+000   1.37235521E-002      26.46  <-- SCF
+      3  -8.43535207E+003  3.20738990E+000  -3.72749422E-001      33.58  <-- SCF
+      4  -8.42832918E+003  3.12958113E+000  -2.92620511E-001      41.66  <-- SCF
+      5  -8.42840292E+003  3.23446610E+000   3.07249612E-003      49.18  <-- SCF
+      6  -8.42844816E+003  3.37304872E+000   1.88509717E-003      55.88  <-- SCF
+      7  -8.42846270E+003  3.41416448E+000   6.05892573E-004      61.60  <-- SCF
+      8  -8.42846416E+003  3.41867012E+000   6.06647936E-005      68.01  <-- SCF
+      9  -8.42846416E+003  3.41708423E+000   1.32013089E-007      75.16  <-- SCF
+     10  -8.42846415E+003  3.41570414E+000  -4.01255231E-007      81.37  <-- SCF
+     11  -8.42846415E+003  3.41539351E+000  -2.63455413E-008      86.59  <-- SCF
+     12  -8.42846415E+003  3.41536303E+000   8.78704604E-010      91.83  <-- SCF
+     13  -8.42846415E+003  3.41534633E+000   5.70571502E-010      96.80  <-- SCF
+------------------------------------------------------------------------ <-- SCF
+ 
+Final energy, E             =  -8428.464151053     eV
+Final free energy (E-TS)    =  -8428.464151053     eV
+(energies not corrected for finite basis set)
+ 
+NB est. 0K energy (E-0.5TS)      =  -8428.464151053     eV
+ 
+
+Writing analysis data to castep.castep_bin
+
+Writing model to castep.check
+ 
+  =====================================================================
+  +       Calculation of Nuclear Magnetic Resonance Parameters        +
+  + ================================================================= +
+ 
+  Starting Calculation of Electric Field Gradient Tensors         |<-- EFG
+  +---------------- MEMORY AND SCRATCH DISK ESTIMATES PER PROCESS --------------+
+  |                                                     Memory          Disk    |
+  | Model and support data                              223.0 MB       280.6 MB |
+  | NMR EFG calculation requirements                     40.1 MB         0.0 MB |
+  |                                               ----------------------------- |
+  | Approx. total storage required per process          263.1 MB       280.6 MB |
+  |                                                                             |
+  | Requirements will fluctuate during execution and may exceed these estimates |
+  +-----------------------------------------------------------------------------+
+  Total Time for EFG Tensors                      30.01 sec       |<-- EFG
+ 
+  Starting Calculation of Chemical Shielding Tensors              |<-- NMR
+  +---------------- MEMORY AND SCRATCH DISK ESTIMATES PER PROCESS --------------+
+  |                                                     Memory          Disk    |
+  | Model and support data                              223.0 MB       280.6 MB |
+  | NMR chemical shift calculation requirements          67.9 MB        19.5 MB |
+  |                                               ----------------------------- |
+  | Approx. total storage required per process          290.9 MB       300.1 MB |
+  |                                                                             |
+  | Requirements will fluctuate during execution and may exceed these estimates |
+  +-----------------------------------------------------------------------------+
+  Starting k-point:   1 of   1                                    |<-- NMR
+  Total Time for step 1 of 6:                    100.71 sec       |<-- NMR
+  Total Time for step 2 of 6:                    100.72 sec       |<-- NMR
+  Total Time for step 3 of 6:                    100.45 sec       |<-- NMR
+  Total Time for step 4 of 6:                    100.27 sec       |<-- NMR
+  Total Time for step 5 of 6:                    100.96 sec       |<-- NMR
+  Total Time for step 6 of 6:                     99.85 sec       |<-- NMR
+  Total Time for Chemical Shielding Tensors      791.74 sec       |<-- NMR
+ 
+  ===============================================================================
+  |                Chemical Shielding and Electric Field Gradient Tensors       |
+  |-----------------------------------------------------------------------------|
+  |     Nucleus                       Shielding tensor             EFG Tensor   |
+  |    Species            Ion    Iso(ppm)   Aniso(ppm)  Asym    Cq(MHz)    Eta  |
+  |    O                  1      230.92      99.76      0.00  -6.047E+00   0.00 |
+  |    O                  2      230.88      99.77      0.00  -6.047E+00   0.00 |
+  |    O                  3      230.94      99.74      0.00  -6.047E+00   0.00 |
+  |    O                  4      230.89      99.79      0.00  -6.047E+00   0.00 |
+  |    O                  5      230.99      99.67      0.00  -6.047E+00   0.00 |
+  |    O                  6      230.89      99.75      0.00  -6.047E+00   0.00 |
+  |    O                  7      230.89      99.80      0.00  -6.047E+00   0.00 |
+  |    O                  8      230.89      99.78      0.00  -6.047E+00   0.00 |
+  |    O                  9      230.94      99.73      0.00  -6.047E+00   0.00 |
+  |    O                 10      230.89      99.76      0.00  -6.047E+00   0.00 |
+  |    O                 11      230.91      99.77      0.00  -6.047E+00   0.00 |
+  |    O                 12      230.88      99.81      0.00  -6.047E+00   0.00 |
+  |    O                 13      230.94      99.73      0.00  -6.047E+00   0.00 |
+  |    O                 14      230.94      99.74      0.00  -6.047E+00   0.00 |
+  |    O                 15      230.89      99.80      0.00  -6.047E+00   0.00 |
+  |    O                 16      230.89      99.74      0.00  -6.047E+00   0.00 |
+  |    Si                 1      459.15      -0.06      0.54   3.103E-04   0.83 |
+  |    Si                 2      459.15      -0.06      0.52   4.538E-04   0.53 |
+  |    Si                 3      459.14      -0.06      0.52  -3.452E-04   0.82 |
+  |    Si                 4      459.15      -0.05      0.47   2.732E-04   0.26 |
+  |    Si                 5      459.15      -0.05      0.62  -2.901E-04   0.95 |
+  |    Si                 6      459.12      -0.08      0.68   3.851E-04   0.05 |
+  |    Si                 7      459.13       0.06      1.00  -3.705E-04   0.84 |
+  |    Si                 8      459.14      -0.06      0.61   2.663E-04   0.94 |
+  ===============================================================================
+ 
+ ************************** Forces **************************
+ *                                                          *
+ *               Cartesian components (eV/A)                *
+ * -------------------------------------------------------- *
+ *                         x            y            z      *
+ *                                                          *
+ * O               1      0.00000     -0.00000      0.00000 *
+ * O               2      0.00001      0.00001      0.00002 *
+ * O               3     -0.00000      0.00001     -0.00000 *
+ * O               4      0.00000     -0.00002      0.00000 *
+ * O               5      0.00001      0.00000      0.00001 *
+ * O               6      0.00001      0.00001      0.00000 *
+ * O               7     -0.00003      0.00001     -0.00001 *
+ * O               8      0.00000      0.00002     -0.00002 *
+ * O               9      0.00001      0.00001     -0.00001 *
+ * O              10     -0.00001     -0.00001     -0.00001 *
+ * O              11      0.00001     -0.00000      0.00001 *
+ * O              12     -0.00002     -0.00001     -0.00002 *
+ * O              13      0.00001     -0.00001     -0.00000 *
+ * O              14      0.00001     -0.00001      0.00001 *
+ * O              15     -0.00001     -0.00001      0.00000 *
+ * O              16     -0.00001     -0.00000     -0.00001 *
+ * Si              1     -0.00001     -0.00000     -0.00003 *
+ * Si              2      0.00000     -0.00001     -0.00001 *
+ * Si              3      0.00002      0.00001      0.00001 *
+ * Si              4     -0.00001      0.00000     -0.00000 *
+ * Si              5     -0.00002     -0.00001      0.00001 *
+ * Si              6      0.00001      0.00000     -0.00000 *
+ * Si              7      0.00000      0.00002     -0.00000 *
+ * Si              8      0.00001     -0.00001      0.00003 *
+ *                                                          *
+ ************************************************************
+ 
+ Pseudo atomic calculation performed for O 2s2 2p4
+ 
+ Converged in 34 iterations to a total energy of -432.3399 eV
+ 
+ Pseudo atomic calculation performed for Si 3s2 3p2
+ 
+ Converged in 20 iterations to a total energy of -165.0692 eV
+Charge spilling parameter for spin component 1 = 1.22%
+ 
+            Orbital Populations       
+     Ion    Atom   Orbital             Charge
+  -------------------------------------------
+      O     1      S                    1.819
+      O     1      Px                   1.803
+      O     1      Py                   1.803
+      O     1      Pz                   1.803
+      O     2      S                    1.819
+      O     2      Px                   1.802
+      O     2      Py                   1.803
+      O     2      Pz                   1.802
+      O     3      S                    1.819
+      O     3      Px                   1.803
+      O     3      Py                   1.803
+      O     3      Pz                   1.802
+      O     4      S                    1.819
+      O     4      Px                   1.803
+      O     4      Py                   1.803
+      O     4      Pz                   1.802
+      O     5      S                    1.819
+      O     5      Px                   1.803
+      O     5      Py                   1.803
+      O     5      Pz                   1.802
+      O     6      S                    1.819
+      O     6      Px                   1.803
+      O     6      Py                   1.803
+      O     6      Pz                   1.802
+      O     7      S                    1.819
+      O     7      Px                   1.803
+      O     7      Py                   1.803
+      O     7      Pz                   1.802
+      O     8      S                    1.819
+      O     8      Px                   1.803
+      O     8      Py                   1.803
+      O     8      Pz                   1.802
+      O     9      S                    1.819
+      O     9      Px                   1.803
+      O     9      Py                   1.803
+      O     9      Pz                   1.802
+      O    10      S                    1.819
+      O    10      Px                   1.802
+      O    10      Py                   1.803
+      O    10      Pz                   1.803
+      O    11      S                    1.819
+      O    11      Px                   1.803
+      O    11      Py                   1.803
+      O    11      Pz                   1.803
+      O    12      S                    1.819
+      O    12      Px                   1.802
+      O    12      Py                   1.803
+      O    12      Pz                   1.802
+      O    13      S                    1.819
+      O    13      Px                   1.803
+      O    13      Py                   1.802
+      O    13      Pz                   1.802
+      O    14      S                    1.819
+      O    14      Px                   1.803
+      O    14      Py                   1.803
+      O    14      Pz                   1.802
+      O    15      S                    1.819
+      O    15      Px                   1.803
+      O    15      Py                   1.803
+      O    15      Pz                   1.803
+      O    16      S                    1.819
+      O    16      Px                   1.803
+      O    16      Py                   1.802
+      O    16      Pz                   1.802
+     Si     1      S                    0.523
+     Si     1      Px                   0.341
+     Si     1      Py                   0.341
+     Si     1      Pz                   0.341
+     Si     2      S                    0.523
+     Si     2      Px                   0.341
+     Si     2      Py                   0.341
+     Si     2      Pz                   0.341
+     Si     3      S                    0.523
+     Si     3      Px                   0.341
+     Si     3      Py                   0.341
+     Si     3      Pz                   0.341
+     Si     4      S                    0.523
+     Si     4      Px                   0.341
+     Si     4      Py                   0.341
+     Si     4      Pz                   0.341
+     Si     5      S                    0.523
+     Si     5      Px                   0.341
+     Si     5      Py                   0.341
+     Si     5      Pz                   0.341
+     Si     6      S                    0.523
+     Si     6      Px                   0.341
+     Si     6      Py                   0.341
+     Si     6      Pz                   0.341
+     Si     7      S                    0.523
+     Si     7      Px                   0.341
+     Si     7      Py                   0.341
+     Si     7      Pz                   0.341
+     Si     8      S                    0.523
+     Si     8      Px                   0.341
+     Si     8      Py                   0.341
+     Si     8      Pz                   0.341
+  -------------------------------------------
+                           Total:     127.998
+  -------------------------------------------
+ 
+     Atomic Populations (Mulliken)
+     -----------------------------
+Species          Ion     s       p       d       f      Total   Charge (e)
+==========================================================================
+  O               1     1.819   5.408   0.000   0.000   7.227    -1.227
+  O               2     1.819   5.407   0.000   0.000   7.227    -1.227
+  O               3     1.819   5.408   0.000   0.000   7.227    -1.227
+  O               4     1.819   5.408   0.000   0.000   7.227    -1.227
+  O               5     1.819   5.408   0.000   0.000   7.227    -1.227
+  O               6     1.819   5.408   0.000   0.000   7.227    -1.227
+  O               7     1.819   5.408   0.000   0.000   7.227    -1.227
+  O               8     1.819   5.408   0.000   0.000   7.227    -1.227
+  O               9     1.819   5.408   0.000   0.000   7.227    -1.227
+  O              10     1.819   5.408   0.000   0.000   7.227    -1.227
+  O              11     1.819   5.408   0.000   0.000   7.227    -1.227
+  O              12     1.819   5.408   0.000   0.000   7.227    -1.227
+  O              13     1.819   5.407   0.000   0.000   7.227    -1.227
+  O              14     1.819   5.408   0.000   0.000   7.227    -1.227
+  O              15     1.819   5.408   0.000   0.000   7.227    -1.227
+  O              16     1.819   5.408   0.000   0.000   7.227    -1.227
+  Si              1     0.523   1.023   0.000   0.000   1.546     2.454
+  Si              2     0.523   1.023   0.000   0.000   1.546     2.454
+  Si              3     0.523   1.023   0.000   0.000   1.546     2.454
+  Si              4     0.523   1.023   0.000   0.000   1.546     2.454
+  Si              5     0.523   1.023   0.000   0.000   1.546     2.454
+  Si              6     0.523   1.023   0.000   0.000   1.546     2.454
+  Si              7     0.523   1.023   0.000   0.000   1.546     2.454
+  Si              8     0.523   1.023   0.000   0.000   1.546     2.454
+==========================================================================
+ 
+                 Bond                   Population      Length (A)
+======================================================================
+              O 10 -- Si 7                   0.52        1.60215
+              O 6  -- Si 8                   0.52        1.60215
+              O 2  -- Si 5                   0.52        1.60215
+              O 15 -- Si 5                   0.52        1.60215
+              O 14 -- Si 7                   0.52        1.60215
+              O 13 -- Si 8                   0.52        1.60215
+              O 11 -- Si 8                   0.52        1.60215
+              O 7  -- Si 5                   0.52        1.60215
+              O 3  -- Si 7                   0.52        1.60215
+              O 16 -- Si 6                   0.52        1.60215
+              O 16 -- Si 1                   0.52        1.60215
+              O 12 -- Si 5                   0.52        1.60215
+              O 12 -- Si 1                   0.52        1.60215
+              O 9  -- Si 6                   0.52        1.60215
+              O 9  -- Si 2                   0.52        1.60215
+              O 8  -- Si 7                   0.52        1.60215
+              O 8  -- Si 1                   0.52        1.60215
+              O 5  -- Si 6                   0.52        1.60215
+              O 5  -- Si 3                   0.52        1.60215
+              O 4  -- Si 8                   0.52        1.60215
+              O 4  -- Si 1                   0.52        1.60215
+              O 1  -- Si 6                   0.52        1.60215
+              O 1  -- Si 4                   0.52        1.60215
+              O 15 -- Si 2                   0.52        1.60215
+              O 14 -- Si 3                   0.52        1.60215
+              O 13 -- Si 4                   0.52        1.60215
+              O 11 -- Si 3                   0.52        1.60215
+              O 7  -- Si 4                   0.52        1.60215
+              O 3  -- Si 2                   0.52        1.60215
+              O 10 -- Si 4                   0.52        1.60215
+              O 6  -- Si 2                   0.52        1.60215
+              O 2  -- Si 3                   0.52        1.60215
+              O 11 -- O 13                  -0.09        2.61630
+              O 8  -- O 10                  -0.09        2.61630
+              O 7  -- O 15                  -0.09        2.61630
+              O 4  -- O 6                   -0.09        2.61630
+              O 3  -- O 14                  -0.09        2.61630
+              O 2  -- O 12                  -0.09        2.61630
+              O 12 -- O 15                  -0.09        2.61630
+              O 10 -- O 14                  -0.09        2.61630
+              O 8  -- O 14                  -0.09        2.61630
+              O 7  -- O 12                  -0.09        2.61630
+              O 6  -- O 13                  -0.09        2.61630
+              O 6  -- O 11                  -0.09        2.61630
+              O 4  -- O 13                  -0.09        2.61630
+              O 4  -- O 11                  -0.09        2.61630
+              O 3  -- O 10                  -0.09        2.61630
+              O 3  -- O 8                   -0.09        2.61630
+              O 2  -- O 15                  -0.09        2.61630
+              O 2  -- O 7                   -0.09        2.61630
+              O 12 -- O 16                  -0.09        2.61630
+              O 9  -- O 16                  -0.09        2.61630
+              O 8  -- O 16                  -0.09        2.61630
+              O 8  -- O 12                  -0.09        2.61630
+              O 5  -- O 16                  -0.09        2.61630
+              O 5  -- O 9                   -0.09        2.61630
+              O 4  -- O 16                  -0.09        2.61630
+              O 4  -- O 12                  -0.09        2.61630
+              O 4  -- O 8                   -0.09        2.61630
+              O 1  -- O 16                  -0.09        2.61630
+              O 1  -- O 9                   -0.09        2.61630
+              O 1  -- O 5                   -0.09        2.61630
+              O 10 -- O 13                  -0.09        2.61630
+              O 9  -- O 15                  -0.09        2.61630
+              O 7  -- O 10                  -0.09        2.61630
+              O 6  -- O 15                  -0.09        2.61630
+              O 5  -- O 14                  -0.09        2.61630
+              O 5  -- O 11                  -0.09        2.61630
+              O 3  -- O 9                   -0.09        2.61630
+              O 3  -- O 6                   -0.09        2.61630
+              O 2  -- O 14                  -0.09        2.61630
+              O 2  -- O 11                  -0.09        2.61630
+              O 1  -- O 13                  -0.09        2.61630
+              O 1  -- O 7                   -0.09        2.61630
+              O 11 -- O 14                  -0.09        2.61630
+              O 7  -- O 13                  -0.09        2.61630
+              O 6  -- O 9                   -0.09        2.61630
+              O 3  -- O 15                  -0.09        2.61630
+              O 2  -- O 5                   -0.09        2.61630
+              O 1  -- O 10                  -0.09        2.61630
+======================================================================
+ 
+
+Writing analysis data to castep.castep_bin
+
+Writing model to castep.check
+ 
+ A BibTeX formatted list of references used in this run has been written to 
+ castep.bib
+ 
+Initialisation time =      6.40 s
+Calculation time    =    917.33 s
+Finalisation time   =      2.89 s
+Total time          =    926.63 s
+Peak Memory Use     = 7120584 kB
+  
+Overall parallel efficiency rating: Mediocre (57%)                              
+  
+Data was distributed by:-
+G-vector (3-way); efficiency rating: Mediocre (58%)                             
+k-point (14-way); efficiency rating: Excellent (97%)                            

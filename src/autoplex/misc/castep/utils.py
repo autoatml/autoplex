@@ -30,6 +30,7 @@ CASTEP_OUTPUT_FILES = [
     "*.den_fmt",
     "*.pot_fmt",
     "*.wvfn_fmt",
+    "*.magres",
     "final_atoms_object.xyz",
     "final_atoms_object.traj",
 ]
@@ -222,3 +223,63 @@ class CastepStaticSetGenerator(CastepInputGenerator):
         return {
             "kpoints_mp_spacing": "0.03",
         }
+
+
+@dataclass
+class CastepMagresSetGenerator(CastepInputGenerator):
+    """
+    Class to generate CASTEP input sets for task: magres (NMR prediction).
+
+    This class creates input parameters for CASTEP NMR predictions
+
+    Parameters
+    ----------
+    use_efg: bool
+        Whether to calculate the EFG alongside the shielding tensor, default True
+    **kwargs
+        Other keyword arguments passed to CastepInputGenerator
+    """
+
+    CONFIG: dict = field(
+        default_factory=lambda: {
+            "PARAM": {
+                "task": "magres",
+            }
+        }
+    )
+    use_efg: bool = True
+
+    @property
+    def param_updates(self) -> dict:
+        """
+        Get updates to the PARAM for a magres CASTEP job.
+
+        Returns
+        -------
+        dict
+            Dictionary of CASTEP .param file parameters for NMR prediction
+        """
+        # preliminary parameters from https://www.ccpnc.ac.uk/docs/castep-for-nmr-calculations#nmrcalculations
+        updates = {
+            "xc_functional": "PBE",
+            "cut_off_energy": 600.0,
+        }
+        if self.use_efg:
+            updates.update({"magres_task": "NMR"})
+            # NMR includes both EFG and MS
+        else:
+            updates.update({"magres_task": "SHIELDING"})
+            # might not be necessary since shielding is the default
+        return updates
+
+    @property
+    def cell_updates(self) -> dict:
+        """
+        Get updates to the CELL for a magres CASTEP job.
+
+        Returns
+        -------
+        dict
+            Dictionary of CASTEP .cell file parameters for NMR prediction
+        """
+        return {}
