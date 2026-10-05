@@ -486,6 +486,27 @@ def test_output_with_custom_builder(memory_jobstore, clean_dir):
     )
     assert len(read(job_rss.output.resolve(memory_jobstore), index=":")) == 3
 
+def test_output_with_amorphous_builder(memory_jobstore, clean_dir):
+    from ase.io import read
+
+    cmd =  "python -m autoplex.misc.utils.mock_custom_builder"
+    args = "SiO2 1.0"
+
+    job_rss = CustomRandomizedStructure(
+        custom_builder_cmd=cmd,
+        custom_builder_args=args,
+        pass_index_to_builder=False,
+        struct_number=3,
+        tag="SiO2",
+        output_file_name="random_structs.extxyz",
+        num_processes=4,
+    ).make()
+
+    responses = run_locally(
+        job_rss, ensure_success=True, create_folders=True, store=memory_jobstore
+    )
+    assert len(read(job_rss.output.resolve(memory_jobstore), index=":")) == 3
+
 
 def test_output_from_scratch_wo_buildcell_option(memory_jobstore, clean_dir):
     from ase.io import read
