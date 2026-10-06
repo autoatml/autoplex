@@ -80,7 +80,7 @@ strict-base = [
 
 strict-matgl = [
     "matgl==1.3.0; python_version < '3.11'",
-    "matgl[dgl]==3.0.2; python_version >= '3.11'",
+    "matgl[dgl]==4.1.0; python_version >= '3.11'",
     "torchdata==0.8.0; python_version >= '3.11'",
     "torchdata<=0.7.1; python_version < '3.11'",
     "torch==2.14.1; python_version >= '3.11'",
