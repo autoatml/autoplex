@@ -1012,7 +1012,7 @@ def cur_select(
             A = LinearOperator(at_descs.shape, matvec=mv, rmatvec=rmv, matmat=mv)
             return svds(A, k=num, return_singular_vectors=do_vectors)
 
-        (_, _, vt) = descriptor_svd(
+        _, _, vt = descriptor_svd(
             m, min(max(1, int(select_nums / 2)), min(m.shape) - 1)
         )
         c_scores = np.sum(vt**2, axis=0) / vt.shape[0]
