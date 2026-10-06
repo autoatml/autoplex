@@ -63,7 +63,7 @@ Each job returns a {class}`~autoplex.misc.castep.schema.TaskDoc`. The tensors ar
 
 ## Example systems
 
-We ran the workflow on cristobalite and amorphous SiO<sub>2</sub> structures from the dataset of [Ben Mahmoud et al., J. Chem. Phys. 163, 024118 (2025)](https://doi.org/10.1063/5.0274240) ([Zenodo, CC BY 4.0](https://doi.org/10.5281/zenodo.15775328)). The amorphous SiO<sub>2</sub> snapshot is the first structure in `test.xyz` of that dataset.
+We ran the workflow on cristobalite and amorphous SiO<sub>2</sub> structures from the dataset of [Ben Mahmoud et al., J. Chem. Phys. 163, 024118 (2025)](https://doi.org/10.1063/5.0274240) ([Zenodo, CC BY 4.0](https://doi.org/10.5281/zenodo.15775328)). The amorphous SiO<sub>2</sub> snapshot is the first structure in `test.xyz` of that dataset, alpha and beta cristobalite structures are structures 1 and 3 in `crystals.xyz` of that dataset.
 
 We used the settings shown above (PBE, 900 eV, shielding + EFG) with CASTEP 21.11 on 38–45 MPI processes on an HPC cluster, with additionally a fixed 3×3×3 k-point grid (`"kpoint_mp_grid": [3, 3, 3]` in `user_cell_settings`) for amorphous SiO<sub>2</sub>. The output and runtime of each structure is shown below:
 
