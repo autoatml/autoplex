@@ -96,7 +96,7 @@ def calculate_cell_size(
 
     Calculates the total mass of the given composition (`formula`),
     and divides by the `density` (given in g/cm^3) to give a cubic lattice parameter.
-    A percentage variation from `density` can be specified (`slack') to generate
+    A percentage variation from `density` can be specified (`slack`) to generate
     similuar cells of different volumes (useful if creating a convex hull, for instance).
 
     Parameters
