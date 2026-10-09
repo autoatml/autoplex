@@ -230,6 +230,25 @@ class RssConfig(AutoplexBaseModel):
         description="Expected number of generated "
         "randomized unit cells by buildcell.",
     )
+    builder: str | None = Field(
+        default="buildcell",
+        description="Builder to be used for generating random structures. "
+        "Currently only accepts 'buildcell' or 'custom'. Defaults to buildcell",
+    )
+    custom_builder_cmd: str | None = Field(
+        default=None,
+        description="Command to be called when using 'custom' option for builder. "
+        "Must be either an absolute path to executable, or accessible via $PATH",
+    )
+    custom_builder_args: str | dict[str, str] | None = Field(
+        default=None, description="Arguments to be passed to the custom builder command"
+    )
+    pass_index_to_builder: bool = Field(
+        default=False,
+        description="Whether the process index should be included in the final argument "
+        "string for the custom builder command (the index will always be appended as the "
+        "last argument)",
+    )
     cell_seed_paths: list[str] | None = Field(
         default=None, description="Custom buildcell control files."
     )
