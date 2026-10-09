@@ -23,7 +23,7 @@ def collect_nmr_data(
     nmr_dirs: list | None = None,
 ) -> dict:
     """
-    Collect NMR data from specified directories.
+    Collect NMR data from specified directories, writes '.extxyz' file to nmr_ref_dir for later data processing.
 
     Parameters
     ----------

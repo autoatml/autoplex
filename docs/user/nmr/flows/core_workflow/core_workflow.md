@@ -4,7 +4,7 @@ This tutorial covers the core workflow in automating NMR predictions via CASTEP,
 
 ## Overview
 
-Given a list of [pymatgen](https://pymatgen.org/) structures (usually given in a `.xyz` file) and user-defined parameters, CASTEP is called with `task: magres` (see the [CASTEP setup](../../../rss/flow/input/input.md#labelling-parameters) for how autoplex runs CASTEP) and returns `.magres` and `.castep` files, as well as the magnetic shielding (MS) and electric field gradient (EFG) tensors for each atom in each structure.
+Given a list of [pymatgen](https://pymatgen.org/) structures (usually given in a `.xyz` file) and user-defined parameters, CASTEP is called with `task: magres` (see the [CASTEP setup](../../../rss/flow/input/input.md#labelling-parameters) for how autoplex runs CASTEP) and produces `.magres` and `.castep` files. Afterwards magnetic shielding (MS) and electric field gradient (EFG) tensors are collected for all structures by writing to a single `.extxyz` file.
 
 ## General workflow
 
@@ -51,15 +51,24 @@ structures = [AseAtomsAdaptor.get_structure(structure) for structure in read("st
 This creates an array of pymatgen `Structure` objects which can then be passed into {class}`~autoplex.misc.castep.flows.CastepMagresFlowMaker`, which creates the `Flow` to be run locally or submitted to HPC (see the [jobflow-remote setup](../../../jobflowremote.md)):
 
 ```python
-from jobflow import run_locally
-
 from autoplex.misc.castep.flows import CastepMagresFlowMaker
 
 flow = CastepMagresFlowMaker(magres_maker=magres_maker).make(structures)
-run_locally(flow, create_folders=True)  # or jobflow-remote's submit_flow
 ```
 
-Each job returns a {class}`~autoplex.misc.castep.schema.TaskDoc`. The tensors are in `output.ms_tensor` (ppm) and `output.efg_tensor` (atomic units), with one 3×3 tensor per atom, ordered like `output.structure`. This may differ from the input order, because CASTEP groups atoms by element. The compressed `castep.castep.gz` and `castep.magres.gz` files stay in the job's `CASTEP/` folder.
+Compressed `castep.castep.gz` and `castep.magres.gz` files are produced in the job's `CASTEP/` folder. `CastepMagresFlowMaker.make()` outputs a list of directories pointing at the `CASTEP/` folder. Next, we collect from these directories using {func}`~autoplex.data.nmr.jobs.collect_nmr_data`, which reads `castep.magres.gz` from each directory (skipping runs that did not converge) and writes all structures to one extended XYZ file, containing NMR-labelled data:
+
+```python
+from jobflow import Flow, run_locally
+from autoplex.data.nmr.jobs import collect_nmr_data
+
+collect = collect_nmr_data(nmr_dirs=flow.output, nmr_ref_file="nmr_ref.extxyz")
+run_locally(Flow([flow, collect]), create_folders=True) # or jobflow-remote's submit_flow
+```
+
+Each atom carries its shielding and EFG tensors as the per-atom arrays `REF_ms` (ppm) and `REF_efg`
+(atomic units), each stored as 9 components (row by row), since extended XYZ cannot store 3×3 tensors.
+The file is written to the collector job's directory; its path is returned as `nmr_ref_dir`, ready for processing.
 
 ## Example systems
 
@@ -73,15 +82,22 @@ We used the settings shown above (PBE, 900 eV, shielding + EFG) with CASTEP 21.1
 | β-cristobalite | 24 | 459.1 | 230.9 | ~15 min |
 | Amorphous SiO<sub>2</sub> | 144 | 423.4 – 449.5 | 166.5 – 231.3 | ~42 h |
 
-Here σ<sub>iso</sub> is the isotropic shielding in ppm, i.e. one third of the trace of the shielding tensor. It can be computed directly from the job output:
+Here σ<sub>iso</sub> is the isotropic shielding in ppm, i.e. one third of the trace of the shielding tensor. It can be computed directly from the `.extxyz` file, using [`ase.io.read`](https://ase-lib.org/):
 
 ```python
 import numpy as np
+from ase.io import read
 
-sigma_iso = [np.trace(tensor) / 3 for tensor in output.ms_tensor]
+structures_out = read("nmr_ref.extxyz", index=":")
+ms = structures_out[0].arrays["REF_ms"].reshape(-1, 3, 3)
+#Take e.g. ms of first structure, convert back to 3x3 tensor. ["REF_efg"] gives efg tensors (if present).
+
+sigma_iso = np.trace(ms, axis1=1, axis2=2) / 3  
+#Compute isotropic shielding for each atom in structure.
+#NOTE: Atoms are listed in CASTEP’s order (grouped by element), which may differ from the order of the input structure. 
 ```
 
-To obtain the isotropic shielding and other NMR parameters from a `.magres` file, it can also be read into an ASE `Atoms` object with [`ase.io.read`](https://ase-lib.org/) and analysed with [Soprano](https://github.com/CCP-NC/soprano) ([docs](https://ccp-nc.github.io/soprano/)), a separate package that is not installed with autoplex. For large structures like amorphous SiO<sub>2</sub>, using fewer k-points can avoid large runtimes, at the cost of accuracy (using a single k-point reduces the runtime to ~1.5 hours in our case, with MAE in isotropic shielding ~0.05 vs ~0.007 ppm).
+To obtain other NMR parameters from a `.extxyz` file, follow the similar process above to obtain MS and EFG tensors. They can then be analysed with e.g. [Soprano](https://github.com/CCP-NC/soprano) ([docs](https://ccp-nc.github.io/soprano/)), a separate package that is not installed with autoplex. For large structures like amorphous SiO<sub>2</sub>, using fewer k-points can avoid large runtimes, at the cost of accuracy (using a single k-point reduces the runtime to ~1.5 hours in our case, with MAE in isotropic shielding ~0.05 vs ~0.007 ppm).
 
 Example `.magres` files for the cristobalite structures are located in [tests/test_data/castep/magres](https://github.com/autoatml/autoplex/tree/main/tests/test_data/castep/magres), and a snippet of the `.magres` output (see the [magres file format](https://www.ccpnc.ac.uk/docs/magres)) for amorphous SiO<sub>2</sub> is provided below:
 ```
@@ -119,7 +135,7 @@ O        2 Coordinates      1.501    9.423    5.435   A
 
 ## Next steps
 
-The core workflow can be extended to automatically train ML models for NMR prediction ([Ben Mahmoud et al, J. Chem. Phys. 163, 024118 (2025)](https://doi.org/10.1063/5.0274240)) in a similar workflow to {class}`~autoplex.auto.rss.flows.RssMaker` (see the {ref}`RSS workflow <rss>`). The outputted `.magres` files could be used in the same way for labelling the dataset, however there will be differences to `RssMaker` in data processing, generation and sampling as similiar energy structures can have wildly different NMR parameters. This has not been implemented yet in autoplex.
+The core workflow can be extended to automatically train ML models for NMR prediction ([Ben Mahmoud et al, J. Chem. Phys. 163, 024118 (2025)](https://doi.org/10.1063/5.0274240)) in a similar workflow to {class}`~autoplex.auto.rss.flows.RssMaker` (see the {ref}`RSS workflow <rss>`). The outputted `.magres` files could be used in the same way for labelling the dataset, however there will be differences to `RssMaker` in data processing, generation and sampling as similar energy structures can have wildly different NMR parameters. This has not been implemented yet in autoplex.
 
 ## Further reading
 
