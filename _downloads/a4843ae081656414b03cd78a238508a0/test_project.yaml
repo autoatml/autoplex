@@ -1,0 +1,77 @@
+name: test_project
+base_dir: /home/username/.jfremote/test_project
+tmp_dir: /home/username/.jfremote/test_project/tmp
+log_dir: /home/username/.jfremote/test_project/log
+daemon_dir: /home/username/.jfremote/test_project/daemon
+log_level: debug
+runner:
+  delay_checkout: 30
+  delay_check_run_status: 30
+  delay_advance_status: 30
+  delay_refresh_limited: 600
+  delay_update_batch: 60
+  lock_timeout: 86400
+  delete_tmp_folder: true
+  max_step_attempts: 3
+  delta_retry:
+  - 30
+  - 300
+  - 1200
+workers:
+  example_worker:
+    type: remote
+    scheduler_type: slurm
+    work_dir: /path/to/your/scratch/dir
+    resources:
+    pre_run: |
+       source activate autoplex
+    post_run:
+    timeout_execute: 120
+    max_jobs: 10
+    batch:
+    host: remote cluster
+    user: username
+    port:
+    password:
+    key_filename:
+    passphrase:
+    gateway:
+    forward_agent:
+    connect_timeout:
+    connect_kwargs:
+    inline_ssh_env:
+    keepalive: 60
+    shell_cmd: bash
+    login_shell: true
+    interactive_login: true
+queue:
+  store:
+    type: MongoStore
+    host: local machine
+    database: db name
+    username: user name
+    password: password
+    collection_name: jobs
+  flows_collection: flows
+  auxiliary_collection: jf_auxiliary
+  db_id_prefix:
+exec_config: {}
+jobstore:
+  docs_store:
+    type: MongoStore
+    database: db name
+    host: local machine
+    port: 27017
+    username: user name
+    password: password
+    collection_name: outputs
+  additional_stores:
+    data:
+      type: GridFSStore
+      database: db name
+      host: local machine
+      port: 27017
+      username: user name
+      password: password
+      collection_name: outputs_blobs
+metadata:
