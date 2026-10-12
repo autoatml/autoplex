@@ -1,0 +1,1 @@
+"""NMR data collection."""
