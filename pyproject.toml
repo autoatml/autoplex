@@ -57,7 +57,7 @@ docs = [
     "myst-nb==1.4.0",
     "sphinx-book-theme==1.1.0",
     "sphinxcontrib-mermaid",
-    "nbconvert==7.17.1",
+    "nbconvert==7.17.2",
 ]
 
 workflow-managers = [
