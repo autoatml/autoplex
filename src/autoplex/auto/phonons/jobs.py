@@ -170,7 +170,7 @@ def do_iterative_rattled_structures(
             "fit_kwargs_list": job2.output["fit_kwargs_list"],
         }
 
-        return Response(replace=Flow(jobs), output=output_dict)
+        return Response(replace=Flow(jobs, output=output_dict))
 
     return {
         "dft_references": previous_output["dft_references"],
@@ -395,15 +395,18 @@ def complete_benchmark(  # this function was put here to prevent circular import
 
     if isinstance(dft_references, list):
         return Response(
-            replace=Flow(jobs),
-            output={
-                "bm_output": collect_output,
-                "dft_references": dft_references[ibenchmark_structure],
-            },
+            replace=Flow(
+                jobs,
+                output={
+                    "bm_output": collect_output,
+                    "dft_references": dft_references[ibenchmark_structure],
+                },
+            ),
         )
     return Response(
-        replace=Flow(jobs),
-        output={"bm_output": collect_output, "dft_references": dft_references},
+        replace=Flow(
+            jobs, output={"bm_output": collect_output, "dft_references": dft_references}
+        ),
     )
 
 

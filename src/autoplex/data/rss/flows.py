@@ -150,6 +150,5 @@ class BuildMultiRandomizedStructure(Maker):
                 final_structures.append(job_struct.output)
 
         return Response(
-            replace=Flow(job_list),
-            output=final_structures,
+            replace=Flow(job_list, output=final_structures),
         )
