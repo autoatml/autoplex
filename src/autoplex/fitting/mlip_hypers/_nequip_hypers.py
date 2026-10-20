@@ -365,7 +365,7 @@ class NEQUIPSettingsOld(AutoplexBaseModel):
         default=64,
         description="Number of hidden neurons in radial function, smaller is faster",
     )
-    avg_num_neighbors: None | Literal["auto"] = Field(
+    avg_num_neighbors: Literal["auto"] | None = Field(
         default="auto",
         description="Number of neighbors to divide by, "
         "None => no normalization, "
