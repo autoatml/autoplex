@@ -234,7 +234,7 @@ class GenerateTrainingDataForTesting(Maker):
             )
             jobs.append(conv_job)
 
-        return Response(replace=Flow(jobs), output=conv_job.output)
+        return Response(replace=Flow(jobs, output=conv_job.output))
 
 
 @dataclass
@@ -505,4 +505,4 @@ class DFTStaticLabelling(Maker):
                 logging.error("Unknown atom types in dimers!")
                 traceback.print_exc()
 
-        return Response(replace=Flow(job_list), output=dirs)
+        return Response(replace=Flow(job_list, output=dirs))

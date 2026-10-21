@@ -798,4 +798,4 @@ def do_rss_multi_node(
         job_list.append(rss)
         rss_info.append(rss.output)
 
-    return Response(replace=Flow(job_list), output=rss_info)
+    return Response(replace=Flow(job_list, output=rss_info))
