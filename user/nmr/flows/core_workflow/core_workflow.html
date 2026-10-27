@@ -1,0 +1,826 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Core Workflow &#8212; autoplex</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=1ea92b8b" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+
+    <script src="../../../../_static/documentation_options.js?v=d980dc4e"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'user/nmr/flows/core_workflow/core_workflow';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="icon" href="../../../../_static/autoplex_favicon.png"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="Executable tutorials" href="../../../executable/index.html" />
+    <link rel="prev" title="NMR workflow" href="../../index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.1.dev1+g924ebd392" />
+  
+    
+    <script src="../../../../_static/searchtools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    <script src="../../../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../../_static/autoplex_logo.png" class="logo__image only-light" alt="autoplex - Home"/>
+    <img src="../../../../_static/autoplex_logo.png" class="logo__image only-dark pst-js-only" alt="autoplex - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Overview</a></li>
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../../../setup.html">Quick-start</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../../tutorials.html">Tutorials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../installation/installation.html">Installation guide</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../rss/index.html">RSS workflow</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../rss/flow/introduction/intro.html">Brief overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../rss/flow/input/input.html">Input YAML configuration file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../rss/flow/quick_start/start.html">Quick start</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../rss/flow/example/example.html">Examples</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../phonon/index.html">Phonon workflow</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../phonon/flows/flows.html">Out-of-the-box workflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../phonon/flows/generation/data.html">Generating reference data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../phonon/flows/fitting/fitting.html">Fitting phonon-accurate potentials</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../phonon/flows/benchmark/benchmark.html">Benchmark of ML-based phonon structure</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../../index.html">NMR workflow</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">Core Workflow</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../executable/index.html">Executable tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../executable/tutorial_phonon.html">Iterative DFT vs MLIP benchmark workflow for phonons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../executable/tutorial_rss.html">RSS Workflow</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../reference/index.html">API reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.auto.html">autoplex.auto</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.auto.phonons.html">autoplex.auto.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.auto.phonons.flows.html">autoplex.auto.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.auto.phonons.jobs.html">autoplex.auto.phonons.jobs</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.auto.rss.html">autoplex.auto.rss</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.auto.rss.flows.html">autoplex.auto.rss.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.auto.rss.jobs.html">autoplex.auto.rss.jobs</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.benchmark.html">autoplex.benchmark</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.benchmark.phonons.html">autoplex.benchmark.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.benchmark.phonons.flows.html">autoplex.benchmark.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.benchmark.phonons.jobs.html">autoplex.benchmark.phonons.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.benchmark.phonons.utils.html">autoplex.benchmark.phonons.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.benchmark.rss.html">autoplex.benchmark.rss</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.html">autoplex.data</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.common.html">autoplex.data.common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.common.flows.html">autoplex.data.common.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.common.jobs.html">autoplex.data.common.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.common.utils.html">autoplex.data.common.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.nmr.html">autoplex.data.nmr</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.nmr.jobs.html">autoplex.data.nmr.jobs</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.phonons.html">autoplex.data.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.phonons.flows.html">autoplex.data.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.phonons.jobs.html">autoplex.data.phonons.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.phonons.utils.html">autoplex.data.phonons.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.data.rss.html">autoplex.data.rss</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.rss.flows.html">autoplex.data.rss.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.rss.jobs.html">autoplex.data.rss.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.data.rss.utils.html">autoplex.data.rss.utils</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.fitting.html">autoplex.fitting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.html">autoplex.fitting.common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.flows.html">autoplex.fitting.common.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.jobs.html">autoplex.fitting.common.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.regularization.html">autoplex.fitting.common.regularization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.common.utils.html">autoplex.fitting.common.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.fitting.mlip_hypers.html">autoplex.fitting.mlip_hypers</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.fitting.mlip_hypers.MLIPHypers.html">MLIPHypers</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.fitting.phonons.html">autoplex.fitting.phonons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.fitting.rss.html">autoplex.fitting.rss</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.misc.html">autoplex.misc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.html">autoplex.misc.castep</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.flows.html">autoplex.misc.castep.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.jobs.html">autoplex.misc.castep.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.run.html">autoplex.misc.castep.run</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.schema.html">autoplex.misc.castep.schema</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.castep.utils.html">autoplex.misc.castep.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../reference/autoplex.misc.utils.html">autoplex.misc.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.utils.mock_castep.html">autoplex.misc.utils.mock_castep</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../reference/autoplex.misc.utils.mock_custom_builder.html">autoplex.misc.utils.mock_custom_builder</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../reference/autoplex.settings.html">autoplex.settings</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.AutoplexSettings.html">AutoplexSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.BcurParams.html">BcurParams</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.BuildcellOptions.html">BuildcellOptions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.CustomIncar.html">CustomIncar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.ResumeFromPreviousState.html">ResumeFromPreviousState</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.RssConfig.html">RssConfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.SETTINGS.html">SETTINGS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../reference/autoplex.settings.SoapParas.html">SoapParas</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contributing Guide</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/contributing.html">Contributing to autoplex</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev/dev_install.html">Developer Installation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../../about/changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../about/contributors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../about/license.html">License</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/JaGeo/autoplex" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/JaGeo/autoplex/issues/new?title=Issue%20on%20page%20%2Fuser/nmr/flows/core_workflow/core_workflow.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../../../_sources/user/nmr/flows/core_workflow/core_workflow.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Core Workflow</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#overview">Overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#general-workflow">General workflow</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-systems">Example systems</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#next-steps">Next steps</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#further-reading">Further reading</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="core-workflow">
+<h1>Core Workflow<a class="headerlink" href="#core-workflow" title="Link to this heading">#</a></h1>
+<p>This tutorial covers the core workflow in automating NMR predictions via CASTEP, with examples on using CASTEP to calculate NMR parameters of two small cristobalite structures as well as an amorphous silica snapshot.</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
+<p>Given a list of <a class="reference external" href="https://pymatgen.org/">pymatgen</a> structures (usually given in a <code class="docutils literal notranslate"><span class="pre">.xyz</span></code> file) and user-defined parameters, CASTEP is called with <code class="docutils literal notranslate"><span class="pre">task:</span> <span class="pre">magres</span></code> (see the <a class="reference internal" href="../../../rss/flow/input/input.html#labelling-parameters"><span class="std std-ref">CASTEP setup</span></a> for how autoplex runs CASTEP) and produces <code class="docutils literal notranslate"><span class="pre">.magres</span></code> and <code class="docutils literal notranslate"><span class="pre">.castep</span></code> files. Afterwards magnetic shielding (MS) and electric field gradient (EFG) tensors are collected for all structures by writing to a single <code class="docutils literal notranslate"><span class="pre">.extxyz</span></code> file.</p>
+</section>
+<section id="general-workflow">
+<h2>General workflow<a class="headerlink" href="#general-workflow" title="Link to this heading">#</a></h2>
+<p>First we define our <code class="docutils literal notranslate"><span class="pre">.param</span></code> and <code class="docutils literal notranslate"><span class="pre">.cell</span></code> parameters using <a class="reference internal" href="../../../../reference/autoplex.misc.castep.utils.CastepMagresSetGenerator.html#autoplex.misc.castep.utils.CastepMagresSetGenerator" title="autoplex.misc.castep.utils.CastepMagresSetGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">CastepMagresSetGenerator</span></code></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.misc.castep.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">CastepMagresSetGenerator</span>
+
+<span class="n">input_set_generator</span> <span class="o">=</span> <span class="n">CastepMagresSetGenerator</span><span class="p">(</span>
+    <span class="n">use_efg</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">user_param_settings</span><span class="o">=</span><span class="p">{</span><span class="s2">"xc_functional"</span><span class="p">:</span> <span class="s2">"PBE"</span><span class="p">,</span> <span class="s2">"cut_off_energy"</span><span class="p">:</span> <span class="mf">900.0</span><span class="p">},</span>
+    <span class="n">user_cell_settings</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">"species_pot"</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">(</span><span class="s2">"O"</span><span class="p">,</span> <span class="s2">"2|1.1|17|20|23|20:21(qc=8)"</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">"Si"</span><span class="p">,</span> <span class="s2">"3|1.8|5|6|7|30:31:32"</span><span class="p">),</span>
+        <span class="p">],</span>
+        <span class="s2">"kpoint_mp_spacing"</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>All allowed CASTEP keywords and definitions for setting up <code class="docutils literal notranslate"><span class="pre">.param</span></code> and <code class="docutils literal notranslate"><span class="pre">.cell</span></code> files can be found in the autoplex package at: <code class="docutils literal notranslate"><span class="pre">/yourpath/autoplex/misc/castep/castep_keywords.json</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">use_efg</span></code> determines whether EFG tensors are calculated as well, if set to <code class="docutils literal notranslate"><span class="pre">False</span></code> it only calculates MS tensors.</p>
+<p>Next, using <code class="docutils literal notranslate"><span class="pre">input_set_generator</span></code> we create a <a class="reference internal" href="../../../../reference/autoplex.misc.castep.jobs.CastepMagresMaker.html#autoplex.misc.castep.jobs.CastepMagresMaker" title="autoplex.misc.castep.jobs.CastepMagresMaker"><code class="xref py py-class docutils literal notranslate"><span class="pre">CastepMagresMaker</span></code></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.misc.castep.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">CastepMagresMaker</span>
+
+<span class="n">magres_maker</span> <span class="o">=</span> <span class="n">CastepMagresMaker</span><span class="p">(</span>
+    <span class="n">input_set_generator</span><span class="o">=</span><span class="n">input_set_generator</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Then we load our structures from e.g. <code class="docutils literal notranslate"><span class="pre">structures.xyz</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pymatgen.io.ase</span><span class="w"> </span><span class="kn">import</span> <span class="n">AseAtomsAdaptor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ase.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">read</span>
+
+<span class="n">structures</span> <span class="o">=</span> <span class="p">[</span><span class="n">AseAtomsAdaptor</span><span class="o">.</span><span class="n">get_structure</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span> <span class="k">for</span> <span class="n">structure</span> <span class="ow">in</span> <span class="n">read</span><span class="p">(</span><span class="s2">"structures.xyz"</span><span class="p">,</span> <span class="s2">":"</span><span class="p">)]</span>
+</pre></div>
+</div>
+<p>This creates an array of pymatgen <code class="docutils literal notranslate"><span class="pre">Structure</span></code> objects which can then be passed into <a class="reference internal" href="../../../../reference/autoplex.misc.castep.flows.CastepMagresFlowMaker.html#autoplex.misc.castep.flows.CastepMagresFlowMaker" title="autoplex.misc.castep.flows.CastepMagresFlowMaker"><code class="xref py py-class docutils literal notranslate"><span class="pre">CastepMagresFlowMaker</span></code></a>, which creates the <code class="docutils literal notranslate"><span class="pre">Flow</span></code> to be run locally or submitted to HPC (see the <a class="reference internal" href="../../../jobflowremote.html"><span class="std std-doc">jobflow-remote setup</span></a>):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.misc.castep.flows</span><span class="w"> </span><span class="kn">import</span> <span class="n">CastepMagresFlowMaker</span>
+
+<span class="n">flow</span> <span class="o">=</span> <span class="n">CastepMagresFlowMaker</span><span class="p">(</span><span class="n">magres_maker</span><span class="o">=</span><span class="n">magres_maker</span><span class="p">)</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">structures</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Compressed <code class="docutils literal notranslate"><span class="pre">castep.castep.gz</span></code> and <code class="docutils literal notranslate"><span class="pre">castep.magres.gz</span></code> files are produced in the job’s <code class="docutils literal notranslate"><span class="pre">CASTEP/</span></code> folder. <code class="docutils literal notranslate"><span class="pre">CastepMagresFlowMaker.make()</span></code> outputs a list of directories pointing at the <code class="docutils literal notranslate"><span class="pre">CASTEP/</span></code> folder. Next, we collect from these directories using <a class="reference internal" href="../../../../reference/autoplex.data.nmr.jobs.collect_nmr_data.html#autoplex.data.nmr.jobs.collect_nmr_data" title="autoplex.data.nmr.jobs.collect_nmr_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">collect_nmr_data()</span></code></a>, which reads <code class="docutils literal notranslate"><span class="pre">castep.magres.gz</span></code> from each directory (skipping runs that did not converge) and writes all structures to one extended XYZ file, containing NMR-labelled data:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">jobflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flow</span><span class="p">,</span> <span class="n">run_locally</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.data.nmr.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">collect_nmr_data</span>
+
+<span class="n">collect</span> <span class="o">=</span> <span class="n">collect_nmr_data</span><span class="p">(</span><span class="n">nmr_dirs</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="n">nmr_ref_file</span><span class="o">=</span><span class="s2">"nmr_ref.extxyz"</span><span class="p">)</span>
+<span class="n">run_locally</span><span class="p">(</span><span class="n">Flow</span><span class="p">([</span><span class="n">flow</span><span class="p">,</span> <span class="n">collect</span><span class="p">]),</span> <span class="n">create_folders</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># or jobflow-remote's submit_flow</span>
+</pre></div>
+</div>
+<p>Each atom carries its shielding and EFG tensors as the per-atom arrays <code class="docutils literal notranslate"><span class="pre">REF_ms</span></code> (ppm) and <code class="docutils literal notranslate"><span class="pre">REF_efg</span></code>
+(atomic units), each stored as 9 components (row by row), since extended XYZ cannot store 3×3 tensors.
+The file is written to the collector job’s directory; its path is returned as <code class="docutils literal notranslate"><span class="pre">nmr_ref_dir</span></code>, ready for processing.</p>
+</section>
+<section id="example-systems">
+<h2>Example systems<a class="headerlink" href="#example-systems" title="Link to this heading">#</a></h2>
+<p>We ran the workflow on cristobalite and amorphous SiO<sub>2</sub> structures from the dataset of <a class="reference external" href="https://doi.org/10.1063/5.0274240">Ben Mahmoud et al., J. Chem. Phys. 163, 024118 (2025)</a> (<a class="reference external" href="https://doi.org/10.5281/zenodo.15775328">Zenodo, CC BY 4.0</a>). The amorphous SiO<sub>2</sub> snapshot is the first structure in <code class="docutils literal notranslate"><span class="pre">test.xyz</span></code> of that dataset, alpha and beta cristobalite structures are structures 1 and 3 in <code class="docutils literal notranslate"><span class="pre">crystals.xyz</span></code> of that dataset.</p>
+<p>We used the settings shown above (PBE, 900 eV, shielding + EFG) with CASTEP 21.11 on 38–45 MPI processes on an HPC cluster, with additionally a fixed 3×3×3 k-point grid (<code class="docutils literal notranslate"><span class="pre">&quot;kpoint_mp_grid&quot;:</span> <span class="pre">[3,</span> <span class="pre">3,</span> <span class="pre">3]</span></code> in <code class="docutils literal notranslate"><span class="pre">user_cell_settings</span></code>) for amorphous SiO<sub>2</sub>. The output and runtime of each structure is shown below:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Structure</p></th>
+<th class="head"><p>Atoms</p></th>
+<th class="head"><p>Si σ<sub>iso</sub> (ppm)</p></th>
+<th class="head"><p>O σ<sub>iso</sub> (ppm)</p></th>
+<th class="head"><p>Runtime</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>α-cristobalite</p></td>
+<td><p>12</p></td>
+<td><p>437.6</p></td>
+<td><p>223.3</p></td>
+<td><p>~5 min</p></td>
+</tr>
+<tr class="row-odd"><td><p>β-cristobalite</p></td>
+<td><p>24</p></td>
+<td><p>459.1</p></td>
+<td><p>230.9</p></td>
+<td><p>~15 min</p></td>
+</tr>
+<tr class="row-even"><td><p>Amorphous SiO<sub>2</sub></p></td>
+<td><p>144</p></td>
+<td><p>423.4 – 449.5</p></td>
+<td><p>166.5 – 231.3</p></td>
+<td><p>~42 h</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Here σ<sub>iso</sub> is the isotropic shielding in ppm, i.e. one third of the trace of the shielding tensor. It can be computed directly from the <code class="docutils literal notranslate"><span class="pre">.extxyz</span></code> file, using <a class="reference external" href="https://ase-lib.org/"><code class="docutils literal notranslate"><span class="pre">ase.io.read</span></code></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ase.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">read</span>
+
+<span class="n">structures_out</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="s2">"nmr_ref.extxyz"</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="s2">":"</span><span class="p">)</span>
+<span class="n">ms</span> <span class="o">=</span> <span class="n">structures_out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">arrays</span><span class="p">[</span><span class="s2">"REF_ms"</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="c1">#Take e.g. ms of first structure, convert back to 3x3 tensor. ["REF_efg"] gives efg tensors (if present).</span>
+
+<span class="n">sigma_iso</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">ms</span><span class="p">,</span> <span class="n">axis1</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">axis2</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">3</span>  
+<span class="c1">#Compute isotropic shielding for each atom in structure.</span>
+<span class="c1">#NOTE: Atoms are listed in CASTEP’s order (grouped by element), which may differ from the order of the input structure. </span>
+</pre></div>
+</div>
+<p>To obtain other NMR parameters from a <code class="docutils literal notranslate"><span class="pre">.extxyz</span></code> file, follow the similar process above to obtain MS and EFG tensors. They can then be analysed with e.g. <a class="reference external" href="https://github.com/CCP-NC/soprano">Soprano</a> (<a class="reference external" href="https://ccp-nc.github.io/soprano/">docs</a>), a separate package that is not installed with autoplex. For large structures like amorphous SiO<sub>2</sub>, using fewer k-points can avoid large runtimes, at the cost of accuracy (using a single k-point reduces the runtime to ~1.5 hours in our case, with MAE in isotropic shielding ~0.05 vs ~0.007 ppm).</p>
+<p>Example <code class="docutils literal notranslate"><span class="pre">.magres</span></code> files for the cristobalite structures are located in <a class="reference external" href="https://github.com/autoatml/autoplex/tree/main/tests/test_data/castep/magres">tests/test_data/castep/magres</a>, and a snippet of the <code class="docutils literal notranslate"><span class="pre">.magres</span></code> output (see the <a class="reference external" href="https://www.ccpnc.ac.uk/docs/magres">magres file format</a>) for amorphous SiO<sub>2</sub> is provided below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+<span class="p">[</span><span class="n">magres_old</span><span class="p">]</span>
+<span class="o">============</span>
+<span class="n">Atom</span><span class="p">:</span> <span class="n">O</span>        <span class="mi">1</span>
+<span class="o">============</span>
+<span class="n">O</span>        <span class="mi">1</span> <span class="n">Coordinates</span>     <span class="mf">10.723</span>    <span class="mf">1.886</span>    <span class="mf">8.916</span>   <span class="n">A</span>
+
+<span class="n">TOTAL</span> <span class="n">Shielding</span> <span class="n">Tensor</span>
+
+             <span class="mf">242.8870</span>     <span class="mf">46.2124</span>     <span class="mf">14.3341</span>
+              <span class="mf">40.4691</span>    <span class="mf">230.3592</span>      <span class="mf">8.3922</span>
+              <span class="mf">13.8238</span>     <span class="mf">10.3303</span>    <span class="mf">207.1829</span>
+
+<span class="n">O</span>        <span class="mi">1</span> <span class="n">Eigenvalue</span>  <span class="n">sigma_xx</span>     <span class="mf">192.4360</span> <span class="p">(</span><span class="n">ppm</span><span class="p">)</span>
+<span class="n">O</span>        <span class="mi">1</span> <span class="n">Eigenvector</span> <span class="n">sigma_xx</span>       <span class="mf">0.6695</span>     <span class="o">-</span><span class="mf">0.7202</span>     <span class="o">-</span><span class="mf">0.1820</span>
+<span class="n">O</span>        <span class="mi">1</span> <span class="n">Eigenvalue</span>  <span class="n">sigma_yy</span>     <span class="mf">203.9185</span> <span class="p">(</span><span class="n">ppm</span><span class="p">)</span>
+<span class="n">O</span>        <span class="mi">1</span> <span class="n">Eigenvector</span> <span class="n">sigma_yy</span>       <span class="mf">0.0379</span>      <span class="mf">0.2778</span>     <span class="o">-</span><span class="mf">0.9599</span>
+<span class="n">O</span>        <span class="mi">1</span> <span class="n">Eigenvalue</span>  <span class="n">sigma_zz</span>     <span class="mf">284.0746</span> <span class="p">(</span><span class="n">ppm</span><span class="p">)</span>
+<span class="n">O</span>        <span class="mi">1</span> <span class="n">Eigenvector</span> <span class="n">sigma_zz</span>       <span class="mf">0.7419</span>      <span class="mf">0.6357</span>      <span class="mf">0.2132</span>
+
+<span class="n">O</span>        <span class="mi">1</span> <span class="n">Isotropic</span><span class="p">:</span>      <span class="mf">226.8097</span> <span class="p">(</span><span class="n">ppm</span><span class="p">)</span>
+<span class="n">O</span>        <span class="mi">1</span> <span class="n">Anisotropy</span><span class="p">:</span>      <span class="mf">85.8973</span> <span class="p">(</span><span class="n">ppm</span><span class="p">)</span>
+<span class="n">O</span>        <span class="mi">1</span> <span class="n">Asymmetry</span><span class="p">:</span>        <span class="mf">0.2005</span>
+
+<span class="o">============</span>
+<span class="n">Atom</span><span class="p">:</span> <span class="n">O</span>        <span class="mi">2</span>
+<span class="o">============</span>
+<span class="n">O</span>        <span class="mi">2</span> <span class="n">Coordinates</span>      <span class="mf">1.501</span>    <span class="mf">9.423</span>    <span class="mf">5.435</span>   <span class="n">A</span>
+
+<span class="o">...</span>
+</pre></div>
+</div>
+</section>
+<section id="next-steps">
+<h2>Next steps<a class="headerlink" href="#next-steps" title="Link to this heading">#</a></h2>
+<p>The core workflow can be extended to automatically train ML models for NMR prediction (<a class="reference external" href="https://doi.org/10.1063/5.0274240">Ben Mahmoud et al, J. Chem. Phys. 163, 024118 (2025)</a>) in a similar workflow to <a class="reference internal" href="../../../../reference/autoplex.auto.rss.flows.RssMaker.html#autoplex.auto.rss.flows.RssMaker" title="autoplex.auto.rss.flows.RssMaker"><code class="xref py py-class docutils literal notranslate"><span class="pre">RssMaker</span></code></a> (see the <a class="reference internal" href="../../../rss/index.html#rss"><span class="std std-ref">RSS workflow</span></a>). The outputted <code class="docutils literal notranslate"><span class="pre">.magres</span></code> files could be used in the same way for labelling the dataset, however there will be differences to <code class="docutils literal notranslate"><span class="pre">RssMaker</span></code> in data processing, generation and sampling as similar energy structures can have wildly different NMR parameters. This has not been implemented yet in autoplex.</p>
+</section>
+<section id="further-reading">
+<h2>Further reading<a class="headerlink" href="#further-reading" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.ccpnc.ac.uk/docs/castep-for-nmr-calculations">CASTEP for NMR calculations (CCP-NC)</a></p></li>
+<li><p>C. Bonhomme et al., “First-principles calculation of NMR parameters using the gauge including projector augmented wave method: a chemist’s point of view”, <em>Chem. Rev.</em> <strong>112</strong>, 5733–5779 (2012), <a class="reference external" href="https://doi.org/10.1021/cr300108a">doi:10.1021/cr300108a</a></p></li>
+<li><p>S. Sturniolo et al., “Visualization and processing of computed solid-state NMR parameters: MagresView and MagresPython”, <em>Solid State Nucl. Magn. Reson.</em> <strong>78</strong>, 64–70 (2016), <a class="reference external" href="https://doi.org/10.1016/j.ssnmr.2016.05.004">doi:10.1016/j.ssnmr.2016.05.004</a></p></li>
+<li><p>C. Ben Mahmoud et al., <em>J. Chem. Phys.</em> <strong>163</strong>, 024118 (2025), <a class="reference external" href="https://doi.org/10.1063/5.0274240">doi:10.1063/5.0274240</a></p></li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../../index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">NMR workflow</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../../../executable/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Executable tutorials</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#overview">Overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#general-workflow">General workflow</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-systems">Example systems</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#next-steps">Next steps</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#further-reading">Further reading</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Author name not set
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, autoplex development team.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
