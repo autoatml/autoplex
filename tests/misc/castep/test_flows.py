@@ -4,10 +4,13 @@ from jobflow import run_locally, Flow
 from autoplex.data.common.flows import DFTStaticLabelling
 from autoplex.misc.castep.jobs import CastepStaticMaker, CastepMagresMaker
 from autoplex.misc.castep.utils import CastepStaticSetGenerator, CastepMagresSetGenerator
-from autoplex.data.common.jobs import collect_dft_data
+from autoplex.data.common.jobs import collect_dft_data, safe_strip_hostname
+from autoplex.data.nmr.jobs import collect_nmr_data
 from pymatgen.io.ase import AseAtomsAdaptor
 from autoplex.misc.castep.flows import CastepMagresFlowMaker
 import numpy as np
+import os
+
 def test_DFTStaticLabelling_with_castep(memory_jobstore, mock_castep, clean_dir):
     
     ref_paths = {
@@ -99,24 +102,45 @@ def test_CastepMagresFlowMaker(memory_jobstore, mock_castep, castep_test_dir, cl
                         )
                     )
     magres_flow = CastepMagresFlowMaker(magres_maker = magres_maker).make(structures)
-    
+
+    nmr_collect_data = collect_nmr_data(nmr_dirs=magres_flow.output)
+
     run_locally(
-        magres_flow,
+        [magres_flow,nmr_collect_data],
         create_folders=True,
         ensure_success=True,
         store=memory_jobstore
     )
 
-    dicts = [magres_job.output.resolve(memory_jobstore) for magres_job in magres_flow.output]
+   
     
-    assert len(dicts) == 2
+
+    #TODO: create collect_nmr_data similiar to collect_dft_data
+    
+    dict_nmr = nmr_collect_data.output.resolve(memory_jobstore)
+    
+    path_to_castep = dict_nmr['nmr_ref_dir']
+    
+    structures = read(path_to_castep, index=":")
+    
+    assert len(structures) == 2
     np.testing.assert_allclose(
-        dicts[1].ms_tensor[0],
-        [[230.9670, 33.2024, -33.2870], [33.2469, 230.8632, -33.2890], [-33.2720, -33.2131, 230.9253]],
+        structures[1].arrays["REF_ms"][0],
+        [230.9670, 33.2024, -33.2870, 33.2469, 230.8632, -33.2890, -33.2720, -33.2131, 230.9253],
         atol=1e-4,
     )
     np.testing.assert_allclose(
-        dicts[0].ms_tensor[0],
-        [[252.7565, 11.0014, -37.9952], [9.9670, 194.5567 , -7.3071], [-38.1106, -7.7682 , 222.5173]],
+        structures[0].arrays["REF_ms"][0],
+        [252.7565, 11.0014, -37.9952, 9.9670, 194.5567 , -7.3071, -38.1106, -7.7682 , 222.5173],
         atol=1e-4,
     )
+
+    
+    #test only the flow maker
+    nmr_dirs = [value.resolve(memory_jobstore) for value in magres_flow.output]
+    dirs = [safe_strip_hostname(value) for value in nmr_dirs] #same code as collect_dft_data
+    assert len(dirs) == 2
+    
+    for d in dirs:
+        assert os.path.basename(d) == "CASTEP"                               # dir_name points at the CASTEP folder
+        assert os.path.exists(os.path.join(d, "castep.magres.gz"))           # and the NMR output is there

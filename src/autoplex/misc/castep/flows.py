@@ -35,12 +35,15 @@ class CastepMagresFlowMaker(Maker):
 
         Returns
         -------
-        Flow with each job included.
+        List of directories for each .castep and .magres file
         """
+        dirs = []
         jobs = []
         for i, structure in enumerate(structures):
             job = self.magres_maker.make(structure=structure)
             job.name = f"{self.magres_maker.name}_{i + 1}"
 
+            dirs.append(job.output.dir_name)
             jobs.append(job)
-        return Flow(jobs, output=[job.output for job in jobs], name=self.name)
+
+        return Flow(jobs, output=dirs, name=self.name)
