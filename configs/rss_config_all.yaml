@@ -152,6 +152,11 @@ hookean_paras:
   - 1.0
 keep_symmetry: false
 remove_traj_files: false
+rss_safety:
+  max_walltime: 600.0
+  min_volume_per_atom: 0.1
+  min_distance: 0.1
+  max_cell_condition_number: 10000.0
 num_processes_rss: 128
 device_for_rss: cpu
 # One needs to define mlip_hypers only for the MLIP one wishes to fit
