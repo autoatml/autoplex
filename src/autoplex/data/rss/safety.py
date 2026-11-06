@@ -86,9 +86,16 @@ class GuardedCalculator(Calculator):
         """Check trial cells, including calls inside an optimizer line search."""
         validate_rss_geometry(atoms, self.safety)
         super().calculate(atoms, properties, system_changes)
-        self.results = {
-            name: self.calculator.get_property(name, atoms) for name in properties
-        }
+        # NequIP 0.6 inspects atoms.calc while converting the input structure.
+        # Keep the same Atoms object so backend updates to info/arrays survive.
+        original_calculator = atoms.calc
+        try:
+            atoms.calc = self.calculator
+            self.results = {
+                name: self.calculator.get_property(name, atoms) for name in properties
+            }
+        finally:
+            atoms.calc = original_calculator
 
 
 def _run_relaxation(function, atom, result_path, seed):
