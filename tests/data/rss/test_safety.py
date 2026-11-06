@@ -26,7 +26,12 @@ from autoplex.settings import RssConfig, RssSafety
 class CountingCalculator(Calculator):
     """Count evaluations to detect validation happening after the backend."""
 
-    implemented_properties: ClassVar[list[str]] = ["energy", "free_energy", "forces", "stress"]
+    implemented_properties: ClassVar[list[str]] = [
+        "energy",
+        "free_energy",
+        "forces",
+        "stress",
+    ]
 
     def __init__(self):
         super().__init__()
@@ -152,16 +157,23 @@ def test_invalid_safety_settings(settings):
 
 
 @pytest.mark.parametrize("max_workers", [1, 2])
-def test_killed_and_stuck_workers_do_not_block_successes(monkeypatch, caplog, max_workers):
+def test_killed_and_stuck_workers_do_not_block_successes(
+    monkeypatch, caplog, max_workers
+):
     """Exercise the RSS safety contract."""
     # Fork keeps this failure-injection test fast on macOS as well as Linux.
     # The default/spawn context is exercised separately below.
     context = mp.get_context("fork")
     monkeypatch.setattr(safety_module.mp, "get_context", lambda: context)
-    atoms = [_atom(action, i) for i, action in enumerate(["ok", "kill", "timeout", "error", "ok"])]
+    atoms = [
+        _atom(action, i)
+        for i, action in enumerate(["ok", "kill", "timeout", "error", "ok"])
+    ]
     previous_children = {p.pid for p in mp.active_children()}
     started = time.monotonic()
-    results = supervise_relaxations(_worker, atoms, max_workers=max_workers, max_walltime=2)
+    results = supervise_relaxations(
+        _worker, atoms, max_workers=max_workers, max_walltime=2
+    )
     assert results == ["0", None, None, None, "4"]
     assert time.monotonic() - started < 10
     assert "structure 1 failed: worker exited with code" in caplog.text
@@ -174,7 +186,9 @@ def test_spawn_context_preserves_order(monkeypatch):
     """Exercise the RSS safety contract."""
     context = mp.get_context("spawn")
     monkeypatch.setattr(safety_module.mp, "get_context", lambda: context)
-    assert supervise_relaxations(_worker, [_atom("ok", 0), _atom("ok", 1)], max_workers=2, max_walltime=60) == [
+    assert supervise_relaxations(
+        _worker, [_atom("ok", 0), _atom("ok", 1)], max_workers=2, max_walltime=60
+    ) == [
         "0",
         "1",
     ]
@@ -200,3 +214,38 @@ def test_independent_reproducible_child_random_streams(monkeypatch):
     second = supervise_relaxations(_random_worker, atoms, 2, 10)
     assert first == second
     assert len(set(first)) == 3
+
+
+class IdentityCheckingCalculator(CountingCalculator):
+    """Model backends such as NequIP inspect the calculator on their input."""
+
+    def __init__(self, fail=False):
+        super().__init__()
+        self.fail = fail
+
+    def calculate(self, atoms=None, properties=("energy",), system_changes=all_changes):
+        """Require the backend attachment and optionally fail after inspection."""
+        if atoms.calc is not self:
+            raise NotImplementedError("Unsupported calculator attached to input atoms")
+        if self.fail:
+            raise RuntimeError("backend calculation failed")
+        super().calculate(atoms, properties, system_changes)
+        atoms.info["backend_metadata"] = "preserved"
+        atoms.arrays["forces"] = self.results["forces"].copy()
+
+
+@pytest.mark.parametrize("fail", [False, True])
+def test_backend_attachment_restored(fail):
+    """Expose the backend during evaluation and restore the guard on all exits."""
+    atom = Atoms("O", cell=[3, 3, 3], pbc=True)
+    backend = IdentityCheckingCalculator(fail=fail)
+    guard = GuardedCalculator(backend, RssSafety())
+    atom.calc = guard
+    if fail:
+        with pytest.raises(RuntimeError, match="backend calculation failed"):
+            atom.get_potential_energy()
+    else:
+        assert atom.get_potential_energy() == 1
+        assert atom.info["backend_metadata"] == "preserved"
+        np.testing.assert_array_equal(atom.arrays["forces"], np.zeros((1, 3)))
+    assert atom.calc is guard
