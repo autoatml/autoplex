@@ -42,14 +42,17 @@ except ImportError:
     from ase.stress import voigt_6_to_full_3x3_stress
 
 try:
-    os.environ["MATGL_BACKEND"] = "DGL"
     import lightning as pl
     import matgl
     import torch
-    from dgl.data.utils import split_dataset
     from matgl.apps.pes import Potential
     from matgl.ext.pymatgen import Structure2Graph, get_element_list
-    from matgl.graph.data import MGLDataLoader, MGLDataset, collate_fn_pes
+    from matgl.graph.data import (
+        MGLDataLoader,
+        MGLDataset,
+        collate_fn_pes,
+        split_dataset,
+    )
     from matgl.models import M3GNet
     from matgl.utils.training import PotentialLightningModule
     from pytorch_lightning.loggers import CSVLogger
@@ -1091,6 +1094,10 @@ def m3gnet_fitting(
             ref_force_name=ref_force_name,
             ref_virial_name=ref_virial_name,
         )
+        # reshape the stress tensors to 3x3 matrices
+        train_stresses = [
+            np.asarray(stress).reshape(3, 3).tolist() for stress in train_stresses
+        ]
 
         train_labels = {
             "energies": train_energies,
@@ -1106,17 +1113,15 @@ def m3gnet_fitting(
             element_types=train_element_types, cutoff=m3gnet_hypers.get("cutoff")
         )
         train_datasets = MGLDataset(
-            threebody_cutoff=m3gnet_hypers.get("threebody_cutoff"),
             structures=train_structs,
             converter=train_converter,
             labels=train_labels,
-            include_line_graph=True,
-            filename="dgl_graph_train.bin",
+            filename="pyg_graph_train.bin",
             filename_lattice="lattice_train.pt",
-            filename_line_graph="dgl_line_graph_train.bin",
+            filename_line_graph="pyg_line_graph_train.bin",
             filename_state_attr="state_attr_train.pt",
             filename_labels="labels_train.json",
-            save_dir=os.path.join(results_dir, exp_name),
+            root=os.path.join(results_dir, exp_name),
         )
 
         if os.path.exists(os.path.join(db_dir, "test.extxyz")):
@@ -1135,6 +1140,10 @@ def m3gnet_fitting(
                 ref_force_name=ref_force_name,
                 ref_virial_name=ref_virial_name,
             )
+            # reshape the stress tensors to 3x3 matrices
+            test_stresses = [
+                np.asarray(stress).reshape(3, 3).tolist() for stress in test_stresses
+            ]
 
             test_labels = {
                 "energies": test_energies,
@@ -1146,17 +1155,15 @@ def m3gnet_fitting(
                 element_types=test_element_types, cutoff=m3gnet_hypers.get("cutoff")
             )
             test_dataset = MGLDataset(
-                threebody_cutoff=m3gnet_hypers.get("threebody_cutoff"),
                 structures=test_structs,
                 converter=test_converter,
                 labels=test_labels,
-                include_line_graph=True,
-                filename="dgl_graph_test.bin",
+                filename="pyg_graph_test.bin",
                 filename_lattice="lattice_test.pt",
-                filename_line_graph="dgl_line_graph_test.bin",
+                filename_line_graph="pyg_line_graph_test.bin",
                 filename_state_attr="state_attr_test.pt",
                 filename_labels="labels_test.json",
-                save_dir=os.path.join(results_dir, exp_name),
+                root=os.path.join(results_dir, exp_name),
             )
 
         if test_equal_to_val:
@@ -1179,15 +1186,16 @@ def m3gnet_fitting(
                 )
 
         my_collate_fn = partial(
-            collate_fn_pes, include_line_graph=True
-        )  # Set all include_line_graph to False will disable three-body interactions
+            collate_fn_pes,
+            include_stress=m3gnet_hypers.get("include_stresses"),
+        )
         train_loader, val_loader, test_loader = MGLDataLoader(
             train_data=train_dataset,
             val_data=val_dataset,
             test_data=test_dataset,
             collate_fn=my_collate_fn,
             batch_size=m3gnet_hypers.get("batch_size"),
-            num_workers=1,
+            num_workers=0,
         )
         # train from scratch
         if not m3gnet_hypers["foundation_model"]:  # train from scratch
@@ -1311,14 +1319,14 @@ def m3gnet_fitting(
         sys.stderr = original_stderr
 
     for fn in (
-        "dgl_graph_train.bin",
+        "pyg_graph_train.bin",
         "lattice_train.pt",
-        "dgl_line_graph_train.bin",
+        "pyg_line_graph_train.bin",
         "state_attr_train.pt",
         "labels_train.json",
-        "dgl_graph_test.bin",
+        "pyg_graph_test.bin",
         "lattice_test.pt",
-        "dgl_line_graph_test.bin",
+        "pyg_line_graph_test.bin",
         "state_attr_test.pt",
         "labels_test.json",
     ):
