@@ -79,7 +79,7 @@ strict-base = [
  ]
 
 strict-matgl = [
-    "matgl==4.1.4; python_version >= '3.11'",
+    "matgl==4.0.3; python_version >= '3.11'",
     "numpy<2; python_version < '3.12'",
  ]
 
