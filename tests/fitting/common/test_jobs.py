@@ -8,7 +8,6 @@ from autoplex.fitting.common.flows import MLIPFitMaker
 from tests.auto.phonons.test_jobs import fake_run_vasp_kwargs
 import subprocess
 try:
-    from dgl.data.utils import split_dataset
     from matgl.models import M3GNet
     has_m3gnet=True
 except:

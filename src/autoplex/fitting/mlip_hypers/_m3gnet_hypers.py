@@ -56,10 +56,10 @@ class M3GNETSettings(AutoplexBaseModel):
         default=0.96, description="Parameter determines the minimum learning rate"
     )
     dim_node_embedding: int = Field(
-        default=128, description="Dimension of node embedding"
+        default=64, description="Dimension of node embedding"
     )
     dim_edge_embedding: int = Field(
-        default=128, description="Dimension of edge embedding"
+        default=64, description="Dimension of edge embedding"
     )
     dim_state_embedding: int = Field(
         default=0, description="Dimension of state embedding"
@@ -70,7 +70,7 @@ class M3GNETSettings(AutoplexBaseModel):
     )
     force_weight: float = Field(default=1.0, description="Weight for forces loss")
     include_line_graph: bool = Field(
-        default=True, description="Whether to include line graph"
+        default=False, description="Whether to include line graph"
     )
     loss: Literal["mse_loss", "huber_loss", "smooth_l1_loss", "l1_loss"] = Field(
         default="mse_loss", description="Loss function used for training"
@@ -88,9 +88,9 @@ class M3GNETSettings(AutoplexBaseModel):
         "given the loss function will be adapted.",
     )
     magmom_weight: float = Field(default=0.0, description="Weight for magnetic moments")
-    max_l: int = Field(default=4, description="Maximum degree of spherical harmonics")
+    max_l: int = Field(default=3, description="Maximum degree of spherical harmonics")
     max_n: int = Field(
-        default=4, description="Maximum number of radial basis functions"
+        default=3, description="Maximum number of radial basis functions"
     )
     nblocks: int = Field(default=3, description="Number of blocks")
     optimizer: Optimizer | None = Field(default=None, description="Optimizer")
@@ -100,11 +100,11 @@ class M3GNETSettings(AutoplexBaseModel):
     scheduler: LRScheduler | None = Field(
         default=None, description="Learning rate scheduler"
     )
-    stress_weight: float = Field(default=0.0, description="Weight for stress loss")
+    stress_weight: float = Field(default=0.01, description="Weight for stress loss")
     sync_dist: bool = Field(
         default=False, description="Sync logging across all GPU workers"
     )
     is_intensive: bool = Field(
         default=False, description="Whether the prediction is intensive"
     )
-    units: int = Field(default=128, description="Number of neurons in each MLP layer")
+    units: int = Field(default=64, description="Number of neurons in each MLP layer")

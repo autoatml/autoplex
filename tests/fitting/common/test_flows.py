@@ -3,7 +3,6 @@ import pytest
 from autoplex.fitting.common.flows import MLIPFitMaker
 import subprocess
 try:
-    #from dgl.data.utils import split_dataset
     from matgl.models import M3GNet
     has_m3gnet=True
 except:

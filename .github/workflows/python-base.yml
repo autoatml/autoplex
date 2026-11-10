@@ -50,18 +50,12 @@ jobs:
           python -m pip install --upgrade pip && \
           python -m uv cache clean && \
           python -m uv pip install '.[strict-${{ matrix.dep-group }},tests,aims]' && \
-          if [ '${{ matrix.dep-group }}' = 'matgl' ]; then \
-            python -m uv pip install 'dgl==2.4.0' -f 'https://data.dgl.ai/wheels/torch-2.4/repo.html'; \
-          fi && \
-          if [ '${{ matrix.python-version }}' = '3.10' ] && [ '${{ matrix.dep-group }}' = 'matgl' ]; then \
-            python -m uv pip install 'ase==3.25.0'; \
-          fi && \
           OMP_NUM_THREADS=1 NEQUIP_NUM_TASKS=1 pytest --cache-clear --cov=autoplex --cov-report term-missing --cov-append --splits 5 --group ${{ matrix.split }} -vv --durations-path /workspace/tests/test_data/.pytest-split-durations --store-durations
         "
 
         
     - name: Upload test durations artifact
-      if: matrix.python-version == '3.10'
+      if: matrix.python-version == '3.11'
       uses: actions/upload-artifact@v4
       with:
         name: test-durations-${{ matrix.python-version }}-${{ matrix.dep-group }}-${{ matrix.split }}
@@ -69,7 +63,7 @@ jobs:
         path: ./tests/test_data/.pytest-split-durations
 
     - name: Upload coverage
-      if: matrix.python-version == '3.10'
+      if: matrix.python-version == '3.11'
       uses: actions/upload-artifact@v4
       with:
         name: coverage-${{ matrix.python-version }}-${{ matrix.dep-group }}-${{ matrix.split }}
@@ -170,7 +164,6 @@ jobs:
           uv pip install "setuptools-scm>=8.0" nanobind
           uv pip install --no-build-isolation phonopy==2.30.1
           uv pip install .[docs,strict-base,strict-mace,strict-matgl,strict-nep,strict-nequip,pacemaker,tests,aims]
-          uv pip install 'dgl==2.4.0' -f 'https://data.dgl.ai/wheels/torch-2.4/repo.html'
                     
     - name: Download test duration artifacts
       uses: actions/download-artifact@v4
@@ -188,7 +181,7 @@ jobs:
     - name: Download MLIPs test duration artifacts
       uses: actions/download-artifact@v4
       with:
-        pattern: test-durations-3.10-*
+        pattern: test-durations-3.11-*
         run-id: ${{ needs.get-mlip-run.outputs.run_id }}
         github-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -235,7 +228,7 @@ jobs:
           continue-on-error: true
           uses: actions/download-artifact@v4
           with:
-            pattern: coverage-3.10-*
+            pattern: coverage-3.11-*
             run-id: ${{ needs.get-mlip-run.outputs.run_id }}
             github-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -269,7 +262,7 @@ jobs:
             micromamba clean -a -y
       - name: Create mamba environment
         run: |
-            micromamba create -n autoplex_docs python=3.10 --yes
+            micromamba create -n autoplex_docs python=3.11 --yes
       - name: Install uv
         run: micromamba run -n autoplex_docs pip install uv
       - name: Install autoplex and dependencies
@@ -279,8 +272,7 @@ jobs:
             uv pip install "scikit-build-core<0.10"
             uv pip install "setuptools-scm>=8.0" nanobind
             uv pip install --no-build-isolation phonopy==2.30.1
-            uv pip install .[docs,strict-base,strict-mace,strict-matgl,strict-nep,strict-nequip,pacemaker,tests,aims]
-            uv pip install 'dgl==2.4.0' -f 'https://data.dgl.ai/wheels/torch-2.4/repo.html'
+            uv pip install .[docs,strict-base,strict-matgl,tests]
 
       - name: Copy tutorials
         run: |

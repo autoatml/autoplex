@@ -102,12 +102,6 @@ pip install autoplex[pacemaker]
 pip install autoplex[aims]
 ```
 
-> ℹ️ For fitting M3GNet models, additionally, `dgl` needs to be installed from source repository as necessary version for `magl` is not available directly available via PyPi. This can be done using following command:
-
-```bash
-pip install 'dgl==2.4.0' -f 'https://data.dgl.ai/wheels/torch-2.4/repo.html'
-```
-
 > ℹ️ To fit and validate `ACEpotentials`, one also needs to install Julia, as `autoplex` relies on [ACEpotentials](https://acesuit.github.io/ACEpotentials.jl/dev/gettingstarted/installation/), which supports fitting of linear ACE. Currently, no Python package exists for the same.
 Please run the following commands to enable the `ACEpotentials` fitting options and further functionality.
 
