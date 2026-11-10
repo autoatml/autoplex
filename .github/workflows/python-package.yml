@@ -22,6 +22,9 @@ jobs:
       matrix:
         python-version: ["3.10", "3.11", "3.12"]
         dep-group: ["matgl", "mace", "nep", "nequip"]
+        exclude:
+          - python-version: "3.10"
+            dep-group: "matgl"
 
     steps:
     - name: Fetch Most Recent Docker Image Tag
@@ -49,18 +52,12 @@ jobs:
           python -m pip install --upgrade pip && \
           python -m uv cache clean && \
           python -m uv pip install '.[strict-${{ matrix.dep-group }},tests,aims]' && \
-          if [ '${{ matrix.dep-group }}' = 'matgl' ]; then \
-            python -m uv pip install 'dgl==2.4.0' -f 'https://data.dgl.ai/wheels/torch-2.4/repo.html'; \
-          fi && \
-          if [ '${{ matrix.python-version }}' = '3.10' ] && [ '${{ matrix.dep-group }}' = 'matgl' ]; then \
-            python -m uv pip install 'ase==3.25.0'; \
-          fi && \
           OMP_NUM_THREADS=1 NEQUIP_NUM_TASKS=1 pytest @/workspace/tests/test_data/test-${{ matrix.dep-group }}.txt --cache-clear --cov=autoplex --cov-report term-missing --cov-append -vv --durations-path /workspace/tests/test_data/.pytest-split-durations --store-durations
         "
 
         
     - name: Upload test durations artifact
-      if: matrix.python-version == '3.10'
+      if: matrix.python-version == '3.11'
       uses: actions/upload-artifact@v4
       with:
         name: test-durations-${{ matrix.python-version }}-${{ matrix.dep-group }}
@@ -68,7 +65,7 @@ jobs:
         path: ./tests/test_data/.pytest-split-durations
 
     - name: Upload coverage
-      if: matrix.python-version == '3.10'
+      if: matrix.python-version == '3.11'
       uses: actions/upload-artifact@v4
       with:
         name: coverage-${{ matrix.python-version }}-${{ matrix.dep-group }}
