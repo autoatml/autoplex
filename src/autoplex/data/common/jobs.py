@@ -743,6 +743,39 @@ def check_convergence_castep(castep_gz: str) -> bool:
     return True
 
 
+def check_metallic_castep(castep_gz: str) -> bool:
+    """
+    Check if CASTEP flagged the system as metallic in an NMR (magres) calculation.
+
+    For systems with fractional occupancies, CASTEP prints a warning
+    ("Fractional occupancy of states detected ... Magnetic Shielding is not
+    implemented for metallic systems") but still completes the calculation.
+    The NMR parameters from such runs are not reliable.
+
+    Parameters
+    ----------
+    castep_gz : str
+        Path to the .castep.gz file.
+
+    Returns
+    -------
+    bool
+        True if CASTEP reported fractional occupancies (metallic system),
+        False otherwise.
+    """
+    markers = (
+        "fractional occupancy of states detected",
+        "not implemented for metallic systems",
+    )
+    with gzip.open(castep_gz, "rt") as f:
+        for line in f:
+            lower_line = line.lower()
+            if any(marker in lower_line for marker in markers):
+                return True
+
+    return False
+
+
 def check_convergence_aims(aims_gz: str) -> bool:
     """
     Check if FHI-aims calculation has converged.

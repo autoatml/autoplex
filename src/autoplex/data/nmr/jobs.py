@@ -13,6 +13,7 @@ with contextlib.suppress(ImportError):
 
 from autoplex.data.common.jobs import (
     check_convergence_castep,
+    check_metallic_castep,
     safe_strip_hostname,
 )
 
@@ -21,6 +22,7 @@ from autoplex.data.common.jobs import (
 def collect_nmr_data(
     nmr_ref_file: str = "nmr_ref.extxyz",
     nmr_dirs: list | None = None,
+    use_all_nmr_data: bool = False,
 ) -> dict:
     """
     Collect NMR data from specified directories, writes '.extxyz' file to nmr_ref_dir for later data processing.
@@ -32,6 +34,11 @@ def collect_nmr_data(
 
     nmr_dirs : list
         List of directories containing NMR data
+
+    use_all_nmr_data : bool
+        If False (default), skip calculations where CASTEP reports fractional
+        occupancies (metallic systems), because their NMR parameters are not
+        reliable. Set to True only if you know what you are doing.
 
     Returns
     -------
@@ -58,9 +65,18 @@ def collect_nmr_data(
         has_castep_output = os.path.exists(os.path.join(val, "castep.castep.gz"))
 
         if has_magres_output and has_castep_output:
-            converged = check_convergence_castep(os.path.join(val, "castep.castep.gz"))
-            if converged:
+            castep_file = os.path.join(val, "castep.castep.gz")
+            converged = check_convergence_castep(castep_file)
+            metallic = check_metallic_castep(castep_file)
+            if converged and metallic and not use_all_nmr_data:
+                logging.warning(
+                    f"CASTEP reports fractional occupancies (metallic system) for path: {castep_file}. "
+                    "Skipping, as the NMR parameters are not reliable. "
+                    "Set use_all_nmr_data=True to keep such calculations."
+                )
+            elif converged:
                 structure = read(os.path.join(val, "castep.magres.gz"), format="magres")
+                structure.info["metallic"] = metallic
                 # unsure if there are cases where energy does not converge and MS and EFG tensors converge
             else:
                 logging.warning(
