@@ -1,6 +1,6 @@
-# This workflow will install pacemaker and its dependencies, run tests and lint with Python 3.10
+# This workflow will install pacemaker and its dependencies, and run the PACE tests with Python 3.10, 3.11 and 3.12
 
-name: Testing Pacemaker (Python 3.10)
+name: Testing Pacemaker
 
 on:
   workflow_dispatch:
@@ -12,8 +12,10 @@ on:
 jobs:
   pacemaker-test:
     runs-on: ubuntu-latest
-    env:
-      PYTHON_VERSION: "3.10"
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
       
     steps:
     - name: Fetch Most Recent Docker Image Tag
@@ -28,27 +30,33 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Run Pacemaker Tests
+    - name: Run tests using Docker image for Python ${{ matrix.python-version }}
       run: |
-        docker pull ghcr.io/autoatml/autoplex/autoplex-python-3.10:${{ env.VERSION }}
+        docker pull ghcr.io/autoatml/autoplex/autoplex-python-${{ matrix.python-version }}:${{ env.VERSION }}
+
 
         docker run --rm \
           -v ${{ github.workspace }}:/workspace \
           -w /workspace \
-          ghcr.io/autoatml/autoplex/autoplex-python-3.10:${{ env.VERSION }} \
+          ghcr.io/autoatml/autoplex/autoplex-python-${{ matrix.python-version }}:${{ env.VERSION }} \
           bash -c "
-          git config --global --add safe.directory /workspace && \
-          python -m pip install --upgrade pip && \
-          python -m uv cache clean && \
-          python -m uv pip install setuptools==81.0.0 && \
-          python -m uv pip install 'protobuf<3.20' tensorflow==2.8.0 && \
-          python -m uv pip install --no-deps git+https://github.com/ICAMS/TensorPotential.git@1e44b2558356800ae070658c0bb856ff9bf74538 && \
-          python -m uv pip install --no-deps git+https://github.com/ICAMS/python-ace.git@d1c213a7d9c5b809a3ae83b2e5a916be26d921f0 && \
-          python -m uv pip install '.[strict-base,tests,aims]' && \
-          OMP_NUM_THREADS=1 pytest --cache-clear --cov=autoplex --cov-report term-missing --cov-append -vv --durations-path /workspace/tests/test_data/.pytest-split-durations --store-durations -k 'PACE'
-        "
-
+            git config --global --add safe.directory /workspace && \
+            python -m pip install --upgrade pip && \
+            python -m uv cache clean && \
+            if [ '${{ matrix.python-version }}' = '3.10' ]; then
+              # legacy PACE stack: only installable from pinned git commits on 3.10
+              python -m uv pip install setuptools==81.0.0 'protobuf<3.20' tensorflow==2.8.0 && \
+              python -m uv pip install --no-deps git+https://github.com/ICAMS/TensorPotential.git@1e44b2558356800ae070658c0bb856ff9bf74538 && \
+              python -m uv pip install --no-deps git+https://github.com/ICAMS/python-ace.git@d1c213a7d9c5b809a3ae83b2e5a916be26d921f0 && \
+              python -m uv pip install '.[strict-base,tests,aims]'
+            else
+              # 3.11+: python-ace / tensorpotential come from PyPI via the pacemaker extra
+              python -m uv pip install '.[strict-base,pacemaker,tests,aims]'
+            fi && \
+            OMP_NUM_THREADS=1 pytest --cache-clear --cov=autoplex --cov-report term-missing --cov-append -vv --durations-path /workspace/tests/test_data/.pytest-split-durations --store-durations -k 'PACE'
+           "
     - name: Upload pacemaker test durations artifact
+      if: matrix.python-version == '3.11'
       uses: actions/upload-artifact@v4
       with:
         name: test-durations-pacemaker
@@ -56,6 +64,7 @@ jobs:
         path: ./tests/test_data/.pytest-split-durations
 
     - name: Upload coverage
+      if: matrix.python-version == '3.11'
       uses: actions/upload-artifact@v4
       with:
         name: coverage-pacemaker
