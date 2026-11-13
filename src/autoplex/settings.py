@@ -495,7 +495,7 @@ class RssConfig(AutoplexBaseModel):
     )
     rss_safety: RssSafety = Field(
         default_factory=RssSafety,
-        description="Geometry guards and per-structure RSS wall-time limit.",
+        description="Geometry guards and per-structure wall-time limit for MLIP relaxations.",
     )
     num_processes_rss: int = Field(
         default=128, description="Number of processes used for running RSS."

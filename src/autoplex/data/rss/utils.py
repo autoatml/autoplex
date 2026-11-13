@@ -503,7 +503,7 @@ def process_rss(
         from matgl.ext.ase import M3GNetCalculator  # noqa: PLC0415
 
         pot_file = matgl.load_model(path=mlip_path)
-        pot = M3GNetCalculator(potential=pot_file)
+        pot = M3GNetCalculator(potential=pot_file, stress_unit="eV/A3")
 
     elif mlip_type == "MACE":
         from mace.calculators import MACECalculator  # noqa: PLC0415

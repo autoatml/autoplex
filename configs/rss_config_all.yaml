@@ -152,6 +152,7 @@ hookean_paras:
   - 1.0
 keep_symmetry: false
 remove_traj_files: false
+# Safety limits for MLIP structure relaxation; generation uses the builder settings.
 rss_safety:
   max_walltime: 600.0
   min_volume_per_atom: 0.1

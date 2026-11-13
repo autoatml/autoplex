@@ -1,8 +1,11 @@
----
-orphan: true
----
+(rss-relaxation-safeguards)=
 
 # RSS relaxation safeguards
+
+`rss_safety` controls the MLIP structure-relaxation step of RSS: validation of
+its initial and trial geometries, and supervised runtime for each relaxation.
+It does not configure random structure generation; that stage uses the builder
+settings, such as `buildcell_options`.
 
 RSS relaxations validate each trial structure before calling the interatomic
 potential. These checks also apply inside optimizer line searches, where a
