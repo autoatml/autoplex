@@ -273,6 +273,7 @@ def test_nequip_rss(test_dir, memory_jobstore, clean_dir):
   not has_m3gnet, reason="matgl is not installed"
 )
 def test_m3gnet_rss(test_dir, memory_jobstore, clean_dir):
+    # Test relaxation at fixed pressure; worker RNG behavior is covered separately.
     np.random.seed(42)
     test_files_dir = test_dir / "data/rss.extxyz"
     atoms = read(test_files_dir, index="0:5:1")
@@ -284,11 +285,11 @@ def test_m3gnet_rss(test_dir, memory_jobstore, clean_dir):
                                  mlip_path=mlip_path,
                                  structures=structures,
                                  scalar_pressure_method='exp',
-                                 scalar_exp_pressure=100,
-                                 scalar_pressure_exponential_width=0.2,
+                                 scalar_exp_pressure=0,
+                                 scalar_pressure_exponential_width=0,
                                  scalar_pressure_low=0,
                                  scalar_pressure_high=50,
-                                 max_steps=10,
+                                 max_steps=100,
                                  force_tol=0.1,
                                  stress_tol=0.1,
                                  hookean_repul=False,
@@ -309,7 +310,15 @@ def test_m3gnet_rss(test_dir, memory_jobstore, clean_dir):
         if i is not None:
             output_filter.append(i)
 
-    assert len(output_filter) == 1
+    assert len(output_filter) == len(structures)
+    for trajectory_path in output_filter:
+        trajectory = read(trajectory_path, index=":")
+        assert trajectory
+        final = trajectory[-1]
+        assert final.info["minim_stat"] == "converged"
+        assert final.info["RSS_applied_pressure"] == 0
+        assert np.isfinite(final.get_potential_energy())
+        assert np.isfinite(final.positions).all()
 
 @pytest.mark.skipif(
   not has_mace, reason="MACE is not installed"
