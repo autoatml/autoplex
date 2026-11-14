@@ -29,15 +29,15 @@ dependencies = [
      "atomate2[strict]==0.0.21; python_version < '3.11'",
      "atomate2[strict]>=0.1.5; python_version >= '3.11'",
      "ase>=3.24.0",
-     "numpy<2; python_version < '3.12'",
+     "numpy<2; python_version < '3.11'",
      "numpy",
      "typing",
      "torch",
      "hiphive",
-     "quippy-ase==0.9.14; python_version < '3.12'",
-     "quippy-ase==0.10.3; python_version >= '3.12'",
-     "f90wrap==0.2.16; python_version <'3.12'",
-     "f90wrap==0.3.0; python_version >='3.12'"
+     "quippy-ase==0.9.14; python_version < '3.11'",
+     "quippy-ase==0.10.3; python_version >= '3.11'",
+     "f90wrap==0.2.16; python_version <'3.11'",
+     "f90wrap==0.3.0; python_version >='3.11'"
 ]
 
 [tool.setuptools.packages.find]
@@ -67,12 +67,12 @@ workflow-managers = [
 strict-base = [
      "atomate2[strict]==0.0.21; python_version < '3.11'",
      "atomate2[strict]==0.1.5; python_version >= '3.11'",
-     "quippy-ase==0.9.14; python_version < '3.12'",
-     "quippy-ase==0.10.3; python_version >= '3.12'",
+     "quippy-ase==0.9.14; python_version < '3.11'",
+     "quippy-ase==0.10.3; python_version >= '3.11'",
      "ase>=3.24.0",
      "torch",
      "hiphive==1.4; python_version < '3.12'",
-     "numpy<2; python_version < '3.12'",
+     "numpy<2; python_version < '3.11'",
      "numpy",
      "typing",
      "scipy<=1.17.1",
@@ -80,13 +80,13 @@ strict-base = [
 
 strict-matgl = [
     "matgl==4.0.3; python_version >= '3.11'",
-    "numpy<2; python_version < '3.12'",
+    "numpy<2; python_version < '3.11'",
  ]
 
 strict-mace = [
     "mace-torch==0.3.14; python_version < '3.11'",
     "mace-torch==0.3.16; python_version >='3.11'",
-    "numpy<2; python_version < '3.12'",
+    "numpy<2; python_version < '3.11'",
  ]
 
 strict-nep = [
@@ -97,7 +97,7 @@ strict-nep = [
 strict-nequip = [
     "nequip==0.19.1; python_version >='3.11'",
     "nequip==0.6.1; python_version < '3.11'",
-    "numpy<2; python_version < '3.12'",
+    "numpy<2; python_version < '3.11'",
  ]
 
 
@@ -107,12 +107,15 @@ tests = ["pytest", "pytest-mock", "pytest-split", "pytest-cov", "types-setuptool
 # Python 3.12 restriction depends changes required for atomate2
 aims = ["pyfhiaims; python_version < '3.12'"]
 pacemaker = [
-     "numpy==1.26.4",
-     "pandas>=2.2",
-     "scipy",
-     "ruamel.yaml",
-     "psutil",
-     "scikit-learn==1.7.2",
+     "numpy==1.26.4;python_version < '3.11'",
+     "pandas>=2.2;python_version < '3.11'",
+     "scipy;python_version < '3.11'",
+     "ruamel.yaml;python_version < '3.11'",
+     "psutil;python_version < '3.11'",
+     "scikit-learn==1.7.2; python_version < '3.11'",
+     "python-ace==0.4.0; python_version >='3.11'",
+     "numpy<2.4;python_version >= '3.11'", # numpy>=2.4 breaks tensorpotential
+     "tensorpotential==0.6.2.1; python_version >='3.11'",
 ]
 
 [tool.setuptools_scm]
