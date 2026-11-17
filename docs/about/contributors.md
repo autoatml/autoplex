@@ -50,6 +50,12 @@ BAM Berlin and Friedrich Schiller University Jena
 [naik-aakash]: https://github.com/naik-aakash
 [0000-0002-6071-6786]: https://orcid.org/0000-0002-6071-6786
 
+**Hanna Türk** [![gh]][HannaTuerk] [![orc]][0000-0002-9858-7019] \
+BAM Berlin
+
+[HannaTuerk]: https://github.com/HannaTuerk
+[0000-0002-9858-7019]: https://orcid.org/0000-0002-9858-7019
+
 ## Contributors
 
 **Joe Morrow** [![gh]][MorrowChem] [![orc]][0000-0002-3441-8646] (RSS code)\
