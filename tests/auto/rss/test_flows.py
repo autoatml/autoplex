@@ -575,6 +575,7 @@ def test_mock_workflow_for_PACE(test_dir, mock_vasp, memory_jobstore, clean_dir)
     }
 
     fake_run_vasp_kwargs = {
+        **{f"static_bulk_{i}": {"check_inputs": ["incar", "potcar"]} for i in range(18)},
         "static_isolated_0": {"incar_settings": {"ISPIN": 2, "KSPACINGS": 2.0}},
         "static_dimer_0": {"incar_settings": {"ISPIN": 2, "KSPACINGS": 2.0}},
         "static_dimer_1": {"incar_settings": {"ISPIN": 2, "KSPACINGS": 2.0}},
@@ -1087,7 +1088,7 @@ def test_rssmaker_custom_config_file(test_dir):
     assert rss.rss_config.isolatedatom_box == [10, 10, 10]
     assert rss.rss_config.dimer_box == [10, 10, 10]
 
-def test_rss_workflow(test_dir, mock_vasp, memory_jobstore, clean_dir):
+def test_rss_workflow_jobprefix(test_dir, mock_vasp, memory_jobstore, clean_dir):
     from autoplex.settings import RssConfig
     from autoplex.auto.rss.flows import RssMaker
     from jobflow import Flow

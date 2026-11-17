@@ -85,7 +85,7 @@ jobs:
           --json databaseId,name,headBranch,headSha,status,conclusion,createdAt \
           --jq '
             [.[] |
-              select(.name == "Testing Pacemaker (Python 3.10)" and .conclusion == "success")
+              select(.name == "Testing Pacemaker" and .conclusion == "success")
             ] |
             sort_by(.createdAt) |
             last |
