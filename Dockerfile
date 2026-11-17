@@ -57,7 +57,7 @@ RUN curl -fsSL https://www.mtg.msm.cam.ac.uk/files/airss-0.9.3.tgz -o /opt/airss
 ENV PATH="${PATH}:/opt/airss/bin"
 
 # Install LAMMPS (rss)
-RUN curl -fsSL https://download.lammps.org/tars/lammps-29Aug2024_update1.tar.gz -o /opt/lammps.tar.gz \
+RUN curl -fsSL https://download.lammps.org/tars/releases/stable/lammps-20240829.tar.gz -o /opt/lammps.tar.gz \
      && tar -xf /opt/lammps.tar.gz -C /opt \
      && rm /opt/lammps.tar.gz \
      && cd /opt/lammps-* \
