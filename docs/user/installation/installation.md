@@ -53,7 +53,7 @@ pip install --no-build-isolation phonopy==2.30.1
 
 Once this is done, you can install `autoplex` simply by:
 
-**For 3.10<=Python<=3.12**
+**For 3.10<=Python<=3.13**
 
 ```bash
 pip install autoplex[strict-base]
