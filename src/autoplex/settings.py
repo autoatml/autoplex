@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Literal
 
 from monty.serialization import loadfn
-from pydantic import Field, model_validator
+from pydantic import ConfigDict, Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from autoplex._basemodel import AutoplexBaseModel
@@ -22,6 +22,7 @@ __all__ = [
     "AutoplexSettings",
     "MLIPHypers",
     "RssConfig",
+    "RssSafety",
 ]
 
 _DEFAULT_CONFIG_FILE_PATH = "~/.autoplex.yaml"
@@ -89,6 +90,37 @@ class AutoplexSettings(BaseSettings):
 
 
 # RSS Configuration
+
+
+class RssSafety(AutoplexBaseModel):
+    """Limits applied to each RSS relaxation, including line-search trials."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    max_walltime: float = Field(
+        default=600.0,
+        gt=0,
+        allow_inf_nan=False,
+        description="Wall-time limit in seconds per structure, including model loading.",
+    )
+    min_volume_per_atom: float | None = Field(
+        default=0.1,
+        gt=0,
+        allow_inf_nan=False,
+        description="Minimum volume per atom in A^3 for fully periodic cells; None disables this check.",
+    )
+    min_distance: float | None = Field(
+        default=0.1,
+        gt=0,
+        allow_inf_nan=False,
+        description="Minimum atomic or periodic self-image separation in A; None disables this check.",
+    )
+    max_cell_condition_number: float = Field(
+        default=1e4,
+        ge=1,
+        allow_inf_nan=False,
+        description="Maximum singular-value ratio of periodic lattice vectors.",
+    )
 
 
 class ResumeFromPreviousState(AutoplexBaseModel):
@@ -460,6 +492,10 @@ class RssConfig(AutoplexBaseModel):
     remove_traj_files: bool = Field(
         default=False,
         description="Bool indicating whether to remove the RSS trajectory files.",
+    )
+    rss_safety: RssSafety = Field(
+        default_factory=RssSafety,
+        description="Geometry guards and per-structure wall-time limit for MLIP relaxations.",
     )
     num_processes_rss: int = Field(
         default=128, description="Number of processes used for running RSS."

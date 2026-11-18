@@ -10,4 +10,5 @@ flow/introduction/intro
 flow/input/input
 flow/quick_start/start
 flow/example/example
+../rss
 ```

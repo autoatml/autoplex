@@ -2,10 +2,10 @@
 
 import ast
 import json
+import logging
 import os
 import sys
 from functools import partial
-from multiprocessing import Pool
 from pathlib import Path
 from typing import Literal
 
@@ -22,12 +22,18 @@ from ase.optimize.precon import Exp, PreconLBFGS
 from ase.units import GPa
 from pymatgen.core import Structure
 from pymatgen.io.ase import AseAtomsAdaptor
-from threadpoolctl import threadpool_limits
 
+from autoplex.data.rss.safety import (
+    GuardedCalculator,
+    RssGeometryError,
+    supervise_relaxations,
+    validate_rss_geometry,
+)
 from autoplex.fitting.common.utils import (
     CustomPotential,
     extract_gap_label,
 )
+from autoplex.settings import RssSafety
 
 try:
     from ase.constraints import UnitCellFilter
@@ -37,6 +43,9 @@ try:
     from ase.constraints import slice2enlist
 except ImportError:
     from ase.constraints.constraint import slice2enlist
+
+
+logger = logging.getLogger(__name__)
 
 
 def extract_pairstyle(
@@ -328,6 +337,7 @@ def process_rss(
     isolated_atom_energies: dict[int, float] | None = None,
     config_type: str = "traj",
     keep_symmetry: bool = True,
+    rss_safety: RssSafety | dict | None = None,
 ) -> str | None:
     """Run RSS on a single thread using MLIPs.
 
@@ -373,12 +383,23 @@ def process_rss(
         Specify the type of configurations generated from RSS.
     keep_symmetry: bool
         If true, preserve symmetry during relaxation.
+    rss_safety: RssSafety | dict | None
+        Geometry guards and the supervised per-structure wall-time limit.
 
     Returns
     -------
     str | None
         Output string containing path for the results of the RSS relaxation.
     """
+    safety = RssSafety.model_validate(rss_safety or {})
+    try:
+        validate_rss_geometry(atom, safety)
+    except RssGeometryError as exc:
+        logger.warning(
+            "RSS structure %s rejected: %s", atom.info.get("unique_starting_index"), exc
+        )
+        return None
+
     if hookean_paras is not None:
         hookean_paras = {
             ast.literal_eval(k) if isinstance(k, str) else k: v
@@ -482,7 +503,7 @@ def process_rss(
         from matgl.ext.ase import M3GNetCalculator  # noqa: PLC0415
 
         pot_file = matgl.load_model(path=mlip_path)
-        pot = M3GNetCalculator(potential=pot_file)
+        pot = M3GNetCalculator(potential=pot_file, stress_unit="eV/A3")
 
     elif mlip_type == "MACE":
         from mace.calculators import MACECalculator  # noqa: PLC0415
@@ -528,7 +549,7 @@ def process_rss(
     if constraint_list:
         atom.set_constraint(constraint_list)
 
-    atom.calc = pot
+    atom.calc = GuardedCalculator(pot, safety)
 
     if scalar_pressure_method == "exp":
         scalar_pressure_tmp = scalar_exp_pressure * GPa
@@ -580,8 +601,8 @@ def process_rss(
             return os.path.join(dir_path, traj_file_name)
         return None
 
-    except RuntimeError:
-        print("RuntimeError occurred during optimization! Return none!")
+    except (RssGeometryError, RuntimeError) as exc:
+        logger.warning("RSS structure %s failed: %s", unique_starting_index, exc)
         return None
 
 
@@ -608,6 +629,7 @@ def minimize_structures(
     config_type: str = "traj",
     struct_start_index: int = 0,
     keep_symmetry: bool = True,
+    rss_safety: RssSafety | dict | None = None,
 ) -> list[str | None]:
     """Run RSS in parallel.
 
@@ -658,12 +680,15 @@ def minimize_structures(
         Specify the starting index within a list
     keep_symmetry: bool
         If true, preserve symmetry during relaxation.
+    rss_safety: RssSafety | dict | None
+        Geometry guards and the supervised per-structure wall-time limit.
 
     Returns
     -------
     list
         Output list[str] containing paths for the results of the RSS relaxation.
     """
+    safety = RssSafety.model_validate(rss_safety or {})
     atoms = [AseAtomsAdaptor().get_atoms(structure) for structure in structures]
     for at in atoms:
         if "virial" in at.info:
@@ -695,12 +720,18 @@ def minimize_structures(
         isolated_atom_energies=isolated_atom_energies,
         config_type=config_type,
         keep_symmetry=keep_symmetry,
+        rss_safety=safety,
     )
 
-    with threadpool_limits(limits=1), Pool(processes=num_processes_rss) as pool:
-        results = pool.map(minimize_worker, atoms)
-
-    return list(results)
+    results = supervise_relaxations(
+        minimize_worker, atoms, num_processes_rss, safety.max_walltime
+    )
+    if atoms and not any(results):
+        raise RuntimeError(
+            "All RSS relaxations failed or were unconverged; inspect the per-structure "
+            "logs and RSS failure warnings before restarting."
+        )
+    return results
 
 
 def split_structure_into_groups(structures: list, num_groups: int) -> list[list]:

@@ -582,6 +582,7 @@ def do_rss_single_node(
     struct_start_index: int = 0,
     config_type: str = "traj",
     keep_symmetry: bool = True,
+    rss_safety: dict | None = None,
 ) -> list[str | None]:
     """
     Perform sandom structure searching (RSS) on one node using a machine learning interatomic potential (MLIP).
@@ -631,6 +632,8 @@ def do_rss_single_node(
         Specify the type of configurations generated from RSS
     keep_symmetry: bool
         If true, preserve symmetry during relaxation.
+    rss_safety: dict | None
+        Geometry guards and the per-structure wall-time limit.
 
     Returns
     -------
@@ -659,6 +662,7 @@ def do_rss_single_node(
         struct_start_index=struct_start_index,
         config_type=config_type,
         keep_symmetry=keep_symmetry,
+        rss_safety=rss_safety,
     )
 
 
@@ -687,6 +691,7 @@ def do_rss_multi_node(
     config_type: str = "traj",
     keep_symmetry: bool = True,
     jobprefix: str = "",
+    rss_safety: dict | None = None,
 ) -> list[list | None]:
     """
     Perform sandom structure searching (RSS) on multiple nodes using a machine learning interatomic potential (MLIP).
@@ -739,6 +744,8 @@ def do_rss_multi_node(
         Specify the type of configurations generated from RSS
     keep_symmetry: bool
         If true, preserve symmetry during relaxation.
+    rss_safety: dict | None
+        Geometry guards and the per-structure wall-time limit.
     jobprefix: str
         Prefix that precedes the jobname.
 
@@ -791,6 +798,7 @@ def do_rss_multi_node(
             struct_start_index=struct_start_index,
             config_type=config_type,
             keep_symmetry=keep_symmetry,
+            rss_safety=rss_safety,
         )
         rss.name = f"{jobprefix}{rss.name}"
         struct_start_index += len(structure_groups[i])

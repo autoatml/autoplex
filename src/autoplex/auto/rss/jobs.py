@@ -436,6 +436,7 @@ def do_rss_iterations(
     static_energy_maker_isolated_atoms: (
         BaseVaspMaker | CastepStaticMaker | ForceFieldStaticMaker | None
     ) = None,
+    rss_safety: dict | None = None,
     **fit_kwargs,
 ):
     """
@@ -584,6 +585,8 @@ def do_rss_iterations(
         Parameters for Hookean repulsion as a dictionary of tuples. Default is None.
     keep_symmetry: bool
         If true, preserve symmetry during relaxation. Default is False.
+    rss_safety: dict | None
+        Geometry guards and the per-structure wall-time limit.
     remove_traj_files: bool
             If true, remove all trajectory files raised by RSS to save memory. Default is False.
     num_processes_rss: int
@@ -693,6 +696,7 @@ def do_rss_iterations(
             hookean_repul=hookean_repul,
             hookean_paras=hookean_paras,
             keep_symmetry=keep_symmetry,
+            rss_safety=rss_safety,
             num_processes_rss=num_processes_rss,
             device=device_for_rss,
             num_groups=num_groups,
@@ -837,6 +841,7 @@ def do_rss_iterations(
             hookean_repul=hookean_repul,
             hookean_paras=hookean_paras,
             keep_symmetry=keep_symmetry,
+            rss_safety=rss_safety,
             remove_traj_files=remove_traj_files,
             num_processes_rss=num_processes_rss,
             device_for_rss=device_for_rss,
