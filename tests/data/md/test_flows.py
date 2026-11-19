@@ -7,21 +7,15 @@ from jobflow import run_locally
 import pytest
 from ase import units
 
-try:
-    import mace  # noqa: F401
-
-    has_mace = True
-except ImportError:
-    has_mace = False
-
-@pytest.mark.skipif(not has_mace, reason="MACE is not installed")
-def test_mdasemaker_mace_nvt(memory_jobstore, clean_dir):
+def test_mdasemaker_gap_nvt(test_dir, memory_jobstore, clean_dir):
     atoms = bulk("Si", "diamond", a=5.43, cubic=True)
     structure = AseAtomsAdaptor.get_structure(atoms)
 
     md_job = MDAseMaker(
-        force_field_name="MLFF.MACE_MPA_0",
-        calculator_kwargs={"device": "cpu"},
+        force_field_name="MLFF.GAP",
+        calculator_kwargs={
+            "param_filename": str(test_dir / "fitting/GAP/gap_file.xml")
+        },
         temperature_list=[300.0],
         eqm_step_list=[2],
         time_step=1.0,
