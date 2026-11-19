@@ -10,3 +10,4 @@ tests/fitting/common/test_jobs.py::test_mace_fit_maker
 tests/fitting/common/test_jobs.py::test_mace_fit_maker_no_stress
 tests/fitting/common/test_jobs.py::test_mace_fit_maker_passEOs
 tests/fitting/common/test_jobs.py::test_mace_finetuning_maker
+tests/data/md/test_flows.py::test_mdasemaker_mace_nvt

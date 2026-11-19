@@ -10,96 +10,94 @@ import numpy as np
 
 from autoplex.data.common.utils import flatten_list
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logger = logging.getLogger(__name__)
 
 
 def generate_temperature_profile(
     temperature_list: list[float],
     eqm_step_list: list[int] | None = None,
     rate_list: list[float] | None = None,
-    time_step: float | None = 1.0,
-):
+) -> tuple[np.ndarray, int]:
     """
-    Generate a temperature array for molecular-dynamics runs.
+    Build a per-step temperature schedule for a multi-stage MD run.
 
-    Each listed temperature corresponds to one MD step.
-    This handles both single-temperature (isothermal) and
-    multi-temperature (e.g., multi-stage quench) runs.
+    Stage ``i`` holds ``temperature_list[i]`` for ``eqm_step_list[i]`` steps and
+    then ramps linearly to the next temperature, spending ``rate_list[i]`` MD steps
+    per kelvin. Heating and cooling are treated identically, so the same function
+    covers isothermal runs, multi-stage quenches and heating/cooling cycles.
 
     Parameters
     ----------
     temperature_list : list[float]
-        A list of values defines a multi-stage quench or anneal profile.
-    eqm_step_list : list[int] | None, optional
-        Number of MD steps to hold each temperature value.
-        Length must match `temperatures`. If None, defaults to 10,000.
-    rate_list : list[float] | None, optional
-        Relative cooling/heating rates between stages (len = len(temperatures) - 1).
-        If None, linear interpolation is used. A larger `rate` value produces more
-        intermediate temperatures (slower quench), while a smaller value gives fewer steps
-        (faster quench). For example, rate=10 -> 10^14 K/s; rate=100 -> 10^13 K/s.
-    dt: float
-        Time step for running MD.
+        Stage temperatures in K, e.g. [3000, 1500, 300] for a two-stage quench.
+    eqm_step_list : list[int] | None
+        MD steps to hold each temperature (one entry per temperature).
+        Defaults to 10,000 steps per stage.
+    rate_list : list[float] | None
+        MD steps per kelvin for each ramp (one entry per ramp, i.e.
+        len(temperature_list) - 1). 0 jumps straight to the next temperature.
+        With a 1 fs time step, rate=10 is 10^14 K/s and rate=100 is 10^13 K/s.
+        None, [] or only zeros run without any ramps.
 
     Returns
     -------
-    np.ndarray
-        Array of temperatures for each MD step (length = n_steps + 1),
-        ready to pass to ``ForceFieldMDMaker.temperature``.
+    tuple[np.ndarray, int]
+        The temperature at every MD step (length n_steps + 1) and n_steps,
+        ready for ``ForceFieldMDMaker.temperature`` and ``.n_steps``.
     """
-    n_seg = len(temperature_list)
-    if eqm_step_list is not None and len(eqm_step_list) != n_seg:
+    temps = np.asarray(temperature_list, dtype=float)
+    n_seg = temps.size
+    holds = (
+        np.full(n_seg, 10_000)
+        if eqm_step_list is None
+        else np.asarray(eqm_step_list, dtype=int)
+    )
+    # None, [] or only zeros: no ramps, whatever the length of rate_list
+    rates = (
+        np.asarray(rate_list, dtype=float)
+        if rate_list is not None and np.any(rate_list)
+        else np.zeros(max(n_seg - 1, 0))
+    )
+
+    if n_seg == 0:
+        raise ValueError("temperature_list needs at least one temperature.")
+    if holds.size != n_seg:
         raise ValueError(
-            f"Length mismatch: eqm_steps_list ({len(eqm_step_list)}) "
-            f"must match temperatures ({n_seg})."
+            f"eqm_step_list needs one entry per temperature ({n_seg}), "
+            f"got {holds.size}."
+        )
+    if (holds < 0).any() or (rates < 0).any():
+        raise ValueError("eqm_step_list and rate_list must be non-negative.")
+
+    if rates.size != n_seg - 1:
+        raise ValueError(
+            f"rate_list needs one rate per ramp between consecutive temperatures: "
+            f"{n_seg - 1} for {n_seg} temperature(s), got {rates.size}. "
+            "Leave rate_list out, or use only zeros, to run without ramps."
         )
 
-    if n_seg == 1:
-        n_hold = 10000 if eqm_step_list is None else eqm_step_list[0]
-        T_array = np.array([temperature_list[0]] * (n_hold + 1))
-        if time_step is None:
-            logging.warning(
-                "time_step is not set. Using default value 1 fs for plotting."
-            )
-            time_step = 1.0
-        plot_temperature_profile(T_array, time_step)
-        return temperature_list, n_hold
-
     T_list = []
-    eqm_step_list = eqm_step_list or [10000] * n_seg
-    if rate_list is None:
-        rate_list = [0.0] * (n_seg - 1)
 
     for i in range(n_seg):
         # hold current temperature
-        T_list.extend([temperature_list[i]] * int(eqm_step_list[i]))
+        T_list.extend([temperature_list[i]] * int(holds[i]))
 
         if i < n_seg - 1:
             T0, T1 = float(temperature_list[i]), float(temperature_list[i + 1])
-            rate_val = float(rate_list[i])
+            rate_val = float(rates[i])
             if rate_val == 0.0:
                 pass
             else:
-                md_steps = int(-(T0 - T1) * rate_list[i])
+                md_steps = int(-(T0 - T1) * rate_val)
                 tem_interval = max(abs(md_steps), 1)
                 # linear interpolation between T0 and T1, one temperature per step
-                if T0 > T1:
-                    tem_list = list(np.linspace(T0, T1, tem_interval + 1))[1:]
-                else:
-                    tem_list = list(np.linspace(T1, T0, tem_interval + 1))[1:]
-                    tem_list.reverse()
+                tem_list = list(np.linspace(T0, T1, tem_interval + 1))[1:]
 
                 T_list.extend(tem_list)
 
     T_list.append(temperature_list[-1])
     T_array = np.array(T_list, dtype=float)
     n_steps = len(T_array) - 1
-    if time_step is None:
-        logging.warning("time_step is not set. Using default value 1 fs for plotting.")
-        time_step = 1.0
-    plot_temperature_profile(T_array, time_step)
     return T_array, n_steps
 
 
@@ -133,12 +131,12 @@ def handle_md_trajectory(
 
     for traj in traj_path:
         if traj is not None and Path(traj).exists():
-            logging.info(f"Processing MD trajectory:, {traj}")
+            logger.info(f"Processing MD trajectory:, {traj}")
             at = ase.io.read(traj, index=":")
             atoms.append(at)
 
             if remove_traj_files:
-                logging.warning(f"The MD trajectory file is deleted: {traj}")
+                logger.warning(f"The MD trajectory file is deleted: {traj}")
                 os.remove(traj)
 
     return atoms
@@ -177,4 +175,4 @@ def plot_temperature_profile(
     fig.savefig(out_path, dpi=300, bbox_inches="tight")
     plt.close(fig)
 
-    logging.info("Temperature profile was generated!")
+    logger.info("Temperature profile was generated!")
