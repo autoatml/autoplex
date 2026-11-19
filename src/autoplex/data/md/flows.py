@@ -21,6 +21,15 @@ from autoplex.fitting.common.utils import extract_gap_label
 
 logger = logging.getLogger(__name__)
 
+# calculator_kwargs key of the model file of locally trained potentials;
+# foundation models (e.g. MLFF.MACE_MPA_0) are downloaded and need no file
+_MODEL_FILE_KEYS = {
+    "MLFF.GAP": "param_filename",
+    "MLFF.MACE": "model",
+    "MLFF.Nequip": "model_path",
+    "MLFF.NEP": "model_filename",
+}
+
 
 @dataclass
 class MDAseMaker(ForceFieldMDMaker):
@@ -35,6 +44,7 @@ class MDAseMaker(ForceFieldMDMaker):
     (cooling)** and **heating** stages.  By specifying multiple temperature points,
     the maker automatically builds a stepwise temperature path, enabling complex
     thermal protocols such as:
+
     - isothermal equilibration
     - multi-stage quench (e.g., 3000 -> 1500 -> 300 K)
     - annealing or cyclic heating-cooling loops
@@ -76,20 +86,20 @@ class MDAseMaker(ForceFieldMDMaker):
     traj_file: str = "MD.traj"  # atomate2 defaults to None, which writes no trajectory
 
     @job
-    def make(self, structure: Structure):
-        """Maker to run MD simulations.
+    def make(self, structure: Structure | list[Structure]):
+        """Maker to run MD simulations, one MD per structure (after supercell and volume scaling).
 
         Parameters
         ----------
-        structure: Structure
-            Pymatgen structure.
-        """
-        logger.warning(
-            "The value of `force_field_name` must use the full, case-sensitive name. "
-            "Supported types include: CHGNet, M3GNet, MATPES_R2SCAN, MATPES_PBE, "
-            "MACE, MACE_MP_0, MACE_MPA_0, MACE_MP_0B3, GAP, NEP, Nequip, SevenNet. "
-        )
+        structure : Structure | list[Structure]
+            Pymatgen structure or a list of structures.
 
+        Returns
+        -------
+        Response
+            Replaces this job by the MD jobs. Its output is the list of
+            trajectory file paths, one per MD run.
+        """
         # Always work on a list, so supercells and volume scaling apply to every input
         structures = (
             [structure] if isinstance(structure, Structure) else list(structure)
@@ -97,7 +107,7 @@ class MDAseMaker(ForceFieldMDMaker):
         if self.supercell_matrix is not None:
             logger.info(f"Applying supercell_matrix:\n{self.supercell_matrix}")
             structures = [s * self.supercell_matrix for s in structures]
-            logger.info(f"Supercell generated: {structures}.")
+            logger.info(f"Atoms per supercell: {[len(s) for s in structures]}")
         if self.volume_custom_scale_factors is not None:
             logger.info("Applying custom volume scaling:")
             logger.info(f"  Scale factors: {self.volume_custom_scale_factors}")
@@ -142,52 +152,25 @@ class MDAseMaker(ForceFieldMDMaker):
 
             self.calculator_kwargs["device"] = device
 
-        if self.force_field_name == "MLFF.GAP":
-            logger.info("Using GAP force field for MD simulation...")
-            gap_label = self.calculator_kwargs.get("param_filename", None)
-            if gap_label is None:
-                raise ValueError(
-                    "`param_filename` must be provided for GAP force field."
-                )
-            gap_path = Path(gap_label)
-            if gap_path.exists():
-                gap_control = "Potential xml_label=" + extract_gap_label(gap_path)
-            else:
-                logger.error(f"GAP parameter file not found: {gap_path}")
+        # Locally trained potentials need an existing model file
+        model_key = _MODEL_FILE_KEYS.get(self.force_field_name)
+        if model_key is not None:
+            model_file = self.calculator_kwargs.get(model_key)
+            if model_file is None or not Path(model_file).exists():
                 raise FileNotFoundError(
-                    f"GAP parameter file does not exist: {gap_path}"
+                    f"{self.force_field_name} needs an existing model file in "
+                    f"calculator_kwargs['{model_key}'], got {model_file!r}. "
+                    "For a foundation model use its full name, e.g. MLFF.MACE_MPA_0."
                 )
-            self.calculator_kwargs["args_str"] = gap_control
+            logger.info(f"Using {self.force_field_name} model {model_file}")
 
-        elif self.force_field_name == "MLFF.MACE":
-            logger.info("Using MACE force field for MD simulation...")
-            model_val = self.calculator_kwargs.get("model", None)
-            if not Path(model_val).exists():
-                raise ValueError(
-                    "No local MACE model was specified in `calculator_kwargs['model']`.\n"
-                    "Please provide the absolute path to your trained MACE model.\n\n"
-                    "If you intend to use a MACE foundation model instead, please specify "
-                    "a fully-qualified force_field_name, such as:\n"
-                    "    'MLFF.MACE_MP_0'\n"
-                    "instead of using the ambiguous name 'MACE'."
-                )
-
-        elif self.force_field_name == "MLFF.Nequip":
-            logger.info("Using NequIP force field for MD simulation...")
-            model_path = self.calculator_kwargs.get("model_path", None)
-            if not Path(model_path).exists():
-                raise ValueError(
-                    "`model_path` must be provided for NequIP force field."
-                )
-
+        if self.force_field_name == "MLFF.GAP":
+            gap_file = Path(self.calculator_kwargs["param_filename"])
+            self.calculator_kwargs["args_str"] = (
+                f"Potential xml_label={extract_gap_label(gap_file)}"
+            )
         elif self.force_field_name == "MLFF.NEP":
-            self.calculator_kwargs.pop("device", None)
-            logger.info("Using NEP force field for MD simulation...")
-            model_filename = self.calculator_kwargs.get("model_filename", None)
-            if not Path(model_filename).exists():
-                raise ValueError(
-                    "`model_filename` must be provided for NEP force field."
-                )
+            self.calculator_kwargs.pop("device", None)  # calorine takes no device
 
         for idx, struct in enumerate(structures):
             # own copy per job: atomate2 caches the calculator on the maker
