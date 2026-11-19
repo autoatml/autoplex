@@ -56,10 +56,12 @@ def test_mdasemaker_gap_npt(test_dir, memory_jobstore, clean_dir):
         time_step=1.0,
         traj_interval=1,
         ensemble="npt",
-        dynamics="nose-hoover-chain",  # atomate2's NPT default (ASE MTKNPT)
-        pressure=0.0,  # in kbar; required for NPT
-        # MTKNPT needs thermostat/barostat damping times (ASE units)
-        ase_md_kwargs={"tdamp": 100 * units.fs, "pdamp": 1000 * units.fs},
+        dynamics="nose-hoover",  # ASE NPT: works with every atomate2 version used in CI
+        pressure=0.0,  # kbar
+        ase_md_kwargs={
+            "ttime": 25 * units.fs,  # thermostat time constant
+            "pfactor": (75 * units.fs) ** 2 * 100 * units.GPa,  # (barostat time)^2 x bulk modulus of Si
+        },
         traj_file="MD.traj",
         traj_file_fmt="ase",
         store_trajectory="partial",
