@@ -8,6 +8,8 @@ from ase.io import read
 from atomate2.forcefields.md import ForceFieldMDMaker
 from jobflow import run_locally
 from pymatgen.io.ase import AseAtomsAdaptor
+from ase import __version__ as ase_version
+from packaging.version import Version
 
 from autoplex.data.md.flows import ScaledMDMaker
 
@@ -111,7 +113,9 @@ def test_scaledmdmaker_gap_npt(test_dir, memory_jobstore, clean_dir):
 
     frames = read(traj_path[0], index=":")
 
-    assert len(frames) == 6  # 5 MD steps + the starting structure
+    # ASE < 3.27 (3.24 on the Python 3.10 CI) does not save the starting structure in NPT
+    n_frames = 5 if Version(ase_version) < Version("3.27") else 6
+    assert len(frames) == n_frames  # 5 MD steps (+ the starting structure)
     # NPT lets the cell change (NVT keeps it fixed)
     assert frames[-1].get_volume() != pytest.approx(frames[0].get_volume())
 
