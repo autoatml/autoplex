@@ -1,14 +1,10 @@
 """Utility functions for MD."""
 
 import logging
-import os
 from pathlib import Path
 
-import ase.io
 import matplotlib.pyplot as plt
 import numpy as np
-
-from autoplex.data.common.utils import flatten_list
 
 logger = logging.getLogger(__name__)
 
