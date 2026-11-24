@@ -32,7 +32,9 @@ def gap_nvt_maker(test_dir):
 
 
 def run_nvt(md_maker, structures, store, **cell_options):
-    """Run a 2-step NVT MD per prepared cell; return the frames of every run."""
+    """Run a 2-step NVT MD per prepared cell; return the frames of every run. 
+    This function is used by methods below.
+    """
     md_job = ScaledMDMaker(
         md_maker=md_maker, temperature_list=[300.0], eqm_step_list=[2], **cell_options
     ).make(structures)
@@ -44,9 +46,7 @@ def run_nvt(md_maker, structures, store, **cell_options):
 
 
 def test_scaledmdmaker_gap_nvt(test_dir, memory_jobstore, clean_dir):
-    atoms = bulk("Si", "diamond", a=5.43, cubic=True)
-    structure = AseAtomsAdaptor.get_structure(atoms)
-
+    """Run a 2-step NVT MD with GAP."""
     md_job = ScaledMDMaker(
         md_engine="ase",
         md_maker=ForceFieldMDMaker(
@@ -64,7 +64,7 @@ def test_scaledmdmaker_gap_nvt(test_dir, memory_jobstore, clean_dir):
         ),
         temperature_list=[300.0],
         eqm_step_list=[2],
-    ).make(structure)
+    ).make(CUBIC)
 
     run_locally(md_job, create_folders=True, ensure_success=True, store=memory_jobstore)
 
@@ -78,9 +78,7 @@ def test_scaledmdmaker_gap_nvt(test_dir, memory_jobstore, clean_dir):
 
 
 def test_scaledmdmaker_gap_npt(test_dir, memory_jobstore, clean_dir):
-    atoms = bulk("Si", "diamond", a=5.43, cubic=True)
-    structure = AseAtomsAdaptor.get_structure(atoms)
-
+    """Run a 2-step NPT MD with GAP."""
     md_job = ScaledMDMaker(
         md_engine="ase",
         md_maker=ForceFieldMDMaker(
@@ -103,7 +101,7 @@ def test_scaledmdmaker_gap_npt(test_dir, memory_jobstore, clean_dir):
         ),
         temperature_list=[300.0],
         eqm_step_list=[5],
-    ).make(structure)
+    ).make(CUBIC)
 
     run_locally(md_job, create_folders=True, ensure_success=True, store=memory_jobstore)
 

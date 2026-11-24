@@ -1,6 +1,9 @@
 from autoplex.data.md.utils import generate_temperature_profile
 import numpy as np
 import pytest
+import matplotlib.pyplot as plt
+
+from autoplex.data.md.utils import generate_temperature_profile, plot_temperature_profile
 
 def test_generate_temperature_profile_values():
     temperature_list = [100.0, 300.0]
@@ -98,3 +101,44 @@ def test_ramp_step_list_is_used_instead_of_the_rate():
 def test_invalid_ramp_step_list_raises(ramp_step_list):
     with pytest.raises(ValueError, match="ramp_step_list"):
         generate_temperature_profile([300.0, 500.0], [2, 2], ramp_step_list=ramp_step_list)
+
+@pytest.fixture
+def keep_figure_open(monkeypatch):
+    """plot_temperature_profile closes its figure; keep it open to read the plotted data."""
+    monkeypatch.setattr(plt, "close", lambda *args, **kwargs: None)
+    yield
+    monkeypatch.undo()
+    plt.close("all")
+
+@pytest.mark.parametrize(
+    ("temperature_list", "eqm_step_list", "rate_list"),
+    [([300.0, 500.0, 400.0], [2, 2, 2], [0, 0.01]), ([300.0], [5], None)],
+    ids=["ramp", "constant"],
+)
+def test_plot_temperature_profile_data(
+    temperature_list, eqm_step_list, rate_list, keep_figure_open, clean_dir
+):
+    """Test that the axis values and labels are correct."""
+    T_array, _ = generate_temperature_profile(temperature_list, eqm_step_list, rate_list)
+
+    plot_temperature_profile(T_array, time_step=2.0)
+
+    ax = plt.gcf().axes[0]
+    profile, ymax_line, ymin_line = ax.get_lines()
+    np.testing.assert_allclose(profile.get_xdata(), np.arange(len(T_array)) * 2.0 / 1000)  # ps
+    np.testing.assert_allclose(profile.get_ydata(), T_array)
+    np.testing.assert_allclose(ymax_line.get_ydata(), T_array.max())
+    np.testing.assert_allclose(ymin_line.get_ydata(), T_array.min())
+    assert {T_array.min(), T_array.max()} <= set(ax.get_yticks())
+    assert (ax.get_xlabel(), ax.get_ylabel()) == ("Simulation time (ps)", "Temperature (K)")
+
+
+def test_plot_temperature_profile_file(tmp_path):
+    """Test that the Figure is saved properly and there is no plt figure open anymore."""
+    fig_name = str(tmp_path / "profile.png")
+
+    plot_temperature_profile(np.array([300.0, 400.0]), time_step=1.0, fig_name=fig_name)
+
+    assert (tmp_path / "profile.png").stat().st_size > 0
+    assert not plt.get_fignums()  # the figure is closed after saving
+

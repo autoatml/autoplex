@@ -114,51 +114,20 @@ def generate_temperature_profile(
     return T_array, n_steps
 
 
-def handle_md_trajectory(
-    traj_path: list | None = None,
-    remove_traj_files: bool = False,
-) -> tuple[list[list], list[list]]:
-    """
-    Handle trajectory and associated information.
-
-    Parameters
-    ----------
-    traj_path: list
-        List of paths pointing to trajectory files to be processed.
-        Default is None.
-    remove_traj_files: bool
-        Whether to remove the directories containing trajectory files
-        after processing them. Default is False.
-
-    Returns
-    -------
-    tuple:
-        atoms: list
-            List of ASE Atoms objects read from the trajectory files.
-    """
-    atoms = []
-    traj_path = [] if traj_path is None else flatten_list(traj_path)
-
-    if all(i is None for i in traj_path):
-        raise ValueError("No valid MD trajectory path was obtained!")
-
-    for traj in traj_path:
-        if traj is not None and Path(traj).exists():
-            logger.info(f"Processing MD trajectory:, {traj}")
-            at = ase.io.read(traj, index=":")
-            atoms.append(at)
-
-            if remove_traj_files:
-                logger.warning(f"The MD trajectory file is deleted: {traj}")
-                os.remove(traj)
-
-    return atoms
-
-
 def plot_temperature_profile(
     T_array: np.ndarray, time_step: float, fig_name: str = "md_temperature_profile.png"
 ):
-    """Plot and save temperature curve."""
+    """Plot and save temperature curve.
+
+    Parameters
+    ----------
+    T_array : list[float]
+        Temperatures in K as array, one entry for each time step.
+    time_step : list[float]
+        Time step of the simulation.
+    fig_name : str
+        The name of the file the plot will be saved in. Default: "md_temperature_profile.png"
+    """
     time = np.arange(len(T_array)) * float(time_step)
 
     fig, ax = plt.subplots(figsize=(4, 2.5))
