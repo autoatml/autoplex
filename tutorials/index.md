@@ -8,4 +8,5 @@ One can download them in the form of jupyter notebooks from:
 ```{toctree}
 tutorial_phonon
 tutorial_rss
+tutorial_mdmaker
 ```
