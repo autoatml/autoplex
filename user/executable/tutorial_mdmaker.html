@@ -1,0 +1,971 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>ScaledMDMaker tutorial &#8212; autoplex</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=1ea92b8b" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+
+    <script src="../../_static/documentation_options.js?v=5760e98e"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'user/executable/tutorial_mdmaker';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="icon" href="../../_static/autoplex_favicon.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="API reference" href="../../reference/index.html" />
+    <link rel="prev" title="RSS Workflow" href="tutorial_rss.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.1.dev1+gb357ffd53" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/autoplex_logo.png" class="logo__image only-light" alt="autoplex - Home"/>
+    <img src="../../_static/autoplex_logo.png" class="logo__image only-dark pst-js-only" alt="autoplex - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Overview</a></li>
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../setup.html">Quick-start</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../tutorials.html">Tutorials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../installation/installation.html">Installation guide</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../rss/index.html">RSS workflow</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../rss/flow/introduction/intro.html">Brief overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../rss/flow/input/input.html">Input YAML configuration file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../rss/flow/quick_start/start.html">Quick start</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../rss/flow/example/example.html">Examples</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../phonon/index.html">Phonon workflow</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../phonon/flows/flows.html">Out-of-the-box workflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../phonon/flows/generation/data.html">Generating reference data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../phonon/flows/fitting/fitting.html">Fitting phonon-accurate potentials</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../phonon/flows/benchmark/benchmark.html">Benchmark of ML-based phonon structure</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../nmr/index.html">NMR workflow</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../nmr/flows/core_workflow/core_workflow.html">Core Workflow</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="index.html">Executable tutorials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="tutorial_phonon.html">Iterative DFT vs MLIP benchmark workflow for phonons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_rss.html">RSS Workflow</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">ScaledMDMaker tutorial</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../reference/index.html">API reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../reference/autoplex.auto.html">autoplex.auto</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../reference/autoplex.auto.phonons.html">autoplex.auto.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/autoplex.auto.phonons.flows.html">autoplex.auto.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/autoplex.auto.phonons.jobs.html">autoplex.auto.phonons.jobs</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../reference/autoplex.auto.rss.html">autoplex.auto.rss</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/autoplex.auto.rss.flows.html">autoplex.auto.rss.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/autoplex.auto.rss.jobs.html">autoplex.auto.rss.jobs</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../reference/autoplex.benchmark.html">autoplex.benchmark</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../reference/autoplex.benchmark.phonons.html">autoplex.benchmark.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/autoplex.benchmark.phonons.flows.html">autoplex.benchmark.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/autoplex.benchmark.phonons.jobs.html">autoplex.benchmark.phonons.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/autoplex.benchmark.phonons.utils.html">autoplex.benchmark.phonons.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/autoplex.benchmark.rss.html">autoplex.benchmark.rss</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../reference/autoplex.data.html">autoplex.data</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../reference/autoplex.data.common.html">autoplex.data.common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/autoplex.data.common.flows.html">autoplex.data.common.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/autoplex.data.common.jobs.html">autoplex.data.common.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/autoplex.data.common.utils.html">autoplex.data.common.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../reference/autoplex.data.md.html">autoplex.data.md</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/autoplex.data.md.flows.html">autoplex.data.md.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/autoplex.data.md.jobs.html">autoplex.data.md.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/autoplex.data.md.utils.html">autoplex.data.md.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../reference/autoplex.data.nmr.html">autoplex.data.nmr</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/autoplex.data.nmr.jobs.html">autoplex.data.nmr.jobs</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../reference/autoplex.data.phonons.html">autoplex.data.phonons</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/autoplex.data.phonons.flows.html">autoplex.data.phonons.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/autoplex.data.phonons.jobs.html">autoplex.data.phonons.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/autoplex.data.phonons.utils.html">autoplex.data.phonons.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../reference/autoplex.data.rss.html">autoplex.data.rss</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/autoplex.data.rss.flows.html">autoplex.data.rss.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/autoplex.data.rss.jobs.html">autoplex.data.rss.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/autoplex.data.rss.utils.html">autoplex.data.rss.utils</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../reference/autoplex.fitting.html">autoplex.fitting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../reference/autoplex.fitting.common.html">autoplex.fitting.common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/autoplex.fitting.common.flows.html">autoplex.fitting.common.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/autoplex.fitting.common.jobs.html">autoplex.fitting.common.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/autoplex.fitting.common.regularization.html">autoplex.fitting.common.regularization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/autoplex.fitting.common.utils.html">autoplex.fitting.common.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../reference/autoplex.fitting.mlip_hypers.html">autoplex.fitting.mlip_hypers</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/autoplex.fitting.mlip_hypers.MLIPHypers.html">MLIPHypers</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/autoplex.fitting.phonons.html">autoplex.fitting.phonons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/autoplex.fitting.rss.html">autoplex.fitting.rss</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../reference/autoplex.misc.html">autoplex.misc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../reference/autoplex.misc.castep.html">autoplex.misc.castep</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/autoplex.misc.castep.flows.html">autoplex.misc.castep.flows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/autoplex.misc.castep.jobs.html">autoplex.misc.castep.jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/autoplex.misc.castep.run.html">autoplex.misc.castep.run</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/autoplex.misc.castep.schema.html">autoplex.misc.castep.schema</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/autoplex.misc.castep.utils.html">autoplex.misc.castep.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../reference/autoplex.misc.utils.html">autoplex.misc.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/autoplex.misc.utils.mock_castep.html">autoplex.misc.utils.mock_castep</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../reference/autoplex.misc.utils.mock_custom_builder.html">autoplex.misc.utils.mock_custom_builder</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../reference/autoplex.settings.html">autoplex.settings</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/autoplex.settings.AutoplexSettings.html">AutoplexSettings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/autoplex.settings.BcurParams.html">BcurParams</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/autoplex.settings.BuildcellOptions.html">BuildcellOptions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/autoplex.settings.CustomIncar.html">CustomIncar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/autoplex.settings.ResumeFromPreviousState.html">ResumeFromPreviousState</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/autoplex.settings.RssConfig.html">RssConfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/autoplex.settings.SETTINGS.html">SETTINGS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../reference/autoplex.settings.SoapParas.html">SoapParas</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contributing Guide</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../dev/contributing.html">Contributing to autoplex</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/dev_install.html">Developer Installation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../about/changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about/contributors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about/license.html">License</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/JaGeo/autoplex" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/JaGeo/autoplex/issues/new?title=Issue%20on%20page%20%2Fuser/executable/tutorial_mdmaker.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/user/executable/tutorial_mdmaker.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>ScaledMDMaker tutorial</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#nvt-simulation-with-temperature-ramping">NVT Simulation with temperature ramping</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#temperature-profile-visualization">Temperature profile visualization</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#nvt-simulation-with-scaled-cells">NVT Simulation with scaled cells</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#volume-scaling">Volume scaling</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#supercells">Supercells</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#npt-simulation">NPT Simulation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#md-at-constant-pressure-npt">MD at constant pressure (NPT)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compare-nvt-scaled-volume-nvt-and-npt">Compare NVT, scaled Volume NVT, and NPT</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="scaledmdmaker-tutorial">
+<h1>ScaledMDMaker tutorial<a class="headerlink" href="#scaledmdmaker-tutorial" title="Link to this heading">#</a></h1>
+<p>This notebook demonstrates <code class="docutils literal notranslate"><span class="pre">ScaledMDMaker</span></code>. It runs the same MD on one or more structures with optionally:</p>
+<ul class="simple">
+<li><p>supercells</p></li>
+<li><p>volume-scaled copies</p></li>
+<li><p>a multi-stage temperature profile (for every structure and/or their scaled form provided)</p></li>
+</ul>
+<p>Every MD run writes its own trajectory file (<code class="docutils literal notranslate"><span class="pre">MD.traj</span></code>).</p>
+<p>The MD itself is done by atomate2: with <code class="docutils literal notranslate"><span class="pre">md_engine=&quot;ase&quot;</span></code> (the default, and for now the only
+option) you pass an atomate2 <code class="docutils literal notranslate"><span class="pre">ForceFieldMDMaker</span></code> with all MD settings as <code class="docutils literal notranslate"><span class="pre">md_maker</span></code>.
+The temperature profile, supercell, and volume settings belong to <code class="docutils literal notranslate"><span class="pre">ScaledMDMaker</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Imports - adapt as needed for your environment</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ase.build</span><span class="w"> </span><span class="kn">import</span> <span class="n">bulk</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">atomate2.forcefields.md</span><span class="w"> </span><span class="kn">import</span> <span class="n">ForceFieldMDMaker</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jobflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_locally</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pymatgen.io.ase</span><span class="w"> </span><span class="kn">import</span> <span class="n">AseAtomsAdaptor</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">autoplex.data.md.flows</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScaledMDMaker</span>
+</pre></div>
+</div>
+<section id="nvt-simulation-with-temperature-ramping">
+<h2>NVT Simulation with temperature ramping<a class="headerlink" href="#nvt-simulation-with-temperature-ramping" title="Link to this heading">#</a></h2>
+<p>The following sets up the MD and runs it locally. The MD itself is atomate2’s <code class="docutils literal notranslate"><span class="pre">ForceFieldMDMaker</span></code>, given as <code class="docutils literal notranslate"><span class="pre">md_maker</span></code> (with <code class="docutils literal notranslate"><span class="pre">md_engine=&quot;ase&quot;</span></code>); it holds all MD settings. <code class="docutils literal notranslate"><span class="pre">ScaledMDMaker</span></code> adds a ramping protocol on top:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">temperature_list</span></code>, lists the temperature stages during the simulation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">eqm_step_list</span></code>, lists the number of steps run at each temperature (low here for tutorial purposes)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rate_list</span></code>, lists the MD steps per kelvin for ramping between consecutive temperatures of <code class="docutils literal notranslate"><span class="pre">temperature_list</span></code>. 0 means an instant change; with a 1 fs time step, 2 corresponds to 5·10^14 K/s and 100 to 10^13 K/s. Optionally, the ramping can also be controlled with <code class="docutils literal notranslate"><span class="pre">ramp_step_list</span></code>, which gives the number of MD steps for the ramp assuming linear scaling and overwrites <code class="docutils literal notranslate"><span class="pre">rate_list</span></code>. Here, <code class="docutils literal notranslate"><span class="pre">ramp_step_list=[0,200]</span></code> would produce the same ramping protocol as <code class="docutils literal notranslate"><span class="pre">rate_list=[0,2]</span></code></p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># NVT MD of the 8-atom cubic Si cell with the MACE-MPA-0 foundation model</span>
+<span class="n">atoms</span> <span class="o">=</span> <span class="n">bulk</span><span class="p">(</span><span class="s2">"Si"</span><span class="p">,</span> <span class="s2">"diamond"</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mf">5.43</span><span class="p">,</span> <span class="n">cubic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">pmg_structure</span> <span class="o">=</span> <span class="n">AseAtomsAdaptor</span><span class="o">.</span><span class="n">get_structure</span><span class="p">(</span><span class="n">atoms</span><span class="p">)</span>
+
+<span class="n">md_job</span> <span class="o">=</span> <span class="n">ScaledMDMaker</span><span class="p">(</span>
+    <span class="n">md_engine</span><span class="o">=</span><span class="s2">"ase"</span><span class="p">,</span>  <span class="c1"># atomate2's ASE MD; other engines are not implemented yet</span>
+    <span class="n">md_maker</span><span class="o">=</span><span class="n">ForceFieldMDMaker</span><span class="p">(</span>  <span class="c1"># all MD settings, as in atomate2</span>
+        <span class="n">force_field_name</span><span class="o">=</span><span class="s2">"MLFF.MACE_MPA_0"</span><span class="p">,</span>
+        <span class="n">calculator_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">"device"</span><span class="p">:</span> <span class="s2">"cpu"</span><span class="p">},</span>
+        <span class="n">time_step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">traj_interval</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">ensemble</span><span class="o">=</span><span class="s2">"nvt"</span><span class="p">,</span>
+        <span class="n">dynamics</span><span class="o">=</span><span class="s2">"langevin"</span><span class="p">,</span>
+        <span class="n">traj_file</span><span class="o">=</span><span class="s2">"MD.traj"</span><span class="p">,</span>
+        <span class="n">traj_file_fmt</span><span class="o">=</span><span class="s2">"ase"</span><span class="p">,</span>
+        <span class="n">store_trajectory</span><span class="o">=</span><span class="s2">"partial"</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">temperature_list</span><span class="o">=</span><span class="p">[</span><span class="mf">300.0</span><span class="p">,</span> <span class="mf">500.0</span><span class="p">,</span> <span class="mf">400.0</span><span class="p">],</span>  <span class="c1"># the temperature profile stays on ScaledMDMaker</span>
+    <span class="n">eqm_step_list</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+    <span class="n">rate_list</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>  <span class="c1"># MD steps per K: 0 jumps directly; 2 = 5·10^14 K/s at 1 fs -&gt; 200 steps for 500 -&gt; 400 K</span>
+<span class="p">)</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">structure</span><span class="o">=</span><span class="n">pmg_structure</span><span class="p">)</span>
+
+<span class="n">run_locally</span><span class="p">(</span><span class="n">md_job</span><span class="p">,</span> <span class="n">create_folders</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ensure_success</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"MD run finished"</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="temperature-profile-visualization">
+<h3>Temperature profile visualization<a class="headerlink" href="#temperature-profile-visualization" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">ScaledMDMaker</span></code> plots the temperature schedule it built for the run above and saves it as <code class="docutils literal notranslate"><span class="pre">md_temperature_profile.png</span></code> in the current directory. With <code class="docutils literal notranslate"><span class="pre">create_folders=True</span></code> it would be in the respective directory.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
+
+<span class="c1"># ScaledMDMaker saved its temperature profile while setting up the NVT run above</span>
+<span class="n">Image</span><span class="p">(</span><span class="s2">"md_temperature_profile.png"</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="nvt-simulation-with-scaled-cells">
+<h2>NVT Simulation with scaled cells<a class="headerlink" href="#nvt-simulation-with-scaled-cells" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">ScaledMDMaker</span></code> can also automatically scale the cell. For this, there are two options:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">supercell_matrix</span></code> turns every input structure into a supercell. A diagonal matrix makes the
+cell bigger (fewer finite-size effects, smaller volume fluctuations in NPT); a non-diagonal
+matrix can also change its shape, e.g. from the primitive to the cubic cell.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">volume_custom_scale_factors</span></code> makes one copy of every (super)cell per factor, with the volume
+scaled by that factor, e.g. to sample compressed and expanded configurations for training data.</p></li>
+</ul>
+<p>The supercell is made first, then the volume scaling. <code class="docutils literal notranslate"><span class="pre">ScaledMDMaker</span></code> runs one MD per resulting
+cell, so the number of runs is (number of input structures) × (number of scale factors).
+Its output is a list of trajectory paths, one per run.</p>
+<p>With more than one run, use <code class="docutils literal notranslate"><span class="pre">run_locally(...,</span> <span class="pre">create_folders=True)</span></code>, so that every run gets its
+own folder. Otherwise all runs write <code class="docutils literal notranslate"><span class="pre">MD.traj</span></code> into the same folder and overwrite each other.</p>
+<p>Here we demonstrate the usage of both, starting with volume scaling.</p>
+<section id="volume-scaling">
+<h3>Volume scaling<a class="headerlink" href="#volume-scaling" title="Link to this heading">#</a></h3>
+<p>First, the cubic cell is scaled to the volume MACE-MPA-0 prefers.
+The original and the scaled cell are then run at 300 K and compared with an NPT run at the end.
+To keep the tutorial fast, we only run a 100 fs NVT MD per cell.</p>
+<p>The cubic cell above uses the experimental lattice constant (5.43 Å), which is slightly too small for
+MACE-MPA-0. A cell relaxation with MACE (atomate2’s <code class="docutils literal notranslate"><span class="pre">ForceFieldRelaxMaker</span></code>) gives the volume MACE
+prefers; the ratio of the two volumes is the scale factor that brings the cell to this optimum.
+We are now running simple MD simulations at 300 K.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">atomate2.forcefields.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">ForceFieldRelaxMaker</span>
+
+<span class="n">relax_job</span> <span class="o">=</span> <span class="n">ForceFieldRelaxMaker</span><span class="p">(</span>
+    <span class="n">force_field_name</span><span class="o">=</span><span class="s2">"MLFF.MACE_MPA_0"</span><span class="p">,</span>
+    <span class="n">calculator_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">"device"</span><span class="p">:</span> <span class="s2">"cpu"</span><span class="p">},</span>
+    <span class="n">relax_cell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">relax_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">"fmax"</span><span class="p">:</span> <span class="mf">0.001</span><span class="p">},</span>  <span class="c1"># tight, so that the cell stress converges too</span>
+<span class="p">)</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">pmg_structure</span><span class="p">)</span>
+
+<span class="n">responses</span> <span class="o">=</span> <span class="n">run_locally</span><span class="p">(</span><span class="n">relax_job</span><span class="p">,</span> <span class="n">create_folders</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ensure_success</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">relaxed_structure</span> <span class="o">=</span> <span class="n">responses</span><span class="p">[</span><span class="n">relax_job</span><span class="o">.</span><span class="n">uuid</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">structure</span>
+
+<span class="n">volume_factor</span> <span class="o">=</span> <span class="n">relaxed_structure</span><span class="o">.</span><span class="n">volume</span> <span class="o">/</span> <span class="n">pmg_structure</span><span class="o">.</span><span class="n">volume</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"relaxed with MACE-MPA-0: a = </span><span class="si">{</span><span class="n">relaxed_structure</span><span class="o">.</span><span class="n">lattice</span><span class="o">.</span><span class="n">a</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> Å, volume = </span><span class="si">{</span><span class="n">relaxed_structure</span><span class="o">.</span><span class="n">volume</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> Å³"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"volume scale factor to the MACE optimum: </span><span class="si">{</span><span class="n">volume_factor</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We will now run two NVT simulations (both 300 K, 100 fs): one at the volume that relates to the experimental finding and one at the MACE-MPA-0 relaxed volume. As this creates several (here: two) cells each with their own MD trajectory, we use <code class="docutils literal notranslate"><span class="pre">create_folders=True</span></code> and we will use a MemoryStore to access the simulations afterwards.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ase.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">read</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jobflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">JobStore</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">maggma.stores</span><span class="w"> </span><span class="kn">import</span> <span class="n">MemoryStore</span>
+
+<span class="n">store</span> <span class="o">=</span> <span class="n">JobStore</span><span class="p">(</span><span class="n">MemoryStore</span><span class="p">(),</span> <span class="n">additional_stores</span><span class="o">=</span><span class="p">{</span><span class="s2">"data"</span><span class="p">:</span> <span class="n">MemoryStore</span><span class="p">()})</span>
+<span class="c1"># 2 NVT runs, one for each scaled cell (one unscaled and one at MACE optimum)</span>
+<span class="n">md_job_volumes</span> <span class="o">=</span> <span class="n">ScaledMDMaker</span><span class="p">(</span>
+    <span class="n">md_engine</span><span class="o">=</span><span class="s2">"ase"</span><span class="p">,</span>
+    <span class="n">md_maker</span><span class="o">=</span><span class="n">ForceFieldMDMaker</span><span class="p">(</span>
+        <span class="n">force_field_name</span><span class="o">=</span><span class="s2">"MLFF.MACE_MPA_0"</span><span class="p">,</span>
+        <span class="n">calculator_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">"device"</span><span class="p">:</span> <span class="s2">"cpu"</span><span class="p">},</span>
+        <span class="n">time_step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">traj_interval</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">ensemble</span><span class="o">=</span><span class="s2">"nvt"</span><span class="p">,</span>
+        <span class="n">dynamics</span><span class="o">=</span><span class="s2">"langevin"</span><span class="p">,</span>
+        <span class="n">traj_file_fmt</span><span class="o">=</span><span class="s2">"ase"</span><span class="p">,</span>
+        <span class="n">store_trajectory</span><span class="o">=</span><span class="s2">"partial"</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">temperature_list</span><span class="o">=</span><span class="p">[</span><span class="mf">300.0</span><span class="p">],</span>
+    <span class="n">eqm_step_list</span><span class="o">=</span><span class="p">[</span><span class="mi">100</span><span class="p">],</span> <span class="c1">#only 100 fs for demonstration purpose</span>
+    <span class="n">rate_list</span><span class="o">=</span><span class="p">[],</span>
+    <span class="c1"># run at one cell at experimental scaling and one scaled to the MACE optimum</span>
+    <span class="n">volume_custom_scale_factors</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">volume_factor</span><span class="p">],</span>
+<span class="p">)</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">structure</span><span class="o">=</span><span class="n">pmg_structure</span><span class="p">)</span>
+
+<span class="n">run_locally</span><span class="p">(</span><span class="n">md_job_volumes</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">,</span> <span class="n">create_folders</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">root_dir</span><span class="o">=</span><span class="s2">"md_volume_scaling"</span><span class="p">,</span> <span class="n">ensure_success</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">md_job_volumes</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">store</span><span class="p">):</span>  <span class="c1"># one trajectory per cell</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">start</span><span class="p">)</span><span class="si">:</span><span class="s2">3d</span><span class="si">}</span><span class="s2"> atoms   volume </span><span class="si">{</span><span class="n">start</span><span class="o">.</span><span class="n">get_volume</span><span class="p">()</span><span class="si">:</span><span class="s2">7.2f</span><span class="si">}</span><span class="s2"> Å³ angles </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">start</span><span class="o">.</span><span class="n">cell</span><span class="o">.</span><span class="n">angles</span><span class="p">(),</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"MDs run finished"</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="supercells">
+<h3>Supercells<a class="headerlink" href="#supercells" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">ScaledMDMaker</span></code> can create a supercell and then employ the volumetric scaling in one run.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># short NVT settings for the examples below</span>
+<span class="n">short_nvt</span> <span class="o">=</span> <span class="n">ForceFieldMDMaker</span><span class="p">(</span>
+    <span class="n">force_field_name</span><span class="o">=</span><span class="s2">"MLFF.MACE_MPA_0"</span><span class="p">,</span>
+    <span class="n">calculator_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">"device"</span><span class="p">:</span> <span class="s2">"cpu"</span><span class="p">},</span>
+    <span class="n">time_step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">ensemble</span><span class="o">=</span><span class="s2">"nvt"</span><span class="p">,</span>
+    <span class="n">dynamics</span><span class="o">=</span><span class="s2">"langevin"</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>We use again a MemoryStore to store the simulations. We could optionally also create a desired temperature profile as we did in the first section.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># bigger cell: 2x1x1 supercell of the cubic cell</span>
+<span class="n">md_job_supercell</span> <span class="o">=</span> <span class="n">ScaledMDMaker</span><span class="p">(</span>
+    <span class="n">md_maker</span><span class="o">=</span><span class="n">short_nvt</span><span class="p">,</span>
+    <span class="n">temperature_list</span><span class="o">=</span><span class="p">[</span><span class="mf">300.0</span><span class="p">],</span>
+    <span class="n">eqm_step_list</span><span class="o">=</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="c1">#5 fs, very short for demonstration purpose</span>
+    <span class="n">supercell_matrix</span><span class="o">=</span><span class="p">[[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span>
+    <span class="n">volume_custom_scale_factors</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">volume_factor</span><span class="p">],</span>
+<span class="p">)</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">structure</span><span class="o">=</span><span class="n">pmg_structure</span><span class="p">)</span>
+<span class="n">run_locally</span><span class="p">(</span><span class="n">md_job_supercell</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">,</span> <span class="n">create_folders</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">root_dir</span><span class="o">=</span><span class="s2">"md_cell_choices"</span><span class="p">,</span> <span class="n">ensure_success</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">md_job_supercell</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">store</span><span class="p">):</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">start</span><span class="p">)</span><span class="si">:</span><span class="s2">3d</span><span class="si">}</span><span class="s2"> atoms   volume </span><span class="si">{</span><span class="n">start</span><span class="o">.</span><span class="n">get_volume</span><span class="p">()</span><span class="si">:</span><span class="s2">7.2f</span><span class="si">}</span><span class="s2"> Å³   angles </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">start</span><span class="o">.</span><span class="n">cell</span><span class="o">.</span><span class="n">angles</span><span class="p">(),</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Compared to the MDs in the previous section, we now doubled the cell size in x-direction by setting a <code class="docutils literal notranslate"><span class="pre">supercell_matrix</span></code>. The volume scaling stayed the same and is employed on the supercell structures.</p>
+</section>
+</section>
+<section id="npt-simulation">
+<h2>NPT Simulation<a class="headerlink" href="#npt-simulation" title="Link to this heading">#</a></h2>
+<section id="md-at-constant-pressure-npt">
+<h3>MD at constant pressure (NPT)<a class="headerlink" href="#md-at-constant-pressure-npt" title="Link to this heading">#</a></h3>
+<p>The run above is NVT: the cell stays fixed. With <code class="docutils literal notranslate"><span class="pre">ensemble=&quot;npt&quot;</span></code> a barostat lets
+the cell change so that the pressure stays at the target value. NPT needs three
+more settings of the <code class="docutils literal notranslate"><span class="pre">ForceFieldMDMaker</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">pressure</span></code>: target pressure in kbar (<code class="docutils literal notranslate"><span class="pre">0.0</span></code> is close to ambient; 1 bar = 0.001 kbar).
+A list of pressures is ramped evenly over the whole run.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dynamics</span></code>: “nose-hoover” (ASE’s NPT: Nose-Hoover thermostat with Parrinello-Rahman barostat) works with every atomate2 version. With atomate2 ≥ 0.0.22, “nose-hoover-chain” (ASE MTKNPT, with ase_md_kwargs={“tdamp”: …, “pdamp”: …}) is the recommended choice.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ase_md_kwargs</span></code>: settings of the ASE integrator, in ASE units. For “nose-hoover”: the thermostat time ttime (about 25 fs) and pfactor = (barostat time)² × bulk modulus, e.g. (75 fs)² × 100 GPa for Si.</p></li>
+</ul>
+<p>The temperature profile (<code class="docutils literal notranslate"><span class="pre">temperature_list</span></code>, <code class="docutils literal notranslate"><span class="pre">eqm_step_list</span></code>, <code class="docutils literal notranslate"><span class="pre">rate_list</span></code>) works
+the same as in NVT.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ase</span><span class="w"> </span><span class="kn">import</span> <span class="n">units</span>
+
+<span class="n">md_job_npt</span> <span class="o">=</span> <span class="n">ScaledMDMaker</span><span class="p">(</span>
+    <span class="n">md_engine</span><span class="o">=</span><span class="s2">"ase"</span><span class="p">,</span>
+    <span class="n">md_maker</span><span class="o">=</span><span class="n">ForceFieldMDMaker</span><span class="p">(</span>
+        <span class="n">force_field_name</span><span class="o">=</span><span class="s2">"MLFF.MACE_MPA_0"</span><span class="p">,</span>
+        <span class="n">calculator_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">"device"</span><span class="p">:</span> <span class="s2">"cpu"</span><span class="p">},</span>
+        <span class="n">time_step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">traj_interval</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">ensemble</span><span class="o">=</span><span class="s2">"npt"</span><span class="p">,</span>
+        <span class="n">dynamics</span><span class="o">=</span><span class="s2">"nose-hoover"</span><span class="p">,</span>  <span class="c1"># ASE NPT: works with every atomate2 version used in CI</span>
+        <span class="n">pressure</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>  <span class="c1"># kbar</span>
+        <span class="n">ase_md_kwargs</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">"ttime"</span><span class="p">:</span> <span class="mi">25</span> <span class="o">*</span> <span class="n">units</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span>  <span class="c1"># thermostat time constant</span>
+            <span class="s2">"pfactor"</span><span class="p">:</span> <span class="p">(</span><span class="mi">75</span> <span class="o">*</span> <span class="n">units</span><span class="o">.</span><span class="n">fs</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">units</span><span class="o">.</span><span class="n">GPa</span><span class="p">,</span>  <span class="c1"># (barostat time)^2 x bulk modulus of Si</span>
+        <span class="p">},</span>
+        <span class="n">traj_file</span><span class="o">=</span><span class="s2">"MD_npt.traj"</span><span class="p">,</span>  <span class="c1"># own file, so the NVT trajectory MD.traj is kept</span>
+        <span class="n">traj_file_fmt</span><span class="o">=</span><span class="s2">"ase"</span><span class="p">,</span>
+        <span class="n">store_trajectory</span><span class="o">=</span><span class="s2">"partial"</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">temperature_list</span><span class="o">=</span><span class="p">[</span><span class="mf">300.0</span><span class="p">],</span>
+    <span class="n">eqm_step_list</span><span class="o">=</span><span class="p">[</span><span class="mi">100</span><span class="p">],</span>
+    <span class="n">rate_list</span><span class="o">=</span><span class="p">[],</span>
+<span class="p">)</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">structure</span><span class="o">=</span><span class="n">pmg_structure</span><span class="p">)</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">run_locally</span><span class="p">(</span><span class="n">md_job_npt</span><span class="p">,</span> <span class="n">create_folders</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ensure_success</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="c1"># ScaledMDMaker replaced itself by atomate2's MD job; its response holds the final structure</span>
+<span class="n">md_run</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="n">md_job_npt</span><span class="o">.</span><span class="n">uuid</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="o">.</span><span class="n">jobs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">structure_npt</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="n">md_run</span><span class="o">.</span><span class="n">uuid</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">structure</span>  <span class="c1"># final structure of the NPT run</span>
+
+<span class="n">volume_npt</span> <span class="o">=</span> <span class="n">structure_npt</span><span class="o">.</span><span class="n">volume</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"NPT volume = </span><span class="si">{</span><span class="n">volume_npt</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> Å³ after 100 fs"</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="compare-nvt-scaled-volume-nvt-and-npt">
+<h2>Compare NVT, scaled Volume NVT, and NPT<a class="headerlink" href="#compare-nvt-scaled-volume-nvt-and-npt" title="Link to this heading">#</a></h2>
+<p>We can now compare the volumes and pressures during the different simulations. We are comparing here only the small cell calculations which ran for 100 fs each.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ase</span><span class="w"> </span><span class="kn">import</span> <span class="n">units</span>
+
+<span class="n">time_step</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># fs, as in all three runs</span>
+
+<span class="n">runs</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="n">md_job_volumes</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">store</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">"NVT, a = 5.43 Å"</span><span class="p">,</span> <span class="s2">"#2a78d6"</span><span class="p">),</span>
+    <span class="p">(</span><span class="n">md_job_volumes</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">store</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">"NVT, scaled to MACE optimum"</span><span class="p">,</span> <span class="s2">"#1baf7a"</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"MD_npt.traj"</span><span class="p">,</span> <span class="s2">"NPT"</span><span class="p">,</span> <span class="s2">"#eb6834"</span><span class="p">),</span>
+<span class="p">]</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax_volume</span><span class="p">,</span> <span class="n">ax_pressure</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">'run'</span><span class="si">:</span><span class="s2">30s</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">'mean volume (Å³)'</span><span class="si">:</span><span class="s2">&gt;17s</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">'mean pressure (GPa)'</span><span class="si">:</span><span class="s2">&gt;20s</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">traj_file</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="n">runs</span><span class="p">:</span>
+    <span class="n">frames</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="n">traj_file</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="s2">":"</span><span class="p">)</span>
+    <span class="n">volume</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">atoms</span><span class="o">.</span><span class="n">get_volume</span><span class="p">()</span> <span class="k">for</span> <span class="n">atoms</span> <span class="ow">in</span> <span class="n">frames</span><span class="p">])</span>
+    <span class="n">pressure</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="n">atoms</span><span class="o">.</span><span class="n">get_stress</span><span class="p">()[:</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="k">for</span> <span class="n">atoms</span> <span class="ow">in</span> <span class="n">frames</span><span class="p">])</span> <span class="o">/</span> <span class="n">units</span><span class="o">.</span><span class="n">GPa</span>
+    <span class="n">time_ps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">frames</span><span class="p">))</span> <span class="o">*</span> <span class="n">time_step</span> <span class="o">/</span> <span class="mi">1000</span>
+    <span class="n">ax_volume</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time_ps</span><span class="p">,</span> <span class="n">volume</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+    <span class="n">ax_pressure</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time_ps</span><span class="p">,</span> <span class="n">pressure</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">label</span><span class="si">:</span><span class="s2">30s</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">volume</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">17.2f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">pressure</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">20.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+<span class="n">ax_volume</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Cell volume (Å$^3$)"</span><span class="p">)</span>
+<span class="n">ax_pressure</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Pressure (GPa)"</span><span class="p">)</span>
+<span class="n">ax_pressure</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Simulation time (ps)"</span><span class="p">)</span>
+<span class="n">ax_pressure</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"0.6"</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>  <span class="c1"># target pressure of the NPT run</span>
+<span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="p">(</span><span class="n">ax_volume</span><span class="p">,</span> <span class="n">ax_pressure</span><span class="p">):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">ax_volume</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Note that for testing reasons the runs are very short (0.1 ps) and the cell has only 8 atoms, so
+volume and pressure fluctuate strongly.</p>
+<ul class="simple">
+<li><p><strong>NVT at a = 5.43 Å</strong> (blue): the experimental lattice constant is about 2 % too small in volume for
+MACE-MPA-0, so the cell stays under about +1 to +2.5 GPa for the whole run.</p></li>
+<li><p><strong>NVT in the scaled cell</strong> (green): scaled to the volume of the MACE relaxation (a = 5.467 Å), the
+pressure fluctuates around zero, while the volume stays fixed.</p></li>
+<li><p><strong>NPT</strong> (orange): the barostat expands the compressed cell and overshoots. After about 70 fs it passes the MACE volume and keeps growing, while its pressure falls from about +2 to about −1 GPa; in a longer run the volume would swing back and oscillate around the MACE volume.</p></li>
+</ul>
+<p>For production runs, start from a relaxed (or scaled) cell, use a larger supercell (see
+“Supercells” above), and run several ps before averaging.</p>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="tutorial_rss.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">RSS Workflow</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../../reference/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">API reference</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#nvt-simulation-with-temperature-ramping">NVT Simulation with temperature ramping</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#temperature-profile-visualization">Temperature profile visualization</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#nvt-simulation-with-scaled-cells">NVT Simulation with scaled cells</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#volume-scaling">Volume scaling</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#supercells">Supercells</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#npt-simulation">NPT Simulation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#md-at-constant-pressure-npt">MD at constant pressure (NPT)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compare-nvt-scaled-volume-nvt-and-npt">Compare NVT, scaled Volume NVT, and NPT</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Author name not set
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, autoplex development team.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
