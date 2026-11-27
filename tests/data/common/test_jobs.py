@@ -1,4 +1,6 @@
 import os
+
+import numpy as np
 from pymatgen.core.structure import Structure
 from autoplex.data.common.jobs import (
     generate_randomized_structures,
@@ -41,6 +43,39 @@ def test_generate_randomized_structures_distort_type_0(memory_jobstore):
             for struct in response.output:
                 # check if all outputs are Structure objects
                 assert isinstance(struct, Structure)
+
+
+def test_generate_randomized_structures_are_diverse_and_reproducible(
+    memory_jobstore,
+):
+    structure = Structure(
+        lattice=[[0, 2.73, 2.73], [2.73, 0, 2.73], [2.73, 2.73, 0]],
+        species=["Si", "Si"],
+        coords=[[0, 0, 0], [0.25, 0.25, 0.25]],
+    )
+
+    for rattle_type in (0, 1):
+        generated: list[list[Structure]] = []
+        for _ in range(2):
+            rattled_job = generate_randomized_structures(
+                structure=structure,
+                supercell_matrix=[[1, 0, 0], [0, 1, 0], [0, 0, 1]],
+                volume_custom_scale_factors=[1.0, 1.0],
+                rattle_type=rattle_type,
+                rattle_seed=42,
+            )
+            responses = run_locally(
+                rattled_job,
+                create_folders=False,
+                ensure_success=True,
+                store=memory_jobstore,
+            )
+            response_collection = next(iter(responses.values()))
+            generated.append(next(iter(response_collection.values())).output)
+
+        assert not np.allclose(generated[0][0].cart_coords, generated[0][1].cart_coords)
+        for first, second in zip(*generated):
+            assert np.allclose(first.cart_coords, second.cart_coords)
 
 
 # test distort_type=1, i.e. angle distortion
