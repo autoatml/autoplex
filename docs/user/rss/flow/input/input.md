@@ -233,6 +233,24 @@ rss_job = RssMaker(name="Si_rss",
 ```            
 
 
+## RSS relaxation safeguards
+
+`rss_safety` configures geometry checks and the per-structure runtime limit for
+MLIP relaxations. It applies to the starting structure of each relaxation and
+all optimizer trial geometries, including line-search evaluations. Random
+structure generation is configured separately through the builder settings.
+
+```yaml
+rss_safety:
+  max_walltime: 600.0              # seconds per relaxation, including model loading
+  min_volume_per_atom: 0.1        # A^3, fully periodic cells only
+  min_distance: 0.1               # A, including periodic self images
+  max_cell_condition_number: 10000.0
+```
+
+See {ref}`rss-relaxation-safeguards` for failure handling, parallel workers,
+partially periodic cells, and guidance on choosing or disabling limits.
+
 ## Data preprocessing parameters
 
 The section defines how the training data is prepared before fitting potentials. This includes filtering, regularization, combining external datasets, and splitting the data into training and testing sets.

@@ -441,6 +441,13 @@ def sample_data(
 
     else:
         atoms, pressures = handle_rss_trajectory(traj_path, remove_traj_files)
+        available_frames = sum(len(trajectory) for trajectory in atoms)
+        if available_frames < num_of_selection:
+            raise ValueError(
+                f"RSS produced only {available_frames} usable trajectory frames, but "
+                f"{num_of_selection} were requested for selection. Inspect RSS "
+                "failure warnings or reduce num_of_rss_selected_structs."
+            )
 
     if selection_method in {"cur", "bcur1s", "bcur2i"}:
         n_species = ElementCollection(

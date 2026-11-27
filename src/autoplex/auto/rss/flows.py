@@ -355,6 +355,7 @@ class RssMaker(Maker):
                 "keep_symmetry",
                 "remove_traj_files",
                 "num_processes_rss",
+                "rss_safety",
                 "device_for_rss",
             ]
             initial_params = {
